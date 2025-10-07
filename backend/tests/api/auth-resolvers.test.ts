@@ -1,0 +1,516 @@
+import { authResolvers } from '../../src/api/auth-resolvers';
+import { AuthService } from '../../src/services/authService';
+
+// Mock dependencies
+jest.mock('../../src/services/authService');
+jest.mock('../../src/utils/logger', () => ({
+  info: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+}));
+
+const mockAuthService = AuthService as jest.MockedClass<typeof AuthService>;
+
+describe('Auth Resolvers', () => {
+  let authServiceInstance: jest.Mocked<AuthService>;
+  let context: any;
+
+  beforeEach(() => {
+    authServiceInstance = {
+      register: jest.fn(),
+      login: jest.fn(),
+      logout: jest.fn(),
+      refreshToken: jest.fn(),
+      verifyAccessToken: jest.fn(),
+      requestPasswordReset: jest.fn(),
+      resetPassword: jest.fn(),
+      changePassword: jest.fn(),
+    } as any;
+
+    mockAuthService.mockImplementation(() => authServiceInstance);
+
+    context = {
+      user: {
+        id: 'user-1',
+        email: 'test@example.com',
+        username: 'testuser',
+      },
+      req: {
+        ip: '127.0.0.1',
+        headers: {
+          'user-agent': 'Test Browser',
+        },
+      },
+    };
+
+    jest.clearAllMocks();
+  });
+
+  describe('Query resolvers', () => {
+    describe('me', () => {
+      it('should return current user when authenticated', async () => {
+        const result = await authResolvers.Query.me(null, {}, context);
+        expect(result).toBe(context.user);
+      });
+
+      it('should return null when not authenticated', async () => {
+        context.user = null;
+        const result = await authResolvers.Query.me(null, {}, context);
+        expect(result).toBeNull();
+      });
+    });
+
+    describe('authStatus', () => {
+      it('should return authentication status', async () => {
+        const result = await authResolvers.Query.authStatus(null, {}, context);
+        
+        expect(result).toEqual({
+          isAuthenticated: true,
+          user: context.user,
+        });
+      });
+
+      it('should return unauthenticated status', async () => {
+        context.user = null;
+        const result = await authResolvers.Query.authStatus(null, {}, context);
+        
+        expect(result).toEqual({
+          isAuthenticated: false,
+          user: null,
+        });
+      });
+    });
+  });
+
+  describe('Mutation resolvers', () => {
+    describe('register', () => {
+      const registerInput = {
+        email: 'test@example.com',
+        username: 'testuser',
+        password: 'Password123!',
+        firstName: 'Test',
+        lastName: 'User',
+      };
+
+      it('should successfully register a new user', async () => {
+        const mockResult = {
+          success: true,
+          user: {
+            id: 'user-1',
+            email: registerInput.email,
+            username: registerInput.username,
+            firstName: registerInput.firstName,
+            lastName: registerInput.lastName,
+          },
+          tokens: {
+            accessToken: 'access-token-123',
+            refreshToken: 'refresh-token-123',
+          },
+        };
+
+        authServiceInstance.register.mockResolvedValue(mockResult);
+
+        const result = await authResolvers.Mutation.register(
+          null,
+          { input: registerInput },
+          context
+        );
+
+        expect(authServiceInstance.register).toHaveBeenCalledWith({
+          ...registerInput,
+          deviceFingerprint: undefined,
+          ipAddress: '127.0.0.1',
+          userAgent: 'Test Browser',
+        });
+
+        expect(result).toEqual({
+          success: true,
+          user: mockResult.user,
+          tokens: mockResult.tokens,
+          message: 'Registration successful',
+        });
+      });
+
+      it('should handle registration errors', async () => {
+        const mockResult = {
+          success: false,
+          error: {
+            code: 'EMAIL_ALREADY_EXISTS',
+            message: 'Email already registered',
+          },
+        };
+
+        authServiceInstance.register.mockResolvedValue(mockResult);
+
+        await expect(
+          authResolvers.Mutation.register(null, { input: registerInput }, context)
+        ).rejects.toThrow('Email already registered');
+
+        expect(authServiceInstance.register).toHaveBeenCalledWith({
+          ...registerInput,
+          deviceFingerprint: undefined,
+          ipAddress: '127.0.0.1',
+          userAgent: 'Test Browser',
+        });
+      });
+    });
+
+    describe('login', () => {
+      const loginInput = {
+        email: 'test@example.com',
+        password: 'Password123!',
+      };
+
+      it('should successfully login with valid credentials', async () => {
+        const mockResult = {
+          success: true,
+          user: {
+            id: 'user-1',
+            email: loginInput.email,
+            username: 'testuser',
+          },
+          tokens: {
+            accessToken: 'access-token-123',
+            refreshToken: 'refresh-token-123',
+          },
+          session: {
+            id: 'session-1',
+            expiresAt: new Date(),
+          },
+        };
+
+        authServiceInstance.login.mockResolvedValue(mockResult);
+
+        const result = await authResolvers.Mutation.login(
+          null,
+          { input: loginInput },
+          context
+        );
+
+        expect(authServiceInstance.login).toHaveBeenCalledWith({
+          ...loginInput,
+          deviceFingerprint: undefined,
+          ipAddress: '127.0.0.1',
+          userAgent: 'Test Browser',
+        });
+
+        expect(result).toEqual({
+          success: true,
+          user: mockResult.user,
+          tokens: mockResult.tokens,
+          session: mockResult.session,
+          message: 'Login successful',
+        });
+      });
+
+      it('should handle login errors', async () => {
+        const mockResult = {
+          success: false,
+          error: {
+            code: 'INVALID_CREDENTIALS',
+            message: 'Invalid email or password',
+          },
+        };
+
+        authServiceInstance.login.mockResolvedValue(mockResult);
+
+        await expect(
+          authResolvers.Mutation.login(null, { input: loginInput }, context)
+        ).rejects.toThrow('Invalid email or password');
+      });
+    });
+
+    describe('logout', () => {
+      it('should successfully logout user', async () => {
+        const mockResult = {
+          success: true,
+          message: 'Logged out successfully',
+        };
+
+        authServiceInstance.logout.mockResolvedValue(mockResult);
+
+        const result = await authResolvers.Mutation.logout(
+          null,
+          { refreshToken: 'refresh-token-123' },
+          context
+        );
+
+        expect(authServiceInstance.logout).toHaveBeenCalledWith(
+          context.user.id,
+          undefined,
+          'refresh-token-123'
+        );
+
+        expect(result).toEqual({
+          success: true,
+          message: 'Logged out successfully',
+        });
+      });
+
+      it('should handle logout without user context', async () => {
+        context.user = null;
+
+        await expect(
+          authResolvers.Mutation.logout(null, {}, context)
+        ).rejects.toThrow('Authentication required');
+      });
+    });
+
+    describe('refreshToken', () => {
+      it('should successfully refresh token', async () => {
+        const mockResult = {
+          success: true,
+          user: context.user,
+          tokens: {
+            accessToken: 'new-access-token',
+            refreshToken: 'new-refresh-token',
+          },
+        };
+
+        authServiceInstance.refreshToken.mockResolvedValue(mockResult);
+
+        const result = await authResolvers.Mutation.refreshToken(
+          null,
+          { refreshToken: 'refresh-token-123' },
+          context
+        );
+
+        expect(authServiceInstance.refreshToken).toHaveBeenCalledWith('refresh-token-123');
+
+        expect(result).toEqual({
+          success: true,
+          user: mockResult.user,
+          tokens: mockResult.tokens,
+          message: 'Token refreshed successfully',
+        });
+      });
+
+      it('should handle invalid refresh token', async () => {
+        const mockResult = {
+          success: false,
+          error: {
+            code: 'INVALID_REFRESH_TOKEN',
+            message: 'Invalid or expired refresh token',
+          },
+        };
+
+        authServiceInstance.refreshToken.mockResolvedValue(mockResult);
+
+        await expect(
+          authResolvers.Mutation.refreshToken(
+            null,
+            { refreshToken: 'invalid-token' },
+            context
+          )
+        ).rejects.toThrow('Invalid or expired refresh token');
+      });
+    });
+
+    describe('requestPasswordReset', () => {
+      it('should successfully request password reset', async () => {
+        const mockResult = {
+          success: true,
+          message: 'Password reset email sent',
+        };
+
+        authServiceInstance.requestPasswordReset.mockResolvedValue(mockResult);
+
+        const result = await authResolvers.Mutation.requestPasswordReset(
+          null,
+          { email: 'test@example.com' },
+          context
+        );
+
+        expect(authServiceInstance.requestPasswordReset).toHaveBeenCalledWith(
+          'test@example.com',
+          '127.0.0.1',
+          'Test Browser'
+        );
+
+        expect(result).toEqual({
+          success: true,
+          message: 'Password reset email sent',
+        });
+      });
+
+      it('should handle password reset request errors', async () => {
+        const mockResult = {
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'No account found with this email',
+          },
+        };
+
+        authServiceInstance.requestPasswordReset.mockResolvedValue(mockResult);
+
+        await expect(
+          authResolvers.Mutation.requestPasswordReset(
+            null,
+            { email: 'nonexistent@example.com' },
+            context
+          )
+        ).rejects.toThrow('No account found with this email');
+      });
+    });
+
+    describe('resetPassword', () => {
+      it('should successfully reset password', async () => {
+        const mockResult = {
+          success: true,
+          message: 'Password reset successfully',
+        };
+
+        authServiceInstance.resetPassword.mockResolvedValue(mockResult);
+
+        const result = await authResolvers.Mutation.resetPassword(
+          null,
+          { token: 'reset-token-123', newPassword: 'NewPassword123!' },
+          context
+        );
+
+        expect(authServiceInstance.resetPassword).toHaveBeenCalledWith(
+          'reset-token-123',
+          'NewPassword123!',
+          '127.0.0.1',
+          'Test Browser'
+        );
+
+        expect(result).toEqual({
+          success: true,
+          message: 'Password reset successfully',
+        });
+      });
+
+      it('should handle invalid reset token', async () => {
+        const mockResult = {
+          success: false,
+          error: {
+            code: 'INVALID_RESET_TOKEN',
+            message: 'Invalid or expired reset token',
+          },
+        };
+
+        authServiceInstance.resetPassword.mockResolvedValue(mockResult);
+
+        await expect(
+          authResolvers.Mutation.resetPassword(
+            null,
+            { token: 'invalid-token', newPassword: 'NewPassword123!' },
+            context
+          )
+        ).rejects.toThrow('Invalid or expired reset token');
+      });
+    });
+
+    describe('changePassword', () => {
+      it('should successfully change password', async () => {
+        const mockResult = {
+          success: true,
+          message: 'Password changed successfully',
+        };
+
+        authServiceInstance.changePassword.mockResolvedValue(mockResult);
+
+        const result = await authResolvers.Mutation.changePassword(
+          null,
+          { currentPassword: 'OldPassword123!', newPassword: 'NewPassword123!' },
+          context
+        );
+
+        expect(authServiceInstance.changePassword).toHaveBeenCalledWith(
+          context.user.id,
+          'OldPassword123!',
+          'NewPassword123!'
+        );
+
+        expect(result).toEqual({
+          success: true,
+          message: 'Password changed successfully',
+        });
+      });
+
+      it('should handle change password without authentication', async () => {
+        context.user = null;
+
+        await expect(
+          authResolvers.Mutation.changePassword(
+            null,
+            { currentPassword: 'OldPassword123!', newPassword: 'NewPassword123!' },
+            context
+          )
+        ).rejects.toThrow('Authentication required');
+      });
+
+      it('should handle incorrect current password', async () => {
+        const mockResult = {
+          success: false,
+          error: {
+            code: 'INVALID_CURRENT_PASSWORD',
+            message: 'Current password is incorrect',
+          },
+        };
+
+        authServiceInstance.changePassword.mockResolvedValue(mockResult);
+
+        await expect(
+          authResolvers.Mutation.changePassword(
+            null,
+            { currentPassword: 'WrongPassword', newPassword: 'NewPassword123!' },
+            context
+          )
+        ).rejects.toThrow('Current password is incorrect');
+      });
+    });
+
+    describe('verifyToken', () => {
+      it('should successfully verify token', async () => {
+        const mockResult = {
+          success: true,
+          user: {
+            id: 'user-1',
+            email: 'test@example.com',
+            username: 'testuser',
+          },
+        };
+
+        authServiceInstance.verifyAccessToken.mockResolvedValue(mockResult);
+
+        const result = await authResolvers.Mutation.verifyToken(
+          null,
+          { token: 'valid-token-123' },
+          context
+        );
+
+        expect(authServiceInstance.verifyAccessToken).toHaveBeenCalledWith('valid-token-123');
+
+        expect(result).toEqual({
+          success: true,
+          user: mockResult.user,
+          message: 'Token is valid',
+        });
+      });
+
+      it('should handle invalid token', async () => {
+        const mockResult = {
+          success: false,
+          error: {
+            code: 'INVALID_TOKEN',
+            message: 'Token is invalid or expired',
+          },
+        };
+
+        authServiceInstance.verifyAccessToken.mockResolvedValue(mockResult);
+
+        await expect(
+          authResolvers.Mutation.verifyToken(
+            null,
+            { token: 'invalid-token' },
+            context
+          )
+        ).rejects.toThrow('Token is invalid or expired');
+      });
+    });
+  });
+});

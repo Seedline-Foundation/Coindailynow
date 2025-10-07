@@ -1,0 +1,1099 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AIAgent {
+  id                 String   @id
+  name               String
+  type               String
+  modelProvider      String
+  modelName          String
+  configuration      String?
+  isActive           Boolean  @default(true)
+  performanceMetrics String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime
+  AITask             AITask[]
+
+  @@index([isActive])
+  @@index([type])
+}
+
+model AITask {
+  id               String        @id
+  agentId          String
+  taskType         String
+  inputData        String?
+  outputData       String?
+  status           String        @default("QUEUED")
+  priority         String        @default("NORMAL")
+  estimatedCost    Float
+  actualCost       Float?
+  processingTimeMs Int?
+  qualityScore     Float?
+  errorMessage     String?
+  retryCount       Int           @default(0)
+  maxRetries       Int           @default(3)
+  scheduledAt      DateTime?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime      @default(now())
+  workflowStepId   String?
+  WorkflowStep     WorkflowStep? @relation(fields: [workflowStepId], references: [id])
+  AIAgent          AIAgent       @relation(fields: [agentId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([priority, createdAt])
+  @@index([agentId, status])
+}
+
+model AnalyticsEvent {
+  id           String   @id
+  userId       String?
+  sessionId    String
+  eventType    String
+  resourceId   String?
+  resourceType String?
+  properties   String
+  metadata     String
+  timestamp    DateTime @default(now())
+  User         User?    @relation(fields: [userId], references: [id])
+
+  @@index([eventType, timestamp])
+  @@index([userId, timestamp])
+  @@index([timestamp])
+  @@index([sessionId])
+  @@index([resourceType])
+  @@index([resourceId])
+  @@index([eventType])
+  @@index([userId])
+}
+
+model Article {
+  id                 String               @id
+  title              String
+  slug               String               @unique
+  excerpt            String
+  content            String
+  featuredImageUrl   String?
+  authorId           String
+  categoryId         String
+  tags               String?
+  status             String               @default("DRAFT")
+  priority           String               @default("NORMAL")
+  isPremium          Boolean              @default(false)
+  viewCount          Int                  @default(0)
+  likeCount          Int                  @default(0)
+  commentCount       Int                  @default(0)
+  shareCount         Int                  @default(0)
+  readingTimeMinutes Int
+  seoTitle           String?
+  seoDescription     String?
+  publishScheduledAt DateTime?
+  publishedAt        DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  deletedAt          DateTime?
+  Category           Category             @relation(fields: [categoryId], references: [id])
+  User               User                 @relation(fields: [authorId], references: [id])
+  ArticleTranslation ArticleTranslation[]
+  ContentWorkflow    ContentWorkflow?
+  UserEngagement     UserEngagement[]
+
+  @@index([slug])
+  @@index([isPremium])
+  @@index([authorId, status])
+  @@index([categoryId, publishedAt])
+  @@index([status, publishedAt])
+}
+
+model ArticleTranslation {
+  id                String   @id
+  articleId         String
+  languageCode      String
+  title             String
+  excerpt           String
+  content           String
+  translationStatus String   @default("PENDING")
+  aiGenerated       Boolean  @default(true)
+  humanReviewed     Boolean  @default(false)
+  translatorId      String?
+  qualityScore      Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime
+  User              User?    @relation(fields: [translatorId], references: [id])
+  Article           Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, languageCode])
+  @@index([translationStatus])
+  @@index([articleId, languageCode])
+}
+
+model Category {
+  id             String     @id
+  name           String
+  slug           String     @unique
+  description    String?
+  parentId       String?
+  iconUrl        String?
+  colorHex       String?
+  sortOrder      Int        @default(0)
+  isActive       Boolean    @default(true)
+  articleCount   Int        @default(0)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime
+  Article        Article[]
+  Category       Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  other_Category Category[] @relation("CategoryToCategory")
+
+  @@index([isActive])
+  @@index([slug])
+}
+
+model CommunityPost {
+  id                  String           @id
+  authorId            String
+  title               String?
+  content             String
+  postType            String           @default("TEXT")
+  parentId            String?
+  tokenMentions       String?
+  mediaUrls           String?
+  upvoteCount         Int              @default(0)
+  downvoteCount       Int              @default(0)
+  commentCount        Int              @default(0)
+  shareCount          Int              @default(0)
+  isPinned            Boolean          @default(false)
+  isLocked            Boolean          @default(false)
+  moderationStatus    String           @default("APPROVED")
+  violationReason     String?
+  penaltyApplied      String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime
+  deletedAt           DateTime?
+  CommunityPost       CommunityPost?   @relation("CommunityPostToCommunityPost", fields: [parentId], references: [id])
+  other_CommunityPost CommunityPost[]  @relation("CommunityPostToCommunityPost")
+  User                User             @relation(fields: [authorId], references: [id])
+  UserEngagement      UserEngagement[]
+  Vote                Vote[]
+
+  @@index([parentId])
+  @@index([moderationStatus, createdAt])
+  @@index([authorId, createdAt])
+}
+
+model ComplianceCheck {
+  id                     String                   @id
+  transactionId          String?
+  userId                 String?
+  requirementId          String
+  amountLimitsCheck      Boolean                  @default(false)
+  kycStatusCheck         Boolean                  @default(false)
+  sanctionsScreenCheck   Boolean                  @default(false)
+  taxComplianceCheck     Boolean                  @default(false)
+  passed                 Boolean                  @default(false)
+  violations             String?
+  checkDetails           String?
+  checkedBy              String?
+  checkedAt              DateTime                 @default(now())
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime
+  ComplianceRequirement  ComplianceRequirement    @relation(fields: [requirementId], references: [id])
+  User                   User?                    @relation(fields: [userId], references: [id])
+  MobileMoneyTransaction MobileMoneyTransaction[]
+
+  @@index([requirementId])
+  @@index([checkedAt])
+  @@index([userId])
+  @@index([passed])
+}
+
+model ComplianceRequirement {
+  id                   String              @id
+  country              String
+  providerId           String
+  kycRequired          Boolean             @default(true)
+  maxTransactionAmount Int
+  maxDailyAmount       Int
+  maxMonthlyAmount     Int
+  identityVerification Boolean             @default(false)
+  taxReporting         Boolean             @default(false)
+  dataRetentionDays    Int                 @default(365)
+  restrictions         String?
+  regulatoryBody       String?
+  licenseRequired      Boolean             @default(false)
+  isActive             Boolean             @default(true)
+  effectiveFrom        DateTime            @default(now())
+  expiresAt            DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime
+  ComplianceCheck      ComplianceCheck[]
+  MobileMoneyProvider  MobileMoneyProvider @relation(fields: [providerId], references: [id])
+
+  @@unique([country, providerId])
+  @@index([isActive])
+  @@index([providerId])
+  @@index([country])
+}
+
+model ContentPerformance {
+  id               String   @id
+  contentId        String
+  contentType      String
+  date             DateTime
+  views            Int      @default(0)
+  uniqueViews      Int      @default(0)
+  likes            Int      @default(0)
+  shares           Int      @default(0)
+  comments         Int      @default(0)
+  readingTimeAvg   Float    @default(0.0)
+  bounceRate       Float    @default(0.0)
+  conversionRate   Float    @default(0.0)
+  revenueGenerated Float    @default(0.0)
+
+  @@unique([contentId, contentType, date])
+  @@index([date])
+  @@index([contentType, date])
+}
+
+model ContentWorkflow {
+  id                    String                 @id
+  articleId             String                 @unique
+  workflowType          String                 @default("ARTICLE_PUBLISHING")
+  currentState          String                 @default("RESEARCH")
+  previousState         String?
+  priority              String                 @default("NORMAL")
+  assignedReviewerId    String?
+  completionPercentage  Float                  @default(0)
+  estimatedCompletionAt DateTime?
+  actualCompletionAt    DateTime?
+  errorMessage          String?
+  retryCount            Int                    @default(0)
+  maxRetries            Int                    @default(3)
+  metadata              String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime
+  User                  User?                  @relation(fields: [assignedReviewerId], references: [id])
+  Article               Article                @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  WorkflowNotification  WorkflowNotification[]
+  WorkflowStep          WorkflowStep[]
+  WorkflowTransition    WorkflowTransition[]
+
+  @@index([workflowType])
+  @@index([assignedReviewerId])
+  @@index([priority, createdAt])
+  @@index([currentState])
+}
+
+model ExchangeIntegration {
+  id                 String    @id
+  name               String
+  slug               String    @unique
+  apiEndpoint        String
+  websocketEndpoint  String?
+  region             String
+  supportedCountries String?
+  isActive           Boolean   @default(true)
+  rateLimitPerMinute Int       @default(60)
+  lastSyncAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime
+
+  @@index([region])
+  @@index([isActive])
+  @@index([slug])
+}
+
+model FraudAnalysis {
+  id                     String                   @id
+  transactionId          String?
+  userId                 String?
+  riskLevel              String
+  riskScore              Int
+  flags                  String
+  recommendation         String
+  reason                 String
+  rulesTriggered         String?
+  deviceFingerprint      String?
+  ipAddress              String?
+  userAgent              String?
+  location               String?
+  phoneNumber            String?
+  amount                 Int?
+  velocity               String?
+  analyzedAt             DateTime                 @default(now())
+  reviewedAt             DateTime?
+  reviewedBy             String?
+  finalDecision          String?
+  notes                  String?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime
+  User                   User?                    @relation(fields: [userId], references: [id])
+  MobileMoneyTransaction MobileMoneyTransaction[]
+
+  @@index([phoneNumber])
+  @@index([analyzedAt])
+  @@index([userId])
+  @@index([recommendation])
+  @@index([riskLevel])
+}
+
+model MarketData {
+  id             String   @id
+  tokenId        String
+  exchange       String
+  priceUsd       Float
+  priceChange24h Float
+  volume24h      Float
+  marketCap      Float
+  timestamp      DateTime @default(now())
+  high24h        Float
+  low24h         Float
+  tradingPairs   String?
+  Token          Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([exchange, timestamp])
+  @@index([tokenId, timestamp])
+}
+
+model MobileMoneyProvider {
+  id                     String                   @id
+  name                   String                   @unique
+  code                   String                   @unique
+  displayName            String
+  country                String
+  currency               String
+  apiEndpoint            String
+  isActive               Boolean                  @default(true)
+  supportedCurrencies    String
+  minAmount              Int
+  maxAmount              Int
+  fixedFee               Int                      @default(0)
+  percentageFee          Float                    @default(0.0)
+  timeout                Int                      @default(300)
+  merchantId             String?
+  apiKey                 String?
+  secretKey              String?
+  webhookSecret          String?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime
+  ComplianceRequirement  ComplianceRequirement[]
+  MobileMoneyTransaction MobileMoneyTransaction[]
+  SubscriptionPayment    SubscriptionPayment[]
+
+  @@index([isActive])
+  @@index([country])
+  @@index([code])
+}
+
+model MobileMoneyTransaction {
+  id                    String              @id
+  userId                String
+  providerId            String
+  providerTransactionId String?
+  amount                Int
+  currency              String
+  phoneNumber           String
+  status                String              @default("PENDING")
+  transactionType       String
+  description           String
+  subscriptionId        String?
+  providerFee           Int                 @default(0)
+  platformFee           Int                 @default(0)
+  totalFee              Int                 @default(0)
+  metadata              String?
+  failureReason         String?
+  fraudAnalysisId       String?
+  complianceCheckId     String?
+  processedAt           DateTime?
+  completedAt           DateTime?
+  expiresAt             DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime
+  ComplianceCheck       ComplianceCheck?    @relation(fields: [complianceCheckId], references: [id])
+  FraudAnalysis         FraudAnalysis?      @relation(fields: [fraudAnalysisId], references: [id])
+  Subscription          Subscription?       @relation(fields: [subscriptionId], references: [id])
+  MobileMoneyProvider   MobileMoneyProvider @relation(fields: [providerId], references: [id])
+  User                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([providerTransactionId])
+  @@index([createdAt])
+  @@index([phoneNumber])
+  @@index([transactionType])
+  @@index([status])
+  @@index([providerId])
+  @@index([userId])
+}
+
+model PasswordReset {
+  id          String    @id
+  userId      String
+  token       String    @unique
+  hashedToken String
+  expiresAt   DateTime
+  isUsed      Boolean   @default(false)
+  usedAt      DateTime?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([isUsed])
+  @@index([expiresAt])
+  @@index([token])
+  @@index([userId])
+}
+
+model PaymentWebhook {
+  id                    String    @id
+  provider              String
+  eventType             String
+  transactionId         String?
+  providerTransactionId String?
+  status                String?
+  amount                Int?
+  currency              String?
+  phoneNumber           String?
+  signature             String
+  payload               String
+  processed             Boolean   @default(false)
+  processedAt           DateTime?
+  errorMessage          String?
+  retryCount            Int       @default(0)
+  maxRetries            Int       @default(3)
+  nextRetryAt           DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime
+
+  @@index([createdAt])
+  @@index([transactionId])
+  @@index([processed])
+  @@index([eventType])
+  @@index([provider])
+}
+
+model RefreshToken {
+  id                String    @id
+  userId            String
+  token             String    @unique
+  hashedToken       String
+  expiresAt         DateTime
+  isRevoked         Boolean   @default(false)
+  revokedAt         DateTime?
+  revokedBy         String?
+  deviceFingerprint String?
+  ipAddress         String?
+  userAgent         String?
+  createdAt         DateTime  @default(now())
+  User              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([isRevoked])
+  @@index([expiresAt])
+  @@index([token])
+  @@index([userId])
+}
+
+model SecurityEvent {
+  id        String   @id
+  userId    String?
+  eventType String
+  severity  String   @default("INFO")
+  ipAddress String?
+  userAgent String?
+  country   String?
+  city      String?
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  @@index([ipAddress])
+  @@index([createdAt])
+  @@index([severity])
+  @@index([eventType])
+  @@index([userId])
+}
+
+model Session {
+  id                 String   @id
+  userId             String
+  sessionToken       String   @unique
+  hashedSessionToken String
+  deviceFingerprint  String?
+  ipAddress          String?
+  userAgent          String?
+  country            String?
+  city               String?
+  isActive           Boolean  @default(true)
+  lastActivityAt     DateTime @default(now())
+  expiresAt          DateTime
+  createdAt          DateTime @default(now())
+  User               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([lastActivityAt])
+  @@index([isActive])
+  @@index([sessionToken])
+  @@index([userId])
+}
+
+model Subscription {
+  id                     String                   @id
+  userId                 String                   @unique
+  planId                 String
+  status                 String                   @default("ACTIVE")
+  currentPeriodStart     DateTime
+  currentPeriodEnd       DateTime
+  trialEnd               DateTime?
+  cancelAtPeriodEnd      Boolean                  @default(false)
+  cancelledAt            DateTime?
+  stripeSubscriptionId   String?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime
+  MobileMoneyTransaction MobileMoneyTransaction[]
+  SubscriptionPlan       SubscriptionPlan         @relation(fields: [planId], references: [id])
+  User                   User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  SubscriptionPayment    SubscriptionPayment[]
+
+  @@index([currentPeriodEnd])
+  @@index([status])
+}
+
+model SubscriptionPayment {
+  id                  String              @id
+  subscriptionId      String
+  userId              String
+  providerId          String
+  phoneNumber         String
+  amount              Int
+  currency            String
+  status              String              @default("PENDING")
+  billingPeriodStart  DateTime
+  billingPeriodEnd    DateTime
+  attemptCount        Int                 @default(0)
+  maxAttempts         Int                 @default(3)
+  nextAttemptAt       DateTime?
+  transactionId       String?
+  completedAt         DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime
+  MobileMoneyProvider MobileMoneyProvider @relation(fields: [providerId], references: [id])
+  User                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Subscription        Subscription        @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([billingPeriodEnd])
+  @@index([nextAttemptAt])
+  @@index([status])
+  @@index([userId])
+  @@index([subscriptionId])
+}
+
+model SubscriptionPlan {
+  id              String         @id
+  name            String
+  description     String
+  priceCents      Int
+  currency        String         @default("USD")
+  billingInterval String
+  trialPeriodDays Int            @default(0)
+  features        String?
+  isActive        Boolean        @default(true)
+  sortOrder       Int            @default(0)
+  stripePriceId   String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime
+  Subscription    Subscription[]
+
+  @@index([isActive])
+}
+
+model Tag {
+  id            String   @id
+  name          String   @unique
+  slug          String   @unique
+  description   String?
+  usageCount    Int      @default(0)
+  trendingScore Float    @default(0.0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+
+  @@index([trendingScore])
+  @@index([usageCount])
+}
+
+model Token {
+  id                String       @id
+  symbol            String       @unique
+  name              String
+  slug              String       @unique
+  description       String?
+  logoUrl           String?
+  websiteUrl        String?
+  whitepaperUrl     String?
+  blockchain        String
+  contractAddress   String?
+  tokenType         String
+  marketCap         Float?
+  circulatingSupply Float?
+  totalSupply       Float?
+  maxSupply         Float?
+  isMemecoin        Boolean      @default(false)
+  isListed          Boolean      @default(true)
+  listingStatus     String       @default("APPROVED")
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime
+  MarketData        MarketData[]
+
+  @@index([tokenType])
+  @@index([isListed])
+  @@index([slug])
+  @@index([symbol])
+}
+
+enum UserRole {
+  USER
+  CONTENT_ADMIN
+  MARKETING_ADMIN
+  TECH_ADMIN
+  SUPER_ADMIN
+}
+
+model User {
+  id                     String                   @id
+  email                  String                   @unique
+  username               String                   @unique
+  passwordHash           String
+  role                   UserRole                 @default(USER)
+  firstName              String?
+  lastName               String?
+  avatarUrl              String?
+  bio                    String?
+  location               String?
+  preferredLanguage      String                   @default("en")
+  subscriptionTier       String                   @default("FREE")
+  emailVerified          Boolean                  @default(false)
+  phoneVerified          Boolean                  @default(false)
+  twoFactorEnabled       Boolean                  @default(false)
+  twoFactorSecret        String?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime
+  lastLoginAt            DateTime?
+  status                 String                   @default("ACTIVE")
+  AnalyticsEvent         AnalyticsEvent[]
+  Article                Article[]
+  ArticleTranslation     ArticleTranslation[]
+  CommunityPost          CommunityPost[]
+  ComplianceCheck        ComplianceCheck[]
+  ContentWorkflow        ContentWorkflow[]
+  FraudAnalysis          FraudAnalysis[]
+  MobileMoneyTransaction MobileMoneyTransaction[]
+  PasswordReset          PasswordReset[]
+  RefreshToken           RefreshToken[]
+  Session                Session[]
+  Subscription           Subscription?
+  SubscriptionPayment    SubscriptionPayment[]
+  UserEngagement         UserEngagement[]
+  UserProfile            UserProfile?
+  Vote                   Vote[]
+  WorkflowNotification   WorkflowNotification[]
+  WorkflowStep           WorkflowStep[]
+  AdminPermission        AdminPermission[]
+  AuditLog               AuditLog[]
+
+  @@index([lastLoginAt])
+  @@index([emailVerified])
+  @@index([status])
+  @@index([subscriptionTier])
+  @@index([username])
+  @@index([email])
+  @@index([role])
+}
+
+model UserEngagement {
+  id               String         @id
+  userId           String?
+  articleId        String?
+  postId           String?
+  actionType       String
+  durationSeconds  Int?
+  scrollPercentage Float?
+  deviceType       String
+  userAgent        String
+  ipAddress        String
+  referrerUrl      String?
+  createdAt        DateTime       @default(now())
+  CommunityPost    CommunityPost? @relation(fields: [postId], references: [id])
+  Article          Article?       @relation(fields: [articleId], references: [id])
+  User             User?          @relation(fields: [userId], references: [id])
+
+  @@index([postId, actionType])
+  @@index([articleId, actionType])
+  @@index([userId, createdAt])
+}
+
+model UserProfile {
+  userId                  String   @id
+  bio                     String?
+  location                String?
+  website                 String?
+  socialMedia             String?
+  tradingExperience       String?
+  investmentPortfolioSize String?
+  preferredExchanges      String?
+  notificationPreferences String?
+  privacySettings         String?
+  contentPreferences      String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime
+  User                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Vote {
+  id            String        @id
+  userId        String
+  postId        String
+  voteType      String
+  createdAt     DateTime      @default(now())
+  CommunityPost CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  User          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model WorkflowNotification {
+  id               String          @id
+  workflowId       String
+  recipientId      String
+  notificationType String
+  title            String
+  message          String
+  priority         String          @default("NORMAL")
+  channel          String?
+  sentAt           DateTime?
+  readAt           DateTime?
+  status           String          @default("PENDING")
+  errorMessage     String?
+  metadata         String?
+  createdAt        DateTime        @default(now())
+  User             User            @relation(fields: [recipientId], references: [id])
+  ContentWorkflow  ContentWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([recipientId])
+  @@index([workflowId])
+}
+
+model WorkflowStep {
+  id                  String          @id
+  workflowId          String
+  stepName            String
+  stepOrder           Int
+  status              String          @default("PENDING")
+  assigneeId          String?
+  estimatedDurationMs Int?
+  actualDurationMs    Int?
+  startedAt           DateTime?
+  completedAt         DateTime?
+  output              String?
+  errorMessage        String?
+  qualityScore        Float?
+  humanFeedback       String?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime
+  AITask              AITask[]
+  User                User?           @relation(fields: [assigneeId], references: [id])
+  ContentWorkflow     ContentWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([stepName])
+  @@index([assigneeId])
+  @@index([status])
+  @@index([workflowId, stepOrder])
+}
+
+model WorkflowTransition {
+  id                String          @id
+  workflowId        String
+  fromState         String
+  toState           String
+  transitionType    String
+  triggeredBy       String?
+  triggerConditions String?
+  transitionReason  String?
+  metadata          String?
+  createdAt         DateTime        @default(now())
+  ContentWorkflow   ContentWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([fromState, toState])
+  @@index([workflowId])
+}
+
+model AuditEvent {
+  id        String   @id @default(cuid())
+  type      String
+  action    String
+  userId    String?
+  resource  String?
+  success   Boolean  @default(true)
+  severity  String   @default("low")
+  category  String   @default("general")
+  details   String?  // JSON string
+  ipAddress String?
+  userAgent String?
+  timestamp DateTime @default(now())
+
+  @@index([type, timestamp])
+  @@index([userId, timestamp])
+  @@index([severity, timestamp])
+  @@index([category, timestamp])
+  @@index([success, timestamp])
+}
+
+model DeviceTrust {
+  id              String   @id @default(cuid())
+  deviceId        String   @unique
+  userId          String
+  fingerprint     String
+  trustScore      Float    @default(0.0)
+  isActive        Boolean  @default(true)
+  lastSeen        DateTime @default(now())
+  ipAddress       String?
+  userAgent       String?
+  location        String?
+  riskFactors     String?  // JSON string
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId, isActive])
+  @@index([deviceId])
+  @@index([trustScore])
+}
+
+model ComplianceReport {
+  id            String   @id @default(cuid())
+  framework     String   // GDPR, CCPA, POPIA
+  status        String   // compliant, non_compliant, in_progress
+  score         Float    @default(0.0)
+  violations    String?  // JSON string
+  recommendations String? // JSON string
+  generatedBy   String?
+  reportData    String?  // JSON string
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([framework, status])
+  @@index([createdAt])
+  @@index([score])
+}
+
+// Modular Marquee System
+model Marquee {
+  id           String          @id @default(cuid())
+  name         String          // Admin-friendly name
+  title        String?         // Display title (e.g., "Trending", "Hot Coins")
+  type         String          @default("token") // token, news, custom
+  position     String          @default("header") // header, footer, content
+  isActive     Boolean         @default(false)
+  isPublished  Boolean         @default(false)
+  startDate    DateTime?       // When to start showing
+  endDate      DateTime?       // When to stop showing
+  priority     Int             @default(1) // Higher priority shows first
+  
+  // Styling Configuration
+  styles       MarqueeStyle?
+  
+  // Content Configuration
+  items        MarqueeItem[]
+  
+  // Metadata
+  createdBy    String?         // User ID who created
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  
+  // Analytics
+  impressions  Int             @default(0)
+  clicks       Int             @default(0)
+
+  @@index([isActive, isPublished])
+  @@index([type, position])
+  @@index([priority])
+  @@index([startDate, endDate])
+}
+
+model MarqueeStyle {
+  id                String   @id @default(cuid())
+  marqueeId         String   @unique
+  marquee           Marquee  @relation(fields: [marqueeId], references: [id], onDelete: Cascade)
+  
+  // Animation Settings
+  speed             Float    @default(50.0) // Animation duration in seconds
+  direction         String   @default("left") // left, right
+  pauseOnHover      Boolean  @default(true)
+  
+  // Visual Settings
+  backgroundColor   String   @default("#1f2937") // bg-gray-900
+  textColor         String   @default("#ffffff")
+  fontSize          String   @default("14px")
+  fontWeight        String   @default("normal")
+  height            String   @default("48px")
+  borderRadius      String   @default("0px")
+  
+  // Border and Effects
+  borderWidth       String   @default("0px")
+  borderColor       String   @default("#transparent")
+  shadowColor       String   @default("transparent")
+  shadowBlur        String   @default("0px")
+  
+  // Icon Settings
+  showIcons         Boolean  @default(true)
+  iconColor         String   @default("#f59e0b") // text-amber-500
+  iconSize          String   @default("20px")
+  
+  // Layout Settings
+  itemSpacing       String   @default("32px") // gap between items
+  paddingVertical   String   @default("12px")
+  paddingHorizontal String   @default("16px")
+  
+  // Advanced Settings
+  gradient          String?  // CSS gradient string
+  customCSS         String?  // Additional custom CSS
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model MarqueeItem {
+  id          String   @id @default(cuid())
+  marqueeId   String
+  marquee     Marquee  @relation(fields: [marqueeId], references: [id], onDelete: Cascade)
+  
+  // Content
+  type        String   // token, news, custom, link
+  title       String   // Main text to display
+  subtitle    String?  // Secondary text
+  description String?  // Tooltip or additional info
+  
+  // Links and Actions
+  linkUrl     String?  // Where to go when clicked
+  linkTarget  String   @default("_self") // _self, _blank
+  
+  // Token-specific fields
+  symbol      String?  // For token type
+  price       Float?   // Current price
+  change24h   Float?   // Price change
+  changePercent24h Float? // Percentage change
+  marketCap   Float?   // Market capitalization
+  volume24h   Float?   // 24h volume
+  isHot       Boolean  @default(false) // Hot/trending indicator
+  
+  // Custom styling per item
+  textColor   String?  // Override default text color
+  bgColor     String?  // Background color for this item
+  icon        String?  // Icon name or emoji
+  iconColor   String?  // Icon color
+  
+  // Positioning and Display
+  order       Int      @default(0) // Display order
+  isVisible   Boolean  @default(true)
+  
+  // Analytics
+  clicks      Int      @default(0)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([marqueeId, order])
+  @@index([type, isVisible])
+}
+
+model MarqueeTemplate {
+  id          String   @id @default(cuid())
+  name        String   // Template name
+  description String?  // Template description
+  category    String   @default("general") // general, crypto, news, finance
+  isDefault   Boolean  @default(false)
+  
+  // Template Configuration (JSON)
+  styleConfig String   // JSON string of MarqueeStyle
+  itemsConfig String?  // JSON string of sample items
+  
+  // Usage tracking
+  usageCount  Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category, isDefault])
+}
+
+// Admin Permission Model for RBAC
+model AdminPermission {
+  id          String   @id @default(cuid())
+  adminId     String
+  resource    String   // users, content, analytics, ai, system, etc.
+  actions     String   // JSON array: ["create", "read", "update", "delete"]
+  constraints String?  // JSON object for additional rules
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  admin       User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@unique([adminId, resource])
+  @@index([adminId])
+  @@index([resource])
+}
+
+// Audit Log Model for tracking all admin actions
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String   // login, logout, create_user, delete_article, etc.
+  resource   String   // user, article, category, etc.
+  resourceId String?  // ID of the affected resource
+  details    String   // JSON object with action details
+  ipAddress  String
+  userAgent  String
+  status     String   @default("success") // success, failure
+  timestamp  DateTime @default(now())
+  admin      User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, timestamp])
+  @@index([action, timestamp])
+  @@index([resource, resourceId])
+  @@index([timestamp])
+}
+
+// Admin Role Model for predefined role templates
+model AdminRole {
+  id          String   @id @default(cuid())
+  name        String   @unique // CONTENT_ADMIN, MARKETING_ADMIN, etc.
+  displayName String   // Content Administrator
+  description String?
+  permissions String   // JSON array of permission objects
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+  @@index([isActive])
+}
+
+model BlacklistedIP {
+  id        String    @id @default(cuid())
+  ipAddress String    @unique
+  userId    String?
+  reason    String
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([ipAddress])
+  @@index([userId])
+  @@index([isActive])
+  @@index([expiresAt])
+}

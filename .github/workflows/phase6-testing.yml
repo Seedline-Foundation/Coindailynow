@@ -1,0 +1,353 @@
+name: Phase 6 - Testing & Quality Assurance
+
+on:
+  push:
+    branches: [ main, development ]
+  pull_request:
+    branches: [ main, development ]
+
+jobs:
+  frontend-tests:
+    name: Frontend Unit & Integration Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Run type checking
+        working-directory: ./frontend
+        run: npm run type-check
+      
+      - name: Run linting
+        working-directory: ./frontend
+        run: npm run lint
+      
+      - name: Run unit tests with coverage
+        working-directory: ./frontend
+        run: npm run test:unit:coverage
+      
+      - name: Run security feature tests
+        working-directory: ./frontend
+        run: npm run test:security
+      
+      - name: Upload frontend coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./frontend/coverage/lcov.info
+          flags: frontend
+          name: frontend-coverage
+      
+      - name: Check coverage thresholds
+        working-directory: ./frontend
+        run: |
+          coverage=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+          if (( $(echo "$coverage < 85" | bc -l) )); then
+            echo "Coverage $coverage% is below 85% threshold"
+            exit 1
+          fi
+
+  backend-tests:
+    name: Backend API Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: coindaily_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+      
+      - name: Run type checking
+        working-directory: ./backend
+        run: npm run type-check
+      
+      - name: Run linting
+        working-directory: ./backend
+        run: npm run lint
+      
+      - name: Generate Prisma client
+        working-directory: ./backend
+        run: npm run db:generate
+      
+      - name: Run database migrations
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/coindaily_test
+        run: npm run db:migrate
+      
+      - name: Run API tests with coverage
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/coindaily_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-key
+          NODE_ENV: test
+        run: npm run test:api:coverage
+      
+      - name: Run security API tests
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/coindaily_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-key
+          NODE_ENV: test
+        run: npm run test:security
+      
+      - name: Upload backend coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+      
+      - name: Check coverage thresholds
+        working-directory: ./backend
+        run: |
+          coverage=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+          if (( $(echo "$coverage < 80" | bc -l) )); then
+            echo "Coverage $coverage% is below 80% threshold"
+            exit 1
+          fi
+
+  e2e-tests:
+    name: E2E Integration Tests
+    runs-on: ubuntu-latest
+    needs: [frontend-tests, backend-tests]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+      
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+      
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+      
+      - name: Start backend server
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/coindaily_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-key
+          NODE_ENV: test
+        run: npm run dev &
+      
+      - name: Start frontend server
+        working-directory: ./frontend
+        run: npm start &
+      
+      - name: Wait for servers
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+          timeout 60 bash -c 'until curl -f http://localhost:4000/health; do sleep 2; done'
+      
+      - name: Run E2E security tests
+        working-directory: ./frontend
+        run: npm run e2e:security
+      
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 30
+
+  performance-tests:
+    name: Performance & Load Testing
+    runs-on: ubuntu-latest
+    needs: [frontend-tests, backend-tests]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+      
+      - name: Start frontend server
+        working-directory: ./frontend
+        run: npm start &
+      
+      - name: Wait for server
+        run: timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+      
+      - name: Run Lighthouse CI
+        working-directory: ./frontend
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun --config=./lighthouserc.json
+      
+      - name: Check performance budget
+        run: |
+          score=$(cat .lighthouseci/manifest.json | jq '.[0].summary.performance')
+          if (( $(echo "$score < 90" | bc -l) )); then
+            echo "Performance score $score is below 90 threshold"
+            exit 1
+          fi
+
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run npm audit (frontend)
+        working-directory: ./frontend
+        run: npm audit --audit-level=high
+        continue-on-error: true
+      
+      - name: Run npm audit (backend)
+        working-directory: ./backend
+        run: npm audit --audit-level=high
+        continue-on-error: true
+      
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --all-projects --severity-threshold=high
+
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=coindaily
+            -Dsonar.projectKey=coindaily-africa
+            -Dsonar.sources=frontend/src,backend/src
+            -Dsonar.tests=frontend/tests,backend/tests
+            -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info,backend/coverage/lcov.info
+            -Dsonar.coverage.exclusions=**/*.test.ts,**/*.test.tsx
+
+  test-summary:
+    name: Test Summary Report
+    runs-on: ubuntu-latest
+    needs: [frontend-tests, backend-tests, e2e-tests, performance-tests, security-scan, code-quality]
+    if: always()
+    
+    steps:
+      - name: Generate test summary
+        run: |
+          echo "## Phase 6 Test Summary 🧪" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend Tests: ${{ needs.frontend-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend Tests: ${{ needs.backend-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- E2E Tests: ${{ needs.e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance Tests: ${{ needs.performance-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Security Scan: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Code Quality: ${{ needs.code-quality.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Coverage" >> $GITHUB_STEP_SUMMARY
+          echo "- Target: 85%+ for frontend, 80%+ for backend" >> $GITHUB_STEP_SUMMARY
+          echo "- View detailed coverage on [Codecov](https://codecov.io/gh/coindaily/platform)" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Check overall status
+        if: |
+          needs.frontend-tests.result != 'success' ||
+          needs.backend-tests.result != 'success' ||
+          needs.e2e-tests.result != 'success' ||
+          needs.performance-tests.result != 'success'
+        run: |
+          echo "❌ Some tests failed. Please check the logs above."
+          exit 1
+      
+      - name: Success notification
+        if: success()
+        run: echo "✅ All Phase 6 tests passed successfully!"
