@@ -49,22 +49,29 @@ describe('Translation System Integration - Task 7', () => {
       // Create test user and article
       const user = await prisma.user.create({
         data: {
+          id: `user-test-${Date.now()}`,
           email: 'author@coindaily.co',
           username: 'testauthor',
           passwordHash: 'hashedpassword',
-          emailVerified: true
+          role: 'CONTENT_ADMIN',
+          emailVerified: true,
+          updatedAt: new Date()
         }
       });
 
       const category = await prisma.category.create({
         data: {
+          id: `category-test-${Date.now()}`,
           name: 'Cryptocurrency News',
-          slug: 'crypto-news'
+          slug: 'crypto-news',
+          sortOrder: 1,
+          updatedAt: new Date()
         }
       });
 
       const article = await prisma.article.create({
         data: {
+          id: `article-test-${Date.now()}`,
           title: 'Bitcoin Adoption Grows in Kenya Through M-Pesa Integration',
           slug: 'bitcoin-kenya-mpesa',
           excerpt: 'Major cryptocurrency exchange partners with mobile money providers',
@@ -72,7 +79,8 @@ describe('Translation System Integration - Task 7', () => {
           authorId: user.id,
           categoryId: category.id,
           status: 'PUBLISHED',
-          readingTimeMinutes: 3
+          readingTimeMinutes: 3,
+          updatedAt: new Date()
         }
       });
 
@@ -139,23 +147,30 @@ describe('Translation System Integration - Task 7', () => {
       // Create test articles
       const user = await prisma.user.create({
         data: {
+          id: `user-test-${Date.now() + 1}`,
           email: 'editor@coindaily.co',
           username: 'testeditor',
           passwordHash: 'hashedpassword',
-          emailVerified: true
+          role: 'CONTENT_ADMIN',
+          emailVerified: true,
+          updatedAt: new Date()
         }
       });
 
       const category = await prisma.category.create({
         data: {
+          id: `category-test-${Date.now() + 1}`,
           name: 'Market Analysis',
-          slug: 'market-analysis'
+          slug: 'market-analysis',
+          sortOrder: 2,
+          updatedAt: new Date()
         }
       });
 
       const articles = await Promise.all([
         prisma.article.create({
           data: {
+            id: `article-test-${Date.now() + 2}`,
             title: 'DeFi Growth in Nigeria Reaches New Heights',
             slug: 'defi-nigeria-growth',
             excerpt: 'Decentralized Finance protocols gain traction',
@@ -163,11 +178,13 @@ describe('Translation System Integration - Task 7', () => {
             authorId: user.id,
             categoryId: category.id,
             status: 'PUBLISHED',
-            readingTimeMinutes: 4
+            readingTimeMinutes: 4,
+            updatedAt: new Date()
           }
         }),
         prisma.article.create({
           data: {
+            id: `article-test-${Date.now() + 3}`,
             title: 'NFT Marketplaces Launch in South Africa',
             slug: 'nft-south-africa',
             excerpt: 'Local NFT platforms emerge',
@@ -175,7 +192,8 @@ describe('Translation System Integration - Task 7', () => {
             authorId: user.id,
             categoryId: category.id,
             status: 'PUBLISHED',
-            readingTimeMinutes: 3
+            readingTimeMinutes: 3,
+            updatedAt: new Date()
           }
         })
       ]);
@@ -218,22 +236,29 @@ describe('Translation System Integration - Task 7', () => {
       // Create test article
       const user = await prisma.user.create({
         data: {
+          id: `user-test-${Date.now() + 4}`,
           email: 'admin@coindaily.co',
           username: 'testadmin',
           passwordHash: 'hashedpassword',
-          emailVerified: true
+          role: 'CONTENT_ADMIN',
+          emailVerified: true,
+          updatedAt: new Date()
         }
       });
 
       const category = await prisma.category.create({
         data: {
+          id: `category-test-${Date.now() + 4}`,
           name: 'Breaking News',
-          slug: 'breaking-news'
+          slug: 'breaking-news',
+          sortOrder: 3,
+          updatedAt: new Date()
         }
       });
 
       const article = await prisma.article.create({
         data: {
+          id: `article-test-${Date.now() + 5}`,
           title: 'Breaking: Major African Bank Announces Bitcoin Support',
           slug: 'african-bank-bitcoin',
           excerpt: 'First major African bank to offer Bitcoin services',
@@ -242,7 +267,8 @@ describe('Translation System Integration - Task 7', () => {
           categoryId: category.id,
           status: 'PUBLISHED',
           readingTimeMinutes: 5,
-          priority: 'BREAKING'
+          priority: 'BREAKING',
+          updatedAt: new Date()
         }
       });
 
@@ -433,22 +459,29 @@ describe('Translation System Integration - Task 7', () => {
       // Create test article
       const user = await prisma.user.create({
         data: {
+          id: `user-test-${Date.now() + 6}`,
           email: 'concurrent@coindaily.co',
           username: 'testconcurrent',
           passwordHash: 'hashedpassword',
-          emailVerified: true
+          role: 'CONTENT_ADMIN',
+          emailVerified: true,
+          updatedAt: new Date()
         }
       });
 
       const category = await prisma.category.create({
         data: {
+          id: `category-test-${Date.now() + 6}`,
           name: 'Concurrent Test',
-          slug: 'concurrent-test'
+          slug: 'concurrent-test',
+          sortOrder: 4,
+          updatedAt: new Date()
         }
       });
 
       const article = await prisma.article.create({
         data: {
+          id: `article-test-${Date.now() + 7}`,
           title: 'Concurrent Translation Test',
           slug: 'concurrent-test',
           excerpt: 'Testing concurrent translation processing',
@@ -456,7 +489,8 @@ describe('Translation System Integration - Task 7', () => {
           authorId: user.id,
           categoryId: category.id,
           status: 'PUBLISHED',
-          readingTimeMinutes: 2
+          readingTimeMinutes: 2,
+          updatedAt: new Date()
         }
       });
 
@@ -534,22 +568,29 @@ describe('Translation System Integration - Task 7', () => {
       // Create a task that will initially fail
       const user = await prisma.user.create({
         data: {
+          id: `user-test-${Date.now() + 8}`,
           email: 'retry@coindaily.co',
           username: 'testretry',
           passwordHash: 'hashedpassword',
-          emailVerified: true
+          role: 'CONTENT_ADMIN',
+          emailVerified: true,
+          updatedAt: new Date()
         }
       });
 
       const category = await prisma.category.create({
         data: {
+          id: `category-test-${Date.now() + 8}`,
           name: 'Retry Test',
-          slug: 'retry-test'
+          slug: 'retry-test',
+          sortOrder: 5,
+          updatedAt: new Date()
         }
       });
 
       const article = await prisma.article.create({
         data: {
+          id: `article-test-${Date.now() + 9}`,
           title: 'Retry Test Article',
           slug: 'retry-test',
           excerpt: 'Testing retry mechanism',
@@ -557,7 +598,8 @@ describe('Translation System Integration - Task 7', () => {
           authorId: user.id,
           categoryId: category.id,
           status: 'PUBLISHED',
-          readingTimeMinutes: 1
+          readingTimeMinutes: 1,
+          updatedAt: new Date()
         }
       });
 

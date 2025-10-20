@@ -140,7 +140,7 @@ export const contentGenerationResolvers = (
             excerpt: true,
             status: true,
             createdAt: true,
-            author: {
+            User: {
               select: {
                 firstName: true,
                 lastName: true,
@@ -158,7 +158,7 @@ export const contentGenerationResolvers = (
           qualityScore: 85, // Mock value - would come from AI metadata
           wordCount: 1200, // Mock value - would be calculated
           createdAt: article.createdAt,
-          author: `${article.author.firstName || ''} ${article.author.lastName || ''}`.trim() || 'Unknown Author'
+          author: `${article.User.firstName || ''} ${article.User.lastName || ''}`.trim() || 'Unknown Author'
         }));
       } catch (error) {
         logger.error('Failed to get recent content generation tasks', { 

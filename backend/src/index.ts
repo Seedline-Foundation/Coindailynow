@@ -202,6 +202,14 @@ async function startServer() {
   const { createLegalRoutes } = await import('./api/legal-routes');
   app.use('/api/legal', createLegalRoutes(prisma, redis, logger));
 
+  // Add AMP Page API routes
+  const ampRoutes = await import('./routes/amp.routes');
+  app.use('/api/amp', ampRoutes.default);
+
+  // Add Content Automation API routes (Task 62)
+  const contentAutomationRoutes = await import('./routes/content-automation.routes');
+  app.use('/api/content-automation', contentAutomationRoutes.default);
+
   // GraphQL middleware with enhanced context
   app.use(
     GRAPHQL_PATH,
@@ -256,6 +264,82 @@ async function startServer() {
   // Analytics API routes
   const analyticsRoutes = await import('./api/analytics');
   app.use('/api/analytics', analyticsRoutes.default);
+
+  // SEO API routes
+  const seoRoutes = await import('./routes/seo.routes');
+  app.use('/api/seo', seoRoutes.default);
+
+  // SEO Dashboard API routes (Task 60)
+  const seoDashboardRoutes = await import('./routes/seoDashboard.routes');
+  app.use('/api/seo', seoDashboardRoutes.default);
+
+  // Content SEO Optimization API routes (Task 61)
+  const contentSeoOptimizationRoutes = await import('./routes/contentSeoOptimization.routes');
+  app.use('/api/content-seo', contentSeoOptimizationRoutes.default);
+
+  // Structured Data API routes
+  const structuredDataRoutes = await import('./routes/structured-data.routes');
+  app.use('/api/structured-data', structuredDataRoutes.default);
+
+  // Sitemap API routes
+  const sitemapRoutes = await import('./routes/sitemap.routes');
+  app.use('/api/sitemap', sitemapRoutes.default);
+
+  // SEO Automation API routes (Task 63)
+  const seoAutomationRoutes = await import('./routes/seoAutomation.routes');
+  app.use('/api/seo-automation', seoAutomationRoutes.default);
+
+  // Distribution & Viral Growth API routes (Task 64)
+  const distributionRoutes = await import('./routes/distribution.routes');
+  app.use('/api/distribution', distributionRoutes.default);
+
+  // Engagement & Personalization API routes (Task 66)
+  const engagementRoutes = await import('./routes/engagement.routes');
+  app.use('/api/engagement', engagementRoutes.default);
+
+  // Predictive SEO Intelligence API routes (Task 68)
+  const predictiveSeoRoutes = await import('./routes/predictive-seo.routes');
+  app.use('/api/predictive-seo', predictiveSeoRoutes.default);
+
+  // Semantic Embedding & Vector Index API routes (Task 72)
+  const embeddingRoutes = await import('./api/routes/embedding.routes');
+  app.use('/api/embedding', embeddingRoutes.default);
+
+  // Knowledge API & LLM Access Layer routes (Task 73)
+  const knowledgeApiRoutes = await import('./api/routes/knowledgeApi.routes');
+  app.use('/api/knowledge-api', knowledgeApiRoutes.default);
+
+  // RAO Metadata, Schema & AI Citation Optimization routes (Task 74)
+  const raoCitationRoutes = await import('./api/raoCitation.routes');
+  app.use('/api/rao-citation', raoCitationRoutes.default);
+
+  // RAO Performance Tracking & Adaptation Loop routes (Task 75)
+  const raoPerformanceRoutes = await import('./api/raoPerformance.routes');
+  app.use('/api/rao-performance', raoPerformanceRoutes.default);
+
+  // Social Media & Community Engagement API routes (Task 78)
+  const socialMediaRoutes = await import('./api/socialMedia.routes');
+  app.use('/api/social-media', socialMediaRoutes.default);
+
+  // Technical SEO Audit & Implementation routes (Task 79)
+  const technicalSeoRoutes = await import('./api/technicalSeo.routes');
+  app.use('/api/technical-seo', technicalSeoRoutes.default);
+
+  // Local SEO & Google My Business routes (Task 80)
+  const localSeoRoutes = await import('./api/localSeo.routes');
+  app.use('/api/local-seo', localSeoRoutes.default);
+
+  // Image Optimization routes (Task 81)
+  const imageOptimizationRoutes = await import('./api/imageOptimization.routes');
+  app.use('/api/image-optimization', imageOptimizationRoutes.default);
+
+  // Security Alert System routes (Task 84)
+  const securityAlertRoutes = await import('./api/securityAlert.routes');
+  app.use('/api/security-alert', securityAlertRoutes.default);
+
+  // Compliance Monitoring routes (Task 85)
+  const complianceMonitoringRoutes = await import('./api/complianceMonitoring.routes');
+  app.use('/api/compliance', complianceMonitoringRoutes.default);
 
   // Error handling middleware (must be last)
   app.use(errorHandler);
@@ -336,6 +420,9 @@ async function startServer() {
     shutdown('unhandledRejection');
   });
 }
+
+// Export app for testing (create a test instance without starting the server)
+export const app = express();
 
 // Start the server
 startServer().catch((error) => {

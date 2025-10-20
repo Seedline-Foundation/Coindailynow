@@ -28,7 +28,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": false,
-    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node", "react", "react-dom", "jest", "@testing-library/jest-dom", "bcryptjs", "ioredis"],
     
     // Emit
     "noEmit": true,
@@ -74,7 +74,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/types/**/*.d.ts"
+    "src/types/**/*.d.ts",
+    "src/types/minimatch.d.ts"
   ],
   "exclude": [
     "node_modules",

@@ -18,7 +18,7 @@ export const translationResolvers = {
     ) => {
       const translations = await context.prisma.articleTranslation.findMany({
         where: { articleId },
-        include: { translator: true }
+        include: { User: true }
       });
 
       return translations.map(translation => ({
@@ -40,7 +40,7 @@ export const translationResolvers = {
     ) => {
       const translation = await context.prisma.articleTranslation.findFirst({
         where: { articleId, languageCode },
-        include: { translator: true }
+        include: { User: true }
       });
 
       if (!translation) return null;
@@ -489,6 +489,7 @@ export const translationResolvers = {
           updatedAt: new Date()
         },
         create: {
+          id: `${articleId}_${languageCode}`,
           articleId,
           languageCode,
           title: retranslation.title,
@@ -497,7 +498,8 @@ export const translationResolvers = {
           qualityScore: retranslation.qualityScore,
           translationStatus: 'COMPLETED',
           aiGenerated: true,
-          humanReviewed: false
+          humanReviewed: false,
+          updatedAt: new Date()
         }
       });
 

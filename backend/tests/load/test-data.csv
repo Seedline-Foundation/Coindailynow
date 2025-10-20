@@ -1,0 +1,11 @@
+userId,authToken,articleId
+user1,test_token_user1,article-001
+user2,test_token_user2,article-002
+user3,test_token_user3,article-003
+user4,test_token_user4,article-004
+user5,test_token_user5,article-005
+admin1,admin_token_1,article-001
+admin2,admin_token_2,article-002
+test1,test_token_test1,article-003
+test2,test_token_test2,article-004
+test3,test_token_test3,article-005

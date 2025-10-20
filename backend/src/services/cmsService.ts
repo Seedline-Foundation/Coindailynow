@@ -6,6 +6,7 @@
 
 import { PrismaClient, Article, ArticleTranslation, User } from '@prisma/client';
 import { Logger } from 'winston';
+import { randomUUID } from 'crypto';
 
 export interface CreateArticleInput {
   title: string;
@@ -115,6 +116,7 @@ export class CMSService {
         // Create article
         const newArticle = await tx.article.create({
           data: {
+            id: randomUUID(),
             title: input.title,
             slug,
             excerpt: input.excerpt,
@@ -129,11 +131,12 @@ export class CMSService {
             publishScheduledAt: input.publishScheduledAt || null,
             readingTimeMinutes,
             status: 'DRAFT',
-            priority: 'NORMAL'
+            priority: 'NORMAL',
+            updatedAt: new Date()
           },
           include: {
-            author: { select: { id: true, username: true, firstName: true, lastName: true } },
-            category: true
+            Category: true,
+            User: { select: { id: true, username: true, firstName: true, lastName: true } }
           }
         });
 
@@ -162,7 +165,7 @@ export class CMSService {
 
     const existingArticle = await this.prisma.article.findUnique({
       where: { id: input.id },
-      include: { author: true }
+      include: { User: true }
     });
 
     if (!existingArticle) {
@@ -200,8 +203,8 @@ export class CMSService {
             updatedAt: new Date()
           },
           include: {
-            author: { select: { id: true, username: true, firstName: true, lastName: true } },
-            category: true
+            User: { select: { id: true, username: true, firstName: true, lastName: true } },
+            Category: true
           }
         });
 
@@ -227,7 +230,7 @@ export class CMSService {
 
     const article = await this.prisma.article.findUnique({
       where: { id: articleId },
-      include: { author: true }
+      include: { User: true }
     });
 
     if (!article) {
@@ -251,8 +254,8 @@ export class CMSService {
             updatedAt: new Date()
           },
           include: {
-            author: { select: { id: true, username: true, firstName: true, lastName: true } },
-            category: true
+            User: { select: { id: true, username: true, firstName: true, lastName: true } },
+            Category: true
           }
         });
 
@@ -300,8 +303,8 @@ export class CMSService {
             updatedAt: new Date()
           },
           include: {
-            author: { select: { id: true, username: true, firstName: true, lastName: true } },
-            category: true
+            User: { select: { id: true, username: true, firstName: true, lastName: true } },
+            Category: true
           }
         });
 
@@ -349,8 +352,8 @@ export class CMSService {
             updatedAt: new Date()
           },
           include: {
-            author: { select: { id: true, username: true, firstName: true, lastName: true } },
-            category: true
+            User: { select: { id: true, username: true, firstName: true, lastName: true } },
+            Category: true
           }
         });
 
@@ -399,8 +402,8 @@ export class CMSService {
             updatedAt: new Date()
           },
           include: {
-            author: { select: { id: true, username: true, firstName: true, lastName: true } },
-            category: true
+            User: { select: { id: true, username: true, firstName: true, lastName: true } },
+            Category: true
           }
         });
 
@@ -531,6 +534,7 @@ export class CMSService {
         // Create new translation
         articleTranslation = await this.prisma.articleTranslation.create({
           data: {
+            id: `${articleId}_${languageCode}`,
             articleId,
             languageCode,
             title: translation.title,
@@ -539,7 +543,8 @@ export class CMSService {
             translatorId: translatorId || null,
             translationStatus: translatorId ? 'COMPLETED' : 'PENDING',
             humanReviewed: !!translatorId,
-            aiGenerated: !translatorId
+            aiGenerated: !translatorId,
+            updatedAt: new Date()
           }
         });
       }
@@ -560,13 +565,13 @@ export class CMSService {
   /**
    * Get article with all translations
    */
-  async getArticleWithTranslations(articleId: string): Promise<Article & { translations: ArticleTranslation[] }> {
+  async getArticleWithTranslations(articleId: string): Promise<Article & { ArticleTranslation: ArticleTranslation[] }> {
     const article = await this.prisma.article.findUnique({
       where: { id: articleId },
       include: {
-        translations: true,
-        author: { select: { id: true, username: true, firstName: true, lastName: true } },
-        category: true
+        ArticleTranslation: true,
+        User: { select: { id: true, username: true, firstName: true, lastName: true } },
+        Category: true
       }
     });
 

@@ -28,7 +28,8 @@
   },
   "include": [
     "src/**/*",
-    "tests/**/*"
+    "tests/**/*",
+    "verify-task-5.2.ts"
   ],
   "exclude": [
     "node_modules",
@@ -36,3 +37,4 @@
     "prisma/**/*"
   ]
 }
+

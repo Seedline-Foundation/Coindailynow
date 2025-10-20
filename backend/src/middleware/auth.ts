@@ -16,6 +16,7 @@ declare global {
         id: string;
         email: string;
         username: string;
+        role: string;
         subscriptionTier: string;
         status: string;
         emailVerified: boolean;
@@ -49,6 +50,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
       id: user.id,
       email: user.email,
       username: user.username,
+      role: user.role,
       subscriptionTier: user.subscriptionTier,
       status: user.status,
       emailVerified: user.emailVerified
@@ -85,6 +87,7 @@ export const optionalAuthMiddleware = async (req: Request, res: Response, next: 
         id: true,
         email: true,
         username: true,
+        role: true,
         subscriptionTier: true,
         status: true,
         emailVerified: true

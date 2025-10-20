@@ -1,0 +1,118 @@
+# Advanced Load Test Scenario
+# Tests system stability under extreme conditions
+# Run with: artillery run tests/load/stress-test.yml
+
+config:
+  target: "http://localhost:3000"
+  phases:
+    # Stress test: 1000 tasks in queue
+    - duration: 180
+      arrivalRate: 200
+      name: "Stress test - 1000 tasks in queue"
+    
+    # Spike test: Sudden burst
+    - duration: 30
+      arrivalRate: 500
+      name: "Spike test - 500 concurrent"
+    
+    # Endurance test: Sustained high load
+    - duration: 600
+      arrivalRate: 150
+      name: "Endurance test - 10 minutes sustained load"
+
+  processor: "./tests/load/artillery-processor.js"
+  
+  ensure:
+    maxErrorRate: 5  # Allow up to 5% errors under stress
+    p95: 2000        # 95th percentile < 2 seconds under stress
+    p99: 5000        # 99th percentile < 5 seconds
+
+  http:
+    timeout: 30
+    pool: 100
+
+scenarios:
+  # High-volume workflow creation
+  - name: "Workflow Creation Stress"
+    weight: 40
+    flow:
+      - loop:
+        - post:
+            url: "/api/ai/orchestrator/workflows"
+            headers:
+              Authorization: "Bearer {{ authToken }}"
+              Content-Type: "application/json"
+            json:
+              type: "CONTENT_CREATION"
+              input:
+                topic: "Stress test {{ $randomString() }}"
+            expect:
+              - statusCode: 201
+        count: 5  # Create 5 workflows per virtual user
+
+  # Queue saturation test
+  - name: "Task Queue Saturation"
+    weight: 30
+    flow:
+      - loop:
+        - post:
+            url: "/api/ai/orchestrator/tasks"
+            headers:
+              Authorization: "Bearer {{ authToken }}"
+              Content-Type: "application/json"
+            json:
+              agentType: "RESEARCH"
+              priority: "NORMAL"
+              input:
+                topic: "Queue test {{ $randomString() }}"
+            expect:
+              - statusCode: 201
+        count: 10  # Create 10 tasks per virtual user
+
+      # Check queue status
+      - get:
+          url: "/api/ai/orchestrator/queue"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Cache stress test
+  - name: "Cache Stress Test"
+    weight: 20
+    flow:
+      - loop:
+        - get:
+            url: "/api/article-translations/{{ articleId }}/{{ language }}"
+            beforeRequest: "randomLanguage"
+            expect:
+              - statusCode: 200
+        count: 20
+
+  # Database stress test
+  - name: "Database Query Stress"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/ai/orchestrator/workflows"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          query:
+            page: "{{ $randomNumber(1, 100) }}"
+            limit: 50
+          expect:
+            - statusCode: 200
+
+      - get:
+          url: "/api/ai/orchestrator/queue"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+      - get:
+          url: "/api/ai/costs/overview"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200

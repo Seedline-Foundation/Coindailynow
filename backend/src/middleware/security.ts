@@ -85,7 +85,7 @@ export const securityAnalysisMiddleware = async (
     };
 
     // Analyze request for threats
-    const threatAnalysis = await securityOrchestrator.getStatus();
+    const threatAnalysis = await securityOrchestrator.getSecurityStatus();
     
     // Initialize security context
     req.securityContext = {
@@ -96,7 +96,7 @@ export const securityAnalysisMiddleware = async (
     };
 
     // Log security event for audit trail
-    await securityOrchestrator.processSecurityEvent({
+    const eventData: any = {
       type: 'audit',
       severity: 'low',
       source: 'SecurityMiddleware',
@@ -106,10 +106,15 @@ export const securityAnalysisMiddleware = async (
         timestamp: new Date(),
         responseTime: Date.now() - startTime,
       },
-      userId: requestInfo.userId,
       ipAddress: requestInfo.ipAddress,
       userAgent: requestInfo.userAgent,
-    });
+    };
+    
+    if (requestInfo.userId) {
+      eventData.userId = requestInfo.userId;
+    }
+    
+    await securityOrchestrator.processSecurityEvent(eventData);
 
     next();
 
@@ -215,7 +220,7 @@ export const dataLossPreventionMiddleware = async (
     });
 
     // Log data access
-    await securityOrchestrator.processSecurityEvent({
+    const eventData2: any = {
       type: 'audit',
       severity: 'low',
       source: 'DataLossPreventionMiddleware',
@@ -225,9 +230,14 @@ export const dataLossPreventionMiddleware = async (
         contentType: req.get('Content-Type'),
         action: getDataAction(req.method),
       },
-      userId: req.user?.id,
       ipAddress: req.ip || 'unknown',
-    });
+    };
+    
+    if (req.user?.id) {
+      eventData2.userId = req.user.id;
+    }
+    
+    await securityOrchestrator.processSecurityEvent(eventData2);
 
     next();
 
@@ -297,7 +307,7 @@ export const enhancedRateLimitMiddleware = async (
     
     if (current > limit) {
       // Log potential attack
-      await securityOrchestrator.processSecurityEvent({
+      const eventData3: any = {
         type: 'threat',
         severity: current > limit * 2 ? 'high' : 'medium',
         source: 'RateLimitMiddleware',
@@ -309,8 +319,14 @@ export const enhancedRateLimitMiddleware = async (
           method: req.method,
         },
         ipAddress: req.ip || 'unknown',
-        userAgent: req.get('User-Agent'),
-      });
+      };
+      
+      const userAgent = req.get('User-Agent');
+      if (userAgent) {
+        eventData3.userAgent = userAgent;
+      }
+      
+      await securityOrchestrator.processSecurityEvent(eventData3);
 
       res.status(429).json({
         error: {
@@ -363,8 +379,6 @@ export const securityResponseMiddleware = async (
           errorType: body?.error?.code,
           responseTime: Date.now() - (req as any).startTime,
         },
-        userId: req.user?.id,
-        ipAddress: req.ip,
       }).catch(error => {
         logger.error('Failed to log security response event', { error });
       });
@@ -403,10 +417,7 @@ export const incidentResponseMiddleware = (
         },
         path: req.path,
         method: req.method,
-        userAgent: req.get('User-Agent'),
       },
-      userId: req.user?.id,
-      ipAddress: req.ip,
     }).catch(logError => {
       logger.error('Failed to log incident response event', { logError });
     });
@@ -486,7 +497,7 @@ function getRateLimit(req: Request): number {
   const userTier = req.user?.subscriptionTier || 'FREE';
   const multiplier = tierMultipliers[userTier] || 1;
 
-  return baseLimit * multiplier;
+  return (baseLimit || 60) * multiplier;
 }
 
 function isCriticalError(error: Error): boolean {

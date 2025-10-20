@@ -583,7 +583,7 @@ export class MarketAnalysisAgent {
     // Mock implementation - would fetch real market data
     return await this.prisma.marketData.findMany({
       where: {
-        token: {
+        Token: {
           symbol: { in: symbols }
         },
         exchange: { in: exchanges },
@@ -593,7 +593,7 @@ export class MarketAnalysisAgent {
         }
       },
       include: {
-        token: true
+        Token: true
       }
     });
   }

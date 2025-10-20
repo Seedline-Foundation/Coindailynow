@@ -9,6 +9,7 @@ export { WorkflowStatusPanel } from './WorkflowStatusPanel';
 export { LanguageManager } from './LanguageManager';
 export { MediaGallery } from './MediaGallery';
 export { CollaborationPanel } from './CollaborationPanel';
+export { default as SEOEditor } from './SEOEditor';
 
 // Export types
 export type {

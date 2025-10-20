@@ -117,7 +117,7 @@ export function detectCommandInjection(input: string): boolean {
  * Schema validation middleware factory
  */
 export function validateSchema(schema: ZodSchema) {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Validate request body
       const validated = await schema.parseAsync(req.body);
@@ -131,7 +131,7 @@ export function validateSchema(schema: ZodSchema) {
           body: req.body
         });
 
-        return res.status(400).json({
+        res.status(400).json({
           error: 'VALIDATION_ERROR',
           message: 'Invalid input data',
           details: error.errors.map(err => ({
@@ -139,13 +139,15 @@ export function validateSchema(schema: ZodSchema) {
             message: err.message
           }))
         });
+        return;
       }
 
       logger.error('Validation error', { error });
-      return res.status(500).json({
+      res.status(500).json({
         error: 'INTERNAL_ERROR',
         message: 'Validation failed'
       });
+      return;
     }
   };
 }
@@ -159,7 +161,7 @@ export function sanitizeInput(options: {
   checkNoSQLInjection?: boolean;
   checkPathTraversal?: boolean;
   checkCommandInjection?: boolean;
-} = {}) {
+} = {}): (req: Request, res: Response, next: NextFunction) => void {
   const {
     allowHtml = false,
     checkSQLInjection = true,
@@ -168,7 +170,7 @@ export function sanitizeInput(options: {
     checkCommandInjection = true
   } = options;
 
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     try {
       // Check query parameters
       for (const [key, value] of Object.entries(req.query)) {
@@ -180,10 +182,11 @@ export function sanitizeInput(options: {
               value,
               ip: req.ip
             });
-            return res.status(400).json({
+            res.status(400).json({
               error: 'INVALID_INPUT',
               message: 'Invalid characters detected in input'
             });
+            return;
           }
 
           if (checkPathTraversal && detectPathTraversal(value)) {
@@ -193,10 +196,11 @@ export function sanitizeInput(options: {
               value,
               ip: req.ip
             });
-            return res.status(400).json({
+            res.status(400).json({
               error: 'INVALID_INPUT',
               message: 'Invalid path detected'
             });
+            return;
           }
 
           if (checkCommandInjection && detectCommandInjection(value)) {
@@ -206,10 +210,11 @@ export function sanitizeInput(options: {
               value,
               ip: req.ip
             });
-            return res.status(400).json({
+            res.status(400).json({
               error: 'INVALID_INPUT',
               message: 'Invalid characters detected'
             });
+            return;
           }
         }
       }
@@ -222,10 +227,11 @@ export function sanitizeInput(options: {
             body: req.body,
             ip: req.ip
           });
-          return res.status(400).json({
+          res.status(400).json({
             error: 'INVALID_INPUT',
             message: 'Invalid input detected'
           });
+          return;
         }
 
         // Sanitize body
@@ -235,10 +241,11 @@ export function sanitizeInput(options: {
       next();
     } catch (error) {
       logger.error('Input sanitization error', { error });
-      return res.status(500).json({
+      res.status(500).json({
         error: 'INTERNAL_ERROR',
         message: 'Input processing failed'
       });
+      return;
     }
   };
 }
@@ -260,7 +267,7 @@ export function validateFileUpload(options: {
   } = options;
 
   return (req: Request, res: Response, next: NextFunction) => {
-    const files = req.files;
+    const files = (req as any).files;
 
     if (!files) {
       return next();

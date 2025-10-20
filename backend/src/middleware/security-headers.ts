@@ -171,7 +171,7 @@ export function securityHeaders() {
     // Use Helmet for most headers
     helmet({
       contentSecurityPolicy: config.csp.enabled ? {
-        directives: config.csp.directives
+        directives: config.csp.directives as any
       } : false,
       
       hsts: config.hsts.enabled ? {

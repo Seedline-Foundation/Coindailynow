@@ -8,6 +8,7 @@ import { PrismaClient, Article, User, UserEngagement, Category, Tag } from '@pri
 import { Logger } from 'winston';
 import { Redis } from 'ioredis';
 import OpenAI from 'openai';
+import { randomUUID } from 'crypto';
 import { MarketAnalysisAgent } from '../agents/marketAnalysisAgent';
 import { HybridSearchService } from './hybridSearchService';
 
@@ -282,9 +283,9 @@ export class ContentRecommendationService {
       orderBy: { createdAt: 'desc' },
       take: 1000, // Last 1000 interactions
       include: {
-        article: {
+        Article: {
           include: {
-            category: true
+            Category: true
           }
         }
       }
@@ -567,9 +568,9 @@ export class ContentRecommendationService {
     const articles = await this.prisma.article.findMany({
       where,
       include: {
-        author: true,
-        category: true,
-        userEngagements: {
+        User: true,
+        Category: true,
+        UserEngagement: {
           select: {
             actionType: true,
             userId: true
@@ -577,7 +578,7 @@ export class ContentRecommendationService {
         },
         _count: {
           select: {
-            userEngagements: true
+            UserEngagement: true
           }
         }
       },
@@ -1001,8 +1002,8 @@ Return JSON format:
     const articles = await this.prisma.article.findMany({
       where: { id: { in: articleIds } },
       include: {
-        author: true,
-        category: true
+        User: true,
+        Category: true
       }
     });
 
@@ -1028,9 +1029,9 @@ Return JSON format:
         articleId: article.id,
         title: article.title,
         excerpt: article.excerpt || '',
-        categoryName: article.category?.name || '',
+        categoryName: article.Category?.name || '',
         tags: this.parseTags(article.tags),
-        authorName: article.author?.username || 'Anonymous',
+        authorName: article.User?.username || 'Anonymous',
         publishedAt: article.publishedAt || new Date(),
         readingTime: article.readingTimeMinutes || 0,
         recommendationScore: scored.finalScore || scored.aiScore,
@@ -1158,6 +1159,7 @@ Return JSON format:
       // Record engagement
       await this.prisma.userEngagement.create({
         data: {
+          id: randomUUID(),
           userId,
           articleId: engagement.articleId,
           actionType: engagement.actionType,
@@ -1204,9 +1206,9 @@ Return JSON format:
           }
         },
         include: {
-          author: true,
-          category: true,
-          userEngagements: {
+          User: true,
+          Category: true,
+          UserEngagement: {
             where: {
               createdAt: {
                 gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
@@ -1224,7 +1226,7 @@ Return JSON format:
       const africanContent = articles
         .map(article => {
           const africanScore = this.calculateAfricanRelevanceScore(article);
-          const engagementScore = article.userEngagements.length / Math.max(article.viewCount || 1, 1);
+          const engagementScore = article.UserEngagement.length / Math.max(article.viewCount || 1, 1);
           
           return {
             article,
@@ -1240,9 +1242,9 @@ Return JSON format:
         articleId: item.article.id,
         title: item.article.title,
         excerpt: item.article.excerpt || '',
-        categoryName: item.article.category?.name || '',
+        categoryName: item.article.Category?.name || '',
         tags: this.parseTags(item.article.tags),
-        authorName: item.article.author?.username || 'Anonymous',
+        authorName: item.article.User?.username || 'Anonymous',
         publishedAt: item.article.publishedAt || new Date(),
         readingTime: item.article.readingTimeMinutes || 0,
         recommendationScore: item.trendingScore,

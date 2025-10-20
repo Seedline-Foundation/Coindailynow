@@ -4,12 +4,12 @@
  */
 
 import { QualityReviewAgent, QualityReviewConfig } from '../agents/qualityReviewAgent';
-import { 
-  QualityReviewTask, 
-  AfricanMarketContext, 
-  AgentType, 
-  TaskStatus, 
-  TaskPriority 
+import {
+  QualityReviewTask,
+  AfricanMarketContext,
+  AgentType,
+  TaskPriority,
+  TaskStatus
 } from '../types/ai-system';
 import { PrismaClient } from '@prisma/client';
 import { Logger } from 'winston';
@@ -216,7 +216,7 @@ export const qualityReviewResolvers = (
           take: limit,
           orderBy: { createdAt: 'desc' },
           include: {
-            author: {
+            User: {
               select: {
                 firstName: true,
                 lastName: true
@@ -327,7 +327,7 @@ export const qualityReviewResolvers = (
                   ageBias: result.review.biasAnalysis.details.ageBias,
                   religiousBias: result.review.biasAnalysis.details.religiousBias
                 } : undefined
-              },
+              } as any,
               culturalAnalysis: result.review.culturalAnalysis ? {
                 religiousContext: {
                   score: result.review.culturalAnalysis.religiousContext.score,
@@ -337,7 +337,9 @@ export const qualityReviewResolvers = (
                   score: result.review.culturalAnalysis.languageUsage.score,
                   localTerms: result.review.culturalAnalysis.languageUsage.localTerms,
                   appropriateness: result.review.culturalAnalysis.languageUsage.appropriateness,
-                  issues: result.review.culturalAnalysis.languageUsage.issues
+                  ...(result.review.culturalAnalysis.languageUsage.issues && {
+                    issues: result.review.culturalAnalysis.languageUsage.issues
+                  })
                 },
                 socialContext: {
                   score: result.review.culturalAnalysis.socialContext.score,
@@ -360,7 +362,7 @@ export const qualityReviewResolvers = (
               })),
               recommendations: result.review.recommendations,
               requiresHumanReview: result.review.requiresHumanReview
-            },
+            } as any,
             processingTime
           };
 
@@ -451,7 +453,7 @@ export const qualityReviewResolvers = (
             return result.value;
           } else {
             return {
-              contentId: args.inputs[index].contentId,
+              contentId: args.inputs[index]?.contentId || `unknown-${index}`,
               taskId: `error-${index}-${Date.now()}`,
               success: false,
               overallQuality: 0,

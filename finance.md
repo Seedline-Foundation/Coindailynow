@@ -15,7 +15,7 @@ Each task is structured for a development team to follow clearly.
 
 #### Components:
 
-1. **Main Token (ERC-20)**
+1. **Main Token (ERC-20)** completed
 
    * Already exists or should be deployed if not.
    * Handles all token supply, minting, and transfers.
@@ -56,16 +56,22 @@ Each task is structured for a development team to follow clearly.
 #### Components:
 
 1. **Internal Wallet System**
-
-   * Each user has a wallet record (not a blockchain wallet — database ledger).
-   * Can receive, send, stake, withdraw, convert, or buy products.
+   * this wallet is a database ledger for  people on the platform.
+   * wallet will be tied to user's (including admin and super admins) name as an identity.
+   ( this mean when a user register on the platform, on his dashboard, there is a tab called My Wallet).
+   * Super admin will have a central wallet called We that will recieve all income on the platform. To access We wallet, 3 emails will need to authenticate it with a token. these emails(must be hidden and make hard to see and find on the code) are: divinegiftx@gmail.com, bizoppventures@gmail.com, ivuomachimaobi1@gmail.com. These emails will recieve token that will be use to authenticate We wallet before accessing or doing any operation.
+   * Before any operate will be done in any wallet, owner must authenticate the operation with a token
+   * Only super admin can edit or mutilate anything in any wallet.
+   * Every user is ONLY entitled to ONE wallet only tied to their user name, phone number and email
+   * Each user account(including admin and super admin) has a wallet record ( database ledger).
+   * Can receive, send, stake, Unstake,  withdraw, convert, or buy products
    * Prevents direct edits by users.
 2. **Transaction Engine**
 
    * Handles:
 
      * Deposits (from blockchain)
-     * Internal transfers (user ↔ user)
+     * Internal transfers (user ↔ user, super admin <-> admin, Admin <-> User, super admin <-> user, admin <-> admin, super admin <-> super admin)
      * Withdrawals (to whitelisted wallet)
      * Payments (services/products/subscriptions)
    * Every action recorded as a transaction entry (amount, date, time, status).

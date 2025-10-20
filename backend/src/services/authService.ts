@@ -34,6 +34,7 @@ export interface AuthenticatedUser {
   username: string;
   firstName?: string;
   lastName?: string;
+  role: string;
   subscriptionTier: string;
   emailVerified: boolean;
   status: string;
@@ -81,19 +82,17 @@ export class AuthService {
       // Create user
       const user = await this.prisma.user.create({
         data: {
+          id: crypto.randomUUID(),
           email: data.email.toLowerCase(),
           username: data.username.toLowerCase(),
           passwordHash,
           firstName: data.firstName || null,
           lastName: data.lastName || null,
           status: 'PENDING_VERIFICATION',
+          updatedAt: new Date()
         },
         include: {
-          subscription: {
-            include: {
-              plan: true
-            }
-          }
+          Subscription: true
         }
       });
 
@@ -116,7 +115,8 @@ export class AuthService {
             categories: ['bitcoin', 'ethereum', 'defi'],
             languages: ['en'],
             difficulty: 'BEGINNER'
-          })
+          }),
+          updatedAt: new Date()
         }
       });
 
@@ -158,11 +158,7 @@ export class AuthService {
       const user = await this.prisma.user.findUnique({
         where: { email: credentials.email.toLowerCase() },
         include: {
-          subscription: {
-            include: {
-              plan: true
-            }
-          }
+          Subscription: true
         }
       });
 
@@ -254,13 +250,9 @@ export class AuthService {
       const tokenRecord = await this.prisma.refreshToken.findUnique({
         where: { token: refreshToken },
         include: {
-          user: {
+          User: {
             include: {
-              subscription: {
-                include: {
-                  plan: true
-                }
-              }
+              Subscription: true
             }
           }
         }
@@ -277,14 +269,14 @@ export class AuthService {
       }
 
       // Check user status
-      if (tokenRecord.user.status === 'SUSPENDED' || tokenRecord.user.status === 'BANNED') {
+      if (tokenRecord.User.status === 'SUSPENDED' || tokenRecord.User.status === 'BANNED') {
         // Revoke all tokens for this user
-        await this.revokeAllUserTokens(tokenRecord.user.id);
+        await this.revokeAllUserTokens(tokenRecord.User.id);
         throw new Error('Account is suspended or banned');
       }
 
       // Generate new token pair
-      const tokens = await this.generateTokenPair(tokenRecord.user, {
+      const tokens = await this.generateTokenPair(tokenRecord.User, {
         ...(tokenRecord.deviceFingerprint && { deviceFingerprint: tokenRecord.deviceFingerprint }),
         ...(tokenRecord.ipAddress && { ipAddress: tokenRecord.ipAddress }),
         ...(tokenRecord.userAgent && { userAgent: tokenRecord.userAgent })
@@ -296,7 +288,7 @@ export class AuthService {
         data: {
           isRevoked: true,
           revokedAt: new Date(),
-          revokedBy: tokenRecord.user.id
+          revokedBy: tokenRecord.User.id
         }
       });
 
@@ -344,6 +336,7 @@ export class AuthService {
     // Store refresh token
     await this.prisma.refreshToken.create({
       data: {
+        id: crypto.randomUUID(),
         userId: user.id,
         token: refreshTokenValue,
         hashedToken: hashedRefreshToken,
@@ -379,6 +372,7 @@ export class AuthService {
 
     await this.prisma.session.create({
       data: {
+        id: crypto.randomUUID(),
         userId,
         sessionToken,
         hashedSessionToken,
@@ -472,6 +466,7 @@ export class AuthService {
       // Store reset token
       await this.prisma.passwordReset.create({
         data: {
+          id: crypto.randomUUID(),
           userId: user.id,
           token: resetToken,
           hashedToken,
@@ -511,7 +506,7 @@ export class AuthService {
       // Find reset token
       const resetRecord = await this.prisma.passwordReset.findUnique({
         where: { token },
-        include: { user: true }
+        include: { User: true }
       });
 
       if (!resetRecord || resetRecord.isUsed || resetRecord.expiresAt < new Date()) {
@@ -619,11 +614,7 @@ export class AuthService {
       const user = await this.prisma.user.findUnique({
         where: { id: decoded.sub },
         include: {
-          subscription: {
-            include: {
-              plan: true
-            }
-          }
+          Subscription: true
         }
       });
 
@@ -661,6 +652,7 @@ export class AuthService {
       username: user.username,
       firstName: user.firstName,
       lastName: user.lastName,
+      role: user.role,
       subscriptionTier: user.subscriptionTier,
       emailVerified: user.emailVerified,
       status: user.status
@@ -681,6 +673,7 @@ export class AuthService {
     try {
       await this.prisma.securityEvent.create({
         data: {
+          id: crypto.randomUUID(),
           userId: event.userId || null,
           eventType: event.eventType,
           severity: event.severity || 'INFO',

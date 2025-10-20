@@ -106,6 +106,7 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       children: [
         { id: 'articles', label: 'Articles', icon: FileText, href: '/super-admin/content' },
         { id: 'ai-content', label: 'AI Content', icon: Bot, href: '/super-admin/content/ai' },
+        { id: 'content-automation', label: 'Content Automation', icon: Bot, href: '/super-admin/content-automation', badge: 'NEW', badgeColor: 'bg-green-500 text-white' },
         { id: 'moderation', label: 'Moderation', icon: Shield, href: '/super-admin/content/moderation' },
         { id: 'categories', label: 'Categories', icon: BookOpen, href: '/super-admin/content/categories' },
       ]

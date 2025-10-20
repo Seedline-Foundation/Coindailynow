@@ -181,7 +181,7 @@ export class TranslationAgent {
       // Get article with existing translations
       const article = await this.prisma.article.findUnique({
         where: { id: articleId },
-        include: { translations: true }
+        include: { ArticleTranslation: true }
       });
 
       if (!article) {
@@ -195,7 +195,7 @@ export class TranslationAgent {
 
       // Get supported languages minus existing translations
       const supportedLanguages = this.translationService.getSupportedLanguages();
-      const existingLanguages = article.translations.map(t => t.languageCode);
+      const existingLanguages = article.ArticleTranslation.map(t => t.languageCode);
       const pendingLanguages = supportedLanguages.filter(lang => 
         lang !== sourceLanguage && !existingLanguages.includes(lang)
       ) as SupportedLanguage[];
@@ -257,6 +257,7 @@ export class TranslationAgent {
         humanReviewed: false
       },
       create: {
+        id: `${task.articleId}_${language}`,
         articleId: task.articleId,
         languageCode: language,
         title: translation.title,
@@ -265,7 +266,8 @@ export class TranslationAgent {
         translationStatus: 'PENDING',
         qualityScore: translation.qualityScore,
         aiGenerated: true,
-        humanReviewed: false
+        humanReviewed: false,
+        updatedAt: new Date()
       }
     });
 

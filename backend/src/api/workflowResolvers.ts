@@ -49,29 +49,29 @@ export const workflowResolvers = {
         const workflow = await context.prisma.contentWorkflow.findUnique({
           where: { id },
           include: {
-            article: {
+            Article: {
               select: {
                 id: true,
                 title: true,
                 status: true,
                 authorId: true,
-                author: {
+                User: {
                   select: { id: true, username: true, firstName: true, lastName: true }
                 }
               }
             },
-            assignedReviewer: {
+            User: {
               select: { id: true, username: true, firstName: true, lastName: true }
             },
-            steps: {
+            WorkflowStep: {
               include: {
-                assignee: {
+                User: {
                   select: { id: true, username: true, firstName: true, lastName: true }
                 }
               },
               orderBy: { stepOrder: 'asc' }
             },
-            transitions: {
+            WorkflowTransition: {
               orderBy: { createdAt: 'asc' }
             }
           }
@@ -82,7 +82,7 @@ export const workflowResolvers = {
         }
 
         // Check permissions
-        const hasAccess = workflow.article.authorId === context.user.id || 
+        const hasAccess = (workflow as any).Article.authorId === context.user.id || 
                          workflow.assignedReviewerId === context.user.id ||
                          isPrivilegedUser(context.user);
 
@@ -143,18 +143,18 @@ export const workflowResolvers = {
         const workflows = await context.prisma.contentWorkflow.findMany({
           where,
           include: {
-            article: {
+            Article: {
               select: {
                 id: true,
                 title: true,
                 status: true,
                 authorId: true,
-                author: {
+                User: {
                   select: { id: true, username: true, firstName: true, lastName: true }
                 }
               }
             },
-            assignedReviewer: {
+            User: {
               select: { id: true, username: true, firstName: true, lastName: true }
             }
           },
@@ -219,9 +219,9 @@ export const workflowResolvers = {
         const notifications = await context.prisma.workflowNotification.findMany({
           where,
           include: {
-            workflow: {
+            ContentWorkflow: {
               include: {
-                article: {
+                Article: {
                   select: { id: true, title: true }
                 }
               }
@@ -288,7 +288,7 @@ export const workflowResolvers = {
         const workflow = await context.prisma.contentWorkflow.findUnique({
           where: { id: input.workflowId },
           include: { 
-            article: { select: { id: true, authorId: true } }
+            Article: { select: { id: true, authorId: true } }
           }
         });
 
@@ -296,7 +296,7 @@ export const workflowResolvers = {
           throw new UserInputError('Workflow not found');
         }
 
-        const canTransition = workflow.article.authorId === context.user.id || 
+        const canTransition = workflow.Article.authorId === context.user.id || 
                              workflow.assignedReviewerId === context.user.id ||
                              isPrivilegedUser(context.user);
 
@@ -339,7 +339,7 @@ export const workflowResolvers = {
         const workflow = await context.prisma.contentWorkflow.findUnique({
           where: { id: workflowId },
           include: { 
-            article: { select: { id: true, authorId: true } }
+            Article: { select: { id: true, authorId: true } }
           }
         });
 

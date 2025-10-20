@@ -633,8 +633,8 @@ export class SecurityIncidentResponse extends EventEmitter {
       timestamp: new Date(),
       event,
       description,
-      user,
       automated,
+      ...(user && { user }),
     };
 
     incident.timeline.push(timelineEvent);

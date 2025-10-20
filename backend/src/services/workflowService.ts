@@ -1,7 +1,19 @@
 /**
  * Content Workflow Engine Service - Task 8
  * Implements automated content workflow: Research → AI Review → Content → AI Review → Translation → AI Review → Human Approval
- * Provides workflow state management, AI integration, human approval checkpoints, analytics and error recovery
+ * Provides workflow state management, AI integration, human approval checkpoints, analytics an        // Get current workflow
+        const currentWorkflow = await tx.contentWorkflow.findUnique({
+          where: { id: input.workflowId }
+        });
+
+        if (!currentWorkflow) {
+          throw new Error(`Workflow ${input.workflowId} not found`);
+        }
+
+        // Get workflow steps
+        const workflowSteps = await tx.workflowStep.findMany({
+          where: { workflowId: input.workflowId }
+        });ecovery
  */
 
 import { PrismaClient, ContentWorkflow, WorkflowStep, WorkflowTransition, WorkflowNotification, Article, User } from '@prisma/client';
@@ -199,6 +211,7 @@ export class WorkflowService extends EventEmitter {
         // Create the workflow
         const newWorkflow = await tx.contentWorkflow.create({
           data: {
+            id: `wf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             articleId: input.articleId,
             workflowType: input.workflowType || 'ARTICLE_PUBLISHING',
             currentState: WorkflowState.RESEARCH,
@@ -206,7 +219,8 @@ export class WorkflowService extends EventEmitter {
             assignedReviewerId: input.assignedReviewerId || null,
             maxRetries: this.config.maxRetries,
             metadata: input.metadata ? JSON.stringify(input.metadata) : null,
-            estimatedCompletionAt: this.calculateEstimatedCompletion()
+            estimatedCompletionAt: this.calculateEstimatedCompletion(),
+            updatedAt: new Date()
           }
         });
 
@@ -217,12 +231,14 @@ export class WorkflowService extends EventEmitter {
           
           await tx.workflowStep.create({
             data: {
+              id: `step_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               workflowId: newWorkflow.id,
               stepName: stepConfig.stepName,
               stepOrder: i + 1,
               status: i === 0 ? 'IN_PROGRESS' : 'PENDING',
               estimatedDurationMs: stepConfig.estimatedDurationMs,
-              startedAt: i === 0 ? new Date() : null
+              startedAt: i === 0 ? new Date() : null,
+              updatedAt: new Date()
             }
           });
         }
@@ -230,6 +246,7 @@ export class WorkflowService extends EventEmitter {
         // Create initial transition
         await tx.workflowTransition.create({
           data: {
+            id: `trans_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             workflowId: newWorkflow.id,
             fromState: '',
             toState: WorkflowState.RESEARCH,
@@ -268,13 +285,17 @@ export class WorkflowService extends EventEmitter {
       const workflow = await this.prisma.$transaction(async (tx) => {
         // Get current workflow
         const currentWorkflow = await tx.contentWorkflow.findUnique({
-          where: { id: input.workflowId },
-          include: { steps: true }
+          where: { id: input.workflowId }
         });
 
         if (!currentWorkflow) {
-          throw new Error(`Workflow not found: ${input.workflowId}`);
+          throw new Error(`Workflow ${input.workflowId} not found`);
         }
+
+        // Get workflow steps
+        const workflowSteps = await tx.workflowStep.findMany({
+          where: { workflowId: input.workflowId }
+        });
 
         // Validate transition
         if (!this.isValidTransition(currentWorkflow.currentState, input.toState)) {
@@ -294,7 +315,7 @@ export class WorkflowService extends EventEmitter {
         });
 
         // Update current step status
-        const currentStep = currentWorkflow.steps.find(s => s.stepName === currentWorkflow.currentState);
+        const currentStep = workflowSteps.find(s => s.stepName === currentWorkflow.currentState);
         if (currentStep && currentStep.status === 'IN_PROGRESS') {
           await tx.workflowStep.update({
             where: { id: currentStep.id },
@@ -303,20 +324,22 @@ export class WorkflowService extends EventEmitter {
               completedAt: new Date(),
               actualDurationMs: currentStep.startedAt 
                 ? Date.now() - currentStep.startedAt.getTime() 
-                : null
+                : null,
+              updatedAt: new Date()
             }
           });
         }
 
         // Start next step if not terminal state
         if (!this.isTerminalState(input.toState)) {
-          const nextStep = currentWorkflow.steps.find(s => s.stepName === input.toState);
+          const nextStep = workflowSteps.find(s => s.stepName === input.toState);
           if (nextStep) {
             await tx.workflowStep.update({
               where: { id: nextStep.id },
               data: {
                 status: 'IN_PROGRESS',
-                startedAt: new Date()
+                startedAt: new Date(),
+                updatedAt: new Date()
               }
             });
           }
@@ -325,6 +348,7 @@ export class WorkflowService extends EventEmitter {
         // Record transition
         await tx.workflowTransition.create({
           data: {
+            id: `trans_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             workflowId: input.workflowId,
             fromState: currentWorkflow.currentState,
             toState: input.toState,
@@ -372,15 +396,25 @@ export class WorkflowService extends EventEmitter {
 
     try {
       const workflow = await this.prisma.contentWorkflow.findUnique({
-        where: { id: workflowId },
-        include: { 
-          steps: true,
-          article: true
-        }
+        where: { id: workflowId }
       });
 
       if (!workflow) {
         throw new Error(`Workflow not found: ${workflowId}`);
+      }
+
+      // Get workflow steps
+      const workflowSteps = await this.prisma.workflowStep.findMany({
+        where: { workflowId }
+      });
+
+      // Get article
+      const article = await this.prisma.article.findUnique({
+        where: { id: workflow.articleId }
+      });
+
+      if (!article) {
+        throw new Error(`Article not found: ${workflow.articleId}`);
       }
 
       const currentStepConfig = this.stepConfigs.get(workflow.currentState);
@@ -400,7 +434,7 @@ export class WorkflowService extends EventEmitter {
 
       // Process AI step
       if (currentStepConfig.aiAgentType) {
-        await this.processAIStep(workflow, currentStepConfig);
+        await this.processAIStep(workflow, article, workflowSteps, currentStepConfig);
       }
 
     } catch (error) {
@@ -415,7 +449,7 @@ export class WorkflowService extends EventEmitter {
   /**
    * Process AI-powered workflow step
    */
-  private async processAIStep(workflow: ContentWorkflow & { article: Article, steps: WorkflowStep[] }, stepConfig: WorkflowStepConfig): Promise<void> {
+  private async processAIStep(workflow: ContentWorkflow, article: Article, steps: WorkflowStep[], stepConfig: WorkflowStepConfig): Promise<void> {
     this.logger.info('Processing AI step', { 
       workflowId: workflow.id, 
       stepName: stepConfig.stepName,
@@ -426,19 +460,20 @@ export class WorkflowService extends EventEmitter {
       // Create AI task
       const aiTask = await this.prisma.aITask.create({
         data: {
+          id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           agentId: 'default-agent', // This would be replaced with actual agent selection
           taskType: stepConfig.aiAgentType!,
           inputData: JSON.stringify({
             articleId: workflow.articleId,
             workflowId: workflow.id,
             stepName: stepConfig.stepName,
-            content: workflow.article.content,
-            title: workflow.article.title
+            content: article.content,
+            title: article.title
           }),
           status: 'QUEUED',
           priority: workflow.priority,
           estimatedCost: 0.1, // Placeholder cost
-          workflowStepId: workflow.steps?.find((s: any) => s.stepName === stepConfig.stepName)?.id || null
+          workflowStepId: steps.find((s: any) => s.stepName === stepConfig.stepName)?.id || null
         }
       });
 
@@ -606,7 +641,6 @@ export class WorkflowService extends EventEmitter {
       const stepPerformance = await this.prisma.workflowStep.groupBy({
         by: ['stepName'],
         where: { 
-          workflow: whereClause,
           status: { in: ['COMPLETED', 'FAILED'] }
         },
         _avg: { actualDurationMs: true, qualityScore: true },
@@ -615,7 +649,7 @@ export class WorkflowService extends EventEmitter {
 
       const bottleneckSteps = stepPerformance.map(step => ({
         stepName: step.stepName,
-        averageDurationMs: step._avg.actualDurationMs || 0,
+        averageDurationMs: step._avg?.actualDurationMs || 0,
         failureRate: 0 // Calculate from status counts
       })).sort((a, b) => b.averageDurationMs - a.averageDurationMs);
 
@@ -657,6 +691,7 @@ export class WorkflowService extends EventEmitter {
     try {
       const notification = await this.prisma.workflowNotification.create({
         data: {
+          id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           workflowId: input.workflowId,
           recipientId: input.recipientId,
           notificationType: input.notificationType,

@@ -456,6 +456,7 @@ export class TranslationService {
 
     return await this.prisma.articleTranslation.create({
       data: {
+        id: `trans_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         articleId,
         languageCode,
         title: translation.title,
@@ -464,7 +465,8 @@ export class TranslationService {
         translationStatus: qualityScore >= 70 ? 'COMPLETED' : 'PENDING',
         aiGenerated: true,
         humanReviewed: false,
-        qualityScore
+        qualityScore,
+        updatedAt: new Date()
       }
     });
   }

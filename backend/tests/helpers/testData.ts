@@ -32,6 +32,7 @@ export async function createTestUser(options: TestUserOptions = {}): Promise<Tes
 
   const user = await prisma.user.create({
     data: {
+      id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       email,
       username,
       passwordHash: hashedPassword,
@@ -39,24 +40,9 @@ export async function createTestUser(options: TestUserOptions = {}): Promise<Tes
       subscriptionTier: options.role ?? 'FREE',
       preferredLanguage: 'en',
       status: 'ACTIVE',
-      profile: {
-        create: {
-          tradingExperience: 'BEGINNER',
-          investmentPortfolioSize: 'SMALL',
-          preferredExchanges: JSON.stringify(['binance-africa', 'luno']),
-          notificationPreferences: JSON.stringify({
-            email: true,
-            push: true,
-            sms: false,
-            timezone: options.timezone || 'UTC'
-          }),
-          privacySettings: JSON.stringify({ isPublic: true }),
-          contentPreferences: JSON.stringify({ language: 'en' }),
-        }
-      }
-    },
-    include: {
-      profile: true
+      role: 'USER',
+      twoFactorSecret: null,
+      updatedAt: new Date(),
     }
   });
 
@@ -77,14 +63,14 @@ export async function createTestUser(options: TestUserOptions = {}): Promise<Tes
     email: user.email,
     username: user.username,
     token,
-    timezone: user.profile?.notificationPreferences ? 
-      JSON.parse(user.profile.notificationPreferences).timezone : 'UTC'
+    timezone: options.timezone || 'UTC' // Use the provided timezone or default to UTC
   };
 }
 
 export async function createTestArticle(authorId: string, options: any = {}) {
   const article = await prisma.article.create({
     data: {
+      id: options.id || `article-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: options.title || `Test Article ${Date.now()}`,
       slug: options.slug || `test-article-${Date.now()}`,
       content: options.content || 'Test article content',
@@ -102,6 +88,7 @@ export async function createTestArticle(authorId: string, options: any = {}) {
       seoTitle: options.seoTitle || `Test Article ${Date.now()}`,
       seoDescription: options.seoDescription || 'Test article description',
       tags: JSON.stringify(options.tags || ['test', 'article']),
+      updatedAt: new Date(),
     }
   });
 
@@ -112,12 +99,14 @@ export async function createTestArticle(authorId: string, options: any = {}) {
 export async function createTestCategory(options: any = {}) {
   const category = await prisma.category.create({
     data: {
+      id: options.id || `category-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name: options.name || `Test Category ${Date.now()}`,
       slug: options.slug || `test-category-${Date.now()}`,
       description: options.description || 'Test category description',
       colorHex: options.colorHex || '#000000',
       isActive: options.isActive ?? true,
       sortOrder: options.sortOrder || 0,
+      updatedAt: new Date(),
     }
   });
 
@@ -131,6 +120,7 @@ export async function createTestMarketData(options: any = {}) {
   if (!tokenId) {
     const token = await prisma.token.create({
       data: {
+        id: options.id || `token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         symbol: options.symbol || 'BTC',
         name: options.name || 'Bitcoin',
         slug: options.slug || `test-token-${Date.now()}`,
@@ -138,6 +128,7 @@ export async function createTestMarketData(options: any = {}) {
         blockchain: 'Bitcoin',
         tokenType: 'CRYPTOCURRENCY',
         isListed: true,
+        updatedAt: new Date(),
       }
     });
     testDataIds.push(token.id);
@@ -146,6 +137,7 @@ export async function createTestMarketData(options: any = {}) {
 
   const marketData = await prisma.marketData.create({
     data: {
+      id: options.id || `marketdata-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       tokenId,
       exchange: options.exchange || 'test-exchange',
       priceUsd: options.priceUsd || 50000,

@@ -146,7 +146,7 @@ export class MarketDataAggregator extends EventEmitter implements IMarketDataAgg
       }
 
       throw new MarketDataError(
-        `Failed to fetch market data: ${error.message}`,
+        `Failed to fetch market data: ${(error as Error).message}`,
         ErrorCode.EXCHANGE_UNAVAILABLE,
         { retryable: true }
       );
@@ -453,7 +453,7 @@ export class MarketDataAggregator extends EventEmitter implements IMarketDataAgg
       const responseTime = Date.now() - startTime;
       logger.error('Exchange fetch failed', { 
         exchange: exchangeName, 
-        error: error.message, 
+        error: (error as Error).message, 
         responseTime 
       });
       
@@ -533,7 +533,9 @@ export class MarketDataAggregator extends EventEmitter implements IMarketDataAgg
     // Prevent memory cache from growing too large
     if (this.memoryCache.size > this.config.caching.maxHotItems) {
       const oldestKey = this.memoryCache.keys().next().value;
-      this.memoryCache.delete(oldestKey);
+      if (oldestKey) {
+        this.memoryCache.delete(oldestKey);
+      }
     }
   }
 
@@ -574,7 +576,7 @@ export class MarketDataAggregator extends EventEmitter implements IMarketDataAgg
       // Try to get recent data from database
       const fallbackData = await this.prisma.marketData.findMany({
         where: {
-          token: {
+          Token: {
             symbol: { in: symbols }
           },
           timestamp: {

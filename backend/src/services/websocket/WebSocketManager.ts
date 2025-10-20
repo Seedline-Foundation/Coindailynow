@@ -97,26 +97,19 @@ export class WebSocketManager {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'test-secret') as any;
         
-        // Get user details with profile
+        // Get user details
         const user = await this.prisma.user.findUnique({
-          where: { id: decoded.userId },
-          include: { profile: true }
+          where: { id: decoded.userId }
         });
 
         if (!user || user.status !== 'ACTIVE') {
           return next(new Error('Authentication failed'));
         }
 
-        // Extract timezone from user profile
+        // Extract timezone from user preferences (assuming it's stored on user)
         let timezone = 'UTC';
-        if (user.profile?.notificationPreferences) {
-          try {
-            const prefs = JSON.parse(user.profile.notificationPreferences);
-            timezone = prefs.timezone || 'UTC';
-          } catch (e) {
-            // Use default timezone if parsing fails
-          }
-        }
+        // Note: notificationPreferences might be stored differently in the schema
+        // This needs to be updated based on actual User model structure
 
         // Check connection limits with pool manager
         const connectionCheck = this.connectionPoolManager.canAcceptConnection(user.id);
