@@ -12,7 +12,6 @@ import {
   Typography,
   Tabs,
   Tab,
-  Grid,
   Card,
   CardContent,
   Button,
@@ -191,62 +190,54 @@ export default function ImageOptimizationDashboard() {
       </Box>
 
       {/* Overview Cards */}
-      <Grid container spacing={3} mb={3}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Total Images
-              </Typography>
-              <Typography variant="h4">{overviewStats.totalImages || 0}</Typography>
-              <Typography variant="caption" color="success.main">
-                {todayMetrics.totalImagesProcessed || 0} today
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Success Rate
-              </Typography>
-              <Typography variant="h4">{overviewStats.successRate?.toFixed(1) || 0}%</Typography>
-              <Typography variant="caption" color="textSecondary">
-                {overviewStats.failedImages || 0} failed
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Bytes Saved
-              </Typography>
-              <Typography variant="h4">
-                {formatBytes(todayMetrics.totalBytesSaved || 0)}
-              </Typography>
-              <Typography variant="caption" color="success.main">
-                {todayMetrics.avgCompressionRatio?.toFixed(1) || 0}% avg
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Processing
-              </Typography>
-              <Typography variant="h4">{overviewStats.processingImages || 0}</Typography>
-              <Typography variant="caption" color="textSecondary">
-                {todayMetrics.avgProcessingTime || 0}ms avg
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 3 }}>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Total Images
+            </Typography>
+            <Typography variant="h4">{overviewStats.totalImages || 0}</Typography>
+            <Typography variant="caption" color="success.main">
+              {todayMetrics.totalImagesProcessed || 0} today
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Success Rate
+            </Typography>
+            <Typography variant="h4">{overviewStats.successRate?.toFixed(1) || 0}%</Typography>
+            <Typography variant="caption" color="textSecondary">
+              {overviewStats.failedImages || 0} failed
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Bytes Saved
+            </Typography>
+            <Typography variant="h4">
+              {formatBytes(todayMetrics.totalBytesSaved || 0)}
+            </Typography>
+            <Typography variant="caption" color="success.main">
+              {todayMetrics.avgCompressionRatio?.toFixed(1) || 0}% avg
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Processing
+            </Typography>
+            <Typography variant="h4">{overviewStats.processingImages || 0}</Typography>
+            <Typography variant="caption" color="textSecondary">
+              {todayMetrics.avgProcessingTime || 0}ms avg
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
 
       {/* Tabs */}
       <Paper sx={{ width: '100%' }}>
@@ -260,89 +251,79 @@ export default function ImageOptimizationDashboard() {
 
         {/* Overview Tab */}
         <TabPanel value={tabValue} index={0}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                  Daily Processing Volume
-                </Typography>
-                {todayMetrics.totalImagesProcessed > 0 ? (
-                  <Box>
-                    <Typography variant="body1">
-                      Images Processed Today: {todayMetrics.totalImagesProcessed}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                      Chart visualization requires chart.js installation
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Alert severity="info">No processing data for today</Alert>
-                )}
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                  Format Distribution
-                </Typography>
-                {formats.length > 0 ? (
-                  <Box>
-                    {formats.map((f: any) => (
-                      <Box key={f.id} sx={{ mb: 1 }}>
-                        <Typography variant="body2">
-                          {f.format.toUpperCase()}: {f.usageCount} images
-                        </Typography>
-                      </Box>
-                    ))}
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                      Chart visualization requires chart.js installation
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Alert severity="info">No format data available</Alert>
-                )}
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
+            <Paper sx={{ p: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                Daily Processing Volume
+              </Typography>
+              {todayMetrics.totalImagesProcessed > 0 ? (
+                <Box>
+                  <Typography variant="body1">
+                    Images Processed Today: {todayMetrics.totalImagesProcessed}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Chart visualization requires chart.js installation
+                  </Typography>
+                </Box>
+              ) : (
+                <Alert severity="info">No processing data for today</Alert>
+              )}
+            </Paper>
+            <Paper sx={{ p: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                Format Distribution
+              </Typography>
+              {formats.length > 0 ? (
+                <Box>
+                  {formats.map((f: any) => (
+                    <Box key={f.id} sx={{ mb: 1 }}>
+                      <Typography variant="body2">
+                        {f.format.toUpperCase()}: {f.usageCount} images
+                      </Typography>
+                    </Box>
+                  ))}
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                    Chart visualization requires chart.js installation
+                  </Typography>
+                </Box>
+              ) : (
+                <Alert severity="info">No format data available</Alert>
+              )}
+            </Paper>
+            <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
               <Paper sx={{ p: 2 }}>
                 <Typography variant="h6" gutterBottom>
                   Optimization Performance
                 </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={4}>
-                    <Box>
-                      <Typography variant="subtitle2" color="textSecondary">
-                        Total Original Size
-                      </Typography>
-                      <Typography variant="h5">
-                        {formatBytes(todayMetrics.totalOriginalSize || 0)}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Box>
-                      <Typography variant="subtitle2" color="textSecondary">
-                        Total Optimized Size
-                      </Typography>
-                      <Typography variant="h5">
-                        {formatBytes(todayMetrics.totalOptimizedSize || 0)}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Box>
-                      <Typography variant="subtitle2" color="textSecondary">
-                        Total Savings
-                      </Typography>
-                      <Typography variant="h5" color="success.main">
-                        {formatBytes(todayMetrics.totalBytesSaved || 0)}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+                  <Box>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Total Original Size
+                    </Typography>
+                    <Typography variant="h5">
+                      {formatBytes(todayMetrics.totalOriginalSize || 0)}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Total Optimized Size
+                    </Typography>
+                    <Typography variant="h5">
+                      {formatBytes(todayMetrics.totalOptimizedSize || 0)}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Total Savings
+                    </Typography>
+                    <Typography variant="h5" color="success.main">
+                      {formatBytes(todayMetrics.totalBytesSaved || 0)}
+                    </Typography>
+                  </Box>
+                </Box>
               </Paper>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </TabPanel>
 
         {/* Images Tab */}
@@ -625,3 +606,4 @@ function formatBytes(bytes: number): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }
+

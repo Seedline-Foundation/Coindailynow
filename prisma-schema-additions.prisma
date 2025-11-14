@@ -1,0 +1,340 @@
+// ============================================================================
+// PRISMA SCHEMA ADDITIONS FOR NEW FINANCE OPERATIONS
+// Add these models to your schema.prisma file
+// ============================================================================
+
+// Model for Scheduled Payments (Operation #94)
+model ScheduledPayment {
+  id                String   @id @default(uuid())
+  userId            String
+  walletId          String
+  recipientWalletId String
+  amount            Float
+  currency          String   @default("USD")
+  scheduledDate     DateTime
+  paymentType       String?
+  description       String?
+  status            String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED, FAILED
+  transactionId     String?  @unique
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  executedAt        DateTime?
+  
+  // Relations
+  User              User              @relation("UserScheduledPayments", fields: [userId], references: [id], onDelete: Cascade)
+  Wallet            Wallet            @relation("WalletScheduledPayments", fields: [walletId], references: [id], onDelete: Cascade)
+  RecipientWallet   Wallet            @relation("RecipientScheduledPayments", fields: [recipientWalletId], references: [id])
+  Transaction       WalletTransaction? @relation("ScheduledPaymentTransaction", fields: [transactionId], references: [id])
+  
+  @@index([userId, status])
+  @@index([walletId, status])
+  @@index([scheduledDate, status])
+  @@index([status])
+  @@map("scheduled_payments")
+}
+
+// Model for Recurring Payments (Operation #95)
+model RecurringPayment {
+  id                String   @id @default(uuid())
+  userId            String
+  walletId          String
+  recipientWalletId String
+  amount            Float
+  currency          String   @default("USD")
+  frequency         String   // DAILY, WEEKLY, BIWEEKLY, MONTHLY, QUARTERLY, YEARLY
+  startDate         DateTime
+  endDate           DateTime?
+  maxOccurrences    Int?
+  currentOccurrence Int      @default(0)
+  nextPaymentDate   DateTime
+  lastPaymentDate   DateTime?
+  description       String?
+  status            String   @default("ACTIVE") // ACTIVE, PAUSED, CANCELLED, COMPLETED, FAILED
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  User              User     @relation("UserRecurringPayments", fields: [userId], references: [id], onDelete: Cascade)
+  Wallet            Wallet   @relation("WalletRecurringPayments", fields: [walletId], references: [id], onDelete: Cascade)
+  RecipientWallet   Wallet   @relation("RecipientRecurringPayments", fields: [recipientWalletId], references: [id])
+  Transactions      RecurringPaymentTransaction[]
+  
+  @@index([userId, status])
+  @@index([walletId, status])
+  @@index([nextPaymentDate, status])
+  @@index([status])
+  @@map("recurring_payments")
+}
+
+// Model to track individual recurring payment executions
+model RecurringPaymentTransaction {
+  id                 String          @id @default(uuid())
+  recurringPaymentId String
+  transactionId      String          @unique
+  occurrenceNumber   Int
+  amount             Float
+  status             String          // COMPLETED, FAILED, PENDING
+  executedAt         DateTime        @default(now())
+  errorMessage       String?
+  
+  // Relations
+  RecurringPayment   RecurringPayment @relation(fields: [recurringPaymentId], references: [id], onDelete: Cascade)
+  Transaction        WalletTransaction @relation("RecurringTransaction", fields: [transactionId], references: [id])
+  
+  @@index([recurringPaymentId])
+  @@index([transactionId])
+  @@map("recurring_payment_transactions")
+}
+
+// Model for Payment Links (Operation #96)
+model PaymentLink {
+  id           String    @id @default(uuid())
+  linkId       String    @unique
+  userId       String
+  walletId     String
+  amount       Float
+  currency     String    @default("USD")
+  description  String?
+  expiresAt    DateTime?
+  maxUses      Int?
+  currentUses  Int       @default(0)
+  requiresAuth Boolean   @default(false)
+  customSlug   String?
+  status       String    @default("ACTIVE") // ACTIVE, EXPIRED, DISABLED, EXHAUSTED
+  metadata     Json?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  // Relations
+  User         User               @relation("UserPaymentLinks", fields: [userId], references: [id], onDelete: Cascade)
+  Wallet       Wallet             @relation("WalletPaymentLinks", fields: [walletId], references: [id], onDelete: Cascade)
+  Payments     PaymentLinkPayment[]
+  
+  @@index([linkId])
+  @@index([userId])
+  @@index([walletId])
+  @@index([status])
+  @@index([expiresAt, status])
+  @@map("payment_links")
+}
+
+// Model to track payments made through payment links
+model PaymentLinkPayment {
+  id            String          @id @default(uuid())
+  paymentLinkId String
+  transactionId String          @unique
+  payerUserId   String?
+  amount        Float
+  status        String          // COMPLETED, FAILED, PENDING
+  paidAt        DateTime        @default(now())
+  
+  // Relations
+  PaymentLink   PaymentLink       @relation(fields: [paymentLinkId], references: [id], onDelete: Cascade)
+  Transaction   WalletTransaction @relation("PaymentLinkTransaction", fields: [transactionId], references: [id])
+  PayerUser     User?             @relation("PayerPayments", fields: [payerUserId], references: [id])
+  
+  @@index([paymentLinkId])
+  @@index([transactionId])
+  @@map("payment_link_payments")
+}
+
+// Model for Invoices (Operation #97)
+model Invoice {
+  id             String    @id @default(uuid())
+  invoiceNumber  String    @unique
+  issuerId       String
+  recipientId    String?
+  walletId       String
+  items          Json      // Array of { description, quantity, unitPrice }
+  subtotal       Float
+  taxRate        Float     @default(0)
+  taxAmount      Float
+  discountAmount Float     @default(0)
+  totalAmount    Float
+  currency       String    @default("USD")
+  status         String    @default("UNPAID") // UNPAID, PAID, PARTIALLY_PAID, CANCELLED, OVERDUE
+  issuedAt       DateTime  @default(now())
+  dueDate        DateTime?
+  paidAt         DateTime?
+  notes          String?
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  
+  // Relations
+  Issuer         User              @relation("InvoiceIssuer", fields: [issuerId], references: [id])
+  Recipient      User?             @relation("InvoiceRecipient", fields: [recipientId], references: [id])
+  Wallet         Wallet            @relation("InvoiceWallet", fields: [walletId], references: [id], onDelete: Cascade)
+  Payments       InvoicePayment[]
+  
+  @@index([invoiceNumber])
+  @@index([issuerId])
+  @@index([recipientId])
+  @@index([status])
+  @@index([dueDate, status])
+  @@map("invoices")
+}
+
+// Model to track payments made towards invoices
+model InvoicePayment {
+  id            String          @id @default(uuid())
+  invoiceId     String
+  transactionId String          @unique
+  amount        Float
+  paidAt        DateTime        @default(now())
+  
+  // Relations
+  Invoice       Invoice           @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  Transaction   WalletTransaction @relation("InvoicePaymentTransaction", fields: [transactionId], references: [id])
+  
+  @@index([invoiceId])
+  @@index([transactionId])
+  @@map("invoice_payments")
+}
+
+// ============================================================================
+// UPDATES TO EXISTING MODELS
+// Add these relations to existing models
+// ============================================================================
+
+// Add to User model:
+/*
+  ScheduledPayments        ScheduledPayment[]       @relation("UserScheduledPayments")
+  RecurringPayments        RecurringPayment[]       @relation("UserRecurringPayments")
+  PaymentLinks             PaymentLink[]            @relation("UserPaymentLinks")
+  PayerPayments            PaymentLinkPayment[]     @relation("PayerPayments")
+  IssuedInvoices           Invoice[]                @relation("InvoiceIssuer")
+  ReceivedInvoices         Invoice[]                @relation("InvoiceRecipient")
+*/
+
+// Add to Wallet model:
+/*
+  ScheduledPaymentsFrom       ScheduledPayment[]    @relation("WalletScheduledPayments")
+  ScheduledPaymentsTo         ScheduledPayment[]    @relation("RecipientScheduledPayments")
+  RecurringPaymentsFrom       RecurringPayment[]    @relation("WalletRecurringPayments")
+  RecurringPaymentsTo         RecurringPayment[]    @relation("RecipientRecurringPayments")
+  PaymentLinks                PaymentLink[]         @relation("WalletPaymentLinks")
+  Invoices                    Invoice[]             @relation("InvoiceWallet")
+*/
+
+// Add to WalletTransaction model:
+/*
+  ScheduledPayment            ScheduledPayment?          @relation("ScheduledPaymentTransaction")
+  RecurringPaymentTransaction RecurringPaymentTransaction? @relation("RecurringTransaction")
+  PaymentLinkPayment          PaymentLinkPayment?        @relation("PaymentLinkTransaction")
+  InvoicePayment              InvoicePayment?            @relation("InvoicePaymentTransaction")
+*/
+
+// ============================================================================
+// MIGRATION COMMANDS
+// ============================================================================
+
+/*
+After adding these models to schema.prisma, run:
+
+1. Create migration:
+   npx prisma migrate dev --name add_finance_operations_models
+
+2. Generate Prisma Client:
+   npx prisma generate
+
+3. Push to database (development):
+   npx prisma db push
+
+4. Format schema:
+   npx prisma format
+
+5. Validate schema:
+   npx prisma validate
+
+6. View in Prisma Studio:
+   npx prisma studio
+*/
+
+// ============================================================================
+// INDEXES EXPLANATION
+// ============================================================================
+
+/*
+Indexes added for optimal query performance:
+
+1. ScheduledPayment
+   - (userId, status) - User's scheduled payments by status
+   - (walletId, status) - Wallet's scheduled payments
+   - (scheduledDate, status) - Date-based queries for processing
+   - (status) - Global status filtering
+
+2. RecurringPayment
+   - (userId, status) - User's recurring payments
+   - (walletId, status) - Wallet's recurring payments
+   - (nextPaymentDate, status) - Next payment processing
+   - (status) - Global status filtering
+
+3. PaymentLink
+   - (linkId) - Fast link lookup
+   - (userId) - User's payment links
+   - (walletId) - Wallet's payment links
+   - (status) - Active links filtering
+   - (expiresAt, status) - Expiration checking
+
+4. Invoice
+   - (invoiceNumber) - Fast invoice lookup
+   - (issuerId) - Issued invoices by user
+   - (recipientId) - Received invoices by user
+   - (status) - Status filtering
+   - (dueDate, status) - Overdue invoice detection
+*/
+
+// ============================================================================
+// EXAMPLE QUERIES
+// ============================================================================
+
+/*
+// Get active scheduled payments due in next 24 hours
+const duePayments = await prisma.scheduledPayment.findMany({
+  where: {
+    status: 'SCHEDULED',
+    scheduledDate: {
+      lte: new Date(Date.now() + 24 * 60 * 60 * 1000)
+    }
+  }
+});
+
+// Get active recurring payments due for processing
+const dueRecurring = await prisma.recurringPayment.findMany({
+  where: {
+    status: 'ACTIVE',
+    nextPaymentDate: {
+      lte: new Date()
+    }
+  }
+});
+
+// Get payment link with payment history
+const paymentLink = await prisma.paymentLink.findUnique({
+  where: { linkId: 'PL_xyz123' },
+  include: {
+    Payments: {
+      include: {
+        Transaction: true
+      }
+    }
+  }
+});
+
+// Get invoice with all payments
+const invoice = await prisma.invoice.findUnique({
+  where: { invoiceNumber: 'INV-12345' },
+  include: {
+    Issuer: true,
+    Recipient: true,
+    Payments: {
+      include: {
+        Transaction: true
+      }
+    }
+  }
+});
+*/

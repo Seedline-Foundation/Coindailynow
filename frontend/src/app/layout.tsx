@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Poppins } from 'next/font/google';
 import './globals.css';
+import { AuthProvider } from '../hooks/useAuth';
 
 // Font configurations
 const inter = Inter({ 
@@ -164,8 +165,8 @@ export default function RootLayout({
         
         {/* PWA Icons */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+        <link rel="icon" type="image/svg+xml" sizes="16x16" href="/icons/favicon-16x16.svg" />
+        <link rel="icon" type="image/svg+xml" sizes="32x32" href="/icons/favicon-32x32.svg" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180.png" />
         <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#f97316" />
         
@@ -221,9 +222,11 @@ export default function RootLayout({
         </a>
         
         {/* Main app content */}
-        <div id="main-content" className="min-h-screen">
-          {children}
-        </div>
+        <AuthProvider>
+          <div id="main-content" className="min-h-screen">
+            {children}
+          </div>
+        </AuthProvider>
         
         {/* Service Worker Registration */}
         <script

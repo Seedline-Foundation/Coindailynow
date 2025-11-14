@@ -417,3 +417,4 @@ export const TrendingMemecoins: React.FC<TrendingMemecoinsProps> = ({
 };
 
 export default TrendingMemecoins;
+

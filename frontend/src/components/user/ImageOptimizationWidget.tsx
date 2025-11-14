@@ -67,7 +67,7 @@ export default function ImageOptimizationWidget() {
       </Box>
 
       <Grid container spacing={2}>
-        <Grid item xs={6}>
+        <Grid  item xs={6}>
           <Box>
             <Typography variant="caption" color="textSecondary">
               Total Images
@@ -81,7 +81,7 @@ export default function ImageOptimizationWidget() {
             />
           </Box>
         </Grid>
-        <Grid item xs={6}>
+        <Grid  item xs={6}>
           <Box>
             <Typography variant="caption" color="textSecondary">
               Success Rate
@@ -104,7 +104,7 @@ export default function ImageOptimizationWidget() {
             />
           </Box>
         </Grid>
-        <Grid item xs={6}>
+        <Grid  item xs={6}>
           <Box>
             <Typography variant="caption" color="textSecondary">
               Bytes Saved
@@ -117,7 +117,7 @@ export default function ImageOptimizationWidget() {
             </Typography>
           </Box>
         </Grid>
-        <Grid item xs={6}>
+        <Grid  item xs={6}>
           <Box>
             <Typography variant="caption" color="textSecondary">
               Compression
@@ -162,3 +162,6 @@ function formatBytes(bytes: number): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }
+
+
+

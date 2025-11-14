@@ -5,10 +5,11 @@
 
 import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
-import app from '../index'; // Your Express app
+import { setupApp } from '../index'; // Your Express app setup
 import { redisClient } from '../config/redis';
 
 const prisma = new PrismaClient();
+let app: any;
 
 describe('AI Agent CRUD Operations - Integration Tests', () => {
   // Test data
@@ -26,6 +27,8 @@ describe('AI Agent CRUD Operations - Integration Tests', () => {
 
   // Cleanup before and after tests
   beforeAll(async () => {
+    const { app: testApp } = await setupApp();
+    app = testApp;
     await prisma.aIAgent.deleteMany({
       where: { id: testAgent.id },
     });

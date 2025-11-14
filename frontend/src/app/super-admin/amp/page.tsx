@@ -11,3 +11,4 @@ import AMPManagementDashboard from '@/components/super-admin/AMPManagementDashbo
 export default function SuperAdminAMPPage() {
   return <AMPManagementDashboard />;
 }
+

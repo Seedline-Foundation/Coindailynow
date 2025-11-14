@@ -244,3 +244,4 @@ export default function VoiceArticlePlayer({ articleId }: VoiceArticlePlayerProp
     </div>
   );
 }
+

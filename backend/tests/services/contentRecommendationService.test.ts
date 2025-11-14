@@ -24,7 +24,7 @@ jest.mock('openai', () => {
 jest.mock('../../src/agents/marketAnalysisAgent');
 jest.mock('../../src/services/hybridSearchService');
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, UserRole } from '@prisma/client';
 import { Redis } from 'ioredis';
 import { Logger } from 'winston';
 import {
@@ -50,23 +50,23 @@ describe('ContentRecommendationService', () => {
     email: 'test@example.com',
     username: 'testuser',
     passwordHash: 'hash',
+    role: UserRole.USER,
     firstName: 'Test',
     lastName: 'User',
     avatarUrl: null,
     bio: null,
     location: null,
-    website: null,
-    isVerified: false,
-    isPrivate: false,
     emailVerified: false,
     lastLoginAt: null,
     preferredLanguage: 'en',
     subscriptionTier: 'free',
     phoneVerified: false,
     twoFactorEnabled: false,
+    twoFactorSecret: null,
     createdAt: new Date(),
     updatedAt: new Date(),
-    status: 'ACTIVE'
+    status: 'ACTIVE',
+    isShadowBanned: false
   };
 
   const mockArticles = [

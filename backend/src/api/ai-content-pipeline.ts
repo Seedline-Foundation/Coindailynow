@@ -10,30 +10,14 @@ import type {
   ArticleGenerationRequest, 
   PipelineConfig 
 } from '../services/aiContentPipelineService';
+import { authMiddleware } from '../middleware/auth';
+import { adminMiddleware } from '../middleware/admin';
 
 const router = express.Router();
 
 // ============================================================================
 // MIDDLEWARE
 // ============================================================================
-
-/**
- * Authentication middleware (admin only for sensitive operations)
- */
-const requireAuth = (req: Request, res: Response, next: any) => {
-  // TODO: Implement JWT authentication
-  // For now, pass through
-  next();
-};
-
-/**
- * Admin-only middleware
- */
-const requireAdmin = (req: Request, res: Response, next: any) => {
-  // TODO: Implement role-based access control
-  // For now, pass through
-  next();
-};
 
 /**
  * Cache tracking middleware
@@ -62,7 +46,7 @@ router.use(trackCache);
  * GET /api/ai/pipeline/config
  * Get current pipeline configuration
  */
-router.get('/config', requireAuth, async (req: Request, res: Response) => {
+router.get('/config', authMiddleware, async (req: Request, res: Response) => {
   try {
     const config = await aiContentPipelineService.getConfiguration();
     
@@ -88,7 +72,7 @@ router.get('/config', requireAuth, async (req: Request, res: Response) => {
  * PUT /api/ai/pipeline/config
  * Update pipeline configuration (admin only)
  */
-router.put('/config', requireAdmin, async (req: Request, res: Response) => {
+router.put('/config', adminMiddleware, async (req: Request, res: Response) => {
   try {
     const updates: Partial<PipelineConfig> = req.body;
 
@@ -146,7 +130,7 @@ router.put('/config', requireAdmin, async (req: Request, res: Response) => {
  * GET /api/ai/pipeline/trending
  * Get current trending topics for automated article creation
  */
-router.get('/trending', requireAuth, async (req: Request, res: Response) => {
+router.get('/trending', authMiddleware, async (req: Request, res: Response) => {
   try {
     const topics = await aiContentPipelineService.monitorTrendingTopics();
     
@@ -187,7 +171,7 @@ router.get('/trending', requireAuth, async (req: Request, res: Response) => {
  *   "qualityThreshold": 0.8
  * }
  */
-router.post('/initiate', requireAuth, async (req: Request, res: Response) => {
+router.post('/initiate', authMiddleware, async (req: Request, res: Response) => {
   try {
     const request: ArticleGenerationRequest = req.body;
 
@@ -249,7 +233,7 @@ router.post('/initiate', requireAuth, async (req: Request, res: Response) => {
  * GET /api/ai/pipeline/status/:pipelineId
  * Get pipeline status
  */
-router.get('/status/:pipelineId', requireAuth, async (req: Request, res: Response) => {
+router.get('/status/:pipelineId', authMiddleware, async (req: Request, res: Response) => {
   try {
     const pipelineId = req.params.pipelineId;
     if (!pipelineId) {
@@ -289,7 +273,7 @@ router.get('/status/:pipelineId', requireAuth, async (req: Request, res: Respons
  * GET /api/ai/pipeline/active
  * Get all active pipelines
  */
-router.get('/active', requireAuth, async (req: Request, res: Response) => {
+router.get('/active', authMiddleware, async (req: Request, res: Response) => {
   try {
     const pipelines = await aiContentPipelineService.getActivePipelines();
     
@@ -316,7 +300,7 @@ router.get('/active', requireAuth, async (req: Request, res: Response) => {
  * POST /api/ai/pipeline/:pipelineId/cancel
  * Cancel a running pipeline
  */
-router.post('/:pipelineId/cancel', requireAuth, async (req: Request, res: Response) => {
+router.post('/:pipelineId/cancel', authMiddleware, async (req: Request, res: Response) => {
   try {
     const pipelineId = req.params.pipelineId;
     if (!pipelineId) {
@@ -366,7 +350,7 @@ router.post('/:pipelineId/cancel', requireAuth, async (req: Request, res: Respon
  * POST /api/ai/pipeline/:pipelineId/retry
  * Retry a failed pipeline
  */
-router.post('/:pipelineId/retry', requireAuth, async (req: Request, res: Response) => {
+router.post('/:pipelineId/retry', authMiddleware, async (req: Request, res: Response) => {
   try {
     const pipelineId = req.params.pipelineId;
     if (!pipelineId) {
@@ -421,7 +405,7 @@ router.post('/:pipelineId/retry', requireAuth, async (req: Request, res: Respons
  * GET /api/ai/pipeline/metrics
  * Get pipeline performance metrics
  */
-router.get('/metrics', requireAuth, async (req: Request, res: Response) => {
+router.get('/metrics', authMiddleware, async (req: Request, res: Response) => {
   try {
     const metrics = await aiContentPipelineService.getPipelineMetrics();
     
@@ -458,7 +442,7 @@ router.get('/metrics', requireAuth, async (req: Request, res: Response) => {
  *   "autoPublish": true
  * }
  */
-router.post('/batch/initiate', requireAdmin, async (req: Request, res: Response) => {
+router.post('/batch/initiate', adminMiddleware, async (req: Request, res: Response) => {
   try {
     const { topics, urgency = 'medium', autoPublish = false } = req.body;
 
@@ -531,7 +515,7 @@ router.post('/batch/initiate', requireAdmin, async (req: Request, res: Response)
  *   "pipelineIds": ["id1", "id2"]
  * }
  */
-router.post('/batch/cancel', requireAdmin, async (req: Request, res: Response) => {
+router.post('/batch/cancel', adminMiddleware, async (req: Request, res: Response) => {
   try {
     const { pipelineIds } = req.body;
 
@@ -586,7 +570,7 @@ router.post('/batch/cancel', requireAdmin, async (req: Request, res: Response) =
  * Automatically discover trending topics and initiate pipelines
  * (Admin only - this is powerful!)
  */
-router.post('/auto-discover', requireAdmin, async (req: Request, res: Response) => {
+router.post('/auto-discover', adminMiddleware, async (req: Request, res: Response) => {
   try {
     const { 
       maxTopics = 5,
@@ -683,3 +667,4 @@ router.get('/health', async (req: Request, res: Response) => {
 // ============================================================================
 
 export default router;
+

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useSubscription } from '@apollo/client';
+import { useQuery, useMutation, useSubscription, gql } from '@apollo/client';
 import {
   ExclamationTriangleIcon,
   ShieldCheckIcon,
@@ -11,18 +11,19 @@ import {
   Cog6ToothIcon,
   BellIcon,
 } from '@heroicons/react/24/outline';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ModerationQueue } from './ModerationQueue';
-import { ViolationDetails } from './ViolationDetails';
-import { UserViolationHistory } from './UserViolationHistory';
-import { ModerationMetrics } from './ModerationMetrics';
-import { ModerationSettings } from './ModerationSettings';
-import { ModerationAlerts } from './ModerationAlerts';
+// TODO: Create these missing components
+// import { ViolationDetails } from './ViolationDetails';
+// import { UserViolationHistory } from './UserViolationHistory';
+// import { ModerationMetrics } from './ModerationMetrics';
+// import { ModerationSettings } from './ModerationSettings';
+// import { ModerationAlerts } from './ModerationAlerts';
 
 // GraphQL Queries
-const GET_MODERATION_METRICS = `
+const GET_MODERATION_METRICS = gql`
   query GetModerationMetrics($timeframe: String) {
     getModerationMetrics(timeframe: $timeframe) {
       totalViolations
@@ -54,13 +55,13 @@ const GET_MODERATION_METRICS = `
   }
 `;
 
-const GET_SYSTEM_HEALTH = `
+const GET_SYSTEM_HEALTH = gql`
   query GetSystemHealth {
     getSystemHealth
   }
 `;
 
-const GET_MODERATION_ALERTS = `
+const GET_MODERATION_ALERTS = gql`
   query GetModerationAlerts($page: Int, $limit: Int) {
     getModerationAlerts(page: $page, limit: $limit) {
       id
@@ -83,7 +84,7 @@ const GET_MODERATION_ALERTS = `
 `;
 
 // Subscriptions
-const MODERATION_ALERT_SUBSCRIPTION = `
+const MODERATION_ALERT_SUBSCRIPTION = gql`
   subscription ModerationAlert {
     moderationAlert {
       id
@@ -105,7 +106,7 @@ const MODERATION_ALERT_SUBSCRIPTION = `
   }
 `;
 
-const VIOLATION_DETECTED_SUBSCRIPTION = `
+const VIOLATION_DETECTED_SUBSCRIPTION = gql`
   subscription ViolationDetected {
     violationDetected {
       isViolation
@@ -234,7 +235,7 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
       case 'degraded':
         return <Badge variant="warning">Degraded</Badge>;
       case 'unhealthy':
-        return <Badge variant="error">Unhealthy</Badge>;
+        return <Badge variant="destructive">Unhealthy</Badge>;
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
@@ -247,11 +248,8 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
       icon: ChartBarIcon,
       component: (
         <div className="space-y-6">
-          <ModerationMetrics 
-            data={metricsData?.getModerationMetrics}
-            loading={metricsLoading}
-            onRefresh={refetchMetrics}
-          />
+          {/* TODO: Re-enable when ModerationMetrics component is created */}
+          <div className="p-4 bg-gray-100 rounded">ModerationMetrics component pending implementation</div>
         </div>
       ),
     },
@@ -273,14 +271,7 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
       icon: ShieldCheckIcon,
       hidden: !selectedViolation,
       component: selectedViolation && (
-        <ViolationDetails
-          violationId={selectedViolation}
-          onClose={() => {
-            setSelectedViolation(null);
-            setActiveTab('queue');
-          }}
-          onUserSelect={handleUserSelect}
-        />
+        <div className="p-4 bg-gray-100 rounded">ViolationDetails component pending implementation</div>
       ),
     },
     {
@@ -289,14 +280,7 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
       icon: UserGroupIcon,
       hidden: !selectedUser,
       component: selectedUser && (
-        <UserViolationHistory
-          userId={selectedUser}
-          onClose={() => {
-            setSelectedUser(null);
-            setActiveTab('queue');
-          }}
-          onViolationSelect={handleViolationSelect}
-        />
+        <div className="p-4 bg-gray-100 rounded">UserViolationHistory component pending implementation</div>
       ),
     },
     {
@@ -305,18 +289,14 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
       icon: BellIcon,
       badge: unreadAlerts,
       component: (
-        <ModerationAlerts
-          alerts={alerts}
-          onMarkAllRead={handleMarkAllAlertsRead}
-          onRefresh={refetchAlerts}
-        />
+        <div className="p-4 bg-gray-100 rounded">ModerationAlerts component pending implementation</div>
       ),
     },
     {
       id: 'settings',
       name: 'Settings',
       icon: Cog6ToothIcon,
-      component: <ModerationSettings />,
+      component: <div className="p-4 bg-gray-100 rounded">ModerationSettings component pending implementation</div>,
     },
   ];
 
@@ -437,8 +417,8 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
                     />
                     {tab.name}
                     {tab.badge !== undefined && tab.badge > 0 && (
-                      <Badge 
-                        variant={isActive ? "primary" : "secondary"}
+                      <Badge
+                        variant={isActive ? "default" : "secondary"}
                         className="ml-2"
                       >
                         {tab.badge}
@@ -464,3 +444,6 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
 };
 
 export default ModerationDashboard;
+
+
+

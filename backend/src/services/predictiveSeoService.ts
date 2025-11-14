@@ -510,7 +510,13 @@ export async function analyzeCompetitor(
         contentGaps: JSON.stringify(gaps.content),
         backlinkGaps: JSON.stringify(gaps.backlinks),
         actionableInsights: JSON.stringify(insights),
+        priorityActions: JSON.stringify([]), // Empty for now
         estimatedImpact: analysis.impact,
+        organicTraffic: 0,
+        keywordRankings: 0,
+        topKeywords: JSON.stringify([]),
+        contentFrequency: 0.0,
+        avgContentLength: 0,
       },
     });
 
@@ -699,6 +705,10 @@ export async function generateSearchForecast(
         predictedClicks60: forecast60.clicks,
         predictedClicks90: forecast90.clicks,
         confidence,
+        seasonality: JSON.stringify([]),
+        factors: JSON.stringify([]),
+        opportunities: JSON.stringify([]),
+        risks: JSON.stringify([]),
       },
       update: {
         forecast30Days: JSON.stringify(forecast30),
@@ -901,6 +911,8 @@ export async function generateRankingPrediction(
         quickWins: JSON.stringify(recommendations.quickWins),
         longTermActions: JSON.stringify(recommendations.longTerm),
         confidence: 0.75,
+        featureImportance: JSON.stringify({}),
+        requiredResources: JSON.stringify([]),
       },
     });
 

@@ -1,55 +1,29 @@
 /**
- * Compliance Monitoring API Proxy - Rules
- * Task 85: Compliance Monitoring Dashboard
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/compliance/rules');
 
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const queryString = searchParams.toString();
-    
-    const response = await fetch(
-      `${BACKEND_URL}/api/compliance/rules${queryString ? `?${queryString}` : ''}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch compliance rules' },
-      { status: 500 }
-    );
-  }
+  return handler(request);
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    
-    const response = await fetch(`${BACKEND_URL}/api/compliance/rules`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to create compliance rule' },
-      { status: 500 }
-    );
-  }
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

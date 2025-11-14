@@ -431,13 +431,59 @@ export async function applyAutomaticAdaptations(recommendations: AdaptationRecom
           break;
 
         case 'schema':
-          // Regenerate schema markup
-          results.push({
-            contentId: rec.contentId,
-            success: true,
-            message: 'Schema regeneration scheduled'
+          // Regenerate schema markup with full implementation
+          const schemaArticle = await prisma.article.findUnique({
+            where: { id: rec.contentId },
+            include: { User: true, Category: true }
           });
-          applied++;
+          
+          if (schemaArticle) {
+            // Generate NewsArticle schema
+            const schema = {
+              '@context': 'https://schema.org',
+              '@type': 'NewsArticle',
+              headline: schemaArticle.title,
+              description: schemaArticle.excerpt,
+              image: schemaArticle.featuredImageUrl || '',
+              datePublished: schemaArticle.publishedAt?.toISOString(),
+              dateModified: schemaArticle.updatedAt.toISOString(),
+              author: {
+                '@type': 'Person',
+                name: schemaArticle.User.username,
+              },
+              publisher: {
+                '@type': 'Organization',
+                name: 'CoinDaily',
+                logo: {
+                  '@type': 'ImageObject',
+                  url: process.env.LOGO_URL || 'https://coindaily.com/logo.png',
+                },
+              },
+            };
+            
+            // Store schema in article metadata
+            const metadata = schemaArticle.metadata ? JSON.parse(schemaArticle.metadata) : {};
+            metadata.schema = schema;
+            
+            await prisma.article.update({
+              where: { id: rec.contentId },
+              data: { metadata: JSON.stringify(metadata) },
+            });
+            
+            results.push({
+              contentId: rec.contentId,
+              success: true,
+              message: 'Schema markup generated and applied'
+            });
+            applied++;
+          } else {
+            results.push({
+              contentId: rec.contentId,
+              success: false,
+              message: 'Article not found'
+            });
+            failed++;
+          }
           break;
 
         default:

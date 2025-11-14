@@ -43,3 +43,4 @@ export function AMPMetaTags({ articleSlug }: { articleSlug: string }) {
     </>
   );
 }
+

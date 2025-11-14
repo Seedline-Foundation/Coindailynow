@@ -329,9 +329,212 @@ export class AIContentPipelineService {
    * Get trends from social media
    */
   private async getSocialMediaTrends(): Promise<TrendingTopic[]> {
-    // TODO: Integrate with Twitter API, Reddit API, etc.
-    // For now, return mock data
-    return [];
+    try {
+      const trends: TrendingTopic[] = [];
+
+      // Twitter API Integration
+      if (process.env.TWITTER_BEARER_TOKEN) {
+        const twitterTrends = await this.getTwitterTrends();
+        trends.push(...twitterTrends);
+      }
+
+      // Reddit API Integration
+      if (process.env.REDDIT_CLIENT_ID && process.env.REDDIT_CLIENT_SECRET) {
+        const redditTrends = await this.getRedditTrends();
+        trends.push(...redditTrends);
+      }
+
+      return trends;
+    } catch (error) {
+      console.error('Error fetching social media trends:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get trends from Twitter API
+   */
+  private async getTwitterTrends(): Promise<TrendingTopic[]> {
+    try {
+      const response = await fetch('https://api.twitter.com/2/tweets/search/recent?query=(crypto OR bitcoin OR ethereum OR memecoin) lang:en&max_results=100&tweet.fields=public_metrics,created_at', {
+        headers: {
+          'Authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Twitter API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const trends: TrendingTopic[] = [];
+      const keywordMap = new Map<string, { count: number; engagement: number; sentiment: { bullish: number; bearish: number; neutral: number } }>();
+
+      // Extract keywords and calculate engagement
+      if (data.data) {
+        for (const tweet of data.data) {
+          const text = tweet.text.toLowerCase();
+          const cryptoKeywords = text.match(/#\w+|\$\w+|bitcoin|ethereum|crypto|defi|nft|memecoin/gi);
+          
+          if (cryptoKeywords) {
+            const engagement = (tweet.public_metrics?.retweet_count || 0) + 
+                             (tweet.public_metrics?.like_count || 0) + 
+                             (tweet.public_metrics?.reply_count || 0);
+
+            // Simple sentiment analysis
+            const bullishWords = (text.match(/moon|bullish|pump|gain|profit|rocket|🚀|📈/gi) || []).length;
+            const bearishWords = (text.match(/bear|dump|crash|loss|down|bearish|📉/gi) || []).length;
+
+            cryptoKeywords.forEach((keyword: string) => {
+              const key = keyword.toLowerCase();
+              const existing = keywordMap.get(key) || { count: 0, engagement: 0, sentiment: { bullish: 0, bearish: 0, neutral: 0 } };
+              keywordMap.set(key, {
+                count: existing.count + 1,
+                engagement: existing.engagement + engagement,
+                sentiment: {
+                  bullish: existing.sentiment.bullish + bullishWords,
+                  bearish: existing.sentiment.bearish + bearishWords,
+                  neutral: existing.sentiment.neutral + (bullishWords === 0 && bearishWords === 0 ? 1 : 0),
+                },
+              });
+            });
+          }
+        }
+      }
+
+      // Convert to TrendingTopic format
+      for (const [keyword, stats] of keywordMap.entries()) {
+        if (stats.count >= 3) { // Minimum threshold
+          const totalSentiment = stats.sentiment.bullish + stats.sentiment.bearish + stats.sentiment.neutral;
+          let sentiment: 'bullish' | 'bearish' | 'neutral' = 'neutral';
+          
+          if (stats.sentiment.bullish > stats.sentiment.bearish && stats.sentiment.bullish > stats.sentiment.neutral) {
+            sentiment = 'bullish';
+          } else if (stats.sentiment.bearish > stats.sentiment.bullish) {
+            sentiment = 'bearish';
+          }
+
+          const urgency = stats.engagement > 10000 ? 'breaking' : stats.engagement > 5000 ? 'high' : stats.engagement > 1000 ? 'medium' : 'low';
+
+          trends.push({
+            keyword: keyword.replace(/^[#$]/, ''),
+            volume: stats.count,
+            sentiment,
+            urgency: urgency as 'breaking' | 'high' | 'medium' | 'low',
+            sources: ['Twitter'],
+            relatedTokens: [],
+            timestamp: new Date(),
+          });
+        }
+      }
+
+      return trends.sort((a, b) => b.volume - a.volume).slice(0, 20);
+    } catch (error) {
+      console.error('Error fetching Twitter trends:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get trends from Reddit API
+   */
+  private async getRedditTrends(): Promise<TrendingTopic[]> {
+    try {
+      // Get Reddit access token
+      const authResponse = await fetch('https://www.reddit.com/api/v1/access_token', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${Buffer.from(`${process.env.REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET}`).toString('base64')}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'grant_type=client_credentials',
+      });
+
+      if (!authResponse.ok) {
+        throw new Error(`Reddit auth error: ${authResponse.statusText}`);
+      }
+
+      const authData = await authResponse.json();
+      const accessToken = authData.access_token;
+
+      // Fetch hot posts from crypto subreddits
+      const subreddits = ['cryptocurrency', 'CryptoMarkets', 'defi', 'bitcoinbeginners', 'altcoin'];
+      const keywordMap = new Map<string, { count: number; score: number; sentiment: { bullish: number; bearish: number; neutral: number } }>();
+
+      for (const subreddit of subreddits) {
+        const response = await fetch(`https://oauth.reddit.com/r/${subreddit}/hot?limit=50`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'User-Agent': 'CoinDaily/1.0',
+          },
+        });
+
+        if (!response.ok) {
+          continue;
+        }
+
+        const data = await response.json();
+        
+        if (data.data?.children) {
+          for (const post of data.data.children) {
+            const postData = post.data;
+            const title = postData.title.toLowerCase();
+            const postScore = postData.score + (postData.num_comments * 2);
+
+            // Simple sentiment from text
+            const bullishWords = (title.match(/moon|bullish|buy|long|gain|profit|rocket|🚀/gi) || []).length;
+            const bearishWords = (title.match(/bear|sell|short|crash|loss|dump|down/gi) || []).length;
+
+            // Extract crypto keywords
+            const keywords = title.match(/bitcoin|ethereum|btc|eth|crypto|defi|nft|memecoin|\$\w+/gi);
+            
+            if (keywords && postScore > 50) {
+              keywords.forEach((keyword: string) => {
+                const key = keyword.replace(/^[$]/, '').toLowerCase();
+                const existing = keywordMap.get(key) || { count: 0, score: 0, sentiment: { bullish: 0, bearish: 0, neutral: 0 } };
+                keywordMap.set(key, {
+                  count: existing.count + 1,
+                  score: existing.score + postScore,
+                  sentiment: {
+                    bullish: existing.sentiment.bullish + bullishWords,
+                    bearish: existing.sentiment.bearish + bearishWords,
+                    neutral: existing.sentiment.neutral + (bullishWords === 0 && bearishWords === 0 ? 1 : 0),
+                  },
+                });
+              });
+            }
+          }
+        }
+      }
+
+      const trends: TrendingTopic[] = [];
+      for (const [keyword, stats] of keywordMap.entries()) {
+        let sentiment: 'bullish' | 'bearish' | 'neutral' = 'neutral';
+        
+        if (stats.sentiment.bullish > stats.sentiment.bearish && stats.sentiment.bullish > stats.sentiment.neutral) {
+          sentiment = 'bullish';
+        } else if (stats.sentiment.bearish > stats.sentiment.bullish) {
+          sentiment = 'bearish';
+        }
+
+        const urgency = stats.score > 5000 ? 'breaking' : stats.score > 2000 ? 'high' : stats.score > 500 ? 'medium' : 'low';
+
+        trends.push({
+          keyword,
+          volume: stats.count,
+          sentiment,
+          urgency: urgency as 'breaking' | 'high' | 'medium' | 'low',
+          sources: ['Reddit'],
+          relatedTokens: [],
+          timestamp: new Date(),
+        });
+      }
+
+      return trends.sort((a, b) => b.volume - a.volume).slice(0, 20);
+    } catch (error) {
+      console.error('Error fetching Reddit trends:', error);
+      return [];
+    }
   }
 
   /**
@@ -371,8 +574,219 @@ export class AIContentPipelineService {
    * Get trends from news sources
    */
   private async getNewsTrends(): Promise<TrendingTopic[]> {
-    // TODO: Integrate with news APIs
-    return [];
+    try {
+      const trends: TrendingTopic[] = [];
+
+      // NewsAPI.org Integration
+      if (process.env.NEWSAPI_KEY) {
+        const newsApiTrends = await this.getNewsApiTrends();
+        trends.push(...newsApiTrends);
+      }
+
+      // CryptoPanic API Integration
+      if (process.env.CRYPTOPANIC_API_KEY) {
+        const cryptoPanicTrends = await this.getCryptoPanicTrends();
+        trends.push(...cryptoPanicTrends);
+      }
+
+      // CoinDesk RSS Feed
+      const coinDeskTrends = await this.getCoinDeskTrends();
+      trends.push(...coinDeskTrends);
+
+      return trends;
+    } catch (error) {
+      console.error('Error fetching news trends:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get trends from NewsAPI.org
+   */
+  private async getNewsApiTrends(): Promise<TrendingTopic[]> {
+    try {
+      const response = await fetch(`https://newsapi.org/v2/everything?q=cryptocurrency OR bitcoin OR ethereum&language=en&sortBy=popularity&pageSize=100&apiKey=${process.env.NEWSAPI_KEY}`);
+      
+      if (!response.ok) {
+        throw new Error(`NewsAPI error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const trends: TrendingTopic[] = [];
+      const keywordMap = new Map<string, { count: number; sentiment: { bullish: number; bearish: number; neutral: number } }>();
+
+      if (data.articles) {
+        for (const article of data.articles) {
+          const text = `${article.title} ${article.description || ''}`.toLowerCase();
+          const keywords = text.match(/bitcoin|ethereum|btc|eth|crypto|blockchain|defi|nft|web3|memecoin|altcoin/gi);
+
+          if (keywords) {
+            const bullishWords = (text.match(/surge|gain|rally|profit|high|up|increase|bullish/gi) || []).length;
+            const bearishWords = (text.match(/drop|loss|crash|down|decline|bearish|fall/gi) || []).length;
+
+            keywords.forEach((keyword: string) => {
+              const key = keyword.toLowerCase();
+              const existing = keywordMap.get(key) || { count: 0, sentiment: { bullish: 0, bearish: 0, neutral: 0 } };
+              keywordMap.set(key, {
+                count: existing.count + 1,
+                sentiment: {
+                  bullish: existing.sentiment.bullish + bullishWords,
+                  bearish: existing.sentiment.bearish + bearishWords,
+                  neutral: existing.sentiment.neutral + (bullishWords === 0 && bearishWords === 0 ? 1 : 0),
+                },
+              });
+            });
+          }
+        }
+      }
+
+      for (const [keyword, stats] of keywordMap.entries()) {
+        if (stats.count >= 5) {
+          let sentiment: 'bullish' | 'bearish' | 'neutral' = 'neutral';
+          
+          if (stats.sentiment.bullish > stats.sentiment.bearish && stats.sentiment.bullish > stats.sentiment.neutral) {
+            sentiment = 'bullish';
+          } else if (stats.sentiment.bearish > stats.sentiment.bullish) {
+            sentiment = 'bearish';
+          }
+
+          const urgency = stats.count > 20 ? 'breaking' : stats.count > 10 ? 'high' : stats.count > 5 ? 'medium' : 'low';
+
+          trends.push({
+            keyword,
+            volume: stats.count,
+            sentiment,
+            urgency: urgency as 'breaking' | 'high' | 'medium' | 'low',
+            sources: ['NewsAPI'],
+            relatedTokens: [],
+            timestamp: new Date(),
+          });
+        }
+      }
+
+      return trends.sort((a, b) => b.volume - a.volume).slice(0, 15);
+    } catch (error) {
+      console.error('Error fetching NewsAPI trends:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get trends from CryptoPanic API
+   */
+  private async getCryptoPanicTrends(): Promise<TrendingTopic[]> {
+    try {
+      const response = await fetch(`https://cryptopanic.com/api/v1/posts/?auth_token=${process.env.CRYPTOPANIC_API_KEY}&kind=news&filter=rising`);
+      
+      if (!response.ok) {
+        throw new Error(`CryptoPanic error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const trends: TrendingTopic[] = [];
+      const currencyMap = new Map<string, { count: number; votes: number; sentiment: 'positive' | 'negative' | 'neutral' }>();
+
+      if (data.results) {
+        for (const post of data.results) {
+          if (post.currencies && post.currencies.length > 0) {
+            const postVotes = post.votes?.liked || 0;
+            const postSentiment = post.votes?.positive > post.votes?.negative ? 'positive' : 
+                                 post.votes?.negative > post.votes?.positive ? 'negative' : 'neutral';
+
+            post.currencies.forEach((currency: any) => {
+              const existing = currencyMap.get(currency.code);
+              if (!existing) {
+                currencyMap.set(currency.code, {
+                  count: 1,
+                  votes: postVotes,
+                  sentiment: postSentiment,
+                });
+              } else {
+                currencyMap.set(currency.code, {
+                  count: existing.count + 1,
+                  votes: existing.votes + postVotes,
+                  sentiment: postSentiment,
+                });
+              }
+            });
+          }
+        }
+      }
+
+      for (const [code, stats] of currencyMap.entries()) {
+        const urgency = stats.votes > 100 ? 'breaking' : stats.votes > 50 ? 'high' : stats.votes > 20 ? 'medium' : 'low';
+        const sentiment = stats.sentiment === 'positive' ? 'bullish' : stats.sentiment === 'negative' ? 'bearish' : 'neutral';
+
+        trends.push({
+          keyword: code,
+          volume: stats.count,
+          sentiment,
+          urgency: urgency as 'breaking' | 'high' | 'medium' | 'low',
+          sources: ['CryptoPanic'],
+          relatedTokens: [],
+          timestamp: new Date(),
+        });
+      }
+
+      return trends.sort((a, b) => b.volume - a.volume).slice(0, 15);
+    } catch (error) {
+      console.error('Error fetching CryptoPanic trends:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get trends from CoinDesk RSS (no API key required)
+   */
+  private async getCoinDeskTrends(): Promise<TrendingTopic[]> {
+    try {
+      // Parse RSS feed (simplified - in production use an RSS parser library)
+      const response = await fetch('https://www.coindesk.com/arc/outboundfeeds/rss/');
+      
+      if (!response.ok) {
+        return [];
+      }
+
+      const text = await response.text();
+      const trends: TrendingTopic[] = [];
+      const keywordMap = new Map<string, number>();
+
+      // Simple regex to extract titles from RSS
+      const titleMatches = text.matchAll(/<title><!\[CDATA\[(.*?)\]\]><\/title>/g);
+      
+      for (const match of titleMatches) {
+        if (match[1]) {
+          const title = match[1].toLowerCase();
+          const keywords = title.match(/bitcoin|ethereum|btc|eth|crypto|blockchain|defi|nft|solana|cardano|polkadot/gi);
+
+          if (keywords) {
+            keywords.forEach((keyword: string) => {
+              const key = keyword.toLowerCase();
+              keywordMap.set(key, (keywordMap.get(key) || 0) + 1);
+            });
+          }
+        }
+      }
+
+      for (const [keyword, count] of keywordMap.entries()) {
+        const urgency = count > 8 ? 'high' : count > 4 ? 'medium' : 'low';
+
+        trends.push({
+          keyword,
+          volume: count,
+          sentiment: 'neutral',
+          urgency: urgency as 'breaking' | 'high' | 'medium' | 'low',
+          sources: ['CoinDesk'],
+          relatedTokens: [],
+          timestamp: new Date(),
+        });
+      }
+
+      return trends.sort((a, b) => b.volume - a.volume).slice(0, 10);
+    } catch (error) {
+      console.error('Error fetching CoinDesk trends:', error);
+      return [];
+    }
   }
 
   /**
@@ -1232,8 +1646,72 @@ export class AIContentPipelineService {
         throw new Error('No failed stage found');
       }
 
-      // Create new pipeline starting from failed stage
-      // TODO: Implement retry logic based on failed stage
+      console.log(`Retrying pipeline ${pipelineId} from stage: ${failedStage.name}`);
+
+      // Reset failed stage status to retry
+      const failedStageIndex = oldStatus.stages.findIndex(s => s.name === failedStage.name);
+      
+      if (failedStageIndex !== -1) {
+        const stage = oldStatus.stages[failedStageIndex];
+        if (stage) {
+          stage.status = 'pending';
+          delete stage.startedAt;
+          delete stage.completedAt;
+          delete stage.duration;
+          delete stage.error;
+        }
+      }
+
+      // Reset all subsequent stages to pending
+      for (let i = failedStageIndex + 1; i < oldStatus.stages.length; i++) {
+        const stage = oldStatus.stages[i];
+        if (stage) {
+          stage.status = 'pending';
+          delete stage.startedAt;
+          delete stage.completedAt;
+          delete stage.duration;
+          delete stage.error;
+        }
+      }
+
+      // Update overall status based on failed stage
+      switch (failedStage.name) {
+        case 'research':
+          oldStatus.status = 'researching';
+          break;
+        case 'content_generation':
+          oldStatus.status = 'generating';
+          break;
+        case 'quality_review':
+          oldStatus.status = 'reviewing';
+          break;
+        case 'image_generation':
+          oldStatus.status = 'generating_images';
+          break;
+        case 'translation':
+          oldStatus.status = 'translating';
+          break;
+        case 'seo_optimization':
+          oldStatus.status = 'optimizing_seo';
+          break;
+        case 'publication':
+          oldStatus.status = 'publishing';
+          break;
+        default:
+          oldStatus.status = 'initiated';
+      }
+
+      oldStatus.currentStage = failedStage.name;
+      oldStatus.errors = oldStatus.errors.filter(e => !e.includes(failedStage.name));
+
+      // Cache updated status
+      await redis.setex(
+        `pipeline:${pipelineId}`,
+        3600,
+        JSON.stringify(oldStatus)
+      );
+
+      console.log(`Pipeline ${pipelineId} reset for retry. Restart the pipeline execution manually or via scheduled job.`);
 
       return oldStatus;
     } catch (error) {

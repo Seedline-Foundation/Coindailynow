@@ -125,8 +125,8 @@ describe('MessageQueue', () => {
       const messages = await messageQueue.getQueuedMessages(testUserId);
 
       expect(messages).toHaveLength(2);
-      expect(messages[0].priority).toBe('urgent'); // Should be sorted by priority
-      expect(messages[1].priority).toBe('normal');
+      expect(messages[0]!.priority).toBe('urgent'); // Should be sorted by priority
+      expect(messages[1]!.priority).toBe('normal');
     });
 
     test('should filter out expired messages', async () => {
@@ -162,7 +162,7 @@ describe('MessageQueue', () => {
       const messages = await messageQueue.getQueuedMessages(testUserId);
 
       expect(messages).toHaveLength(1);
-      expect(messages[0].type).toBe('valid_message');
+      expect(messages[0]!.type).toBe('valid_message');
     });
 
     test('should handle parsing errors gracefully', async () => {
@@ -185,7 +185,7 @@ describe('MessageQueue', () => {
       const messages = await messageQueue.getQueuedMessages(testUserId);
 
       expect(messages).toHaveLength(1);
-      expect(messages[0].type).toBe('valid_message');
+      expect(messages[0]!.type).toBe('valid_message');
     });
   });
 

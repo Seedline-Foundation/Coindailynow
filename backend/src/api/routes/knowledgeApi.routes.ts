@@ -1,5 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { knowledgeAPIService } from '../../services/knowledgeApiService';
+import { authMiddleware } from '../../middleware/auth';
+import { adminMiddleware } from '../../middleware/admin';
 
 const router = express.Router();
 
@@ -280,9 +282,8 @@ router.post('/citations/track', async (req: Request, res: Response): Promise<any
 /**
  * Get API statistics
  */
-router.get('/admin/statistics', async (req: Request, res: Response) => {
+router.get('/admin/statistics', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
   try {
-    // TODO: Add admin authentication middleware
     const stats = await knowledgeAPIService.getAPIStatistics();
     res.json(stats);
   } catch (error) {
@@ -297,9 +298,8 @@ router.get('/admin/statistics', async (req: Request, res: Response) => {
 /**
  * Create API key
  */
-router.post('/admin/keys', async (req: Request, res: Response): Promise<any> => {
+router.post('/admin/keys', authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<any> => {
   try {
-    // TODO: Add admin authentication middleware
     const { userId, name, description, tier, rateLimit, allowedEndpoints, expiresAt } = req.body;
 
     if (!name) {
@@ -338,9 +338,8 @@ router.post('/admin/keys', async (req: Request, res: Response): Promise<any> => 
 /**
  * Process article to knowledge base
  */
-router.post('/admin/knowledge-base/process', async (req: Request, res: Response): Promise<any> => {
+router.post('/admin/knowledge-base/process', authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<any> => {
   try {
-    // TODO: Add admin authentication middleware
     const { articleId, summary, keyPoints, entities, facts, sources } = req.body;
 
     if (!articleId || !summary) {
@@ -375,9 +374,8 @@ router.post('/admin/knowledge-base/process', async (req: Request, res: Response)
 /**
  * Create RAG feed
  */
-router.post('/admin/feeds', async (req: Request, res: Response): Promise<any> => {
+router.post('/admin/feeds', authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<any> => {
   try {
-    // TODO: Add admin authentication middleware
     const { name, description, feedType, category, region, language, updateFrequency } = req.body;
 
     if (!name || !description || !feedType) {
@@ -413,9 +411,8 @@ router.post('/admin/feeds', async (req: Request, res: Response): Promise<any> =>
 /**
  * Get all feeds
  */
-router.get('/admin/feeds', async (req: Request, res: Response) => {
+router.get('/admin/feeds', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
   try {
-    // TODO: Add admin authentication middleware
     const feeds = await knowledgeAPIService.getAllFeeds();
     res.json({ feeds });
   } catch (error) {

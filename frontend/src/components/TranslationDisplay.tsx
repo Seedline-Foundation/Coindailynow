@@ -279,3 +279,4 @@ export const TranslationDisplay: React.FC<TranslationDisplayProps> = ({
 };
 
 export default TranslationDisplay;
+

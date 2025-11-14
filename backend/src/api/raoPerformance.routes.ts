@@ -31,10 +31,10 @@ router.post('/track-citation', async (req: Request, res: Response) => {
       query
     });
 
-    res.json(result);
+    return res.json(result);
   } catch (error) {
     console.error('Error tracking citation:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to track citation',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -64,10 +64,10 @@ router.post('/track-overview', async (req: Request, res: Response) => {
       snippet
     });
 
-    res.json(result);
+    return res.json(result);
   } catch (error) {
     console.error('Error tracking overview:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to track overview',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -90,10 +90,10 @@ router.get('/statistics', async (req: Request, res: Response) => {
     }
 
     const stats = await raoPerformanceService.getPerformanceStatistics(timeframe);
-    res.json(stats);
+    return res.json(stats);
   } catch (error) {
     console.error('Error getting statistics:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to get statistics',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -116,10 +116,10 @@ router.get('/retrieval-patterns', async (req: Request, res: Response) => {
     }
 
     const patterns = await raoPerformanceService.analyzeRetrievalPatterns(timeframe);
-    res.json({ patterns });
+    return res.json({ patterns });
   } catch (error) {
     console.error('Error analyzing patterns:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to analyze patterns',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -148,10 +148,10 @@ router.get('/content/:contentId', async (req: Request, res: Response) => {
       });
     }
 
-    res.json(performance);
+    return res.json(performance);
   } catch (error) {
     console.error('Error getting content performance:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to get content performance',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -173,10 +173,10 @@ router.post('/recommendations/:contentId', async (req: Request, res: Response) =
     }
 
     const recommendations = await raoPerformanceService.generateAdaptationRecommendations(contentId);
-    res.json({ recommendations });
+    return res.json({ recommendations });
   } catch (error) {
     console.error('Error generating recommendations:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to generate recommendations',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -198,10 +198,10 @@ router.post('/apply-adaptations', async (req: Request, res: Response) => {
     }
 
     const result = await raoPerformanceService.applyAutomaticAdaptations(recommendations);
-    res.json(result);
+    return res.json(result);
   } catch (error) {
     console.error('Error applying adaptations:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to apply adaptations',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -240,10 +240,10 @@ router.post('/semantic-analysis/:contentId', async (req: Request, res: Response)
     }
 
     const result = await raoPerformanceService.updateSemanticAnalysis(contentId);
-    res.json(result);
+    return res.json(result);
   } catch (error) {
     console.error('Error updating semantic analysis:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to update semantic analysis',
       message: error instanceof Error ? error.message : 'Unknown error'
     });

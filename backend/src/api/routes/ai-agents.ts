@@ -23,8 +23,8 @@ import {
   resetAgentState,
   toggleAIAgent,
   logAIOperation,
-} from '../services/aiAgentService';
-import { logger } from '../utils/logger';
+} from '../../services/aiAgentService';
+import { logger } from '../../utils/logger';
 
 const router = Router();
 
@@ -166,6 +166,10 @@ router.get('/agents/:id', async (req: Request, res: Response) => {
     const startTime = Date.now();
     const { id } = req.params;
 
+    if (!id) {
+      return errorResponse(res, { message: 'Agent ID is required' }, 400);
+    }
+
     // Get agent
     const agent = await getAIAgentById(id);
 
@@ -204,6 +208,10 @@ router.put('/agents/:id', async (req: Request, res: Response) => {
     const startTime = Date.now();
     const { id } = req.params;
 
+    if (!id) {
+      return errorResponse(res, { message: 'Agent ID is required' }, 400);
+    }
+
     // Validate configuration
     if (!req.body.configuration) {
       return errorResponse(res, { message: 'Missing configuration field' }, 400);
@@ -240,6 +248,10 @@ router.patch('/agents/:id/toggle', async (req: Request, res: Response) => {
     const startTime = Date.now();
     const { id } = req.params;
 
+    if (!id) {
+      return errorResponse(res, { message: 'Agent ID is required' }, 400);
+    }
+
     // Validate isActive
     if (req.body.isActive === undefined) {
       return errorResponse(res, { message: 'Missing isActive field' }, 400);
@@ -269,6 +281,10 @@ router.delete('/agents/:id', async (req: Request, res: Response) => {
     const startTime = Date.now();
     const { id } = req.params;
 
+    if (!id) {
+      return errorResponse(res, { message: 'Agent ID is required' }, 400);
+    }
+
     // Deactivate agent
     const agent = await deactivateAIAgent(id);
 
@@ -295,6 +311,10 @@ router.get('/agents/:id/metrics', async (req: Request, res: Response) => {
   try {
     const startTime = Date.now();
     const { id } = req.params;
+
+    if (!id) {
+      return errorResponse(res, { message: 'Agent ID is required' }, 400);
+    }
 
     // Build date filter
     const filter: any = {};
@@ -335,6 +355,10 @@ router.post('/agents/:id/reset', async (req: Request, res: Response) => {
     const startTime = Date.now();
     const { id } = req.params;
 
+    if (!id) {
+      return errorResponse(res, { message: 'Agent ID is required' }, 400);
+    }
+
     // Reset agent
     const agent = await resetAgentState(id);
 
@@ -356,6 +380,10 @@ router.post('/agents/:id/reset', async (req: Request, res: Response) => {
 router.get('/agents/:id/health', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
+    if (!id) {
+      return errorResponse(res, { message: 'Agent ID is required' }, 400);
+    }
 
     // Check if agent exists
     const agent = await getAIAgentById(id);

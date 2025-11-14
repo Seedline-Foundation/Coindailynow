@@ -17,8 +17,8 @@ import {
   getAIAgentMetrics,
   resetAgentState,
   logAIOperation,
-} from '../services/aiAgentService';
-import { logger } from '../utils/logger';
+} from '../../services/aiAgentService';
+import { logger } from '../../utils/logger';
 
 // ==================== TYPE DEFINITIONS ====================
 

@@ -1,38 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server';
+/**
+ * API Route Proxy
+ * Proxies requests to backend API
+ */
+
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
+
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/super-admin/security/unblock-ip');
+
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { ipId } = body;
+  return handler(request);
+}
 
-    // Validate input
-    if (!ipId) {
-      return NextResponse.json(
-        { error: 'IP ID is required' },
-        { status: 400 }
-      );
-    }
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
 
-    // Mock unblocking IP
-    console.log(`Unblocking IP ID: ${ipId}`);
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
 
-    // In production, this would:
-    // 1. Remove IP from database blacklist
-    // 2. Update firewall rules
-    // 3. Log audit event
-    // 4. Notify security team
-
-    return NextResponse.json({
-      success: true,
-      message: `IP has been unblocked`,
-      ipId,
-      unblockedAt: new Date().toISOString()
-    });
-  } catch (error) {
-    console.error('Error unblocking IP:', error);
-    return NextResponse.json(
-      { error: 'Failed to unblock IP address' },
-      { status: 500 }
-    );
-  }
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

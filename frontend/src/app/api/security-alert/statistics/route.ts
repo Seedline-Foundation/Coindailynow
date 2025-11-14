@@ -1,32 +1,29 @@
 /**
- * Security Alert Statistics API Proxy
- * Task 84: Security Alert System
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/security-alert/statistics');
 
 export async function GET(request: NextRequest) {
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/security-alert/statistics`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  return handler(request);
+}
 
-    if (!response.ok) {
-      throw new Error(`Backend responded with ${response.status}`);
-    }
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('[SecurityAlert Proxy] Error fetching statistics:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch statistics' },
-      { status: 500 }
-    );
-  }
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

@@ -216,7 +216,8 @@ describe('WebSocket Server', () => {
     });
 
     test('should queue messages for offline users', async () => {
-      const messageQueue = new MessageQueue();
+      const mockRedis = {} as any; // Mock Redis client
+      const messageQueue = new MessageQueue(mockRedis);
       const offlineUserId = 'offline-user-id';
       
       const message = {
@@ -234,7 +235,7 @@ describe('WebSocket Server', () => {
       // Verify message is queued
       const queuedMessages = await messageQueue.getQueuedMessages(offlineUserId);
       expect(queuedMessages.length).toBe(1);
-      expect(queuedMessages[0].data.symbol).toBe(message.data.symbol);
+      expect(queuedMessages[0]?.data.symbol).toBe(message.data.symbol);
 
       // Clear message after delivery
       await messageQueue.clearMessages(offlineUserId);
@@ -342,7 +343,7 @@ describe('WebSocket Server', () => {
 
         // Test message broadcast performance
         const broadcastStart = Date.now();
-        wsManager.broadcast('performance_test', { timestamp: broadcastStart });
+        wsManager.broadcast('performance_test', 'test_event', { timestamp: broadcastStart });
         
         await new Promise(resolve => setTimeout(resolve, 1000));
         const broadcastTime = Date.now() - broadcastStart;

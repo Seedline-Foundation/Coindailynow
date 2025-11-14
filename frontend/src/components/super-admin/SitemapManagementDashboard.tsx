@@ -390,3 +390,4 @@ function StatCard({ icon, title, value, subtitle }: StatCardProps) {
     </div>
   );
 }
+

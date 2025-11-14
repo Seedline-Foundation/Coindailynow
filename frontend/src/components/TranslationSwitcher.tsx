@@ -220,3 +220,4 @@ export const TranslationSwitcher: React.FC<TranslationSwitcherProps> = ({
 };
 
 export default TranslationSwitcher;
+

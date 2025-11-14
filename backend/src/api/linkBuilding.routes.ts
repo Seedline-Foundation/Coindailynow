@@ -31,15 +31,18 @@ router.post('/backlinks', async (req, res) => {
  */
 router.get('/backlinks', async (req, res) => {
   try {
-    const filters = {
-      status: req.query.status as string | undefined,
-      region: req.query.region as string | undefined,
-      campaignId: req.query.campaignId as string | undefined,
-      minQuality: req.query.minQuality
-        ? parseInt(req.query.minQuality as string)
-        : undefined,
-      limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
-    };
+    const filters: {
+      status?: string;
+      region?: string;
+      campaignId?: string;
+      minQuality?: number;
+      limit?: number;
+    } = {};
+    if (req.query.status) filters.status = req.query.status as string;
+    if (req.query.region) filters.region = req.query.region as string;
+    if (req.query.campaignId) filters.campaignId = req.query.campaignId as string;
+    if (req.query.minQuality) filters.minQuality = parseInt(req.query.minQuality as string);
+    if (req.query.limit) filters.limit = parseInt(req.query.limit as string);
 
     const backlinks = await linkBuildingService.getBacklinks(filters);
     res.json({ success: true, data: backlinks });
@@ -54,14 +57,22 @@ router.get('/backlinks', async (req, res) => {
  */
 router.put('/backlinks/:id/status', async (req, res) => {
   try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Backlink ID is required' 
+      });
+    }
+    
     const { status } = req.body;
     const backlink = await linkBuildingService.updateBacklinkStatus(
-      req.params.id,
+      id,
       status
     );
-    res.json({ success: true, data: backlink });
+    return res.json({ success: true, data: backlink });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -71,10 +82,18 @@ router.put('/backlinks/:id/status', async (req, res) => {
  */
 router.put('/backlinks/:id/verify', async (req, res) => {
   try {
-    const backlink = await linkBuildingService.verifyBacklink(req.params.id);
-    res.json({ success: true, data: backlink });
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Backlink ID is required' 
+      });
+    }
+    
+    const backlink = await linkBuildingService.verifyBacklink(id);
+    return res.json({ success: true, data: backlink });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -101,11 +120,14 @@ router.post('/campaigns', async (req, res) => {
  */
 router.get('/campaigns', async (req, res) => {
   try {
-    const filters = {
-      status: req.query.status as string | undefined,
-      campaignType: req.query.campaignType as string | undefined,
-      region: req.query.region as string | undefined,
-    };
+    const filters: {
+      status?: string;
+      campaignType?: string;
+      region?: string;
+    } = {};
+    if (req.query.status) filters.status = req.query.status as string;
+    if (req.query.campaignType) filters.campaignType = req.query.campaignType as string;
+    if (req.query.region) filters.region = req.query.region as string;
 
     const campaigns = await linkBuildingService.getCampaigns(filters);
     res.json({ success: true, data: campaigns });
@@ -120,10 +142,18 @@ router.get('/campaigns', async (req, res) => {
  */
 router.get('/campaigns/:id', async (req, res) => {
   try {
-    const campaign = await linkBuildingService.getCampaignById(req.params.id);
-    res.json({ success: true, data: campaign });
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Campaign ID is required' 
+      });
+    }
+    
+    const campaign = await linkBuildingService.getCampaignById(id);
+    return res.json({ success: true, data: campaign });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -133,14 +163,22 @@ router.get('/campaigns/:id', async (req, res) => {
  */
 router.put('/campaigns/:id/status', async (req, res) => {
   try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Campaign ID is required' 
+      });
+    }
+    
     const { status } = req.body;
     const campaign = await linkBuildingService.updateCampaignStatus(
-      req.params.id,
+      id,
       status
     );
-    res.json({ success: true, data: campaign });
+    return res.json({ success: true, data: campaign });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -167,12 +205,16 @@ router.post('/prospects', async (req, res) => {
  */
 router.get('/prospects', async (req, res) => {
   try {
-    const filters = {
-      status: req.query.status as string | undefined,
-      prospectType: req.query.prospectType as string | undefined,
-      region: req.query.region as string | undefined,
-      campaignId: req.query.campaignId as string | undefined,
-    };
+    const filters: {
+      status?: string;
+      prospectType?: string;
+      region?: string;
+      campaignId?: string;
+    } = {};
+    if (req.query.status) filters.status = req.query.status as string;
+    if (req.query.prospectType) filters.prospectType = req.query.prospectType as string;
+    if (req.query.region) filters.region = req.query.region as string;
+    if (req.query.campaignId) filters.campaignId = req.query.campaignId as string;
 
     const prospects = await linkBuildingService.getProspects(filters);
     res.json({ success: true, data: prospects });
@@ -187,15 +229,23 @@ router.get('/prospects', async (req, res) => {
  */
 router.put('/prospects/:id/status', async (req, res) => {
   try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Prospect ID is required' 
+      });
+    }
+    
     const { status, relationshipStrength } = req.body;
     const prospect = await linkBuildingService.updateProspectStatus(
-      req.params.id,
+      id,
       status,
       relationshipStrength
     );
-    res.json({ success: true, data: prospect });
+    return res.json({ success: true, data: prospect });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -222,11 +272,14 @@ router.post('/outreach', async (req, res) => {
  */
 router.get('/outreach', async (req, res) => {
   try {
-    const filters = {
-      prospectId: req.query.prospectId as string | undefined,
-      campaignId: req.query.campaignId as string | undefined,
-      status: req.query.status as string | undefined,
-    };
+    const filters: {
+      prospectId?: string;
+      campaignId?: string;
+      status?: string;
+    } = {};
+    if (req.query.prospectId) filters.prospectId = req.query.prospectId as string;
+    if (req.query.campaignId) filters.campaignId = req.query.campaignId as string;
+    if (req.query.status) filters.status = req.query.status as string;
 
     const outreach = await linkBuildingService.getOutreachActivities(filters);
     res.json({ success: true, data: outreach });
@@ -241,16 +294,24 @@ router.get('/outreach', async (req, res) => {
  */
 router.put('/outreach/:id/status', async (req, res) => {
   try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Outreach ID is required' 
+      });
+    }
+    
     const { status, response, outcome } = req.body;
     const outreach = await linkBuildingService.updateOutreachStatus(
-      req.params.id,
+      id,
       status,
       response,
       outcome
     );
-    res.json({ success: true, data: outreach });
+    return res.json({ success: true, data: outreach });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -290,14 +351,16 @@ router.post('/influencers', async (req, res) => {
  */
 router.get('/influencers', async (req, res) => {
   try {
-    const filters = {
-      platform: req.query.platform as string | undefined,
-      region: req.query.region as string | undefined,
-      status: req.query.status as string | undefined,
-      minFollowers: req.query.minFollowers
-        ? parseInt(req.query.minFollowers as string)
-        : undefined,
-    };
+    const filters: {
+      platform?: string;
+      region?: string;
+      status?: string;
+      minFollowers?: number;
+    } = {};
+    if (req.query.platform) filters.platform = req.query.platform as string;
+    if (req.query.region) filters.region = req.query.region as string;
+    if (req.query.status) filters.status = req.query.status as string;
+    if (req.query.minFollowers) filters.minFollowers = parseInt(req.query.minFollowers as string);
 
     const influencers = await linkBuildingService.getInfluencers(filters);
     res.json({ success: true, data: influencers });

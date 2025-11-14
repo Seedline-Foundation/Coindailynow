@@ -9,7 +9,7 @@
  */
 
 import request from 'supertest';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, UserRole } from '@prisma/client';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { io as ioClient, Socket } from 'socket.io-client';
@@ -34,22 +34,26 @@ describe('AI System API Integration Tests', () => {
     // Create test users
     const testUser = await prisma.user.create({
       data: {
+        id: 'test-user-id',
         email: 'test-api@coindaily.com',
         username: 'testapi',
-        password: 'hashed_password',
-        role: 'USER',
+        passwordHash: 'hashed_password',
+        role: UserRole.USER,
         status: 'ACTIVE',
+        updatedAt: new Date(),
       },
     });
     testUserId = testUser.id;
 
     const adminUser = await prisma.user.create({
       data: {
+        id: 'admin-user-id',
         email: 'admin-api@coindaily.com',
         username: 'adminapi',
-        password: 'hashed_password',
-        role: 'ADMIN',
+        passwordHash: 'hashed_password',
+        role: UserRole.ADMIN,
         status: 'ACTIVE',
+        updatedAt: new Date(),
       },
     });
 

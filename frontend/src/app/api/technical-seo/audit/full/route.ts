@@ -1,26 +1,29 @@
-import { NextResponse } from 'next/server';
-
 /**
- * Run Full Technical SEO Audit API Proxy
- * POST /api/technical-seo/audit/full
+ * API Route Proxy
+ * Proxies requests to backend API
  */
-export async function POST() {
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-    const response = await fetch(`${apiUrl}/api/technical-seo/audit/full`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Technical SEO full audit error:', error);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
-  }
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
+
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/technical-seo/audit/full');
+
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
+
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

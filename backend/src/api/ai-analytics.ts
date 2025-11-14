@@ -17,6 +17,8 @@
  */
 
 import express, { Request, Response, NextFunction } from 'express';
+import { authMiddleware } from '../middleware/auth';
+import { adminMiddleware } from '../middleware/admin';
 import {
   getSystemOverview,
   getAgentAnalytics,
@@ -469,9 +471,8 @@ router.get('/budget', async (req: Request, res: Response) => {
  * 
  * Response: Cleanup result
  */
-router.post('/cleanup', async (req: Request, res: Response) => {
+router.post('/cleanup', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
   try {
-    // TODO: Add admin authentication middleware
     logger.info('Starting analytics cleanup');
 
     const result = await cleanupOldAnalytics();

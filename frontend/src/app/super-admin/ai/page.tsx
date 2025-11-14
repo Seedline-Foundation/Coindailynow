@@ -60,6 +60,7 @@ export default function AIManagementPage() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const [showConfigModal, setShowConfigModal] = useState(false);
 
   useEffect(() => {
     fetchAIData();
@@ -163,7 +164,10 @@ export default function AIManagementPage() {
             <RefreshCw className="h-4 w-4" />
             <span>Refresh</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+          <button 
+            onClick={() => setShowConfigModal(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+          >
             <Settings className="h-4 w-4" />
             <span>Configure</span>
           </button>
@@ -428,6 +432,163 @@ export default function AIManagementPage() {
           )}
         </div>
       </div>
+
+      {/* Configuration Modal */}
+      {showConfigModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center space-x-2">
+                  <Settings className="h-6 w-6 text-yellow-400" />
+                  <span>AI System Configuration</span>
+                </h2>
+                <button
+                  onClick={() => setShowConfigModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Global Settings */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4">Global Settings</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Max Concurrent Tasks</label>
+                      <input
+                        type="number"
+                        defaultValue={10}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Task Timeout (seconds)</label>
+                      <input
+                        type="number"
+                        defaultValue={300}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Retry Attempts</label>
+                      <input
+                        type="number"
+                        defaultValue={3}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* AI Model Settings */}
+                <div className="border-t border-gray-700 pt-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">AI Model Configuration</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Content Generation Model</label>
+                      <select className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        <option value="gpt-4">GPT-4</option>
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Quality Review Model</label>
+                      <select className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                        <option value="gemini-pro">Google Gemini Pro</option>
+                        <option value="claude-3">Claude 3</option>
+                        <option value="gpt-4">GPT-4</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Translation Model</label>
+                      <select className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                        <option value="nllb-200">Meta NLLB-200</option>
+                        <option value="gpt-4">GPT-4</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rate Limits */}
+                <div className="border-t border-gray-700 pt-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Rate Limits</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Requests per Minute</label>
+                      <input
+                        type="number"
+                        defaultValue={60}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Daily Token Limit</label>
+                      <input
+                        type="number"
+                        defaultValue={1000000}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Auto-scaling */}
+                <div className="border-t border-gray-700 pt-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Auto-scaling</h3>
+                  <div className="space-y-4">
+                    <label className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="rounded bg-gray-700 border-gray-600"
+                      />
+                      <span className="text-gray-300">Enable auto-scaling based on queue length</span>
+                    </label>
+                    <label className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="rounded bg-gray-700 border-gray-600"
+                      />
+                      <span className="text-gray-300">Automatic error recovery</span>
+                    </label>
+                    <label className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        className="rounded bg-gray-700 border-gray-600"
+                      />
+                      <span className="text-gray-300">Priority queue optimization</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 mt-8 pt-6 border-t border-gray-700">
+                <button
+                  onClick={() => setShowConfigModal(false)}
+                  className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // Save configuration logic here
+                    setShowConfigModal(false);
+                  }}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Save Configuration
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

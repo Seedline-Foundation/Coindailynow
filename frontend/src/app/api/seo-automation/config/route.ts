@@ -1,59 +1,29 @@
-// Next.js API Route: SEO Automation Config
-// GET /api/seo-automation/config
+/**
+ * API Route Proxy
+ * Proxies requests to backend API
+ */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/seo-automation/config');
 
 export async function GET(request: NextRequest) {
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/seo-automation/config`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': request.headers.get('authorization') || '',
-      },
-    });
+  return handler(request);
+}
 
-    const data = await response.json();
-
-    return NextResponse.json(data, { status: response.status });
-  } catch (error: any) {
-    console.error('Error fetching SEO automation config:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch SEO automation config',
-        message: error.message,
-      },
-      { status: 500 }
-    );
-  }
+export async function POST(request: NextRequest) {
+  return handler(request);
 }
 
 export async function PUT(request: NextRequest) {
-  try {
-    const body = await request.json();
+  return handler(request);
+}
 
-    const response = await fetch(`${BACKEND_URL}/api/seo-automation/config`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': request.headers.get('authorization') || '',
-      },
-      body: JSON.stringify(body),
-    });
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
-
-    return NextResponse.json(data, { status: response.status });
-  } catch (error: any) {
-    console.error('Error updating SEO automation config:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to update SEO automation config',
-        message: error.message,
-      },
-      { status: 500 }
-    );
-  }
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

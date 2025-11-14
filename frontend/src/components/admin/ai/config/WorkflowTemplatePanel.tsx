@@ -241,3 +241,4 @@ const WorkflowTemplatePanel: React.FC<WorkflowTemplatePanelProps> = ({ onNotific
 };
 
 export default WorkflowTemplatePanel;
+

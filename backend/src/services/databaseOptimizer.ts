@@ -24,6 +24,8 @@ class DatabaseOptimizer {
   private config: QueryOptimizationConfig;
   private queryCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
   private queryMetrics: { query: string; duration: number; timestamp: Date }[] = [];
+  private cacheHits = 0;
+  private cacheMisses = 0;
 
   constructor(prisma: PrismaClient, config: Partial<QueryOptimizationConfig> = {}) {
     this.prisma = prisma;
@@ -44,9 +46,20 @@ class DatabaseOptimizer {
    */
   private setupQueryLogging(): void {
     if (this.config.enableQueryLogging) {
-      // Note: Query logging would need to be implemented through Prisma middleware
-      // For now, we'll track metrics through our wrapper methods
-      logger.info('Database query logging enabled');
+      // Query logging is implemented through wrapper methods
+      // Each optimized query method will log its execution
+      logger.info('Database query logging enabled - tracking through wrapper methods');
+    }
+  }
+
+  /**
+   * Track cache hit or miss
+   */
+  private trackCacheAccess(hit: boolean): void {
+    if (hit) {
+      this.cacheHits++;
+    } else {
+      this.cacheMisses++;
     }
   }
 
@@ -358,13 +371,14 @@ class DatabaseOptimizer {
   }
 
   /**
-   * Cache management
+   * Get data from cache
    */
   private getFromCache(key: string): any | null {
     if (!this.config.enableQueryCache) return null;
 
     const cached = this.queryCache.get(key);
     if (cached && Date.now() < cached.timestamp + cached.ttl * 1000) {
+      this.trackCacheAccess(true); // Cache hit
       return cached.data;
     }
 
@@ -372,6 +386,7 @@ class DatabaseOptimizer {
       this.queryCache.delete(key);
     }
 
+    this.trackCacheAccess(false); // Cache miss
     return null;
   }
 
@@ -427,11 +442,17 @@ class DatabaseOptimizer {
 
     const totalQueryTime = recentQueries.reduce((sum, q) => sum + q.duration, 0);
 
+    // Calculate cache hit rate
+    const totalCacheAccesses = this.cacheHits + this.cacheMisses;
+    const cacheHitRate = totalCacheAccesses > 0 
+      ? (this.cacheHits / totalCacheAccesses) * 100 
+      : 0;
+
     return {
       totalQueries: recentQueries.length,
       slowQueries: slowQueries.length,
       averageQueryTime: recentQueries.length > 0 ? totalQueryTime / recentQueries.length : 0,
-      cacheHitRate: 0, // TODO: Implement cache hit rate calculation
+      cacheHitRate,
       connectionPoolSize: 10, // Default Prisma pool size
       activeConnections: 1, // This would need to be tracked differently
     };

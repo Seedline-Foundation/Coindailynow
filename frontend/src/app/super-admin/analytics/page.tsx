@@ -21,7 +21,9 @@ import {
   BarChart3,
   PieChart,
   LineChart,
-  Activity
+  Activity,
+  Zap,
+  Smartphone
 } from 'lucide-react';
 
 interface AnalyticsData {
@@ -34,31 +36,65 @@ interface AnalyticsData {
     total: number;
     active: number;
     new: number;
+    returning: number;
+    avgSessionDuration: number; // in minutes
+    avgTimeOnPlatform: number; // in minutes per user
+    bounceRate: number;
     trend: Array<{ time: string; value: number }>;
   };
   content: {
     views: number;
     engagement: number;
     avgTimeOnPage: number;
+    shares: number;
+    comments: number;
+    likes: number;
     trend: Array<{ time: string; value: number }>;
   };
   revenue: {
     total: number;
     mrr: number;
+    arr: number;
     change: number;
+    subscriptions: number;
+    churnRate: number;
+    avgRevenuePerUser: number;
     trend: Array<{ time: string; value: number }>;
+  };
+  performance: {
+    avgLoadTime: number;
+    apiResponseTime: number;
+    errorRate: number;
+    uptime: number;
+  };
+  conversions: {
+    signupRate: number;
+    premiumConversionRate: number;
+    totalConversions: number;
+  };
+  devices: {
+    mobile: number;
+    desktop: number;
+    tablet: number;
   };
   topArticles: Array<{
     id: string;
     title: string;
     views: number;
     engagement: number;
+    avgTimeSpent: number;
   }>;
   geography: Array<{
     country: string;
     users: number;
     percentage: number;
+    avgTimeSpent: number;
   }>;
+  userBehavior: {
+    avgPagesPerSession: number;
+    avgSessionsPerUser: number;
+    peakHours: Array<{ hour: string; users: number }>;
+  };
 }
 
 export default function AnalyticsPage() {
@@ -99,7 +135,12 @@ export default function AnalyticsPage() {
       'Metric,Value\n' +
       `Total Traffic,${analytics?.traffic.total}\n` +
       `Active Users,${analytics?.users.active}\n` +
-      `Total Revenue,$${analytics?.revenue.total}\n`;
+      `Avg Time on Platform,${analytics?.users.avgTimeOnPlatform} min\n` +
+      `Avg Session Duration,${analytics?.users.avgSessionDuration} min\n` +
+      `Total Revenue,$${analytics?.revenue.total}\n` +
+      `MRR,$${analytics?.revenue.mrr}\n` +
+      `Bounce Rate,${analytics?.users.bounceRate}%\n` +
+      `Conversion Rate,${analytics?.conversions.premiumConversionRate}%\n`;
     
     const link = document.createElement('a');
     link.href = encodeURI(csv);
@@ -184,8 +225,8 @@ export default function AnalyticsPage() {
         </div>
       ) : (
         <>
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Key Metrics - Row 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <Eye className="h-8 w-8 text-blue-400" />
@@ -213,17 +254,19 @@ export default function AnalyticsPage() {
               </div>
               <p className="text-3xl font-bold text-white">{analytics?.users.active.toLocaleString()}</p>
               <p className="text-sm text-gray-400 mt-1">Active Users</p>
+              <p className="text-xs text-gray-500 mt-1">{analytics?.users.returning} returning</p>
             </div>
 
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
-                <MousePointerClick className="h-8 w-8 text-purple-400" />
+                <Activity className="h-8 w-8 text-purple-400" />
                 <span className="text-sm text-green-400">
-                  {analytics?.content.engagement}%
+                  {analytics?.users.bounceRate}% bounce
                 </span>
               </div>
-              <p className="text-3xl font-bold text-white">{analytics?.content.views.toLocaleString()}</p>
-              <p className="text-sm text-gray-400 mt-1">Content Views</p>
+              <p className="text-3xl font-bold text-white">{analytics?.users.avgTimeOnPlatform.toFixed(1)} min</p>
+              <p className="text-sm text-gray-400 mt-1">Avg Time on Platform</p>
+              <p className="text-xs text-gray-500 mt-1">{analytics?.users.avgSessionDuration.toFixed(1)} min/session</p>
             </div>
 
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
@@ -242,6 +285,116 @@ export default function AnalyticsPage() {
               </div>
               <p className="text-3xl font-bold text-white">${analytics?.revenue.total.toLocaleString()}</p>
               <p className="text-sm text-gray-400 mt-1">Total Revenue</p>
+            </div>
+          </div>
+
+          {/* Key Metrics - Row 2: Engagement & Content */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <MousePointerClick className="h-8 w-8 text-orange-400" />
+                <span className="text-sm text-green-400">
+                  {analytics?.content.engagement}%
+                </span>
+              </div>
+              <p className="text-3xl font-bold text-white">{analytics?.content.views.toLocaleString()}</p>
+              <p className="text-sm text-gray-400 mt-1">Content Views</p>
+              <p className="text-xs text-gray-500 mt-1">{analytics?.content.avgTimeOnPage.toFixed(1)} min avg</p>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <FileText className="h-8 w-8 text-cyan-400" />
+                <span className="text-sm text-blue-400">
+                  {analytics?.userBehavior.avgPagesPerSession.toFixed(1)} pages/session
+                </span>
+              </div>
+              <p className="text-3xl font-bold text-white">{analytics?.content.shares.toLocaleString()}</p>
+              <p className="text-sm text-gray-400 mt-1">Social Shares</p>
+              <div className="flex items-center space-x-3 text-xs text-gray-500 mt-1">
+                <span>{analytics?.content.comments} comments</span>
+                <span>{analytics?.content.likes} likes</span>
+              </div>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <Activity className="h-8 w-8 text-pink-400" />
+                <span className="text-sm text-purple-400">
+                  {analytics?.conversions.signupRate}% signup
+                </span>
+              </div>
+              <p className="text-3xl font-bold text-white">{analytics?.conversions.totalConversions.toLocaleString()}</p>
+              <p className="text-sm text-gray-400 mt-1">Total Conversions</p>
+              <p className="text-xs text-gray-500 mt-1">{analytics?.conversions.premiumConversionRate}% to premium</p>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <TrendingUp className="h-8 w-8 text-emerald-400" />
+                <span className="text-sm text-red-400">
+                  {analytics?.revenue.churnRate}% churn
+                </span>
+              </div>
+              <p className="text-3xl font-bold text-white">${analytics?.revenue.avgRevenuePerUser.toFixed(2)}</p>
+              <p className="text-sm text-gray-400 mt-1">ARPU</p>
+              <p className="text-xs text-gray-500 mt-1">{analytics?.revenue.subscriptions} subscriptions</p>
+            </div>
+          </div>
+
+          {/* Key Metrics - Row 3: Performance & Technical */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <Zap className="h-8 w-8 text-yellow-400" />
+                <span className={`text-sm ${
+                  (analytics?.performance.avgLoadTime || 0) < 2 ? 'text-green-400' : 'text-orange-400'
+                }`}>
+                  {(analytics?.performance.avgLoadTime || 0) < 2 ? 'Fast' : 'Moderate'}
+                </span>
+              </div>
+              <p className="text-3xl font-bold text-white">{analytics?.performance.avgLoadTime.toFixed(2)}s</p>
+              <p className="text-sm text-gray-400 mt-1">Avg Load Time</p>
+              <p className="text-xs text-gray-500 mt-1">{analytics?.performance.apiResponseTime}ms API</p>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <Activity className="h-8 w-8 text-green-400" />
+                <span className={`text-sm ${
+                  (analytics?.performance.uptime || 0) >= 99.9 ? 'text-green-400' : 'text-yellow-400'
+                }`}>
+                  {analytics?.performance.uptime}%
+                </span>
+              </div>
+              <p className="text-3xl font-bold text-white">{analytics?.performance.uptime.toFixed(2)}%</p>
+              <p className="text-sm text-gray-400 mt-1">System Uptime</p>
+              <p className="text-xs text-gray-500 mt-1">{analytics?.performance.errorRate}% error rate</p>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <Globe className="h-8 w-8 text-indigo-400" />
+                <div className="flex items-center space-x-1">
+                  <Smartphone className="h-3 w-3 text-gray-400" />
+                  <span className="text-xs text-gray-400">{analytics?.devices.mobile}%</span>
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-white">{analytics?.devices.desktop}%</p>
+              <p className="text-sm text-gray-400 mt-1">Desktop Traffic</p>
+              <p className="text-xs text-gray-500 mt-1">{analytics?.devices.tablet}% tablet</p>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <BarChart3 className="h-8 w-8 text-violet-400" />
+                <span className="text-sm text-blue-400">
+                  {analytics?.userBehavior.avgSessionsPerUser.toFixed(1)} sessions
+                </span>
+              </div>
+              <p className="text-3xl font-bold text-white">${analytics?.revenue.mrr.toLocaleString()}</p>
+              <p className="text-sm text-gray-400 mt-1">MRR</p>
+              <p className="text-xs text-gray-500 mt-1">${analytics?.revenue.arr.toLocaleString()} ARR</p>
             </div>
           </div>
 
@@ -339,7 +492,10 @@ export default function AnalyticsPage() {
                   <div key={index}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium text-gray-300">{location.country}</span>
-                      <span className="text-sm text-gray-400">{location.users.toLocaleString()}</span>
+                      <div className="flex items-center space-x-3">
+                        <span className="text-xs text-gray-500">{location.avgTimeSpent.toFixed(1)} min</span>
+                        <span className="text-sm text-gray-400">{location.users.toLocaleString()}</span>
+                      </div>
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-2">
                       <div
@@ -380,6 +536,10 @@ export default function AnalyticsPage() {
                           <MousePointerClick className="h-3 w-3" />
                           <span>{article.engagement}% engagement</span>
                         </span>
+                        <span className="text-xs text-gray-400 flex items-center space-x-1">
+                          <Activity className="h-3 w-3" />
+                          <span>{article.avgTimeSpent.toFixed(1)} min avg</span>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -392,3 +552,4 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+

@@ -421,6 +421,7 @@ export async function generateContentCalendar(input: ContentCalendarInput) {
       if (dayOfWeek === 0 || dayOfWeek === 6) continue; // Skip weekends
       
       const keyword = keywords[keywordIndex % keywords.length];
+      if (!keyword) continue; // Skip if no keyword available
       keywordIndex++;
       
       // Use GPT-4 to generate content brief

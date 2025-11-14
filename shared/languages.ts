@@ -1,5 +1,5 @@
 /**
- * Supported Languages Configuration - Task 8.1
+ * Supported Languages Configuration 
  * 
  * Centralized language configuration for both frontend and backend.
  * 13 languages: 7 African + 6 European
@@ -38,7 +38,7 @@ export const COUNTRY_LANGUAGE_MAP: Record<string, LanguageCode> = {
   // African countries
   KE: 'sw', // Kenya - Swahili
   TZ: 'sw', // Tanzania - Swahili
-  NG: 'ha', // Nigeria - Hausa (could also be yo or ig)
+  NG: 'ig', // Nigeria - Igbo
   ET: 'am', // Ethiopia - Amharic
   ZA: 'zu', // South Africa - Zulu
   

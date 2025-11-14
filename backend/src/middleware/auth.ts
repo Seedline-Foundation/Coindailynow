@@ -301,3 +301,6 @@ export const userRateLimit = (requests: number, windowMs: number) => {
     next();
   };
 };
+
+// Alias for backward compatibility
+export const authenticate = authMiddleware;

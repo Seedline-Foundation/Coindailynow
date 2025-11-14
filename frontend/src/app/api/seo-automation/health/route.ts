@@ -1,45 +1,29 @@
-// Next.js API Route: SEO Automation Health Check
-// GET /api/seo-automation/health
+/**
+ * API Route Proxy
+ * Proxies requests to backend API
+ */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/seo-automation/health');
 
 export async function GET(request: NextRequest) {
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/seo-automation/health`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  return handler(request);
+}
 
-    const data = await response.json();
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
 
-    return NextResponse.json(data, { status: response.status });
-  } catch (error: any) {
-    console.error('Error checking SEO automation health:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to check SEO automation health',
-        message: error.message,
-        health: {
-          status: 'offline',
-          integrations: {
-            googleSearchConsole: false,
-            ahrefs: false,
-            semrush: false,
-          },
-          monitoring: {
-            rankTracking: false,
-            brokenLinks: false,
-            internalLinks: false,
-            schemaValidation: false,
-          },
-          timestamp: new Date().toISOString(),
-        },
-      },
-      { status: 503 }
-    );
-  }
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

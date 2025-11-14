@@ -135,7 +135,7 @@ export class ImageOptimizationService {
       // Apply watermark if specified (FR-580)
       if (options.watermark) {
         const watermarked = await this.applyWatermark(imageBuffer, options.watermark);
-        processedBuffer = watermarked;
+        processedBuffer = watermarked as any;
       }
 
       // Generate placeholder for lazy loading (FR-023)

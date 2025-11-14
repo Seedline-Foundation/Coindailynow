@@ -8,6 +8,8 @@ import {
 import { AuthService } from '../../src/services/authService';
 
 // Mock dependencies
+jest.mock('jsonwebtoken');
+jest.mock('@prisma/client');
 jest.mock('../../src/services/authService');
 jest.mock('../../src/utils/logger', () => ({
   info: jest.fn(),
@@ -15,6 +17,20 @@ jest.mock('../../src/utils/logger', () => ({
   warn: jest.fn(),
   debug: jest.fn(),
 }));
+
+import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
+
+const mockJwt = jwt as jest.Mocked<typeof jwt>;
+const mockPrismaClient = PrismaClient as jest.MockedClass<typeof PrismaClient>;
+const mockPrisma = {
+  user: {
+    findUnique: jest.fn(),
+  },
+} as any;
+
+// Mock PrismaClient constructor to return our mock
+mockPrismaClient.mockImplementation(() => mockPrisma);
 
 const mockAuthService = AuthService as jest.MockedClass<typeof AuthService>;
 
@@ -186,6 +202,7 @@ describe('Auth Middleware', () => {
         id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',
+        role: 'USER',
         subscriptionTier: 'PREMIUM',
         status: 'ACTIVE',
         emailVerified: true,
@@ -202,6 +219,7 @@ describe('Auth Middleware', () => {
         id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',
+        role: 'USER',
         subscriptionTier: 'ENTERPRISE',
         status: 'ACTIVE',
         emailVerified: true,
@@ -218,6 +236,7 @@ describe('Auth Middleware', () => {
         id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',
+        role: 'USER',
         subscriptionTier: 'FREE',
         status: 'ACTIVE',
         emailVerified: true,
@@ -261,6 +280,7 @@ describe('Auth Middleware', () => {
         id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',
+        role: 'USER',
         subscriptionTier: 'FREE',
         status: 'ACTIVE',
         emailVerified: true,
@@ -280,6 +300,7 @@ describe('Auth Middleware', () => {
         id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',
+        role: 'USER',
         subscriptionTier: 'FREE',
         status: 'ACTIVE',
         emailVerified: false,

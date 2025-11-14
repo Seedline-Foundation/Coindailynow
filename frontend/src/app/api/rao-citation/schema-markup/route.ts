@@ -1,30 +1,29 @@
 /**
- * RAO Citation API Proxy - Schema Markup
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/rao-citation/schema-markup');
+
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
+  return handler(request);
+}
 
-    const response = await fetch(`${BACKEND_URL}/api/rao-citation/schema-markup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Error generating schema markup:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate schema markup' },
-      { status: 500 }
-    );
-  }
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

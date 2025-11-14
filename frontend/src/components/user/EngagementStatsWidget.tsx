@@ -280,3 +280,4 @@ function StatCard({ icon, label, value, bgColor }: StatCardProps) {
     </div>
   );
 }
+

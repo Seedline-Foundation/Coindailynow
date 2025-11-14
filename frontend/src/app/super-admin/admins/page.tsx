@@ -83,9 +83,11 @@ export default function AdminManagementPage() {
     try {
       const response = await fetch('/api/super-admin/roles');
       const data = await response.json();
-      setRoles(data);
+      // Ensure roles is always an array
+      setRoles(Array.isArray(data) ? data : (Array.isArray(data.roles) ? data.roles : []));
     } catch (error) {
       console.error('Failed to load roles:', error);
+      setRoles([]);
     }
   };
 
@@ -225,7 +227,7 @@ export default function AdminManagementPage() {
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           >
             <option value="all">All Roles</option>
-            {roles.map(role => (
+            {Array.isArray(roles) && roles.map(role => (
               <option key={role.id} value={role.name}>{role.name}</option>
             ))}
           </select>
@@ -499,7 +501,7 @@ function CreateAdminModal({ roles, onClose, onSuccess }: {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">Select Role</option>
-                  {roles.map(role => (
+                  {Array.isArray(roles) && roles.map(role => (
                     <option key={role.id} value={role.name}>{role.name}</option>
                   ))}
                 </select>
@@ -599,6 +601,156 @@ function RoleManagementModal({ roles, onClose, onSuccess }: {
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newRole, setNewRole] = useState({
+    name: '',
+    description: '',
+    permissions: [] as string[]
+  });
+  const [loading, setLoading] = useState(false);
+
+  const availablePermissions = [
+    { id: 'manage_users', label: 'Manage Users', description: 'Create, edit, and delete user accounts' },
+    { id: 'manage_content', label: 'Manage Content', description: 'Create, edit, and publish articles' },
+    { id: 'manage_tokens', label: 'Manage Tokens', description: 'Add and update cryptocurrency tokens' },
+    { id: 'manage_ai', label: 'Manage AI', description: 'Control AI content generation settings' },
+    { id: 'view_analytics', label: 'View Analytics', description: 'Access platform analytics and reports' },
+    { id: 'manage_settings', label: 'Manage Settings', description: 'Configure system settings' },
+    { id: 'manage_roles', label: 'Manage Roles', description: 'Create and modify user roles' },
+    { id: 'manage_admins', label: 'Manage Admins', description: 'Manage administrator accounts' }
+  ];
+
+  const togglePermission = (permissionId: string) => {
+    setNewRole(prev => ({
+      ...prev,
+      permissions: prev.permissions.includes(permissionId)
+        ? prev.permissions.filter(p => p !== permissionId)
+        : [...prev.permissions, permissionId]
+    }));
+  };
+
+  const handleCreateRole = async () => {
+    if (!newRole.name || !newRole.description || newRole.permissions.length === 0) {
+      alert('Please fill in all fields and select at least one permission');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/super-admin/roles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newRole)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create role');
+      }
+
+      // Reset form
+      setNewRole({ name: '', description: '', permissions: [] });
+      setShowCreateForm(false);
+      onSuccess();
+    } catch (error) {
+      console.error('Error creating role:', error);
+      alert('Failed to create role. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (showCreateForm) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              Create New Role
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Role Name
+                </label>
+                <input
+                  type="text"
+                  value={newRole.name}
+                  onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
+                  placeholder="e.g., Content Editor"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={newRole.description}
+                  onChange={(e) => setNewRole({ ...newRole, description: e.target.value })}
+                  placeholder="Describe the role's responsibilities..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Permissions
+                </label>
+                <div className="space-y-2 max-h-64 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                  {availablePermissions.map(permission => (
+                    <label
+                      key={permission.id}
+                      className="flex items-start space-x-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={newRole.permissions.includes(permission.id)}
+                        onChange={() => togglePermission(permission.id)}
+                        className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {permission.label}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {permission.description}
+                        </div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4 mt-6 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setShowCreateForm(false)}
+                disabled={loading}
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateRole}
+                disabled={loading}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Creating...' : 'Create Role'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -608,7 +760,7 @@ function RoleManagementModal({ roles, onClose, onSuccess }: {
           </h2>
           
           <div className="space-y-4">
-            {roles.map(role => (
+            {Array.isArray(roles) && roles.map(role => (
               <div key={role.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -642,7 +794,10 @@ function RoleManagementModal({ roles, onClose, onSuccess }: {
             >
               Close
             </button>
-            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
               Create New Role
             </button>
           </div>
@@ -651,3 +806,4 @@ function RoleManagementModal({ roles, onClose, onSuccess }: {
     </div>
   );
 }
+

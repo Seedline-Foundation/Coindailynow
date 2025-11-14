@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import {
   FunnelIcon,
   MagnifyingGlassIcon,
@@ -10,18 +10,18 @@ import {
   CheckIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
-import { Table } from '@/components/ui/Table';
-import { Pagination } from '@/components/ui/Pagination';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Pagination } from '@/components/ui/pagination';
 import { Modal } from '@/components/ui/Modal';
 import { Tooltip } from '@/components/ui/Tooltip';
 
 // GraphQL Queries and Mutations
-const GET_MODERATION_QUEUE = `
+const GET_MODERATION_QUEUE = gql`
   query GetModerationQueue($filters: ModerationQueueFilters) {
     getModerationQueue(filters: $filters) {
       id
@@ -77,7 +77,7 @@ const GET_MODERATION_QUEUE = `
   }
 `;
 
-const CONFIRM_VIOLATION = `
+const CONFIRM_VIOLATION = gql`
   mutation ConfirmViolation($input: ViolationReviewInput!) {
     confirmViolation(input: $input) {
       id
@@ -86,7 +86,7 @@ const CONFIRM_VIOLATION = `
   }
 `;
 
-const MARK_FALSE_POSITIVE = `
+const MARK_FALSE_POSITIVE = gql`
   mutation MarkFalsePositive($input: FalsePositiveInput!) {
     markFalsePositive(input: $input) {
       id
@@ -95,7 +95,7 @@ const MARK_FALSE_POSITIVE = `
   }
 `;
 
-const PERFORM_BULK_ACTION = `
+const PERFORM_BULK_ACTION = gql`
   mutation PerformBulkAction($action: BulkModerationAction!) {
     performBulkAction(action: $action) {
       id
@@ -250,8 +250,8 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
     const variants = {
       LOW: 'success',
       MEDIUM: 'warning',
-      HIGH: 'error',
-      CRITICAL: 'error',
+      HIGH: 'destructive',
+      CRITICAL: 'destructive',
     } as const;
     
     return (
@@ -317,19 +317,18 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
       {/* Filters and Actions */}
       <Card className="p-6">
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1">
+          <div className="flex-1 relative">
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <Input
               placeholder="Search content, users, or violations..."
-              className="w-full"
-              leftIcon={MagnifyingGlassIcon}
+              className="w-full pl-10"
             />
           </div>
           
           <div className="flex gap-2">
             <Select
               value={filters.status}
-              onValueChange={(value) => setFilters(prev => ({ ...prev, status: value, page: 1 }))}
-              placeholder="Status"
+              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value, page: 1 }))}
             >
               <option value="">All Statuses</option>
               <option value="PENDING">Pending</option>
@@ -339,8 +338,7 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
 
             <Select
               value={filters.violationType}
-              onValueChange={(value) => setFilters(prev => ({ ...prev, violationType: value, page: 1 }))}
-              placeholder="Violation Type"
+              onChange={(e) => setFilters(prev => ({ ...prev, violationType: e.target.value, page: 1 }))}
             >
               <option value="">All Types</option>
               <option value="TOXICITY">Toxicity</option>
@@ -353,8 +351,7 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
 
             <Select
               value={filters.severity}
-              onValueChange={(value) => setFilters(prev => ({ ...prev, severity: value, page: 1 }))}
-              placeholder="Severity"
+              onChange={(e) => setFilters(prev => ({ ...prev, severity: e.target.value, page: 1 }))}
             >
               <option value="">All Severities</option>
               <option value="LOW">Low</option>
@@ -401,77 +398,77 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
       <Card>
         <div className="overflow-x-auto">
           <Table>
-            <Table.Head>
-              <Table.Row>
-                <Table.HeaderCell>
+            <TableHeader>
+              <TableRow>
+                <TableHead>
                   <input
                     type="checkbox"
                     checked={selectedItems.size === processedItems.length && processedItems.length > 0}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     className="rounded"
                   />
-                </Table.HeaderCell>
-                <Table.HeaderCell 
+                </TableHead>
+                <TableHead 
                   onClick={() => handleSort('priority')}
                   className="cursor-pointer hover:bg-gray-50"
                 >
                   Priority
-                </Table.HeaderCell>
-                <Table.HeaderCell 
+                </TableHead>
+                <TableHead 
                   onClick={() => handleSort('violationType')}
                   className="cursor-pointer hover:bg-gray-50"
                 >
                   Violation
-                </Table.HeaderCell>
-                <Table.HeaderCell>Content Preview</Table.HeaderCell>
-                <Table.HeaderCell 
+                </TableHead>
+                <TableHead>Content Preview</TableHead>
+                <TableHead 
                   onClick={() => handleSort('user')}
                   className="cursor-pointer hover:bg-gray-50"
                 >
                   User
-                </Table.HeaderCell>
-                <Table.HeaderCell 
+                </TableHead>
+                <TableHead 
                   onClick={() => handleSort('createdAt')}
                   className="cursor-pointer hover:bg-gray-50"
                 >
                   Time in Queue
-                </Table.HeaderCell>
-                <Table.HeaderCell>Actions</Table.HeaderCell>
-              </Table.Row>
-            </Table.Head>
-            <Table.Body>
+                </TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {loading ? (
-                <Table.Row>
-                  <Table.Cell colSpan={7} className="text-center py-8">
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
                     <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto" />
                     <p className="mt-2 text-gray-500">Loading queue...</p>
-                  </Table.Cell>
-                </Table.Row>
+                  </TableCell>
+                </TableRow>
               ) : processedItems.length === 0 ? (
-                <Table.Row>
-                  <Table.Cell colSpan={7} className="text-center py-8">
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
                     <ExclamationTriangleIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500">No violations found matching your filters</p>
-                  </Table.Cell>
-                </Table.Row>
+                  </TableCell>
+                </TableRow>
               ) : (
                 processedItems.map((item) => (
-                  <Table.Row key={item.id} className="hover:bg-gray-50">
-                    <Table.Cell>
+                  <TableRow key={item.id} className="hover:bg-gray-50">
+                    <TableCell>
                       <input
                         type="checkbox"
                         checked={selectedItems.has(item.id)}
                         onChange={(e) => handleItemSelect(item.id, e.target.checked)}
                         className="rounded"
                       />
-                    </Table.Cell>
-                    <Table.Cell>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2">
                         {getPriorityIndicator(item.priority)}
                         <span className="text-sm font-medium">{item.priority}</span>
                       </div>
-                    </Table.Cell>
-                    <Table.Cell>
+                    </TableCell>
+                    <TableCell>
                       <div className="space-y-1">
                         {getViolationTypeBadge(item.violation.violationType)}
                         {getSeverityBadge(item.violation.severity)}
@@ -479,8 +476,8 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
                           {Math.round(item.violation.confidence * 100)}% confidence
                         </div>
                       </div>
-                    </Table.Cell>
-                    <Table.Cell>
+                    </TableCell>
+                    <TableCell>
                       <div className="max-w-xs">
                         <p className="text-sm font-medium text-gray-900 mb-1">
                           {item.violation.contentType.toUpperCase()}
@@ -489,8 +486,8 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
                           {item.violation.content.substring(0, 100)}...
                         </p>
                       </div>
-                    </Table.Cell>
-                    <Table.Cell>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => onUserSelect(item.violation.user.id)}
@@ -498,22 +495,21 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
                         >
                           {item.violation.user.username}
                         </button>
-                        <Badge variant="secondary" size="sm">
+                        <Badge variant="secondary">
                           {item.violation.user.role}
                         </Badge>
                         {item.userContext.reputation && (
                           <Tooltip content={`Trust: ${item.userContext.reputation.trustLevel}`}>
                             <Badge 
-                              variant={item.userContext.reputation.riskLevel === 'HIGH' ? 'error' : 'secondary'}
-                              size="sm"
+                              variant={item.userContext.reputation.riskLevel === 'HIGH' ? 'destructive' : 'secondary'}
                             >
                               {item.userContext.reputation.score}
                             </Badge>
                           </Tooltip>
                         )}
                       </div>
-                    </Table.Cell>
-                    <Table.Cell>
+                    </TableCell>
+                    <TableCell>
                       <div className="text-sm">
                         <div className="font-medium">
                           {formatTimeInQueue(item.timeInQueue)}
@@ -522,8 +518,8 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
                           {new Date(item.violation.createdAt).toLocaleDateString()}
                         </div>
                       </div>
-                    </Table.Cell>
-                    <Table.Cell>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center space-x-2">
                         <Tooltip content="View Details">
                           <Button
@@ -555,11 +551,11 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
                           </Button>
                         </Tooltip>
                       </div>
-                    </Table.Cell>
-                  </Table.Row>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </Table.Body>
+            </TableBody>
           </Table>
         </div>
 
@@ -592,7 +588,7 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
             </Button>
             <Button
               onClick={handleBulkAction}
-              variant={bulkActionType === 'CONFIRM' ? 'primary' : 'error'}
+              variant={bulkActionType === 'CONFIRM' ? 'default' : 'destructive'}
             >
               Confirm Action
             </Button>
@@ -604,3 +600,6 @@ export const ModerationQueue: React.FC<ModerationQueueProps> = ({
 };
 
 export default ModerationQueue;
+
+
+

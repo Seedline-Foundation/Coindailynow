@@ -172,10 +172,10 @@ export class UserFeedbackService {
             rating: feedback.rating,
             feedbackCategory: feedback.feedbackType,
             comment: feedback.comment,
-            metadata: {
+            metadata: JSON.stringify({
               aiGenerated: feedback.aiGenerated,
               timestamp: feedback.timestamp.toISOString(),
-            },
+            }),
           },
         });
       }
@@ -295,17 +295,17 @@ export class UserFeedbackService {
         data: {
           userId: feedback.userId,
           articleId: feedback.articleId,
-          relatedId: feedback.translationId,
           feedbackType: 'TRANSLATION_ISSUE',
           feedbackCategory: feedback.issueType,
           comment: feedback.comment,
-          metadata: {
+          metadata: JSON.stringify({
             language: feedback.language,
             originalText: feedback.originalText,
             suggestedText: feedback.suggestedText,
+            translationId: feedback.translationId,
             severity: feedback.severity,
             timestamp: feedback.timestamp.toISOString(),
-          },
+          }),
         },
       });
 
@@ -456,14 +456,14 @@ export class UserFeedbackService {
         data: {
           userId: feedback.userId,
           articleId: feedback.articleId,
-          relatedId: feedback.recommendationId,
           feedbackType: 'RECOMMENDATION_QUALITY',
           rating: feedback.rating,
           feedbackCategory: feedback.feedbackType,
           comment: feedback.comment,
-          metadata: {
+          metadata: JSON.stringify({
+            recommendationId: feedback.recommendationId,
             timestamp: feedback.timestamp.toISOString(),
-          },
+          }),
         },
       });
 
@@ -828,13 +828,21 @@ export class UserFeedbackService {
     });
 
     if (stats._count > 0) {
+      const article = await this.prisma.article.findUnique({
+        where: { id: articleId },
+        select: { metadata: true },
+      });
+      
+      const existingMetadata = article?.metadata ? JSON.parse(article.metadata) : {};
+      
       await this.prisma.article.update({
         where: { id: articleId },
         data: {
-          metadata: {
+          metadata: JSON.stringify({
+            ...existingMetadata,
             averageRating: stats._avg.rating,
             totalRatings: stats._count,
-          },
+          }),
         },
       });
     }
@@ -923,14 +931,16 @@ export class UserFeedbackService {
     // Create a task for human review
     await this.prisma.aITask.create({
       data: {
-        agentType: 'HUMAN_REVIEW',
+        id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        agentId: 'human-review-agent',
         taskType: 'TRANSLATION_REVIEW',
         priority,
         status: 'QUEUED',
-        inputData: {
+        estimatedCost: 0,
+        inputData: JSON.stringify({
           feedbackId,
           reviewType: 'translation_issue',
-        },
+        }),
       },
     });
   }
@@ -944,15 +954,17 @@ export class UserFeedbackService {
   ): Promise<void> {
     await this.prisma.aITask.create({
       data: {
-        agentType: 'QUALITY_REVIEW',
+        id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        agentId: 'quality-review-agent',
         taskType: 'LEARNING',
         priority: 'LOW',
         status: 'QUEUED',
-        inputData: {
+        estimatedCost: 0,
+        inputData: JSON.stringify({
           feedbackId,
           feedbackType,
           learningPurpose: 'model_improvement',
-        },
+        }),
       },
     });
   }

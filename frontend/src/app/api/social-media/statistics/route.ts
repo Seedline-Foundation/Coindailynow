@@ -1,29 +1,29 @@
 /**
- * Social Media Statistics API Proxy (Task 78)
- * Next.js API route for fetching social media statistics
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/social-media/statistics');
 
-export async function GET() {
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/social-media/statistics`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    });
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Error fetching social media statistics:', error);
-    return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch statistics' },
-      { status: 500 }
-    );
-  }
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

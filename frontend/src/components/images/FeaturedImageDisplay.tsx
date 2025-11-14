@@ -222,3 +222,4 @@ export const FeaturedImageDisplay: React.FC<FeaturedImageDisplayProps> = ({
 };
 
 export default FeaturedImageDisplay;
+

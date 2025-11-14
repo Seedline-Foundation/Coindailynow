@@ -1,10 +1,13 @@
 import { ApolloServer } from '@apollo/server';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { typeDefs } from '../../src/api/schema';
-import { resolvers } from '../../src/api/resolvers';
+import { resolvers as rawResolvers } from '../../src/api/resolvers';
 import { GraphQLContext } from '../../src/api/context';
 import { PrismaClient } from '@prisma/client';
 import { CacheService } from '../../src/middleware/cache';
+
+// Type cast resolvers to proper shape
+const resolvers = rawResolvers as any;
 
 // Mock dependencies
 jest.mock('@prisma/client');
@@ -80,12 +83,41 @@ const mockAuthService = {
   verifyAccessToken: jest.fn(),
 } as any;
 
+const mockTranslationService = {
+  translate: jest.fn(),
+} as any;
+
+const mockTranslationAgent = {
+  translate: jest.fn(),
+} as any;
+
+const mockDbOptimizer = {
+  optimize: jest.fn(),
+} as any;
+
+const mockCacheStrategy = {
+  get: jest.fn(),
+  set: jest.fn(),
+} as any;
+
+const mockLogger = {
+  info: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+} as any;
+
 // Mock context
 const createMockContext = (user?: any): GraphQLContext => ({
   prisma: mockPrisma,
   redis: mockRedis,
   cache: mockCache,
   authService: mockAuthService,
+  translationService: mockTranslationService,
+  translationAgent: mockTranslationAgent,
+  dbOptimizer: mockDbOptimizer,
+  cacheStrategy: mockCacheStrategy,
+  logger: mockLogger,
   user,
   requestStartTime: Date.now(),
   operationName: 'TestOperation',

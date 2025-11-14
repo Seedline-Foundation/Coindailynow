@@ -194,6 +194,15 @@ router.get('/articles/:articleId/images/:imageId', async (req: Request, res: Res
   try {
     const { articleId, imageId } = req.params;
 
+    if (!imageId || !articleId) {
+      return res.status(400).json({
+        error: {
+          code: 'MISSING_PARAMETERS',
+          message: 'Article ID and Image ID are required',
+        },
+      });
+    }
+
     const image = await prisma.articleImage.findFirst({
       where: {
         id: imageId,

@@ -679,20 +679,41 @@ export class ComplianceMonitor extends EventEmitter {
 
   private async storeComplianceReport(report: ComplianceReport): Promise<void> {
     try {
-      // TODO: Create ComplianceReport model in Prisma schema
-      // await this.prisma.complianceReport.create({
-      //   data: {
-      //     id: report.id,
-      //     framework: report.framework,
-      //     periodStart: report.period.start,
-      //     periodEnd: report.period.end,
-      //     overallScore: report.overallScore,
-      //     violations: JSON.stringify(report.violations),
-      //     recommendations: JSON.stringify(report.recommendations),
-      //     generatedAt: report.generatedAt,
-      //   },
-      // });
-      logger.info('Compliance report generated (storage not implemented)', { reportId: report.id });
+      // Store compliance report in database
+      await this.prisma.complianceReport.create({
+        data: {
+          id: report.id,
+          reportType: 'audit_summary',
+          title: `${report.framework} Compliance Report`,
+          description: `Compliance report for period ${report.period.start.toISOString()} to ${report.period.end.toISOString()}`,
+          startDate: report.period.start,
+          endDate: report.period.end,
+          agentTypes: JSON.stringify([]),
+          operationTypes: JSON.stringify([]),
+          totalOperations: 0,
+          successfulOps: 0,
+          failedOps: 0,
+          humanOverrides: 0,
+          averageQuality: report.overallScore,
+          totalCost: null,
+          reportData: JSON.stringify({
+            violations: report.violations,
+            framework: report.framework
+          }),
+          gdprCompliant: 0,
+          dataRetention: JSON.stringify({}),
+          consentStatus: JSON.stringify({}),
+          recommendations: JSON.stringify(report.recommendations),
+          format: 'JSON',
+          requestedBy: 'system',
+          accessLevel: 'internal',
+          status: 'completed',
+          generatedAt: report.generatedAt,
+          createdAt: report.generatedAt,
+          updatedAt: report.generatedAt
+        }
+      });
+      logger.info('Compliance report stored successfully', { reportId: report.id });
     } catch (error) {
       logger.error('Failed to store compliance report', { error, reportId: report.id });
     }
@@ -718,28 +739,24 @@ export class ComplianceMonitor extends EventEmitter {
   }> {
     try {
       const totalUsers = await this.prisma.user.count();
-      // TODO: Fix Profile relation - UserProfile model may not exist in current schema
-      // const withConsent = await this.prisma.user.count({
-      //   where: {
-      //     Profile: {
-      //       consentGiven: true,
-      //       consentDate: { not: null },
-      //     },
-      //   },
-      // });
-      const withConsent = 0; // Placeholder until schema is updated
+      
+      // Count users with active consent through UserConsent records
+      const withConsent = await this.prisma.userConsent.count({
+        where: {
+          consented: true,
+          withdrawnAt: null
+        }
+      });
 
       const expiredConsentDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000); // 1 year ago
-      // TODO: Fix Profile relation - UserProfile model may not exist in current schema
-      // const expiredConsent = await this.prisma.user.count({
-      //   where: {
-      //     profile: {
-      //       consentGiven: true,
-      //       consentDate: { lt: expiredConsentDate },
-      //     },
-      //   },
-      // });
-      const expiredConsent = 0; // Placeholder until schema is updated
+      
+      // Count expired consents
+      const expiredConsent = await this.prisma.userConsent.count({
+        where: {
+          consented: true,
+          expiresAt: { lt: expiredConsentDate }
+        }
+      });
 
       return {
         totalUsers,

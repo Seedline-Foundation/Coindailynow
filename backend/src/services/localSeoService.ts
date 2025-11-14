@@ -276,7 +276,7 @@ export const addLocalKeyword = async (data: LocalKeywordData) => {
     difficulty: data.difficulty || 0,
     competition: data.competition || 'MEDIUM',
     optimizationScore: calculateKeywordOptimizationScore(data),
-  });
+  }) as any;
 
   const keyword = await prisma.localKeyword.create({
     data: createData,
@@ -383,7 +383,7 @@ export const addCitation = async (data: CitationData) => {
     napConsistent,
     napIssues: napIssues.length > 0 ? JSON.stringify(napIssues) : null,
     citationStatus: napConsistent ? 'VERIFIED' : 'INCONSISTENT',
-  });
+  }) as any;
 
   const citation = await prisma.localCitation.create({
     data: createData,
@@ -580,7 +580,7 @@ export const createLocalContent = async (data: {
     optimizationScore,
     isOptimized: optimizationScore >= 80,
     publishedAt: new Date(),
-  });
+  }) as any;
 
   const content = await prisma.localContent.create({
     data: createData,

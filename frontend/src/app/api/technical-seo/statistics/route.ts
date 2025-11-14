@@ -1,27 +1,29 @@
-import { NextResponse } from 'next/server';
-
 /**
- * Technical SEO Statistics API Proxy
- * GET /api/technical-seo/statistics
+ * API Route Proxy
+ * Proxies requests to backend API
  */
-export async function GET() {
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-    const response = await fetch(`${apiUrl}/api/technical-seo/statistics`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    });
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Technical SEO statistics error:', error);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
-  }
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
+
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/technical-seo/statistics');
+
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
+
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

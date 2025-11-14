@@ -1,40 +1,29 @@
 /**
- * Next.js API Route: Sitemap Stats
- * Route: /api/sitemap/stats
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
+
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/sitemap/stats');
 
 export async function GET(request: NextRequest) {
-  try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-    const response = await fetch(`${backendUrl}/api/sitemap/stats`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  return handler(request);
+}
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch sitemap stats');
-    }
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
 
-    return NextResponse.json(data, {
-      status: 200,
-      headers: {
-        'Cache-Control': 'public, max-age=300, s-maxage=300',
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching sitemap stats:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to fetch sitemap statistics',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    );
-  }
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

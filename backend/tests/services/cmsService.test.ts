@@ -586,7 +586,7 @@ describe('CMSService', () => {
         content: 'Original content',
         author: mockUser,
         category: mockCategory,
-        translations: [
+        ArticleTranslation: [
           {
             id: 'trans-1',
             languageCode: 'fr',
@@ -606,9 +606,9 @@ describe('CMSService', () => {
 
       const result = await cmsService.getArticleWithTranslations('article-1');
 
-      expect(result.translations).toHaveLength(2);
-      expect(result.translations.map(t => t.languageCode)).toContain('fr');
-      expect(result.translations.map(t => t.languageCode)).toContain('sw');
+      expect(result.ArticleTranslation).toHaveLength(2);
+      expect(result.ArticleTranslation.map((t: any) => t.languageCode)).toContain('fr');
+      expect(result.ArticleTranslation.map((t: any) => t.languageCode)).toContain('sw');
     });
   });
 

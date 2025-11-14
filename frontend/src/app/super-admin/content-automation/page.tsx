@@ -8,3 +8,4 @@ import ContentAutomationDashboard from '@/components/super-admin/ContentAutomati
 export default function ContentAutomationPage() {
   return <ContentAutomationDashboard />;
 }
+

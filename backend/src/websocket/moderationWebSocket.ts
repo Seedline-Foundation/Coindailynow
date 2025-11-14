@@ -185,7 +185,7 @@ export class ModerationWebSocketServer {
       try {
         await this.prisma.moderationAlert.update({
           where: { id: alertId },
-          data: { isRead: true, readAt: new Date() },
+          data: { status: 'READ', acknowledgedAt: new Date() },
         });
 
         socket.emit('moderation:alert_marked_read', {
@@ -346,11 +346,11 @@ export class ModerationWebSocketServer {
         recentAlerts,
       ] = await Promise.all([
         this.prisma.violationReport.count({ where: { status: 'PENDING' } }),
-        this.prisma.userPenalty.count({ where: { status: 'ACTIVE' } }),
+        this.prisma.userPenalty.count({ where: { isActive: true } }),
         this.connectedAdmins.size,
         this.prisma.moderationAlert.count({
           where: {
-            isRead: false,
+            status: 'UNREAD',
             createdAt: {
               gte: new Date(Date.now() - 60 * 60 * 1000), // Last hour
             },
@@ -462,11 +462,12 @@ export class ModerationWebSocketServer {
     try {
       await this.prisma.moderationAlert.create({
         data: {
-          type: 'CRITICAL_SYSTEM_ALERT',
+          alertType: 'CRITICAL_SYSTEM_ALERT',
           severity: alert.severity,
+          title: 'Critical System Alert',
           message: alert.message,
-          data: alert.data || {},
-          isRead: false,
+          metadata: JSON.stringify(alert.data || {}),
+          status: 'UNREAD',
         },
       });
     } catch (error) {

@@ -7,7 +7,7 @@ import { createModerationWebSocketServer } from '../websocket/moderationWebSocke
 import { moderationWorker } from '../workers/moderationWorker';
 import moderationRoutes from '../api/ai-moderation';
 import { moderationTypeDefs } from '../graphql/schemas/moderation';
-import moderationResolvers from '../graphql/resolvers/moderation';
+import { moderationResolvers } from '../graphql/resolvers/moderation';
 
 /**
  * AI Content Moderation Integration Module
@@ -304,7 +304,10 @@ export class AIModerationSystem {
       throw new Error('Moderation system must be initialized before use');
     }
 
-    return await this.moderationService.moderateContent(input);
+    return await this.moderationService.moderateContent({
+      ...input,
+      contentType: input.contentType as 'article' | 'comment' | 'post' | 'message',
+    });
   }
 
   /**
@@ -326,7 +329,7 @@ export class AIModerationSystem {
     ] = await Promise.all([
       this.prisma.violationReport.count(),
       this.prisma.violationReport.count({ where: { status: 'PENDING' } }),
-      this.prisma.userPenalty.count({ where: { status: 'ACTIVE' } }),
+      this.prisma.userPenalty.count({ where: { isActive: true } }),
       this.webSocketServer?.getConnectionStats()?.connectedAdmins || 0,
     ]);
 
@@ -369,7 +372,7 @@ export class AIModerationSystem {
           level3Threshold: 10,
           shadowBanDuration: this.config.shadowBanDuration,
           outrightBanDuration: this.config.outrightBanDuration,
-          officialBanDuration: this.config.officialBanDuration,
+          officialBanDuration: this.config.officialBanDuration ?? undefined,
           backgroundMonitoringEnabled: this.config.backgroundMonitoring,
           realTimeAlertsEnabled: this.config.realTimeAlerts,
           monitoringInterval: this.config.monitoringInterval,
@@ -390,7 +393,7 @@ export class AIModerationSystem {
     const usersWithoutReputation = await this.prisma.user.findMany({
       where: {
         UserReputation: {
-          none: {},
+          is: null,
         },
       },
       select: { id: true },

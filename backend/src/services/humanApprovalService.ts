@@ -837,12 +837,15 @@ class HumanApprovalService {
           // Get performance metrics
           const performanceMetrics = await this.getEditorPerformanceMetrics(editor.id);
 
+          // Get editor configuration (content types, languages, workload limits)
+          const editorConfig = await this.getEditorConfiguration(editor.id);
+
           return {
             editorId: editor.id,
             editorName: `${editor.firstName || ''} ${editor.lastName || ''}`.trim() || editor.username,
-            contentTypes: [ContentType.ARTICLE, ContentType.MARKET_ANALYSIS, ContentType.TUTORIAL], // TODO: Make configurable
-            languages: ['en'], // TODO: Make configurable
-            maxWorkload: 10, // TODO: Make configurable
+            contentTypes: editorConfig.contentTypes,
+            languages: editorConfig.languages,
+            maxWorkload: editorConfig.maxWorkload,
             currentWorkload,
             performanceMetrics,
           };
@@ -857,6 +860,46 @@ class HumanApprovalService {
     } catch (error) {
       logger.error('[HumanApprovalService] Error getting available editors:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Get editor configuration (content types, languages, workload)
+   */
+  private async getEditorConfiguration(editorId: string): Promise<{
+    contentTypes: ContentType[];
+    languages: string[];
+    maxWorkload: number;
+  }> {
+    try {
+      // Try to get from UserProfile contentPreferences
+      const userProfile = await prisma.userProfile.findUnique({
+        where: { userId: editorId },
+      });
+
+      if (userProfile && userProfile.contentPreferences) {
+        const prefs = JSON.parse(userProfile.contentPreferences);
+        
+        return {
+          contentTypes: prefs.contentTypes || [ContentType.ARTICLE, ContentType.MARKET_ANALYSIS, ContentType.TUTORIAL],
+          languages: prefs.languages || ['en'],
+          maxWorkload: prefs.maxWorkload || 10,
+        };
+      }
+
+      // Return defaults
+      return {
+        contentTypes: [ContentType.ARTICLE, ContentType.MARKET_ANALYSIS, ContentType.TUTORIAL],
+        languages: ['en'],
+        maxWorkload: 10,
+      };
+    } catch (error) {
+      logger.warn(`[HumanApprovalService] Error loading editor config for ${editorId}, using defaults:`, error);
+      return {
+        contentTypes: [ContentType.ARTICLE, ContentType.MARKET_ANALYSIS, ContentType.TUTORIAL],
+        languages: ['en'],
+        maxWorkload: 10,
+      };
     }
   }
 

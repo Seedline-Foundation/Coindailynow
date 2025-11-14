@@ -461,7 +461,7 @@ export class EngagementService {
 
     return recommendations.map((article, index) => ({
       ...article,
-      recommendationId: recommendationRecords[index].id,
+      recommendationId: recommendationRecords[index]?.id || '',
     }));
   }
 
@@ -851,7 +851,7 @@ export class EngagementService {
   async getEngagementAnalytics(dateRange?: { from: Date; to: Date }) {
     const where = dateRange
       ? {
-          createdAt: {
+          awardedAt: {
             gte: dateRange.from,
             lte: dateRange.to,
           },
@@ -889,35 +889,45 @@ export class EngagementService {
     ]);
 
     // Top engaged users
-    const topUsers = await prisma.userBehavior.findMany({
+    const topUserBehaviors = await prisma.userBehavior.findMany({
       orderBy: { engagementScore: 'desc' },
       take: 10,
-      include: {
-        User: {
+    });
+
+    const topUsers = await Promise.all(
+      topUserBehaviors.map(async (behavior) => {
+        const user = await prisma.user.findUnique({
+          where: { id: behavior.userId },
           select: {
             id: true,
             username: true,
             email: true,
             avatarUrl: true,
           },
-        },
-      },
-    });
+        });
+        return { ...behavior, User: user };
+      })
+    );
 
     // Recent milestones
-    const recentMilestones = await prisma.engagementMilestone.findMany({
+    const recentMilestoneData = await prisma.engagementMilestone.findMany({
       where: { achieved: true },
       orderBy: { achievedAt: 'desc' },
       take: 20,
-      include: {
-        User: {
+    });
+
+    const recentMilestones = await Promise.all(
+      recentMilestoneData.map(async (milestone) => {
+        const user = await prisma.user.findUnique({
+          where: { id: milestone.userId },
           select: {
             username: true,
             avatarUrl: true,
           },
-        },
-      },
-    });
+        });
+        return { ...milestone, User: user };
+      })
+    );
 
     return {
       overview: {
@@ -929,7 +939,7 @@ export class EngagementService {
         voiceArticles,
       },
       rewards: {
-        total: totalRewards._sum.pointsEarned || 0,
+        total: totalRewards._sum?.pointsEarned || 0,
         count: totalRewards._count,
       },
       topUsers,

@@ -511,18 +511,78 @@ class AIRecommendationService {
     }
 
     try {
-      // Get trending memecoins (placeholder - integrate with real market data)
-      // Note: Token table doesn't have priceChange24h, volume24h fields yet
-      // TODO: Add MarketData table or update Token schema
+      // Get trending memecoins using MarketData table
       const alerts: MemecoinAlert[] = [];
       
-      // Temporary: Return empty alerts until market data integration is complete
-      // This prevents database errors while keeping the API functional
+      // Query MarketData for tokens with significant price changes or volume
+      const trendingTokens = await prisma.marketData.findMany({
+        where: {
+          timestamp: {
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+          },
+          OR: [
+            { priceChange24h: { gte: 50 } }, // 50%+ price increase
+            { priceChange24h: { lte: -30 } }, // 30%+ price decrease
+            { volume24h: { gte: 1000000 } }, // High volume ($1M+)
+          ],
+        },
+        include: {
+          Token: true,
+        },
+        orderBy: {
+          timestamp: 'desc',
+        },
+        take: 50,
+      });
+
+      // Group by token and get latest data for each
+      const tokenMap = new Map<string, any>();
+      for (const data of trendingTokens) {
+        if (!tokenMap.has(data.tokenId)) {
+          tokenMap.set(data.tokenId, data);
+        }
+      }
+
+      // Generate alerts for significant movements
+      for (const [tokenId, marketData] of tokenMap.entries()) {
+        const priceChange = marketData.priceChange24h;
+        const volume = marketData.volume24h;
+        
+        let alertType: 'surge' | 'drop' | 'whale_activity' | 'new_listing' = 'surge';
+        let relevanceScore = 50;
+        
+        if (priceChange > 0) {
+          alertType = 'surge';
+          relevanceScore = Math.min(100, priceChange);
+        } else {
+          alertType = 'drop';
+          relevanceScore = Math.min(100, Math.abs(priceChange));
+        }
+        
+        if (volume > 5000000) {
+          relevanceScore += 20; // Boost score for high volume
+        }
+
+        const message = priceChange > 0
+          ? `${marketData.Token.name} (${marketData.Token.symbol}) surged ${priceChange.toFixed(2)}% in 24h`
+          : `${marketData.Token.name} (${marketData.Token.symbol}) dropped ${Math.abs(priceChange).toFixed(2)}% in 24h`;
+
+        alerts.push({
+          symbol: marketData.Token.symbol,
+          name: marketData.Token.name,
+          alertType,
+          relevanceScore,
+          priceChange24h: priceChange,
+          volume24h: volume,
+          message,
+          timestamp: marketData.timestamp,
+        });
+      }
 
       // Cache for 3 minutes
-      await redis.setex(cacheKey, CACHE_TTL.AI_INSIGHTS, JSON.stringify(alerts));
+      await redis.setex(cacheKey, CACHE_TTL.AI_INSIGHTS, JSON.stringify(alerts.slice(0, 20)));
 
-      return alerts;
+      return alerts.slice(0, 20); // Return top 20 alerts
     } catch (error) {
       console.error('[Recommendations] Error fetching memecoin alerts:', error);
       return [];
@@ -623,8 +683,8 @@ class AIRecommendationService {
           notificationFrequency: (dbPreferences.digestFrequency.toLowerCase() as NotificationFrequency) || NotificationFrequency.DAILY,
           enableMemecoinAlerts: dbPreferences.priceAlerts ?? true,
           enableMarketInsights: dbPreferences.aiRecommendations ?? true,
-          portfolioSymbols: [],  // TODO: Add to UserPreference schema
-          excludedTopics: [],    // TODO: Add to UserPreference schema
+          portfolioSymbols: JSON.parse((dbPreferences as any).portfolioSymbols || '[]'),
+          excludedTopics: JSON.parse((dbPreferences as any).excludedTopics || '[]'),
           createdAt: dbPreferences.createdAt,
           updatedAt: dbPreferences.updatedAt,
         };

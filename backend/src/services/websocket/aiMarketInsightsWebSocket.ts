@@ -15,6 +15,7 @@
 
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { getAIMarketInsightsService } from '../aiMarketInsightsService';
+import { socketAuthMiddleware } from '../../middleware/auth';
 
 // ============================================================================
 // TYPES
@@ -46,12 +47,8 @@ export class AIMarketInsightsWebSocketService {
   private setupNamespace() {
     const namespace = this.io.of('/ai/market');
 
-    namespace.use((socket, next) => {
-      // TODO: Add JWT authentication middleware
-      // const token = socket.handshake.auth.token;
-      // Verify token and attach user to socket
-      next();
-    });
+    // Add authentication middleware
+    namespace.use(socketAuthMiddleware);
 
     namespace.on('connection', (socket: Socket) => {
       console.log(`[Market WS] Client connected: ${socket.id}`);

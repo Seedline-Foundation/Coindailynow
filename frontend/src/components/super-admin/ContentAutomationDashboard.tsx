@@ -539,3 +539,4 @@ function SettingsPanel({ settings, onUpdate }: any) {
     </div>
   );
 }
+

@@ -55,9 +55,11 @@ router.patch('/alerts/:id/dismiss', async (req: Request, res: Response) => {
     }
     const alert = await securityAlertService.dismissAlert(id, userId || 'system');
     res.json(alert);
+    return;
   } catch (error: any) {
     console.error('[SecurityAlert] Error in PATCH /alerts/:id/dismiss:', error);
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -76,9 +78,11 @@ router.patch('/alerts/:id/action', async (req: Request, res: Response) => {
       actionDetails
     );
     res.json(alert);
+    return;
   } catch (error: any) {
     console.error('[SecurityAlert] Error in PATCH /alerts/:id/action:', error);
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -91,9 +95,11 @@ router.patch('/alerts/:id/read', async (req: Request, res: Response) => {
     }
     const alert = await securityAlertService.markAlertAsRead(id);
     res.json(alert);
+    return;
   } catch (error: any) {
     console.error('[SecurityAlert] Error in PATCH /alerts/:id/read:', error);
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -185,9 +191,11 @@ router.patch('/recommendations/:id/status', async (req: Request, res: Response) 
       dismissReason
     );
     res.json(recommendation);
+    return;
   } catch (error: any) {
     console.error('[SecurityAlert] Error in PATCH /recommendations/:id/status:', error);
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -239,9 +247,11 @@ router.patch('/compliance/:id/acknowledge', async (req: Request, res: Response) 
       userId || 'system'
     );
     res.json(update);
+    return;
   } catch (error: any) {
     console.error('[SecurityAlert] Error in PATCH /compliance/:id/acknowledge:', error);
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -296,9 +306,11 @@ router.patch('/seo-incidents/:id/status', async (req: Request, res: Response) =>
       recoveryProgress
     );
     res.json(incident);
+    return;
   } catch (error: any) {
     console.error('[SecurityAlert] Error in PATCH /seo-incidents/:id/status:', error);
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 

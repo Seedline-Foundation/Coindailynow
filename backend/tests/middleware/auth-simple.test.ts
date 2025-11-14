@@ -45,6 +45,7 @@ describe('Auth Middleware', () => {
         id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',
+        role: 'USER',
         subscriptionTier: 'FREE',
         emailVerified: true,
         status: 'ACTIVE',

@@ -1,20 +1,30 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import AIModerationService, { ViolationType, SeverityLevel } from '../services/aiModerationService';
+import Redis from 'ioredis';
+import AIModerationService from '../services/aiModerationService';
 import { authenticate, requireRole } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import { z } from 'zod';
 
 const router = Router();
 const prisma = new PrismaClient();
-const moderationService = new AIModerationService(prisma);
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const moderationService = new AIModerationService(
+  prisma, 
+  redis, 
+  process.env.PERSPECTIVE_API_KEY || ''
+);
+
+// Define validation enums
+const ViolationTypeEnum = ['religious', 'hate_speech', 'harassment', 'sexual', 'spam', 'other'] as const;
+const SeverityLevelEnum = ['low', 'medium', 'high', 'critical'] as const;
 
 // Validation schemas
 const getModerationQueueSchema = z.object({
   query: z.object({
     status: z.enum(['PENDING', 'PROCESSED', 'CONFIRMED', 'FALSE_POSITIVE']).optional(),
-    violationType: z.nativeEnum(ViolationType).optional(),
-    severity: z.nativeEnum(SeverityLevel).optional(),
+    violationType: z.enum(ViolationTypeEnum).optional(),
+    severity: z.enum(SeverityLevelEnum).optional(),
     page: z.string().transform(Number).default('1'),
     limit: z.string().transform(Number).default('20')
   })
@@ -87,16 +97,16 @@ router.use(requireRole(['SUPER_ADMIN', 'ADMIN']));
  * @desc Get moderation queue items with filtering and pagination
  * @access Super Admin, Admin
  */
-router.get('/queue', validateRequest(getModerationQueueSchema), async (req: Request, res: Response) => {
+router.get('/queue', validateRequest({ query: getModerationQueueSchema.shape.query }), async (req: Request, res: Response) => {
   try {
     const { status, violationType, severity, page, limit } = req.query as any;
 
     const result = await moderationService.getModerationQueue(
-      status,
-      violationType,
-      severity,
-      page,
-      limit
+      { 
+        status, 
+        contentType: violationType 
+      },
+      { page: Number(page) || 1, limit: Number(limit) || 20 }
     );
 
     res.status(200).json({
@@ -123,8 +133,10 @@ router.get('/queue', validateRequest(getModerationQueueSchema), async (req: Requ
 router.get('/queue/stats', async (req: Request, res: Response) => {
   try {
     const days = parseInt(req.query.days as string) || 30;
+    const now = new Date();
+    const start = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
     
-    const stats = await moderationService.getModerationStats(days);
+    const stats = await moderationService.getModerationStats({ start, end: now });
 
     res.status(200).json({
       success: true,
@@ -147,11 +159,15 @@ router.get('/queue/stats', async (req: Request, res: Response) => {
  * @desc Confirm a violation and apply penalty
  * @access Super Admin, Admin
  */
-router.post('/queue/:queueId/confirm', validateRequest(confirmViolationSchema), async (req: Request, res: Response) => {
+router.post('/queue/:queueId/confirm', validateRequest({ params: confirmViolationSchema.shape.params, body: confirmViolationSchema.shape.body }), async (req: Request, res: Response) => {
   try {
     const { queueId } = req.params;
     const { notes } = req.body;
     const adminId = req.user!.id;
+
+    if (!queueId) {
+      return res.status(400).json({ success: false, message: 'Queue ID is required' });
+    }
 
     await moderationService.confirmViolation(queueId, adminId);
 
@@ -159,11 +175,11 @@ router.post('/queue/:queueId/confirm', validateRequest(confirmViolationSchema), 
     await prisma.adminAction.create({
       data: {
         adminId,
-        action: 'CONFIRM_VIOLATION',
-        targetType: 'MODERATION_QUEUE',
+        adminRole: req.user!.role,
+        actionType: 'confirm_violation',
+        targetType: 'moderation_queue',
         targetId: queueId,
-        notes,
-        timestamp: new Date()
+        adminComment: notes || null
       }
     });
 
@@ -171,6 +187,7 @@ router.post('/queue/:queueId/confirm', validateRequest(confirmViolationSchema), 
       success: true,
       message: 'Violation confirmed and penalty applied'
     });
+    return;
 
   } catch (error: any) {
     console.error('❌ Error confirming violation:', error);
@@ -179,6 +196,7 @@ router.post('/queue/:queueId/confirm', validateRequest(confirmViolationSchema), 
       error: 'Failed to confirm violation',
       details: error.message
     });
+    return;
   }
 });
 
@@ -187,11 +205,15 @@ router.post('/queue/:queueId/confirm', validateRequest(confirmViolationSchema), 
  * @desc Mark violation as false positive
  * @access Super Admin, Admin
  */
-router.post('/queue/:queueId/false-positive', validateRequest(falsePositiveSchema), async (req: Request, res: Response) => {
+router.post('/queue/:queueId/false-positive', validateRequest({ params: falsePositiveSchema.shape.params, body: falsePositiveSchema.shape.body }), async (req: Request, res: Response) => {
   try {
     const { queueId } = req.params;
     const { notes } = req.body;
     const adminId = req.user!.id;
+
+    if (!queueId) {
+      return res.status(400).json({ success: false, message: 'Queue ID is required' });
+    }
 
     await moderationService.markFalsePositive(queueId, adminId, notes);
 
@@ -199,11 +221,11 @@ router.post('/queue/:queueId/false-positive', validateRequest(falsePositiveSchem
     await prisma.adminAction.create({
       data: {
         adminId,
-        action: 'MARK_FALSE_POSITIVE',
-        targetType: 'MODERATION_QUEUE',
+        adminRole: req.user!.role,
+        actionType: 'mark_false_positive',
+        targetType: 'moderation_queue',
         targetId: queueId,
-        notes,
-        timestamp: new Date()
+        adminComment: notes || null
       }
     });
 
@@ -211,6 +233,7 @@ router.post('/queue/:queueId/false-positive', validateRequest(falsePositiveSchem
       success: true,
       message: 'Marked as false positive'
     });
+    return;
 
   } catch (error: any) {
     console.error('❌ Error marking false positive:', error);
@@ -219,6 +242,7 @@ router.post('/queue/:queueId/false-positive', validateRequest(falsePositiveSchem
       error: 'Failed to mark as false positive',
       details: error.message
     });
+    return;
   }
 });
 
@@ -227,11 +251,15 @@ router.post('/queue/:queueId/false-positive', validateRequest(falsePositiveSchem
  * @desc Adjust penalty for a violation
  * @access Super Admin only
  */
-router.post('/queue/:queueId/adjust-penalty', requireRole(['SUPER_ADMIN']), validateRequest(adjustPenaltySchema), async (req: Request, res: Response) => {
+router.post('/queue/:queueId/adjust-penalty', requireRole(['SUPER_ADMIN']), validateRequest({ params: adjustPenaltySchema.shape.params, body: adjustPenaltySchema.shape.body }), async (req: Request, res: Response) => {
   try {
     const { queueId } = req.params;
     const { penaltyType, duration, reason, notes } = req.body;
     const adminId = req.user!.id;
+
+    if (!queueId) {
+      return res.status(400).json({ success: false, message: 'Queue ID is required' });
+    }
 
     // Get queue item to get user info
     const queueItem = await prisma.moderationQueue.findUnique({
@@ -255,18 +283,27 @@ router.post('/queue/:queueId/adjust-penalty', requireRole(['SUPER_ADMIN']), vali
       escalationPath: ['Admin adjusted penalty']
     };
 
-    await moderationService['applyPenalty'](queueItem.userId, penalty);
+    // Apply penalty via the service method
+    const penaltyData = {
+      violationReportId: queueId,
+      penaltyType: penaltyType.toLowerCase(),
+      duration: duration || 7,
+      severity: 'medium',
+      reason,
+      appliedBy: adminId
+    };
+
+    await moderationService['applyPenalty'](queueItem.authorId, penaltyData);
 
     // Update queue item
     await prisma.moderationQueue.update({
       where: { id: queueId },
       data: {
         status: 'CONFIRMED',
-        recommendedAction: penaltyType,
-        reason,
+        flagReason: reason,
         reviewedBy: adminId,
         reviewedAt: new Date(),
-        notes
+        reviewNotes: notes || null
       }
     });
 
@@ -274,11 +311,12 @@ router.post('/queue/:queueId/adjust-penalty', requireRole(['SUPER_ADMIN']), vali
     await prisma.adminAction.create({
       data: {
         adminId,
-        action: 'ADJUST_PENALTY',
-        targetType: 'MODERATION_QUEUE',
+        adminRole: req.user!.role,
+        actionType: 'adjust_penalty',
+        targetType: 'moderation_queue',
         targetId: queueId,
-        notes: `Adjusted to ${penaltyType}: ${reason}`,
-        timestamp: new Date()
+        adminComment: `Adjusted to ${penaltyType}: ${reason}`,
+        reason
       }
     });
 
@@ -286,6 +324,7 @@ router.post('/queue/:queueId/adjust-penalty', requireRole(['SUPER_ADMIN']), vali
       success: true,
       message: 'Penalty adjusted and applied'
     });
+    return;
 
   } catch (error: any) {
     console.error('❌ Error adjusting penalty:', error);
@@ -294,6 +333,7 @@ router.post('/queue/:queueId/adjust-penalty', requireRole(['SUPER_ADMIN']), vali
       error: 'Failed to adjust penalty',
       details: error.message
     });
+    return;
   }
 });
 
@@ -302,18 +342,25 @@ router.post('/queue/:queueId/adjust-penalty', requireRole(['SUPER_ADMIN']), vali
  * @desc Get user violation history
  * @access Super Admin, Admin
  */
-router.get('/users/:userId/violations', validateRequest(getUserHistorySchema), async (req: Request, res: Response) => {
+router.get('/users/:userId/violations', validateRequest({ params: getUserHistorySchema.shape.params, query: getUserHistorySchema.shape.query }), async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const { page, limit } = req.query as any;
 
-    const result = await moderationService.getUserViolationHistory(userId, page, limit);
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
+
+    const result = await moderationService.getUserViolationHistory(userId, { 
+      limit: Number(limit) || 10 
+    });
 
     res.status(200).json({
       success: true,
       data: result,
       message: 'User violation history retrieved'
     });
+    return;
 
   } catch (error: any) {
     console.error('❌ Error fetching user violations:', error);
@@ -322,6 +369,7 @@ router.get('/users/:userId/violations', validateRequest(getUserHistorySchema), a
       error: 'Failed to fetch user violation history',
       details: error.message
     });
+    return;
   }
 });
 
@@ -335,6 +383,10 @@ router.get('/users/:userId/penalties', async (req: Request, res: Response) => {
     const { userId } = req.params;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
 
     const penalties = await prisma.userPenalty.findMany({
       where: { userId },
@@ -366,6 +418,7 @@ router.get('/users/:userId/penalties', async (req: Request, res: Response) => {
       },
       message: 'User penalty history retrieved'
     });
+    return;
 
   } catch (error: any) {
     console.error('❌ Error fetching user penalties:', error);
@@ -374,6 +427,7 @@ router.get('/users/:userId/penalties', async (req: Request, res: Response) => {
       error: 'Failed to fetch user penalty history',
       details: error.message
     });
+    return;
   }
 });
 
@@ -387,6 +441,10 @@ router.post('/users/:userId/ban', requireRole(['SUPER_ADMIN']), async (req: Requ
     const { userId } = req.params;
     const { penaltyType, duration, reason } = req.body;
     const adminId = req.user!.id;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
 
     // Validate penalty type
     if (!['SHADOW_BAN', 'OUTRIGHT_BAN', 'OFFICIAL_BAN'].includes(penaltyType)) {
@@ -408,14 +466,14 @@ router.post('/users/:userId/ban', requireRole(['SUPER_ADMIN']), async (req: Requ
       });
     }
 
-    // Apply penalty
+    // Apply penalty with proper signature
     const penalty = {
-      recommendedPenalty: penaltyType as any,
+      violationReportId: 'MANUAL_BAN_' + userId,
+      penaltyType: penaltyType.toLowerCase(),
       duration: duration || 7,
+      severity: 'HIGH',
       reason: reason || 'Manual admin action',
-      confidence: 1.0,
-      requiresHumanReview: false,
-      escalationPath: ['Manual admin ban']
+      appliedBy: adminId
     };
 
     await moderationService['applyPenalty'](userId, penalty);
@@ -424,11 +482,12 @@ router.post('/users/:userId/ban', requireRole(['SUPER_ADMIN']), async (req: Requ
     await prisma.adminAction.create({
       data: {
         adminId,
-        action: 'MANUAL_BAN',
-        targetType: 'USER',
+        adminRole: req.user!.role,
+        actionType: 'manual_ban',
+        targetType: 'user',
         targetId: userId,
-        notes: `Manual ${penaltyType}: ${reason}`,
-        timestamp: new Date()
+        adminComment: `Manual ${penaltyType}: ${reason}`,
+        reason
       }
     });
 
@@ -436,6 +495,7 @@ router.post('/users/:userId/ban', requireRole(['SUPER_ADMIN']), async (req: Requ
       success: true,
       message: `User ${penaltyType} applied successfully`
     });
+    return;
 
   } catch (error: any) {
     console.error('❌ Error applying manual ban:', error);
@@ -444,6 +504,7 @@ router.post('/users/:userId/ban', requireRole(['SUPER_ADMIN']), async (req: Requ
       error: 'Failed to apply manual ban',
       details: error.message
     });
+    return;
   }
 });
 
@@ -457,6 +518,10 @@ router.post('/users/:userId/unban', requireRole(['SUPER_ADMIN']), async (req: Re
     const { userId } = req.params;
     const { reason } = req.body;
     const adminId = req.user!.id;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
 
     // Remove active penalties
     await prisma.userPenalty.updateMany({
@@ -476,10 +541,7 @@ router.post('/users/:userId/unban', requireRole(['SUPER_ADMIN']), async (req: Re
       where: { id: userId },
       data: {
         isShadowBanned: false,
-        isBanned: false,
-        shadowBanUntil: null,
-        bannedUntil: null,
-        banReason: null
+        status: 'ACTIVE'
       }
     });
 
@@ -487,11 +549,12 @@ router.post('/users/:userId/unban', requireRole(['SUPER_ADMIN']), async (req: Re
     await prisma.adminAction.create({
       data: {
         adminId,
-        action: 'UNBAN_USER',
-        targetType: 'USER',
+        adminRole: req.user!.role,
+        actionType: 'unban_user',
+        targetType: 'user',
         targetId: userId,
-        notes: reason || 'User unbanned',
-        timestamp: new Date()
+        adminComment: reason || 'User unbanned',
+        reason: reason || null
       }
     });
 
@@ -499,6 +562,7 @@ router.post('/users/:userId/unban', requireRole(['SUPER_ADMIN']), async (req: Re
       success: true,
       message: 'User unbanned successfully'
     });
+    return;
 
   } catch (error: any) {
     console.error('❌ Error unbanning user:', error);
@@ -507,6 +571,7 @@ router.post('/users/:userId/unban', requireRole(['SUPER_ADMIN']), async (req: Re
       error: 'Failed to unban user',
       details: error.message
     });
+    return;
   }
 });
 
@@ -515,7 +580,7 @@ router.post('/users/:userId/unban', requireRole(['SUPER_ADMIN']), async (req: Re
  * @desc Manually moderate specific content
  * @access Super Admin, Admin
  */
-router.post('/content/moderate', validateRequest(moderateContentSchema), async (req: Request, res: Response) => {
+router.post('/content/moderate', validateRequest({ body: moderateContentSchema.shape.body }), async (req: Request, res: Response) => {
   try {
     const { contentId, contentType, text, userId } = req.body;
 
@@ -523,7 +588,7 @@ router.post('/content/moderate', validateRequest(moderateContentSchema), async (
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        subscription: true
+        Subscription: true
       }
     });
 
@@ -534,26 +599,34 @@ router.post('/content/moderate', validateRequest(moderateContentSchema), async (
       });
     }
 
-    // Create moderation content object
+    // Create moderation content object (removed tier reference - not in Subscription model)
     const content = {
       id: contentId,
       text,
       type: contentType,
       authorId: userId,
       authorRole: user.role as any,
-      subscriptionTier: user.subscription?.tier as any,
+      subscriptionTier: user.subscriptionTier,
       accountAge: Math.floor((Date.now() - user.createdAt.getTime()) / (24 * 60 * 60 * 1000)),
       createdAt: new Date()
     };
 
-    // Run moderation
-    const result = await moderationService.moderateContent(content);
+    // Run moderation with proper interface
+    const moderationRequest = {
+      userId,
+      contentType,
+      contentId,
+      content: text
+    };
+
+    const result = await moderationService.moderateContent(moderationRequest);
 
     res.status(200).json({
       success: true,
       data: result,
-      message: result.approved ? 'Content approved' : 'Content flagged for violations'
+      message: result.isViolation ? 'Content flagged for violations' : 'Content approved'
     });
+    return;
 
   } catch (error: any) {
     console.error('❌ Error moderating content:', error);
@@ -562,6 +635,7 @@ router.post('/content/moderate', validateRequest(moderateContentSchema), async (
       error: 'Failed to moderate content',
       details: error.message
     });
+    return;
   }
 });
 
@@ -570,7 +644,7 @@ router.post('/content/moderate', validateRequest(moderateContentSchema), async (
  * @desc Perform bulk actions on queue items
  * @access Super Admin only
  */
-router.post('/queue/bulk-action', requireRole(['SUPER_ADMIN']), validateRequest(bulkActionSchema), async (req: Request, res: Response) => {
+router.post('/queue/bulk-action', requireRole(['SUPER_ADMIN']), validateRequest({ body: bulkActionSchema.shape.body }), async (req: Request, res: Response) => {
   try {
     const { queueIds, action, notes } = req.body;
     const adminId = req.user!.id;
@@ -612,11 +686,11 @@ router.post('/queue/bulk-action', requireRole(['SUPER_ADMIN']), validateRequest(
     await prisma.adminAction.create({
       data: {
         adminId,
-        action: `BULK_${action}`,
-        targetType: 'MODERATION_QUEUE',
+        adminRole: req.user!.role,
+        actionType: `bulk_${action.toLowerCase()}`,
+        targetType: 'moderation_queue',
         targetId: `bulk-${queueIds.length}`,
-        notes: `Bulk action on ${queueIds.length} items: ${notes || ''}`,
-        timestamp: new Date()
+        adminComment: `Bulk action on ${queueIds.length} items: ${notes || ''}`
       }
     });
 
@@ -648,17 +722,19 @@ router.get('/alerts', async (req: Request, res: Response) => {
     const severity = req.query.severity as string;
 
     const where: any = {
-      type: 'CRITICAL_VIOLATION'
+      severity: 'critical',
+      status: 'PENDING'
     };
 
     if (severity) {
       where.severity = severity;
     }
 
-    const alerts = await prisma.adminAlert.findMany({
+    // Use ViolationReport for critical alerts instead of adminAlert
+    const alerts = await prisma.violationReport.findMany({
       where,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             username: true,
@@ -672,7 +748,7 @@ router.get('/alerts', async (req: Request, res: Response) => {
       take: limit
     });
 
-    const total = await prisma.adminAlert.count({ where });
+    const total = await prisma.violationReport.count({ where });
 
     res.status(200).json({
       success: true,
@@ -697,19 +773,24 @@ router.get('/alerts', async (req: Request, res: Response) => {
 
 /**
  * @route POST /api/moderation/alerts/:alertId/mark-read
- * @desc Mark alert as read
+ * @desc Mark alert as read (updates violation report status)
  * @access Super Admin, Admin
  */
 router.post('/alerts/:alertId/mark-read', async (req: Request, res: Response) => {
   try {
     const { alertId } = req.params;
 
-    await prisma.adminAlert.update({
+    if (!alertId) {
+      return res.status(400).json({ success: false, message: 'Alert ID is required' });
+    }
+
+    // Update violation report status instead of adminAlert
+    await prisma.violationReport.update({
       where: { id: alertId },
       data: {
-        isRead: true,
-        readAt: new Date(),
-        readBy: req.user!.id
+        status: 'confirmed',
+        reviewedBy: req.user!.id,
+        reviewedAt: new Date()
       }
     });
 
@@ -717,6 +798,7 @@ router.post('/alerts/:alertId/mark-read', async (req: Request, res: Response) =>
       success: true,
       message: 'Alert marked as read'
     });
+    return;
 
   } catch (error: any) {
     console.error('❌ Error marking alert as read:', error);
@@ -725,6 +807,7 @@ router.post('/alerts/:alertId/mark-read', async (req: Request, res: Response) =>
       error: 'Failed to mark alert as read',
       details: error.message
     });
+    return;
   }
 });
 
@@ -744,10 +827,11 @@ router.get('/system/status', async (req: Request, res: Response) => {
         where: { status: 'PENDING' }
       }),
       
-      prisma.adminAlert.count({
+      // Use ViolationReport for critical alerts count
+      prisma.violationReport.count({
         where: {
-          severity: 'CRITICAL',
-          isRead: false
+          severity: 'critical',
+          status: 'PENDING'
         }
       }),
       

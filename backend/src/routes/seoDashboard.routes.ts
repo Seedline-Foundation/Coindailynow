@@ -99,14 +99,14 @@ router.post('/keywords', authMiddleware, requireSuperAdmin, async (req: Request,
       language,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: keywordData,
       message: 'Keyword tracking started',
     });
   } catch (error: any) {
     console.error('Error tracking keyword:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to track keyword',
       message: error.message,
@@ -141,19 +141,19 @@ router.put('/keywords/:keywordId/ranking', authMiddleware, requireSuperAdmin, as
     await seoDashboardService.updateKeywordRanking(keywordId, {
       position: parseInt(position),
       url,
-      title,
-      snippet,
+      title: title || undefined,
+      snippet: snippet || undefined,
       clicks: clicks ? parseInt(clicks) : undefined,
       impressions: impressions ? parseInt(impressions) : undefined,
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Keyword ranking updated',
     });
   } catch (error: any) {
     console.error('Error updating keyword ranking:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to update keyword ranking',
       message: error.message,
@@ -216,14 +216,14 @@ router.post('/pages/analyze', authMiddleware, requireSuperAdmin, async (req: Req
 
     const analysis = await seoDashboardService.analyzePage(url, contentId);
 
-    res.json({
+    return res.json({
       success: true,
       data: analysis,
       message: 'Page analyzed successfully',
     });
   } catch (error: any) {
     console.error('Error analyzing page:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to analyze page',
       message: error.message,
@@ -286,13 +286,13 @@ router.put('/alerts/:alertId/read', authMiddleware, requireSuperAdmin, async (re
 
     await seoDashboardService.markAlertAsRead(alertId);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Alert marked as read',
     });
   } catch (error: any) {
     console.error('Error marking alert as read:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to mark alert as read',
       message: error.message,
@@ -326,13 +326,13 @@ router.put('/alerts/:alertId/resolve', authMiddleware, requireSuperAdmin, async 
 
     await seoDashboardService.resolveAlert(alertId, userId);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Alert resolved',
     });
   } catch (error: any) {
     console.error('Error resolving alert:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to resolve alert',
       message: error.message,
@@ -450,13 +450,13 @@ router.post('/rao/track', authMiddleware, requireSuperAdmin, async (req: Request
       semanticRelevance: semanticRelevance || 0,
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'RAO performance tracked',
     });
   } catch (error: any) {
     console.error('Error tracking RAO performance:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to track RAO performance',
       message: error.message,
@@ -496,14 +496,14 @@ router.get('/user/stats', authMiddleware, async (req: Request, res: Response) =>
       },
     };
 
-    res.json({
+    return res.json({
       success: true,
       data: userStats,
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
     console.error('Error fetching user stats:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to fetch user stats',
       message: error.message,

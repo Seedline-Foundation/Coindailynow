@@ -621,3 +621,5 @@ export default function LegalComplianceDashboard() {
     </div>
   );
 }
+
+

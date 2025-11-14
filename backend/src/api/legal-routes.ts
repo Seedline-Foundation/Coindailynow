@@ -15,6 +15,7 @@ interface AuthenticatedRequest extends Request {
     id: string;
     email: string;
     username: string;
+    role: string;
     subscriptionTier: string;
     status: string;
     emailVerified: boolean;
@@ -39,6 +40,7 @@ const authMiddleware = (req: AuthenticatedRequest, res: Response, next: any) => 
     id: 'test-user', 
     email: 'test@test.com', 
     username: 'testuser',
+    role: 'USER',
     subscriptionTier: 'premium',
     status: 'active',
     emailVerified: true

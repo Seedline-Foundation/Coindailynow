@@ -203,12 +203,12 @@ export class AIImageService {
       const result: ImageGenerationResult = {
         id: savedImage.id,
         imageUrl: savedImage.imageUrl,
-        thumbnailUrl: savedImage.thumbnailUrl || undefined,
+        thumbnailUrl: savedImage.thumbnailUrl ?? undefined,
         altText: savedImage.altText,
-        width: savedImage.width || undefined,
-        height: savedImage.height || undefined,
-        format: savedImage.format || undefined,
-        size: savedImage.size || undefined,
+        width: savedImage.width ?? undefined,
+        height: savedImage.height ?? undefined,
+        format: savedImage.format ?? undefined,
+        size: savedImage.size ?? undefined,
         metadata: {
           processingTime: Date.now() - startTime,
           cached: false,

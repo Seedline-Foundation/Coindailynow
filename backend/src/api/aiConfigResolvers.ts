@@ -5,7 +5,7 @@
  * Task 6.2: AI Configuration Management
  */
 
-import { PubSub } from 'graphql-subscriptions';
+import { PubSub, withFilter } from 'graphql-subscriptions';
 import * as configService from '../services/aiConfigurationService';
 import { logger } from '../utils/logger';
 
@@ -243,20 +243,28 @@ export const aiConfigResolvers = {
      * Subscribe to configuration changes
      */
     configurationChanged: {
-      subscribe: (_: any, { agentId }: { agentId?: string }) => {
-        // TODO: Filter by agentId if provided
-        return pubsub.asyncIterator(['CONFIGURATION_CHANGED']);
-      },
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(['CONFIGURATION_CHANGED']),
+        (payload: any, variables: { agentId?: string }) => {
+          // Filter by agentId if provided
+          if (!variables.agentId) return true;
+          return !payload.agentId || payload.agentId === variables.agentId;
+        }
+      ),
     },
     
     /**
      * Subscribe to budget alerts
      */
     budgetAlert: {
-      subscribe: (_: any, { agentId }: { agentId?: string }) => {
-        // TODO: Filter by agentId if provided
-        return pubsub.asyncIterator(['BUDGET_ALERT']);
-      },
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(['BUDGET_ALERT']),
+        (payload: any, variables: { agentId?: string }) => {
+          // Filter by agentId if provided
+          if (!variables.agentId) return true;
+          return !payload.agentId || payload.agentId === variables.agentId;
+        }
+      ),
     },
   },
 };

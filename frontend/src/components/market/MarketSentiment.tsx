@@ -469,3 +469,4 @@ export const MarketSentiment: React.FC<MarketSentimentProps> = ({
 };
 
 export default MarketSentiment;
+

@@ -155,6 +155,13 @@ router.get('/batch/:batchId', async (req: Request, res: Response) => {
   try {
     const { batchId } = req.params;
     
+    if (!batchId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Batch ID is required',
+      });
+    }
+    
     const batch = await prisma.imageBatch.findUnique({
       where: { id: batchId },
       include: {

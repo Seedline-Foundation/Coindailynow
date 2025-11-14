@@ -47,8 +47,9 @@
     "@emotion/styled": "^11.14.1",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
-    "@mui/icons-material": "^7.3.4",
-    "@mui/material": "^7.3.4",
+    "@mui/icons-material": "^5.18.0",
+    "@mui/material": "^5.18.0",
+    "@mui/system": "5.16.7",
     "@next/bundle-analyzer": "^14.0.4",
     "@prisma/client": "^6.16.3",
     "@types/jsonwebtoken": "^9.0.10",
@@ -128,5 +129,8 @@
   "overrides": {
     "elliptic": "^6.6.1",
     "cookie": "^0.7.0"
+  },
+  "optionalDependencies": {
+    "@next/swc-win32-x64-msvc": "^14.2.32"
   }
 }

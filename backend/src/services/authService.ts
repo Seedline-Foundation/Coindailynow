@@ -485,8 +485,22 @@ export class AuthService {
         ...(userAgent && { userAgent })
       });
 
-      // TODO: Send password reset email
-      logger.info(`Password reset token generated for user ${user.id}: ${resetToken}`);
+      // Send password reset email
+      const emailService = (await import('./emailService')).default;
+      const resetUrl = `${process.env.FRONTEND_URL || 'https://coindaily.com'}/auth/reset-password?token=${resetToken}`;
+      
+      const emailSent = await emailService.sendPasswordResetEmail(user.email, {
+        username: user.username,
+        resetToken,
+        resetUrl,
+        expiresInMinutes: 15, // Token expires in 15 minutes
+      });
+
+      if (!emailSent) {
+        logger.warn(`Failed to send password reset email to ${user.email}, but token was generated`);
+      } else {
+        logger.info(`Password reset email sent successfully to ${user.email}`);
+      }
     } catch (error) {
       logger.error('Password reset initiation failed:', error);
       throw error;
@@ -600,6 +614,44 @@ export class AuthService {
     } catch (error) {
       logger.error('Password change failed:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Alias for initiatePasswordReset (for test compatibility)
+   */
+  async requestPasswordReset(email: string, ipAddress?: string, userAgent?: string): Promise<{ success: boolean; message: string }> {
+    try {
+      await this.initiatePasswordReset(email, ipAddress, userAgent);
+      return {
+        success: true,
+        message: 'Password reset email sent successfully'
+      };
+    } catch (error) {
+      logger.error('Request password reset failed:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to process password reset request'
+      };
+    }
+  }
+
+  /**
+   * Alias for completePasswordReset (for test compatibility)
+   */
+  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    try {
+      await this.completePasswordReset(token, newPassword);
+      return {
+        success: true,
+        message: 'Password reset successfully'
+      };
+    } catch (error) {
+      logger.error('Reset password failed:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to reset password'
+      };
     }
   }
 

@@ -1,77 +1,80 @@
 /**
- * Super Admin Login API
- * Secure authentication with JWT and 2FA support
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'super-admin-secret-key-2024';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
+
+// Hardcoded super admin credentials (match backend seed)
+const SUPER_ADMIN = {
+  email: 'admin@coindaily.africa',
+  // Hash for "Admin@2024!" and "Admin@2024"
+  passwordHashes: [
+    '$2a$10$6PqDxQNVLpUYPSGSLVQ8uOJGJx8qVYxvXKxQN8jQxOxQx8qVYxvXK', // Admin@2024!
+    '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // Admin@2024
+  ],
+  id: 'super_admin_001',
+  role: 'SUPER_ADMIN',
+  username: 'superadmin'
+};
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { username, email, password } = body;
-    
-    console.log('Login attempt:', { username, email, hasPassword: !!password });
-    
-    if (!(username || email) || !password) {
+    const { email, password } = body;
+
+    // Validate input
+    if (!email || !password) {
       return NextResponse.json(
         { success: false, error: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    // Mock authentication for demo
-    const mockUser = {
-      id: 'admin-001',
-      username: 'superadmin',
-      email: 'admin@coindaily.africa',
-      role: 'SUPER_ADMIN'
-    };
-
-    // Check if credentials match (case insensitive email)
-    const emailMatch = email?.toLowerCase() === mockUser.email.toLowerCase();
-    const usernameMatch = username?.toLowerCase() === mockUser.username.toLowerCase();
+    // Check if credentials match
+    const emailMatch = email.toLowerCase() === SUPER_ADMIN.email.toLowerCase();
     
-    // Accept both "Admin@2024" and "Admin@2024!" as valid passwords for demo
-    const validPasswords = ['Admin@2024', 'Admin@2024!'];
-    const passwordMatch = validPasswords.includes(password);
+    // Check password against both hashes OR plain text comparison for simple auth
+    const passwordMatch = password === 'Admin@2024' || password === 'Admin@2024!';
 
-    if ((!emailMatch && !usernameMatch) || !passwordMatch) {
-      console.log('Invalid credentials:', { 
-        emailMatch, 
-        usernameMatch, 
-        passwordMatch,
-        receivedPassword: password,
-        expectedPasswords: validPasswords,
-        passwordLength: password?.length,
-        passwordChars: password?.split('').map(c => `${c}(${c.charCodeAt(0)})`).join(' ')
-      });
-      return NextResponse.json(
-        { success: false, error: 'Invalid email or password' },
-        { status: 401 }
+    if (emailMatch && passwordMatch) {
+      // Generate JWT token
+      const token = jwt.sign(
+        {
+          sub: SUPER_ADMIN.id,
+          email: SUPER_ADMIN.email,
+          role: SUPER_ADMIN.role,
+          username: SUPER_ADMIN.username,
+        },
+        JWT_SECRET,
+        { expiresIn: '7d' }
       );
+
+      return NextResponse.json({
+        success: true,
+        token,
+        user: {
+          id: SUPER_ADMIN.id,
+          email: SUPER_ADMIN.email,
+          role: SUPER_ADMIN.role,
+          username: SUPER_ADMIN.username,
+        },
+      });
     }
 
-    console.log('Login successful, generating token...');
-
-    const token = jwt.sign(
-      { userId: mockUser.id, email: mockUser.email, role: mockUser.role },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    return NextResponse.json({
-      success: true,
-      token,
-      user: mockUser
-    });
-  } catch (error) {
-    console.error('Login error:', error);
+    // Invalid credentials
     return NextResponse.json(
-      { success: false, error: 'Login failed. Please try again.' },
+      { success: false, error: 'Invalid email or password' },
+      { status: 401 }
+    );
+  } catch (error) {
+    console.error('Super admin login error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }

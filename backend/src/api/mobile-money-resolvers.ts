@@ -607,6 +607,13 @@ export const mobileMoneyResolvers = {
           });
         }
 
+        // Validate reason
+        if (!args.reason || args.reason.trim().length === 0) {
+          throw new GraphQLError('Refund reason is required', {
+            extensions: { code: 'INVALID_INPUT' }
+          });
+        }
+
         // Admin only for refunds
         if (!context.user.roles?.includes('ADMIN')) {
           throw new GraphQLError('Admin access required for refunds', {
@@ -615,10 +622,35 @@ export const mobileMoneyResolvers = {
         }
 
         const mobileMoneyService = context.services.mobileMoneyService as MobileMoneyService;
-        // Note: Refund functionality not implemented yet
-        throw new GraphQLError('Refund functionality is not implemented yet', {
-          extensions: { code: 'NOT_IMPLEMENTED' }
-        });
+        
+        // Process refund
+        const result = await mobileMoneyService.processRefund(
+          args.transactionId,
+          args.reason,
+          context.user.id
+        );
+
+        if (!result.success) {
+          throw new GraphQLError(result.error?.message || 'Refund failed', {
+            extensions: { 
+              code: result.error?.code || 'REFUND_ERROR',
+              details: result.error?.details
+            }
+          });
+        }
+
+        return {
+          success: true,
+          refund: {
+            id: result.data!.refundId,
+            transactionId: result.data!.originalTransactionId,
+            amount: result.data!.amount,
+            status: result.data!.status,
+            reason: args.reason,
+            processedAt: new Date(),
+            createdAt: new Date()
+          }
+        };
 
       } catch (error: any) {
         context.logger.error('Failed to process mobile money refund', {

@@ -1,55 +1,29 @@
 /**
- * Indexes API Proxy - Task 65
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/localization/indexes');
 
-// GET /api/localization/indexes
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const queryString = searchParams.toString();
-
-    const response = await fetch(
-      `${API_BASE_URL}/api/localization/indexes${queryString ? `?${queryString}` : ''}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
-  }
+export async function GET(request: NextRequest) {
+  return handler(request);
 }
 
-// POST /api/localization/indexes
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
 
-    const response = await fetch(`${API_BASE_URL}/api/localization/indexes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
-  }
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

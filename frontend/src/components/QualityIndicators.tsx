@@ -243,3 +243,4 @@ export const QualityIndicators: React.FC<QualityIndicatorsProps> = ({
 };
 
 export default QualityIndicators;
+

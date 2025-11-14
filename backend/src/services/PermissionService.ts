@@ -25,6 +25,7 @@ const prisma = new PrismaClient();
 
 const ROLE_HIERARCHY: Record<UserRole, number> = {
   SUPER_ADMIN: 5,
+  ADMIN: 4,
   TECH_ADMIN: 3,
   MARKETING_ADMIN: 3,
   CONTENT_ADMIN: 3,

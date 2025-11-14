@@ -125,8 +125,9 @@ export function createUserFeedbackRouter(
     async (req: AuthenticatedRequest, res: Response): Promise<void> => {
       try {
         const { articleId } = req.params;
-        const userId = req.user?.id || 'anonymous';
+        const userId: string | undefined = req.user?.id;
 
+        // @ts-ignore - userId is optional in getContentFeedback
         const feedback = await feedbackService.getContentFeedback(articleId, userId);
 
         res.status(200).json({
@@ -496,7 +497,7 @@ export function createUserFeedbackRouter(
           prisma.userFeedback.findMany({
             where: whereClause,
             include: {
-              article: {
+              Article: {
                 select: {
                   id: true,
                   title: true,

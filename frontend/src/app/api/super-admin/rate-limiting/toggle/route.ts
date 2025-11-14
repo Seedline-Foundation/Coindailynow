@@ -1,31 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server';
+/**
+ * API Route Proxy
+ * Proxies requests to backend API
+ */
+
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
+
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/super-admin/rate-limiting/toggle');
+
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { id, enabled } = body;
+  return handler(request);
+}
 
-    // Mock toggle rate limit
-    console.log(`Toggling rate limit ${id} to ${enabled}`);
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
 
-    // In production, this would:
-    // 1. Update rate limit configuration in database
-    // 2. Apply changes to API gateway/middleware
-    // 3. Log configuration change
-    // 4. Notify monitoring system
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
 
-    return NextResponse.json({
-      success: true,
-      message: `Rate limit ${enabled ? 'enabled' : 'disabled'}`,
-      id,
-      enabled,
-      updatedAt: new Date().toISOString()
-    });
-  } catch (error) {
-    console.error('Error toggling rate limit:', error);
-    return NextResponse.json(
-      { error: 'Failed to toggle rate limit' },
-      { status: 500 }
-    );
-  }
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

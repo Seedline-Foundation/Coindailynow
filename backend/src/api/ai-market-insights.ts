@@ -21,6 +21,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { getAIMarketInsightsService } from '../services/aiMarketInsightsService';
 import type { GetWhaleActivityOptions } from '../services/aiMarketInsightsService';
+import { authMiddleware } from '../middleware/auth';
+import { adminMiddleware } from '../middleware/admin';
 
 const router = Router();
 
@@ -327,13 +329,14 @@ router.get('/insights', async (req: Request, res: Response) => {
  */
 router.post(
   '/cache/invalidate',
+  authMiddleware,
+  adminMiddleware,
   [
     body('symbol').optional().isString().isLength({ min: 2, max: 10 }).toUpperCase(),
     handleValidationErrors,
   ],
   async (req: Request, res: Response) => {
     try {
-      // TODO: Add authentication middleware to verify admin
       const { symbol } = req.body;
 
       const service = getAIMarketInsightsService();

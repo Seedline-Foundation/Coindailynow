@@ -77,9 +77,9 @@ export const STAKING_OPERATIONS = {
 // ============================================================================
 
 export const CONVERSION_OPERATIONS = {
-  CONVERT_CE_TO_TOKEN: 'convert_ce_to_token',           // CE Points to platform tokens
-  CONVERT_TOKEN_TO_CE: 'convert_token_to_ce',           // Tokens to CE Points
-  CONVERT_JOY_TO_TOKEN: 'convert_joy_to_token',         // JOY Tokens to platform token
+  CONVERT_CE_TO_JOY: 'convert_ce_to_joy',               // CE Points to JOY Token (one-way)
+  CONVERT_JOY_TO_FIAT: 'convert_joy_to_fiat',           // JOY Token to Fiat currency (swap)
+  CONVERT_JOY_TO_CRYPTO: 'convert_joy_to_crypto',       // JOY Token to other crypto (via ChangeNOW)
 } as const;
 
 // ============================================================================

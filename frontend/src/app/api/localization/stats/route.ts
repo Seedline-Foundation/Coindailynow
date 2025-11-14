@@ -1,27 +1,29 @@
 /**
- * Localization API Proxy Routes - Task 65
- * Next.js API routes for localization system
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/localization/stats');
 
-// GET /api/localization/stats
-export async function GET() {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/localization/stats`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
-  }
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

@@ -265,3 +265,4 @@ const QualityThresholdPanel: React.FC<QualityThresholdPanelProps> = ({ onNotific
 };
 
 export default QualityThresholdPanel;
+

@@ -617,16 +617,16 @@ export const updateLeaderboard = async (
     prisma.userEngagement.aggregate({
       where: {
         userId,
-        timestamp: { gte: periodStart, lte: periodEnd },
+        createdAt: { gte: periodStart, lte: periodEnd },
       },
       _count: true,
     }),
   ]);
 
   const totalPoints = rewards._sum.points || 0;
-  const sharesCount = rewards._count || 0;
+  const sharesCount = (rewards._count as any)?._all || 0;
   const referralsCount = referrals;
-  const engagementCount = engagements._count || 0;
+  const engagementCount = (engagements._count as any)?._all || 0;
 
   // Upsert leaderboard entry
   const entry = await prisma.engagementLeaderboard.upsert({
@@ -874,7 +874,7 @@ export const getPartnerStats = async (partnerId: string) => {
       if (!acc.requestsByType[req.requestType]) {
         acc.requestsByType[req.requestType] = 0;
       }
-      acc.requestsByType[req.requestType]++;
+      acc.requestsByType[req.requestType]!++;
       return acc;
     },
     {

@@ -702,7 +702,7 @@ export const revertToVersion = async (articleId: string, versionNumber: number, 
     data: {
       title: snapshot.title,
       content: snapshot.content,
-      summary: snapshot.summary,
+      excerpt: snapshot.summary,
       // Add other fields as needed
     },
   });

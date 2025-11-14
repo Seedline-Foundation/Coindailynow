@@ -6,6 +6,8 @@ import { translationResolvers } from './translationResolvers';
 import { workflowResolvers } from './workflowResolvers';
 import { analyticsResolvers } from './graphql/resolvers/analyticsResolvers';
 import { legalResolvers } from './resolvers/legal.resolvers';
+import { walletModalResolvers } from '../graphql/resolvers/walletModalResolvers';
+import { withdrawalResolvers } from '../graphql/resolvers/withdrawalResolvers';
 
 export const resolvers: IResolvers<any, GraphQLContext> = {
   Query: {
@@ -126,7 +128,13 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
     ...((analyticsResolvers as any).Query || {}),
 
     // Merge legal queries - Task 30
-    ...((legalResolvers as any).Query || {})
+    ...((legalResolvers as any).Query || {}),
+
+    // Merge wallet modal queries - Wallet System
+    ...((walletModalResolvers as any).Query || {}),
+
+    // Merge withdrawal management queries - Wallet System
+    ...((withdrawalResolvers as any).Query || {})
   },
 
   Mutation: {
@@ -146,7 +154,13 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
     ...((analyticsResolvers as any).Mutation || {}),
 
     // Merge legal mutations - Task 30
-    ...((legalResolvers as any).Mutation || {})
+    ...((legalResolvers as any).Mutation || {}),
+
+    // Merge wallet modal mutations - Wallet System
+    ...((walletModalResolvers as any).Mutation || {}),
+
+    // Merge withdrawal management mutations - Wallet System
+    ...((withdrawalResolvers as any).Mutation || {})
   },
 
   // Type resolvers

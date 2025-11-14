@@ -21,7 +21,15 @@ import {
   TrendingUp,
   TrendingDown,
   Wifi,
-  Globe
+  Globe,
+  Shield,
+  AlertCircle,
+  Info,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Wrench
 } from 'lucide-react';
 
 interface SystemMetrics {
@@ -62,12 +70,36 @@ interface SystemMetrics {
     message: string;
     timestamp: string;
   }>;
+  criticalIssues?: Array<{
+    id: string;
+    title: string;
+    description: string;
+    severity: 'critical' | 'high';
+    category: 'performance' | 'security' | 'infrastructure' | 'database' | 'network';
+    detectedAt: string;
+    affectedServices: string[];
+    metrics: {
+      current: string;
+      threshold: string;
+      impact: string;
+    };
+    possibleCauses: string[];
+    recommendedActions: Array<{
+      priority: 'immediate' | 'urgent' | 'high';
+      action: string;
+      steps: string[];
+      technicalDetails?: string;
+    }>;
+    escalationRequired: boolean;
+  }>;
 }
 
 export default function SystemHealthPage() {
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
+  const [showCriticalIssues, setShowCriticalIssues] = useState(true);
 
   useEffect(() => {
     fetchMetrics();
@@ -98,6 +130,11 @@ export default function SystemHealthPage() {
 
   const getHealthStatus = () => {
     if (!metrics) return 'unknown';
+    
+    // Check for critical issues first
+    if (metrics.criticalIssues && metrics.criticalIssues.length > 0) {
+      return 'critical';
+    }
     
     const cpuHealth = metrics.server.cpu < 70;
     const memoryHealth = metrics.server.memory < 80;
@@ -413,6 +450,227 @@ export default function SystemHealthPage() {
             </div>
           </div>
 
+          {/* Critical Issues Detailed Panel */}
+          {metrics && metrics.criticalIssues && metrics.criticalIssues.length > 0 && (
+            <div className="bg-red-900/20 border-2 border-red-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center space-x-3">
+                  <AlertCircle className="h-7 w-7 text-red-400 animate-pulse" />
+                  <span>Critical Issues Requiring Immediate Attention</span>
+                  <span className="px-3 py-1 bg-red-600 text-white text-sm rounded-full">
+                    {metrics.criticalIssues.length}
+                  </span>
+                </h2>
+                <button
+                  onClick={() => setShowCriticalIssues(!showCriticalIssues)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  {showCriticalIssues ? <ChevronUp className="h-6 w-6" /> : <ChevronDown className="h-6 w-6" />}
+                </button>
+              </div>
+
+              {showCriticalIssues && (
+                <div className="space-y-6">
+                  {metrics.criticalIssues.map((issue) => (
+                    <div
+                      key={issue.id}
+                      className="bg-gray-800 border-2 border-red-600 rounded-lg overflow-hidden"
+                    >
+                      {/* Issue Header */}
+                      <div className="p-6 bg-red-900/30">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+                                issue.severity === 'critical' 
+                                  ? 'bg-red-600 text-white' 
+                                  : 'bg-orange-600 text-white'
+                              }`}>
+                                {issue.severity.toUpperCase()}
+                              </span>
+                              <span className="px-3 py-1 text-xs font-medium bg-gray-700 text-gray-300 rounded-full">
+                                {issue.category.toUpperCase()}
+                              </span>
+                              {issue.escalationRequired && (
+                                <span className="px-3 py-1 text-xs font-medium bg-purple-600 text-white rounded-full flex items-center space-x-1">
+                                  <AlertTriangle className="h-3 w-3" />
+                                  <span>ESCALATE</span>
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">{issue.title}</h3>
+                            <p className="text-gray-300 text-sm leading-relaxed">{issue.description}</p>
+                          </div>
+                          <button
+                            onClick={() => setExpandedIssue(expandedIssue === issue.id ? null : issue.id)}
+                            className="ml-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+                          >
+                            {expandedIssue === issue.id ? 'Hide Details' : 'View Solution'}
+                          </button>
+                        </div>
+
+                        {/* Issue Metadata */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-red-700/50">
+                          <div>
+                            <p className="text-xs text-gray-400 mb-1">Detected</p>
+                            <p className="text-sm text-white font-medium">
+                              {new Date(issue.detectedAt).toLocaleString()}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-400 mb-1">Current Value</p>
+                            <p className="text-sm text-red-400 font-bold">{issue.metrics.current}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-400 mb-1">Threshold</p>
+                            <p className="text-sm text-yellow-400 font-medium">{issue.metrics.threshold}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-400 mb-1">Impact</p>
+                            <p className="text-sm text-orange-400 font-medium">{issue.metrics.impact}</p>
+                          </div>
+                        </div>
+
+                        {/* Affected Services */}
+                        {issue.affectedServices.length > 0 && (
+                          <div className="mt-4 pt-4 border-t border-red-700/50">
+                            <p className="text-xs text-gray-400 mb-2">Affected Services:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {issue.affectedServices.map((service, idx) => (
+                                <span
+                                  key={idx}
+                                  className="px-3 py-1 bg-red-800/50 text-red-300 text-xs rounded-full"
+                                >
+                                  {service}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Expanded Details */}
+                      {expandedIssue === issue.id && (
+                        <div className="p-6 bg-gray-800 space-y-6">
+                          {/* Possible Causes */}
+                          <div>
+                            <h4 className="text-lg font-bold text-white mb-3 flex items-center space-x-2">
+                              <AlertCircle className="h-5 w-5 text-yellow-400" />
+                              <span>Possible Causes</span>
+                            </h4>
+                            <ul className="space-y-2">
+                              {issue.possibleCauses.map((cause, idx) => (
+                                <li key={idx} className="flex items-start space-x-3">
+                                  <span className="flex-shrink-0 w-6 h-6 bg-yellow-600/20 rounded-full flex items-center justify-center text-yellow-400 text-xs font-bold mt-0.5">
+                                    {idx + 1}
+                                  </span>
+                                  <span className="text-gray-300 text-sm">{cause}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          {/* Recommended Actions */}
+                          <div>
+                            <h4 className="text-lg font-bold text-white mb-4 flex items-center space-x-2">
+                              <Wrench className="h-5 w-5 text-green-400" />
+                              <span>Recommended Actions for Technical Team</span>
+                            </h4>
+                            <div className="space-y-4">
+                              {issue.recommendedActions.map((action, idx) => (
+                                <div
+                                  key={idx}
+                                  className={`border-l-4 pl-4 py-3 ${
+                                    action.priority === 'immediate'
+                                      ? 'border-red-500 bg-red-900/10'
+                                      : action.priority === 'urgent'
+                                      ? 'border-orange-500 bg-orange-900/10'
+                                      : 'border-yellow-500 bg-yellow-900/10'
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between mb-3">
+                                    <h5 className="text-white font-semibold flex items-center space-x-2">
+                                      <span className={`px-2 py-1 text-xs rounded ${
+                                        action.priority === 'immediate'
+                                          ? 'bg-red-600 text-white'
+                                          : action.priority === 'urgent'
+                                          ? 'bg-orange-600 text-white'
+                                          : 'bg-yellow-600 text-white'
+                                      }`}>
+                                        {action.priority.toUpperCase()}
+                                      </span>
+                                      <span>{action.action}</span>
+                                    </h5>
+                                  </div>
+
+                                  {/* Action Steps */}
+                                  <div className="mt-3">
+                                    <p className="text-xs text-gray-400 mb-2 font-medium">Steps to Execute:</p>
+                                    <ol className="space-y-2">
+                                      {action.steps.map((step, stepIdx) => (
+                                        <li key={stepIdx} className="flex items-start space-x-3">
+                                          <span className="flex-shrink-0 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold mt-0.5">
+                                            {stepIdx + 1}
+                                          </span>
+                                          <span className="text-gray-300 text-sm flex-1">{step}</span>
+                                        </li>
+                                      ))}
+                                    </ol>
+                                  </div>
+
+                                  {/* Technical Details */}
+                                  {action.technicalDetails && (
+                                    <div className="mt-4 p-3 bg-gray-900 rounded border border-gray-700">
+                                      <p className="text-xs text-gray-400 mb-2 flex items-center space-x-1">
+                                        <FileText className="h-3 w-3" />
+                                        <span>Technical Details:</span>
+                                      </p>
+                                      <code className="text-xs text-green-400 font-mono block whitespace-pre-wrap">
+                                        {action.technicalDetails}
+                                      </code>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Escalation Notice */}
+                          {issue.escalationRequired && (
+                            <div className="p-4 bg-purple-900/20 border border-purple-600 rounded-lg">
+                              <div className="flex items-start space-x-3">
+                                <Shield className="h-6 w-6 text-purple-400 flex-shrink-0 mt-1" />
+                                <div>
+                                  <h5 className="text-white font-bold mb-2">⚠️ Escalation Required</h5>
+                                  <p className="text-purple-300 text-sm mb-3">
+                                    This issue requires immediate escalation to senior technical staff or infrastructure team.
+                                  </p>
+                                  <div className="flex items-center space-x-4 text-sm">
+                                    <a
+                                      href={`mailto:tech-team@coindaily.africa?subject=CRITICAL: ${issue.title}&body=Issue ID: ${issue.id}%0D%0ADetected: ${issue.detectedAt}%0D%0A%0D%0A${issue.description}`}
+                                      className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                                    >
+                                      <ExternalLink className="h-4 w-4" />
+                                      <span>Email Technical Team</span>
+                                    </a>
+                                    <button className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+                                      <AlertTriangle className="h-4 w-4" />
+                                      <span>Create Incident Ticket</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* System Alerts */}
           {metrics && metrics.alerts.length > 0 && (
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
@@ -453,3 +711,4 @@ export default function SystemHealthPage() {
     </div>
   );
 }
+

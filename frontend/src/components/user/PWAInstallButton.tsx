@@ -166,3 +166,4 @@ function Feature({ icon, text }: FeatureProps) {
     </div>
   );
 }
+

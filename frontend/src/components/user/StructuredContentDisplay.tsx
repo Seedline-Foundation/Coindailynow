@@ -227,3 +227,4 @@ const StructuredContentDisplay: React.FC<StructuredContentDisplayProps> = ({ art
 };
 
 export default StructuredContentDisplay;
+

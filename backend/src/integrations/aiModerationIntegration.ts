@@ -4,9 +4,11 @@ import AIModerationService from '../services/aiModerationService';
 import aiModerationRouter from '../api/ai-moderation';
 import aiModerationTypeDefs from '../api/aiModerationSchema';
 import aiModerationResolvers from '../api/aiModerationResolvers';
+import { Redis } from 'ioredis';
 
 const prisma = new PrismaClient();
-const moderationService = new AIModerationService(prisma);
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const moderationService = new AIModerationService(prisma, redis, process.env.PERSPECTIVE_API_KEY || '');
 
 export class AIModerationIntegration {
   private isServiceRunning: boolean = false;
@@ -110,8 +112,8 @@ export class AIModerationIntegration {
       // Get last processed time
       const lastProcessed = await prisma.moderationQueue.findFirst({
         where: { status: { in: ['PROCESSED', 'CONFIRMED'] } },
-        orderBy: { processedAt: 'desc' },
-        select: { processedAt: true }
+        orderBy: { reviewedAt: 'desc' },
+        select: { reviewedAt: true }
       });
 
       // Determine overall status
@@ -129,7 +131,7 @@ export class AIModerationIntegration {
           backgroundService: this.isServiceRunning,
           database: databaseHealthy,
           queueSize,
-          lastProcessed: lastProcessed?.processedAt || null
+          lastProcessed: lastProcessed?.reviewedAt || null
         }
       };
 
@@ -188,9 +190,9 @@ export class AIModerationIntegration {
 
       // Violation metrics
       const [violations24h, violations7d, violations30d] = await Promise.all([
-        prisma.userViolation.count({ where: { createdAt: { gte: oneDayAgo } } }),
-        prisma.userViolation.count({ where: { createdAt: { gte: oneWeekAgo } } }),
-        prisma.userViolation.count({ where: { createdAt: { gte: oneMonthAgo } } })
+        prisma.violationReport.count({ where: { createdAt: { gte: oneDayAgo } } }),
+        prisma.violationReport.count({ where: { createdAt: { gte: oneWeekAgo } } }),
+        prisma.violationReport.count({ where: { createdAt: { gte: oneMonthAgo } } })
       ]);
 
       // Penalty metrics
@@ -209,7 +211,7 @@ export class AIModerationIntegration {
       const processedLast24h = await prisma.moderationQueue.count({
         where: {
           status: { in: ['PROCESSED', 'CONFIRMED', 'FALSE_POSITIVE'] },
-          processedAt: { gte: oneDayAgo }
+          reviewedAt: { gte: oneDayAgo }
         }
       });
 
@@ -258,27 +260,28 @@ export class AIModerationIntegration {
       // Get user information
       const user = await prisma.user.findUnique({
         where: { id: userId },
-        include: { subscription: true }
+        include: { Subscription: true }
       });
 
       if (!user) {
         throw new Error('User not found');
       }
 
-      // Create content object
-      const content = {
-        id: contentId,
-        text,
-        type: contentType,
-        authorId: userId,
-        authorRole: user.role as any,
-        subscriptionTier: user.subscription?.tier as any,
-        accountAge: Math.floor((Date.now() - user.createdAt.getTime()) / (24 * 60 * 60 * 1000)),
-        createdAt: new Date()
+      // Create moderation request
+      const moderationRequest: any = {
+        userId,
+        contentType,
+        contentId,
+        content: text,
+        context: JSON.stringify({
+          authorRole: user.role,
+          subscriptionTier: user.subscriptionTier,
+          accountAge: Math.floor((Date.now() - user.createdAt.getTime()) / (24 * 60 * 60 * 1000)),
+        })
       };
 
       // Run moderation
-      return await moderationService.moderateContent(content);
+      return await moderationService.moderateContent(moderationRequest);
 
     } catch (error) {
       console.error('❌ Manual content moderation failed:', error);
@@ -307,7 +310,7 @@ export class AIModerationIntegration {
             break;
             
           case 'false_positive':
-            await moderationService.markFalsePositive(queueId, adminId, notes);
+            await moderationService.recordFalsePositive(queueId, adminId, notes || 'No notes provided');
             break;
             
           case 'delete':
@@ -341,7 +344,7 @@ export class AIModerationIntegration {
       const cutoffDate = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000);
 
       const [deletedViolations, deletedQueue, deletedAlerts] = await Promise.all([
-        prisma.userViolation.deleteMany({
+        prisma.violationReport.deleteMany({
           where: {
             createdAt: { lt: cutoffDate },
             status: { in: ['CONFIRMED', 'FALSE_POSITIVE'] }
@@ -355,10 +358,10 @@ export class AIModerationIntegration {
           }
         }),
         
-        prisma.adminAlert.deleteMany({
+        prisma.moderationAlert.deleteMany({
           where: {
             createdAt: { lt: cutoffDate },
-            isRead: true
+            status: 'ACKNOWLEDGED'
           }
         })
       ]);

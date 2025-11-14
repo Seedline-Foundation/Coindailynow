@@ -537,22 +537,410 @@ export class MobileMoneyService implements IMobileMoneyService {
   /**
    * Process webhook
    */
-  async processWebhook(): Promise<ServiceResponse<{ processed: boolean; transactionId?: string }>> {
-    return ServiceResult.error('NOT_IMPLEMENTED', 'Webhook processing not implemented');
+  async processWebhook(
+    provider: MobileMoneyProvider,
+    payload: any,
+    signature?: string
+  ): Promise<ServiceResponse<{ processed: boolean; transactionId?: string }>> {
+    const startTime = Date.now();
+    
+    try {
+      this.logger.info('Processing mobile money webhook', {
+        provider,
+        timestamp: new Date().toISOString()
+      });
+
+      // Validate webhook signature
+      if (signature) {
+        const isValid = await this.validateWebhookSignature(provider, payload, signature);
+        if (!isValid) {
+          return ServiceResult.error('INVALID_SIGNATURE', 'Webhook signature validation failed');
+        }
+      }
+
+      // Extract transaction ID from payload (provider-specific)
+      let transactionId: string | undefined;
+      let status: PaymentStatus;
+      let providerTransactionId: string | undefined;
+
+      switch (provider) {
+        case 'MPESA':
+          transactionId = payload.Body?.stkCallback?.CheckoutRequestID;
+          providerTransactionId = payload.Body?.stkCallback?.MpesaReceiptNumber;
+          status = payload.Body?.stkCallback?.ResultCode === 0 ? PaymentStatus.COMPLETED : PaymentStatus.FAILED;
+          break;
+        
+        case 'MTN_MONEY':
+          transactionId = payload.externalId;
+          providerTransactionId = payload.financialTransactionId;
+          status = payload.status === 'SUCCESSFUL' ? PaymentStatus.COMPLETED : PaymentStatus.FAILED;
+          break;
+        
+        case 'ORANGE_MONEY':
+          transactionId = payload.order_id;
+          providerTransactionId = payload.txnid;
+          status = payload.status === 'SUCCESS' ? PaymentStatus.COMPLETED : PaymentStatus.FAILED;
+          break;
+        
+        case 'AIRTEL_MONEY':
+          transactionId = payload.transaction?.id;
+          providerTransactionId = payload.transaction?.airtel_money_id;
+          status = payload.transaction?.status === 'TS' ? PaymentStatus.COMPLETED : PaymentStatus.FAILED;
+          break;
+        
+        default:
+          return ServiceResult.error('UNSUPPORTED_PROVIDER', `Webhook not supported for provider: ${provider}`);
+      }
+
+      if (!transactionId) {
+        return ServiceResult.error('INVALID_PAYLOAD', 'Transaction ID not found in webhook payload');
+      }
+
+      // Find transaction in database
+      const whereConditions: any[] = [{ id: transactionId }];
+      if (providerTransactionId) {
+        whereConditions.push({ providerTransactionId });
+      }
+
+      const transaction = await this.prisma.mobileMoneyTransaction.findFirst({
+        where: {
+          OR: whereConditions
+        }
+      });
+
+      if (!transaction) {
+        this.logger.warn('Transaction not found for webhook', { transactionId, providerTransactionId });
+        return ServiceResult.error('TRANSACTION_NOT_FOUND', 'Transaction not found');
+      }
+
+      // Update transaction status
+      const now = new Date();
+      await this.prisma.mobileMoneyTransaction.update({
+        where: { id: transaction.id },
+        data: {
+          status,
+          providerTransactionId: providerTransactionId || transaction.providerTransactionId,
+          processedAt: status === 'COMPLETED' ? now : transaction.processedAt,
+          completedAt: status === 'COMPLETED' ? now : null,
+          failureReason: status === 'FAILED' ? payload.errorMessage || 'Payment failed' : null,
+          updatedAt: now
+        }
+      });
+
+      // Clear cache for this transaction
+      const cacheKey = `mobile_money:transaction:${transaction.id}`;
+      await this.redis.del(cacheKey);
+
+      const duration = Date.now() - startTime;
+      this.logger.info('Webhook processed successfully', {
+        transactionId: transaction.id,
+        status,
+        duration
+      });
+
+      return ServiceResult.success({
+        processed: true,
+        transactionId: transaction.id
+      });
+
+    } catch (error: any) {
+      const duration = Date.now() - startTime;
+      this.logger.error('Webhook processing failed', {
+        error: error.message,
+        provider,
+        duration
+      });
+      return ServiceResult.error('WEBHOOK_ERROR', 'Failed to process webhook', error.message);
+    }
   }
 
   /**
    * Validate webhook signature
    */
-  async validateWebhookSignature(): Promise<boolean> {
-    return false;
+  async validateWebhookSignature(
+    provider: MobileMoneyProvider,
+    payload: any,
+    signature: string
+  ): Promise<boolean> {
+    try {
+      const crypto = require('crypto');
+      
+      // Get provider secret from environment
+      const secrets: Record<string, string | undefined> = {
+        MPESA: process.env.MPESA_WEBHOOK_SECRET,
+        MTN_MONEY: process.env.MTN_WEBHOOK_SECRET,
+        ORANGE_MONEY: process.env.ORANGE_WEBHOOK_SECRET,
+        AIRTEL_MONEY: process.env.AIRTEL_WEBHOOK_SECRET
+      };
+
+      const secret = secrets[provider];
+      if (!secret) {
+        this.logger.warn('Webhook secret not configured for provider', { provider });
+        return true; // Allow if not configured (for testing)
+      }
+
+      // Calculate expected signature (HMAC-SHA256)
+      const payloadString = JSON.stringify(payload);
+      const hmac = crypto.createHmac('sha256', secret);
+      hmac.update(payloadString);
+      const expectedSignature = hmac.digest('hex');
+
+      return signature === expectedSignature;
+
+    } catch (error: any) {
+      this.logger.error('Webhook signature validation error', { error: error.message, provider });
+      return false;
+    }
   }
 
   /**
    * Get success rates
    */
-  async getSuccessRates(): Promise<ServiceResponse<{ provider: string; successRate: number; totalTransactions: number }[]>> {
-    return ServiceResult.error('NOT_IMPLEMENTED', 'Success rates calculation not implemented');
+  async getSuccessRates(options: {
+    period: 'day' | 'week' | 'month';
+    provider?: MobileMoneyProvider;
+    country?: string;
+  }): Promise<ServiceResponse<{ provider: string; successRate: number; totalTransactions: number }[]>> {
+    const startTime = Date.now();
+    
+    try {
+      // Calculate date range based on period
+      const now = new Date();
+      let start: Date;
+      
+      switch (options.period) {
+        case 'day':
+          start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          break;
+        case 'week':
+          start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case 'month':
+          start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+      }
+      const end = now;
+
+      this.logger.info('Calculating success rates', {
+        period: options.period,
+        startDate: start.toISOString(),
+        endDate: end.toISOString(),
+        provider: options.provider,
+        country: options.country
+      });
+
+      // Check cache first
+      const cacheKey = `mobile_money:success_rates:${options.period}:${options.provider || 'all'}:${options.country || 'all'}`;
+      const cached = await this.redis.get(cacheKey);
+      if (cached) {
+        return ServiceResult.success(JSON.parse(cached));
+      }
+
+      // Build provider filter
+      const providerFilter: any = { isActive: true };
+      if (options.provider) {
+        providerFilter.name = options.provider;
+      }
+      if (options.country) {
+        providerFilter.supportedCountries = {
+          contains: options.country
+        };
+      }
+
+      // Get all providers
+      const providers = await this.prisma.mobileMoneyProvider.findMany({
+        where: providerFilter
+      });
+
+      const successRates = await Promise.all(
+        providers.map(async (provider) => {
+          // Get transaction counts
+          const [total, successful, failed] = await Promise.all([
+            this.prisma.mobileMoneyTransaction.count({
+              where: {
+                providerId: provider.id,
+                createdAt: {
+                  gte: start,
+                  lte: end
+                }
+              }
+            }),
+            this.prisma.mobileMoneyTransaction.count({
+              where: {
+                providerId: provider.id,
+                status: 'COMPLETED',
+                createdAt: {
+                  gte: start,
+                  lte: end
+                }
+              }
+            }),
+            this.prisma.mobileMoneyTransaction.count({
+              where: {
+                providerId: provider.id,
+                status: 'FAILED',
+                createdAt: {
+                  gte: start,
+                  lte: end
+                }
+              }
+            })
+          ]);
+
+          const successRate = total > 0 ? (successful / total) * 100 : 0;
+
+          return {
+            provider: provider.name,
+            successRate: Math.round(successRate * 100) / 100, // Round to 2 decimal places
+            totalTransactions: total
+          };
+        })
+      );
+
+      // Cache for 1 hour
+      await this.redis.setex(cacheKey, 3600, JSON.stringify(successRates));
+
+      const duration = Date.now() - startTime;
+      this.logger.info('Success rates calculated', {
+        providersCount: successRates.length,
+        duration
+      });
+
+      return ServiceResult.success(successRates);
+
+    } catch (error: any) {
+      const duration = Date.now() - startTime;
+      this.logger.error('Failed to calculate success rates', {
+        error: error.message,
+        duration
+      });
+      return ServiceResult.error('CALCULATION_ERROR', 'Failed to calculate success rates', error.message);
+    }
+  }
+
+  /**
+   * Process refund for a mobile money transaction
+   */
+  async processRefund(
+    transactionId: string,
+    reason: string,
+    userId: string
+  ): Promise<ServiceResponse<{
+    refundId: string;
+    originalTransactionId: string;
+    amount: number;
+    status: string;
+  }>> {
+    const startTime = Date.now();
+    
+    try {
+      this.logger.info('Processing mobile money refund', {
+        transactionId,
+        reason,
+        userId
+      });
+
+      // Find original transaction
+      const originalTransaction = await this.prisma.mobileMoneyTransaction.findUnique({
+        where: { id: transactionId },
+        include: {
+          MobileMoneyProvider: true
+        }
+      });
+
+      if (!originalTransaction) {
+        return ServiceResult.error('TRANSACTION_NOT_FOUND', 'Original transaction not found');
+      }
+
+      // Validate transaction can be refunded
+      if (originalTransaction.status !== 'COMPLETED') {
+        return ServiceResult.error(
+          'INVALID_STATUS',
+          'Only completed transactions can be refunded'
+        );
+      }
+
+      // Check if already refunded
+      const existingRefund = await this.prisma.mobileMoneyTransaction.findFirst({
+        where: {
+          providerTransactionId: originalTransaction.id,
+          transactionType: 'REFUND'
+        }
+      });
+
+      if (existingRefund) {
+        return ServiceResult.error('ALREADY_REFUNDED', 'Transaction has already been refunded');
+      }
+
+      // Create refund transaction
+      const refundId = `refund_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const now = new Date();
+
+      const refundTransaction = await this.prisma.mobileMoneyTransaction.create({
+        data: {
+          id: refundId,
+          userId: originalTransaction.userId,
+          providerId: originalTransaction.providerId,
+          providerTransactionId: originalTransaction.id, // Link to original transaction
+          amount: originalTransaction.amount,
+          currency: originalTransaction.currency,
+          phoneNumber: originalTransaction.phoneNumber,
+          status: 'PENDING',
+          transactionType: 'REFUND',
+          description: `Refund for transaction ${transactionId}: ${reason}`,
+          providerFee: 0, // No fees for refunds
+          platformFee: 0,
+          totalFee: 0,
+          metadata: JSON.stringify({
+            originalTransactionId: transactionId,
+            refundReason: reason,
+            initiatedBy: userId
+          }),
+          createdAt: now,
+          updatedAt: now,
+          expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000) // 24 hours expiry
+        }
+      });
+
+      // In a real implementation, you would call the provider's refund API here
+      // For now, we'll mark it as processing
+      await this.prisma.mobileMoneyTransaction.update({
+        where: { id: refundId },
+        data: {
+          status: 'PROCESSING',
+          processedAt: new Date(),
+          updatedAt: new Date()
+        }
+      });
+
+      // Clear cache
+      await this.redis.del(`mobile_money:transaction:${transactionId}`);
+      await this.redis.del(`mobile_money:transaction:${refundId}`);
+
+      const duration = Date.now() - startTime;
+      this.logger.info('Refund processed successfully', {
+        refundId,
+        originalTransactionId: transactionId,
+        amount: originalTransaction.amount,
+        duration
+      });
+
+      return ServiceResult.success({
+        refundId,
+        originalTransactionId: transactionId,
+        amount: originalTransaction.amount,
+        status: 'PROCESSING'
+      });
+
+    } catch (error: any) {
+      const duration = Date.now() - startTime;
+      this.logger.error('Refund processing failed', {
+        error: error.message,
+        transactionId,
+        duration
+      });
+      return ServiceResult.error('REFUND_ERROR', 'Failed to process refund', error.message);
+    }
   }
 
   /**

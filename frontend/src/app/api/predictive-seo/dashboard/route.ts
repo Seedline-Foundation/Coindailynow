@@ -1,23 +1,29 @@
-// Predictive SEO Intelligence API Proxy - Task 68
-import { NextRequest, NextResponse } from 'next/server';
+/**
+ * API Route Proxy
+ * Proxies requests to backend API
+ */
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
+
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/predictive-seo/dashboard');
 
 export async function GET(request: NextRequest) {
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/predictive-seo/dashboard`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Error fetching dashboard:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch dashboard data' },
-      { status: 500 }
-    );
-  }
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

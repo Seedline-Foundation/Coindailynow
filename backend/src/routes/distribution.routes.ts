@@ -43,9 +43,9 @@ router.patch('/campaigns/:id/status', async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: 'Campaign ID is required' });
     }
     const campaign = await distributionService.updateCampaignStatus(req.params.id, status);
-    res.json({ success: true, data: campaign });
+    return res.json({ success: true, data: campaign });
   } catch (error: any) {
-    res.status(400).json({ success: false, error: error.message });
+    return res.status(400).json({ success: false, error: error.message });
   }
 });
 
@@ -55,9 +55,9 @@ router.get('/campaigns/:id/stats', async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: 'Campaign ID is required' });
     }
     const stats = await distributionService.getCampaignStats(req.params.id);
-    res.json({ success: true, data: stats });
+    return res.json({ success: true, data: stats });
   } catch (error: any) {
-    res.status(404).json({ success: false, error: error.message });
+    return res.status(404).json({ success: false, error: error.message });
   }
 });
 

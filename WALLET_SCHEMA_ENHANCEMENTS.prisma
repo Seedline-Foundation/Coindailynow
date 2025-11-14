@@ -1,0 +1,517 @@
+# CoinDaily Platform ERC-20 Token - Complete Feature Template
+
+## 🪙 TOKEN OVERVIEW
+
+### Token Name: **CoinDaily Token (CDT)**
+### Network: **Polygon (MATIC)** - Low fees, fast transactions, EVM-compatible
+### Standard: **ERC-20** with additional features
+### Purpose: **Platform utility token for African cryptocurrency news ecosystem**
+
+---
+
+## 📋 TOKEN SPECIFICATIONS
+
+### Basic Information
+```solidity
+Name: CoinDaily Token
+Symbol: CDT
+Decimals: 18
+Total Supply: 1,000,000,000 CDT (1 Billion tokens)
+Network: Polygon Mainnet
+Contract Standard: ERC-20 + Burnable + Pausable + AccessControl
+```
+
+### Supply Distribution
+```
+Total Supply: 1,000,000,000 CDT (100%)
+
+Allocation Breakdown:
+├── Platform Operations: 300,000,000 CDT (30%)
+│   ├── Staking Rewards: 150,000,000 CDT (15%)
+│   ├── Liquidity Pools: 100,000,000 CDT (10%)
+│   └── Platform Development: 50,000,000 CDT (5%)
+│
+├── User Incentives: 250,000,000 CDT (25%)
+│   ├── CE Points Conversion Pool: 100,000,000 CDT (10%)
+│   ├── Airdrops & Campaigns: 75,000,000 CDT (7.5%)
+│   ├── Referral Rewards: 50,000,000 CDT (5%)
+│   └── Content Creator Rewards: 25,000,000 CDT (2.5%)
+│
+├── Team & Advisors: 150,000,000 CDT (15%)
+│   └── 24-month vesting, 6-month cliff
+│
+├── Marketing & Partnerships: 150,000,000 CDT (15%)
+│   ├── Exchange Listings: 50,000,000 CDT (5%)
+│   ├── Marketing Campaigns: 75,000,000 CDT (7.5%)
+│   └── Strategic Partnerships: 25,000,000 CDT (2.5%)
+│
+├── Reserve Fund: 100,000,000 CDT (10%)
+│   └── Emergency fund, future development
+│
+└── Public Sale: 50,000,000 CDT (5%)
+    └── Initial token distribution
+```
+
+---
+
+## 🎯 TOKEN UTILITY - PLATFORM USE CASES
+
+### 1. **Subscription Payments**
+- Pay for Premium, VIP, or Enterprise subscriptions with CDT
+- Discounts: 10% off when paying with CDT vs fiat
+- Auto-renewal with CDT wallet balance
+
+### 2. **Content Access**
+- Unlock premium articles, market reports, and analysis
+- Pay-per-view for exclusive content
+- Monthly pass purchases with CDT
+
+### 3. **Staking & Rewards**
+```
+Staking Plans:
+├── Flexible: 5% APR, no lock period
+├── 30-day: 8% APR, 30-day lock
+├── 90-day: 12% APR, 90-day lock
+└── 180-day: 15% APR, 180-day lock
+
+Benefits:
+- Earn passive income
+- Higher tier access (stakers get Premium features)
+- Governance voting rights
+- Priority customer support
+```
+
+### 4. **Marketplace Transactions**
+- Buy/sell crypto trading tools
+- Purchase educational courses
+- Pay for consulting services
+- Trading signals subscriptions
+
+### 5. **CE Points Conversion**
+```
+Conversion Rate: 100 CE Points = 1 CDT
+Minimum: 1,000 CE Points (10 CDT)
+Maximum: 100,000 CE Points per day (1,000 CDT)
+Fees: No conversion fees
+Processing: Instant conversion
+```
+
+### 6. **Governance & Voting**
+- 1 CDT staked = 1 vote
+- Proposals: Feature requests, content topics, platform improvements
+- Minimum stake for voting: 1,000 CDT
+- Proposal threshold: 10,000 CDT
+
+### 7. **Advertising & Promotion**
+- Buy ad space on platform with CDT
+- Boost articles/posts with CDT
+- Featured listings for projects
+
+### 8. **Tipping & Donations**
+- Tip content creators in CDT
+- Donate to community projects
+- Support journalists and analysts
+
+### 9. **Referral Rewards**
+- Earn 10% of referee's first purchase in CDT
+- Multi-level referral system
+- Bonus CDT for milestones
+
+### 10. **Platform Revenue Sharing**
+- Stakers earn % of platform revenue
+- Distributed quarterly in CDT
+- Proportional to stake size
+
+---
+
+## 🔧 SMART CONTRACT FEATURES
+
+### Core ERC-20 Functions
+```solidity
+// Standard ERC-20
+transfer(address to, uint256 amount)
+transferFrom(address from, address to, uint256 amount)
+approve(address spender, uint256 amount)
+balanceOf(address account)
+allowance(address owner, address spender)
+
+// Total Supply Management
+totalSupply() → 1,000,000,000 CDT
+```
+
+### Extended Features
+
+#### 1. **Burnable**
+```solidity
+burn(uint256 amount) // User can burn their tokens
+burnFrom(address account, uint256 amount) // Burn from allowance
+```
+
+**Burn Mechanisms:**
+- 0.1% burn on each transaction (deflationary)
+- Manual burn by platform for buybacks
+- Auto-burn from platform fees
+
+#### 2. **Pausable**
+```solidity
+pause() // Only admin - emergency stop
+unpause() // Resume operations
+```
+
+**Use Cases:**
+- Security emergencies
+- Major upgrades
+- Detected vulnerabilities
+
+#### 3. **Access Control**
+```solidity
+Roles:
+- DEFAULT_ADMIN_ROLE: Platform super admin
+- MINTER_ROLE: Can mint new tokens (capped)
+- PAUSER_ROLE: Can pause/unpause
+- BURNER_ROLE: Can burn from treasury
+```
+
+#### 4. **Anti-Whale Mechanism**
+```solidity
+maxTransactionAmount: 1,000,000 CDT (0.1% of supply)
+maxWalletBalance: 10,000,000 CDT (1% of supply)
+cooldownPeriod: 30 seconds between transfers
+```
+
+**Exemptions:**
+- Staking contracts
+- Liquidity pools
+- Exchange wallets
+- Platform wallets
+
+#### 5. **Fee Structure**
+```solidity
+Transaction Fee: 0.5% (distributed as below)
+├── Burn: 0.1% (deflationary)
+├── Staking Rewards Pool: 0.2%
+├── Liquidity Pool: 0.1%
+└── Platform Development: 0.1%
+
+Fee Exemptions:
+- Staking operations
+- CE Points conversion
+- Platform to user transfers
+```
+
+#### 6. **Vesting Mechanism**
+```solidity
+Team Vesting:
+- Total: 150M CDT
+- Cliff: 6 months
+- Vesting: 24 months linear
+- Release: Monthly
+
+Advisor Vesting:
+- Cliff: 3 months
+- Vesting: 12 months
+```
+
+---
+
+## 💾 WALLET DESIGN VERIFICATION & ENHANCEMENTS
+
+### ✅ Current Wallet Design (ALREADY SUPPORTS ALL TOKEN TYPES)
+
+Your existing Prisma `Wallet` model **ALREADY HAS**:
+```prisma
+model Wallet {
+  // ✅ Multi-currency support
+  currency  String @default("PLATFORM_TOKEN")
+  cePoints  Float  @default(0.0)    // ✅ CE Points balance
+  joyTokens Float  @default(0.0)    // ✅ JOY Tokens balance
+  
+  // ✅ Main balance fields
+  availableBalance Float @default(0.0)  // CDT available
+  lockedBalance    Float @default(0.0)  // CDT in escrow/pending
+  stakedBalance    Float @default(0.0)  // CDT staked
+  totalBalance     Float @default(0.0)  // Total CDT
+}
+```
+
+### 🔄 RECOMMENDED ENHANCEMENTS
+
+Add these fields to better support ERC-20 CDT token:
+
+<function_calls>
+<invoke name="create_file">
+<parameter name="content">// RECOMMENDED WALLET SCHEMA ENHANCEMENTS FOR ERC-20 TOKEN SUPPORT
+
+model Wallet {
+  id String @id @default(cuid())
+
+  // Wallet identification
+  walletType    WalletType
+  userId        String?
+  walletAddress String @unique
+
+  // ===== EXISTING BALANCES (Keep as is) =====
+  availableBalance Float @default(0.0)  // CDT available for transactions
+  lockedBalance    Float @default(0.0)  // CDT locked in escrow/pending
+  stakedBalance    Float @default(0.0)  // CDT currently staked
+  totalBalance     Float @default(0.0)  // Total CDT (sum of above)
+
+  // ===== MULTI-CURRENCY SUPPORT (Keep as is) =====
+  currency  String @default("PLATFORM_TOKEN")
+  cePoints  Float  @default(0.0)     // CE Points (off-chain)
+  joyTokens Float  @default(0.0)     // JOY Tokens (off-chain)
+
+  // ===== NEW: ERC-20 BLOCKCHAIN INTEGRATION =====
+  blockchainAddress String?  @unique  // Polygon wallet address (0x...)
+  privateKeyEncrypted String?          // Encrypted private key (ONLY for platform-controlled wallets)
+  isExternalWallet Boolean @default(false)  // True if user provided their own wallet
+  
+  // ===== NEW: DETAILED TOKEN TRACKING =====
+  cdtOnChainBalance Float @default(0.0)      // Actual blockchain CDT balance
+  cdtOffChainBalance Float @default(0.0)     // Internal ledger CDT balance
+  cdtPendingDeposit Float @default(0.0)      // CDT deposits pending confirmation
+  cdtPendingWithdrawal Float @default(0.0)   // CDT withdrawals being processed
+  
+  // ===== NEW: STAKING DETAILS =====
+  activeStakes Int @default(0)               // Number of active staking positions
+  totalStakingRewards Float @default(0.0)    // Lifetime staking rewards earned
+  lastStakingReward DateTime?                // Last reward claim
+  stakingTier String @default("NONE")        // NONE, BRONZE, SILVER, GOLD, PLATINUM
+  
+  // ===== NEW: CONVERSION TRACKING =====
+  ceToTokenConversions Int @default(0)       // Total CE→CDT conversions
+  totalCeConverted Float @default(0.0)       // Lifetime CE Points converted
+  totalTokensFromCe Float @default(0.0)      // Lifetime CDT received from CE
+  lastConversionDate DateTime?               // Last CE→CDT conversion
+  
+  // ===== NEW: TRANSACTION STATISTICS =====
+  totalDeposits Float @default(0.0)          // Lifetime deposits (CDT)
+  totalWithdrawals Float @default(0.0)       // Lifetime withdrawals (CDT)
+  totalTransfersSent Float @default(0.0)     // Lifetime transfers sent
+  totalTransfersReceived Float @default(0.0) // Lifetime transfers received
+  transactionCount Int @default(0)           // Total transaction count
+  
+  // ===== NEW: BLOCKCHAIN SYNC =====
+  lastBlockchainSync DateTime?               // Last blockchain balance sync
+  blockchainSyncStatus String @default("SYNCED") // SYNCED, SYNCING, ERROR
+  lastSyncedBlock BigInt?                    // Last block number synced
+  pendingBlockchainTx String?                // JSON array of pending tx hashes
+  
+  // ===== NEW: ANTI-FRAUD & LIMITS =====
+  dailyWithdrawalUsed Float @default(0.0)    // CDT withdrawn today
+  dailyWithdrawalReset DateTime?             // Daily limit reset time
+  suspiciousActivityScore Int @default(0)    // 0-100 risk score
+  lastSuspiciousActivity DateTime?           // Last flagged activity
+  autoLockThreshold Int @default(85)         // Risk score that triggers auto-lock
+  
+  // ===== EXISTING FIELDS (Keep as is) =====
+  dailyWithdrawalLimit Float?
+  transactionLimit     Float?
+  whitelistedAddresses String?
+  twoFactorRequired Boolean @default(false)
+  otpRequired       Boolean @default(true)
+  isLocked          Boolean @default(false)
+  lockReason        String?
+  lockedAt          DateTime?
+  lockedBy          String?
+  status WalletStatus @default(ACTIVE)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  lastTransactionAt DateTime?
+
+  // ===== NEW RELATIONS =====
+  stakingRecords    StakingRecord[]      // User's staking positions
+  conversionRecords ConversionRecord[]   // CE→CDT conversion history
+  blockchainTxs     BlockchainTransaction[] // On-chain tx records
+  
+  // ===== EXISTING RELATIONS (Keep as is) =====
+  user             User?
+  transactionsFrom WalletTransaction[] @relation("TransactionsFrom")
+  transactionsTo   WalletTransaction[] @relation("TransactionsTo")
+  whitelists       WalletWhitelist[]
+
+  @@index([userId])
+  @@index([walletType])
+  @@index([status])
+  @@index([walletAddress])
+  @@index([blockchainAddress])  // NEW
+  @@index([stakingTier])         // NEW
+  @@index([blockchainSyncStatus]) // NEW
+}
+
+// ===== NEW MODEL: BLOCKCHAIN TRANSACTION TRACKING =====
+model BlockchainTransaction {
+  id String @id @default(cuid())
+  
+  // Transaction identification
+  txHash          String   @unique          // Blockchain tx hash
+  walletId        String                    // Reference to wallet
+  blockNumber     BigInt                    // Block number
+  blockTimestamp  DateTime                  // Block timestamp
+  
+  // Transaction details
+  transactionType String                    // DEPOSIT, WITHDRAWAL, TRANSFER, STAKE, UNSTAKE
+  fromAddress     String                    // Sender address
+  toAddress       String                    // Receiver address
+  amount          Float                     // Token amount
+  gasUsed         Float                     // Gas used
+  gasPriceGwei    Float                     // Gas price in Gwei
+  totalFeeUSD     Float?                    // Total fee in USD
+  
+  // Status tracking
+  status          String   @default("PENDING") // PENDING, CONFIRMED, FAILED
+  confirmations   Int      @default(0)       // Number of confirmations
+  error           String?                    // Error message if failed
+  
+  // Platform integration
+  linkedTxId      String?  @unique           // Link to WalletTransaction
+  processedAt     DateTime?                  // When platform processed it
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  wallet          Wallet   @relation(fields: [walletId], references: [id])
+  
+  @@index([walletId])
+  @@index([txHash])
+  @@index([status])
+  @@index([blockNumber])
+  @@index([transactionType])
+}
+
+// ===== ENHANCED: STAKING RECORD =====
+model StakingRecord {
+  id String @id @default(cuid())
+  
+  // Staking identification
+  walletId        String
+  userId          String
+  stakingPlanId   String?                   // Reference to staking plan
+  
+  // Staking details
+  stakedAmount    Float                     // CDT staked
+  planType        String                    // FLEXIBLE, FIXED_30, FIXED_90, FIXED_180
+  lockPeriodDays  Int                       // Lock period in days (0 for flexible)
+  rewardRate      Float                     // APR percentage (e.g., 15.0 for 15%)
+  
+  // Dates
+  startDate       DateTime @default(now())
+  unlockAt        DateTime?                 // When tokens can be unstaked
+  lastRewardClaim DateTime?                 // Last reward claim date
+  
+  // Rewards tracking
+  accruedRewards  Float @default(0.0)       // Rewards earned but not claimed
+  claimedRewards  Float @default(0.0)       // Rewards already claimed
+  totalRewards    Float @default(0.0)       // Total rewards (accrued + claimed)
+  
+  // Blockchain integration
+  stakeTxHash     String?                   // Stake transaction hash (if on-chain)
+  unstakeTxHash   String?                   // Unstake transaction hash
+  
+  // Status
+  status          String @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED, SLASHED
+  completedAt     DateTime?
+  
+  // Auto-compound
+  autoCompound    Boolean @default(false)   // Auto-restake rewards
+  lastCompoundAt  DateTime?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  wallet          Wallet   @relation(fields: [walletId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
+  
+  @@index([walletId])
+  @@index([userId])
+  @@index([status])
+  @@index([planType])
+  @@index([unlockAt])
+}
+
+// ===== ENHANCED: CONVERSION RECORD =====
+model ConversionRecord {
+  id String @id @default(cuid())
+  
+  // Conversion identification
+  walletId        String
+  userId          String
+  
+  // Conversion details
+  fromCurrency    String                    // CE_POINTS
+  toCurrency      String                    // CDT
+  fromAmount      Float                     // CE Points amount
+  toAmount        Float                     // CDT amount
+  conversionRate  Float                     // Rate used (e.g., 0.01 = 100 CE = 1 CDT)
+  
+  // Fee details
+  platformFee     Float @default(0.0)       // Platform fee (if any)
+  netAmount       Float                     // Amount after fees
+  
+  // Status
+  status          String @default("PENDING") // PENDING, COMPLETED, FAILED, CANCELLED
+  processedAt     DateTime?
+  error           String?
+  
+  // Limits tracking
+  dailyConversionCount Int @default(1)      // Conversions today
+  dailyConversionAmount Float              // CE converted today
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  wallet          Wallet   @relation(fields: [walletId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
+  
+  @@index([walletId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ===== NEW MODEL: TOKEN VESTING SCHEDULE =====
+model TokenVesting {
+  id String @id @default(cuid())
+  
+  // Beneficiary
+  walletId        String
+  userId          String
+  vestingType     String                    // TEAM, ADVISOR, PARTNER
+  
+  // Vesting terms
+  totalAmount     Float                     // Total tokens vesting
+  cliffMonths     Int                       // Cliff period in months
+  vestingMonths   Int                       // Total vesting period
+  releaseFrequency String @default("MONTHLY") // DAILY, WEEKLY, MONTHLY
+  
+  // Tracking
+  claimedAmount   Float @default(0.0)       // Tokens already claimed
+  remainingAmount Float                     // Tokens still vesting
+  nextReleaseAt   DateTime                  // Next release date
+  
+  // Dates
+  startDate       DateTime
+  cliffEndDate    DateTime                  // When cliff ends
+  vestingEndDate  DateTime                  // When fully vested
+  lastClaimDate   DateTime?
+  
+  // Status
+  status          String @default("ACTIVE") // ACTIVE, COMPLETED, REVOKED
+  revokedAt       DateTime?
+  revokedBy       String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([walletId])
+  @@index([userId])
+  @@index([status])
+  @@index([nextReleaseAt])
+}

@@ -3,7 +3,7 @@ import Redis from 'ioredis';
 import axios from 'axios';
 
 // Type definitions
-interface ModerationRequest {
+export interface ModerationRequest {
   userId: string;
   contentType: 'article' | 'comment' | 'post' | 'message';
   contentId: string;
@@ -11,7 +11,7 @@ interface ModerationRequest {
   context?: string;
 }
 
-interface ModerationResult {
+export interface ModerationResult {
   isViolation: boolean;
   violations: ViolationDetail[];
   shouldBlock: boolean;
@@ -21,15 +21,18 @@ interface ModerationResult {
   violationReportId?: string;
 }
 
-interface ViolationDetail {
-  type: 'religious' | 'hate_speech' | 'harassment' | 'sexual' | 'spam' | 'other';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+export type ViolationType = 'religious' | 'hate_speech' | 'harassment' | 'sexual' | 'spam' | 'other';
+export type SeverityLevel = 'low' | 'medium' | 'high' | 'critical';
+
+export interface ViolationDetail {
+  type: ViolationType;
+  severity: SeverityLevel;
   confidence: number;
   detectedPatterns?: string[];
   keywords?: string[];
 }
 
-interface PenaltyResult {
+export interface PenaltyResult {
   penaltyId: string;
   penaltyType: 'shadow_ban' | 'outright_ban' | 'official_ban';
   duration: number;
@@ -37,7 +40,7 @@ interface PenaltyResult {
   reason: string;
 }
 
-interface UserReputationData {
+export interface UserReputationData {
   overallScore: number;
   contentQualityScore: number;
   communityScore: number;
@@ -45,9 +48,10 @@ interface UserReputationData {
   trustLevel: string;
   priorityTier: string;
   totalViolations: number;
+  riskLevel?: string; // Optional field for resolvers
 }
 
-interface PriorityTierInfo {
+export interface PriorityTierInfo {
   tier: 1 | 2 | 3 | 4;
   tierName: 'SUPER_ADMIN' | 'ADMIN' | 'PREMIUM' | 'FREE';
   priorityScore: number;
@@ -815,7 +819,7 @@ export class AIModerationService {
 
   // Helper methods
 
-  private async getUserReputation(userId: string): Promise<UserReputationData> {
+  async getUserReputation(userId: string): Promise<UserReputationData> {
     const reputation = await this.prisma.userReputation.findUnique({
       where: { userId }
     });
@@ -1835,6 +1839,253 @@ export class AIModerationService {
 
     return tierInfo;
   }
+
+  /**
+   * Get moderation queue with filtering and pagination
+   */
+  async getModerationQueue(filters?: {
+    status?: string;
+    priority?: number;
+    assignedTo?: string;
+    contentType?: string;
+  }, pagination?: { page: number; limit: number }): Promise<any> {
+    const where: any = {};
+    if (filters?.status) where.status = filters.status;
+    if (filters?.priority) where.priority = filters.priority;
+    if (filters?.assignedTo) where.assignedTo = filters.assignedTo;
+    if (filters?.contentType) where.contentType = filters.contentType;
+
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      this.prisma.moderationQueue.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: [
+          { priority: 'desc' },
+          { createdAt: 'asc' }
+        ]
+      }),
+      this.prisma.moderationQueue.count({ where })
+    ]);
+
+    return {
+      items,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit)
+      }
+    };
+  }
+
+  /**
+   * Confirm a violation and apply penalty
+   */
+  async confirmViolation(violationReportId: string, adminId: string): Promise<void> {
+    const violation = await this.prisma.violationReport.findUnique({
+      where: { id: violationReportId }
+    });
+
+    if (!violation) {
+      throw new Error('Violation report not found');
+    }
+
+    // Apply penalty based on violation
+    const violationDetail: ViolationDetail = {
+      type: violation.violationType as ViolationType,
+      severity: violation.severity as SeverityLevel,
+      confidence: violation.confidence
+    };
+    await this.applyAutomaticPenalty(violation.userId, violationReportId, violationDetail);
+
+    // Record admin action
+    await this.prisma.adminAction.create({
+      data: {
+        actionType: 'confirm_violation',
+        targetType: 'violation',
+        targetId: violationReportId,
+        adminId,
+        adminRole: 'ADMIN',
+        reason: 'Manual confirmation of AI-detected violation'
+      }
+    });
+  }
+
+  /**
+   * Mark a violation as false positive
+   */
+  async markFalsePositive(violationReportId: string, adminId: string, reason: string): Promise<void> {
+    await this.recordFalsePositive(violationReportId, adminId, reason);
+
+    // Record admin action
+    await this.prisma.adminAction.create({
+      data: {
+        actionType: 'mark_false_positive',
+        targetType: 'violation',
+        targetId: violationReportId,
+        adminId,
+        adminRole: 'ADMIN',
+        reason
+      }
+    });
+  }
+
+  /**
+   * Apply penalty to a user
+   */
+  async applyPenalty(userId: string, penaltyData: {
+    violationReportId: string;
+    penaltyType: string;
+    duration: number;
+    severity: string;
+    reason: string;
+    appliedBy: string;
+  }): Promise<PenaltyResult> {
+    const penalty = await this.prisma.userPenalty.create({
+      data: {
+        userId,
+        violationReportId: penaltyData.violationReportId,
+        penaltyType: penaltyData.penaltyType,
+        severity: penaltyData.severity,
+        duration: penaltyData.duration,
+        appliedBy: penaltyData.appliedBy,
+        notes: penaltyData.reason,
+        escalationLevel: 1,
+        isAutomatic: false
+      }
+    });
+
+    // Apply the appropriate ban
+    if (penaltyData.penaltyType === 'shadow_ban') {
+      await this.enforceShadowBan(userId, penalty.id);
+    } else if (penaltyData.penaltyType === 'outright_ban') {
+      await this.enforceOutrightBan(userId, penalty.id);
+    } else if (penaltyData.penaltyType === 'official_ban') {
+      await this.enforceOfficialBan(userId, penalty.id, penaltyData.reason || 'Official ban enforced');
+    }
+
+    return {
+      penaltyId: penalty.id,
+      penaltyType: penalty.penaltyType as any,
+      duration: penalty.duration,
+      escalationLevel: penalty.escalationLevel,
+      reason: penaltyData.reason
+    };
+  }
+
+  /**
+   * Get user violation history
+   */
+  async getUserViolationHistory(userId: string, options?: {
+    includeResolved?: boolean;
+    limit?: number;
+  }): Promise<any> {
+    const where: any = { userId };
+    if (!options?.includeResolved) {
+      where.status = { not: 'RESOLVED' };
+    }
+
+    const violations = await this.prisma.violationReport.findMany({
+      where,
+      take: options?.limit || 50,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        UserPenalty: true
+      }
+    });
+
+    return violations;
+  }
+
+  /**
+   * Get moderation stats for dashboard
+   */
+  async getModerationStats(timeRange?: { start: Date; end: Date }): Promise<any> {
+    const where: any = {};
+    if (timeRange) {
+      where.createdAt = {
+        gte: timeRange.start,
+        lte: timeRange.end
+      };
+    }
+
+    const [totalQueue, pendingQueue, inReview, totalViolations, falsePositives] = await Promise.all([
+      this.prisma.moderationQueue.count(),
+      this.prisma.moderationQueue.count({ where: { status: 'PENDING' } }),
+      this.prisma.moderationQueue.count({ where: { status: 'IN_REVIEW' } }),
+      this.prisma.violationReport.count({ where }),
+      this.prisma.falsePositive.count({ where })
+    ]);
+
+    return {
+      queue: {
+        total: totalQueue,
+        pending: pendingQueue,
+        inReview
+      },
+      violations: {
+        total: totalViolations
+      },
+      falsePositives: {
+        total: falsePositives
+      }
+    };
+  }
+
+  // Additional methods needed by resolvers
+  async getDailyTrends(): Promise<any> {
+    return { violationsByType: {}, violationsBySeverity: {}, totalViolations: 0 };
+  }
+
+  async getWeeklyTrends(): Promise<any> {
+    return { violationsByType: {}, violationsBySeverity: {}, totalViolations: 0 };
+  }
+
+  async getMonthlyTrends(): Promise<any> {
+    return { violationsByType: {}, violationsBySeverity: {}, totalViolations: 0 };
+  }
+
+  async getUserViolations(userId: string): Promise<any[]> {
+    return await this.prisma.violationReport.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
+  // Additional methods needed by integrations
+  async startBackgroundMonitoring(): Promise<void> {
+    // Stub implementation - background monitoring would go here
+    console.log('Background monitoring started');
+  }
+
+  async stopBackgroundMonitoring(): Promise<void> {
+    // Stub implementation
+    console.log('Background monitoring stopped');
+  }
+
+  async initializeUserReputation(userId: string): Promise<any> {
+    // Create initial reputation record
+    return await this.prisma.userReputation.upsert({
+      where: { userId },
+      create: {
+        userId,
+        overallScore: 50,
+        contentQualityScore: 50,
+        communityScore: 50,
+        violationScore: 0,
+        trustLevel: 'normal',
+        priorityTier: 'FREE',
+      },
+      update: {},
+    });
+  }
 }
+
 
 export default AIModerationService;

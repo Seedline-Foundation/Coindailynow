@@ -298,7 +298,13 @@ export const formatError = (error: any) => {
 };
 
 // Graceful shutdown with connection cleanup
+let isShuttingDown = false;
 const shutdown = async () => {
+  if (isShuttingDown) {
+    return; // Prevent multiple shutdowns
+  }
+  isShuttingDown = true;
+  
   logger.info('Shutting down GraphQL context...');
   
   try {
@@ -312,11 +318,13 @@ const shutdown = async () => {
   } catch (error) {
     logger.error('Error during shutdown:', error);
   }
+  
+  process.exit(0);
 };
 
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
-process.on('beforeExit', shutdown);
+// Removed 'beforeExit' listener as it causes infinite loops
 
 // Function to set optimization services from server
 export const setOptimizationServices = (

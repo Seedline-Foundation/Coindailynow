@@ -150,6 +150,91 @@ export default function AuditPage() {
     }
   };
 
+  const generateReport = async (reportType: 'security' | 'gdpr' | 'user-activity' | 'data-access') => {
+    try {
+      const reportNames = {
+        'security': 'Security Audit Report',
+        'gdpr': 'GDPR Compliance Report',
+        'user-activity': 'User Activity Report',
+        'data-access': 'Data Access Report'
+      };
+
+      // Show loading state
+      const loadingToast = document.createElement('div');
+      loadingToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3';
+      loadingToast.innerHTML = `
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Generating ${reportNames[reportType]}...</span>
+      `;
+      document.body.appendChild(loadingToast);
+
+      const params = new URLSearchParams({
+        reportType,
+        dateRange,
+        format: 'pdf'
+      });
+
+      const response = await fetch(`/api/super-admin/audit/reports?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      });
+
+      // Remove loading toast
+      document.body.removeChild(loadingToast);
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const timestamp = new Date().toISOString().split('T')[0];
+        a.download = `${reportType}-report-${timestamp}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        // Show success message
+        const successToast = document.createElement('div');
+        successToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3';
+        successToast.innerHTML = `
+          <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span>Report generated successfully!</span>
+        `;
+        document.body.appendChild(successToast);
+        setTimeout(() => {
+          document.body.removeChild(successToast);
+        }, 3000);
+      } else {
+        throw new Error('Failed to generate report');
+      }
+    } catch (error) {
+      console.error('Error generating report:', error);
+      
+      // Show error message
+      const errorToast = document.createElement('div');
+      errorToast.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3';
+      errorToast.innerHTML = `
+        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        <span>Failed to generate report. Please try again.</span>
+      `;
+      document.body.appendChild(errorToast);
+      setTimeout(() => {
+        if (document.body.contains(errorToast)) {
+          document.body.removeChild(errorToast);
+        }
+      }, 3000);
+    }
+  };
+
   const getActionIcon = (category: string) => {
     switch (category) {
       case 'authentication': return <Lock className="w-5 h-5" />;
@@ -532,7 +617,10 @@ export default function AuditPage() {
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button className="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left">
+              <button 
+                onClick={() => generateReport('security')}
+                className="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left"
+              >
                 <FileText className="w-8 h-8 text-blue-500" />
                 <div>
                   <h3 className="text-white font-semibold">Security Audit Report</h3>
@@ -540,7 +628,10 @@ export default function AuditPage() {
                 </div>
               </button>
 
-              <button className="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left">
+              <button 
+                onClick={() => generateReport('gdpr')}
+                className="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left"
+              >
                 <Shield className="w-8 h-8 text-green-500" />
                 <div>
                   <h3 className="text-white font-semibold">GDPR Compliance Report</h3>
@@ -548,7 +639,10 @@ export default function AuditPage() {
                 </div>
               </button>
 
-              <button className="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left">
+              <button 
+                onClick={() => generateReport('user-activity')}
+                className="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left"
+              >
                 <User className="w-8 h-8 text-purple-500" />
                 <div>
                   <h3 className="text-white font-semibold">User Activity Report</h3>
@@ -556,7 +650,10 @@ export default function AuditPage() {
                 </div>
               </button>
 
-              <button className="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left">
+              <button 
+                onClick={() => generateReport('data-access')}
+                className="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left"
+              >
                 <Database className="w-8 h-8 text-orange-500" />
                 <div>
                   <h3 className="text-white font-semibold">Data Access Report</h3>
@@ -570,3 +667,4 @@ export default function AuditPage() {
     </div>
   );
 }
+

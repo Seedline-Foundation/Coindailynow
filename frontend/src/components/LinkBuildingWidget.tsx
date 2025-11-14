@@ -112,7 +112,7 @@ export default function LinkBuildingWidget() {
 
         {/* Key Metrics */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={6}>
+          <Grid  item xs={6}>
             <Box>
               <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
                 <LinkIcon fontSize="small" color="primary" />
@@ -131,7 +131,7 @@ export default function LinkBuildingWidget() {
             </Box>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid  item xs={6}>
             <Box>
               <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
                 <TrendingUpIcon fontSize="small" color="success" />
@@ -166,7 +166,7 @@ export default function LinkBuildingWidget() {
               Authority Metrics
             </Typography>
             <Grid container spacing={1}>
-              <Grid item xs={4}>
+              <Grid  item xs={4}>
                 <Tooltip title="Domain Authority">
                   <Box textAlign="center">
                     <Typography variant="caption" color="textSecondary">
@@ -178,7 +178,7 @@ export default function LinkBuildingWidget() {
                   </Box>
                 </Tooltip>
               </Grid>
-              <Grid item xs={4}>
+              <Grid  item xs={4}>
                 <Tooltip title="Trust Flow">
                   <Box textAlign="center">
                     <Typography variant="caption" color="textSecondary">
@@ -190,7 +190,7 @@ export default function LinkBuildingWidget() {
                   </Box>
                 </Tooltip>
               </Grid>
-              <Grid item xs={4}>
+              <Grid  item xs={4}>
                 <Tooltip title="Referring Domains">
                   <Box textAlign="center">
                     <Typography variant="caption" color="textSecondary">
@@ -298,3 +298,6 @@ export default function LinkBuildingWidget() {
     </Card>
   );
 }
+
+
+

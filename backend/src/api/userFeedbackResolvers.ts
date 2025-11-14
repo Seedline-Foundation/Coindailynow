@@ -168,7 +168,7 @@ export const createUserFeedbackResolvers = (
             prisma.userFeedback.findMany({
               where: whereClause,
               include: {
-                article: {
+                Article: {
                   select: {
                     id: true,
                     title: true,
@@ -207,7 +207,7 @@ export const createUserFeedbackResolvers = (
           const feedback = await prisma.userFeedback.findUnique({
             where: { id },
             include: {
-              article: true,
+              Article: true,
             },
           });
 
@@ -259,7 +259,7 @@ export const createUserFeedbackResolvers = (
           // Publish event
           const feedback = await prisma.userFeedback.findUnique({
             where: { id: result.id },
-            include: { article: true },
+            include: { Article: true },
           });
           pubsub.publish(FEEDBACK_SUBMITTED, { feedbackSubmitted: feedback });
 
@@ -299,7 +299,7 @@ export const createUserFeedbackResolvers = (
           // Publish event
           const feedback = await prisma.userFeedback.findUnique({
             where: { id: result.id },
-            include: { article: true },
+            include: { Article: true },
           });
           pubsub.publish(FEEDBACK_SUBMITTED, { feedbackSubmitted: feedback });
 
@@ -342,7 +342,7 @@ export const createUserFeedbackResolvers = (
           // Publish event
           const feedback = await prisma.userFeedback.findUnique({
             where: { id: result.id },
-            include: { article: true },
+            include: { Article: true },
           });
           pubsub.publish(FEEDBACK_SUBMITTED, { feedbackSubmitted: feedback });
 
@@ -401,13 +401,13 @@ export const createUserFeedbackResolvers = (
             where: { id: feedbackId },
             data: {
               resolvedAt: new Date(),
-              metadata: {
+              metadata: JSON.stringify({
                 resolution,
                 resolvedBy: context.user?.id,
-              },
+              }),
             },
             include: {
-              article: true,
+              Article: true,
             },
           });
 

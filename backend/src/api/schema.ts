@@ -501,19 +501,6 @@ export const typeDefs = `
     DELISTED
   }
 
-  type MarketData {
-    id: ID!
-    token: Token!
-    price: Float!
-    volume24h: Float!
-    marketCap: Float!
-    priceChange24h: Float!
-    priceChangePercentage24h: Float!
-    high24h: Float!
-    low24h: Float!
-    timestamp: DateTime!
-  }
-
   type Category {
     id: ID!
     name: String!
@@ -709,11 +696,6 @@ export const typeDefs = `
     autoDelete: Boolean!
   }
 
-  input DataPortabilityRequest {
-    dataTypes: [String!]!
-    format: ExportFormat!
-  }
-
   # Query Type
   type Query {
     # Authentication queries
@@ -811,7 +793,7 @@ export const typeDefs = `
     subscriptionPlans: [SubscriptionPlan!]!
 
     # Health check
-    health: String!
+    health: HealthCheck!
 
     # Task 10: Content Generation Agent queries
     contentGenerationStatus: ContentGenerationStatus!
@@ -842,6 +824,37 @@ export const typeDefs = `
     getCookieCategories: [CookieCategory!]!
     getPrivacyImpactAssessment(assessmentId: String!): String!
     getCrossBorderDataTransfers: [String!]!
+
+    # Wallet Modal queries - Hybrid Wallet System
+    """Get whitelisted wallet addresses for current user"""
+    getWhitelistedWallets: [String!]!
+    
+    """Search users by username or email"""
+    searchUsers(query: String!, limit: Int): [UserSearchResult!]!
+    
+    """Get real-time exchange rate from payment provider"""
+    getExchangeRate(
+      fromCurrency: String!
+      toCurrency: String!
+      amount: Float!
+      provider: PaymentProvider!
+    ): ExchangeRate!
+    
+    """Check if recent swap transaction has been completed"""
+    checkSwapStatus(walletId: ID!): SwapStatus!
+
+    # Withdrawal Management queries
+    """Get current user's withdrawal requests"""
+    getUserWithdrawalRequests(status: WithdrawalStatus, limit: Int): [WithdrawalRequest!]!
+    
+    """Get all pending withdrawal requests (Admin only)"""
+    getPendingWithdrawalRequests(limit: Int, offset: Int): [WithdrawalRequest!]!
+    
+    """Get withdrawal statistics (Admin only)"""
+    getWithdrawalStats: WithdrawalStats!
+
+    # Performance monitoring
+    performanceStats(timeRange: String): PerformanceStats!
   }
 
   # Mutation Type
@@ -964,7 +977,7 @@ export const typeDefs = `
     # Task 30: Legal & Compliance mutations
     recordConsent(input: ConsentInput!): ConsentRecord!
     revokeConsent(consentId: ID!): ConsentRecord!
-    requestDataPortability(input: DataPortabilityRequest!): DataPortabilityExport!
+    requestDataPortability(input: DataPortabilityInput!): DataPortabilityExport!
     deleteUserData(userId: String!, reason: String!): Boolean!
     createDataRetentionPolicy(input: DataRetentionPolicyInput!): DataRetentionPolicy!
     updateDataRetentionPolicy(id: ID!, input: DataRetentionPolicyInput!): DataRetentionPolicy!
@@ -972,6 +985,65 @@ export const typeDefs = `
     generateComplianceReport(input: ComplianceReportInput!): ComplianceReport!
     acknowledgeDataBreach(breachId: String!, acknowledgment: String!): Boolean!
     updateConsentBanner(jurisdiction: String!, content: String!, version: String!): ConsentBanner!
+
+    # Wallet Modal mutations - Hybrid Wallet System
+    """Convert CE Points to JY Tokens"""
+    convertCEToJY(walletId: ID!, ceAmount: Float!): ConversionResult!
+    
+    """Deposit JY from whitelisted external wallet"""
+    depositFromWallet(
+      walletId: ID!
+      sourceAddress: String!
+      amount: Float!
+      txHash: String
+    ): DepositResult!
+    
+    """Create internal platform transfer"""
+    createTransfer(
+      fromWalletId: ID!
+      toIdentifier: String!
+      amount: Float!
+      transferType: TransferType!
+      note: String
+    ): TransferResult!
+
+    # Withdrawal Management mutations
+    """Create a withdrawal request (requires 48hr cooldown, Wed/Fri only, min 0.05 JY)"""
+    createWithdrawalRequest(
+      walletId: ID!
+      amount: Float!
+      destinationAddress: String!
+      notes: String
+    ): WithdrawalRequestResponse!
+    
+    """Approve a withdrawal request (Admin only)"""
+    approveWithdrawalRequest(
+      requestId: ID!
+      adminNotes: String
+      txHash: String
+    ): WithdrawalRequest!
+    
+    """Reject a withdrawal request (Admin only)"""
+    rejectWithdrawalRequest(
+      requestId: ID!
+      reason: String!
+      adminNotes: String
+    ): WithdrawalRequest!
+
+    # Performance and cache management
+    invalidateCache(strategy: String, pattern: String, tag: String): CacheInvalidationResult!
+    warmupCache(strategy: String!): CacheWarmupResult!
+  }
+
+  type CacheInvalidationResult {
+    success: Boolean!
+    invalidatedCount: Int!
+    message: String!
+  }
+
+  type CacheWarmupResult {
+    success: Boolean!
+    message: String!
   }
 
   # Input Types
@@ -1148,7 +1220,7 @@ export const typeDefs = `
     DOWNVOTE
   }
 
-  type AuthPayload {
+  type AuthTokenPayload {
     token: String!
     refreshToken: String!
     user: User!
@@ -1304,6 +1376,8 @@ export const typeDefs = `
   input DateRangeInput {
     start: DateTime
     end: DateTime
+    startDate: DateTime
+    endDate: DateTime
   }
 
   # Task 8: Content Workflow Engine Types
@@ -1804,7 +1878,7 @@ export const typeDefs = `
     userId: ID!
     sessionAnalytics: SessionAnalytics!
     engagementMetrics: UserEngagementMetrics!
-    contentPreferences: ContentPreferences!
+    contentPreferences: UserContentPreferences!
     africanMarketBehavior: AfricanMarketBehavior!
     deviceUsagePatterns: DeviceUsagePatterns!
   }
@@ -1837,7 +1911,7 @@ export const typeDefs = `
     lifetimeValue: Float!
   }
 
-  type ContentPreferences {
+  type UserContentPreferences {
     preferredCategories: [CategoryPreference!]!
     readingTimePreference: ReadingTimePreference!
     contentTypePreference: ContentTypePreference!
@@ -2165,6 +2239,44 @@ export const typeDefs = `
     conversionRate: Float!
   }
 
+  type PerformanceStats {
+    timeRange: String!
+    api: ApiPerformanceStats!
+    cache: CachePerformanceStats!
+  }
+
+  type HealthCheck {
+    status: String!
+    timestamp: String!
+    version: String!
+    performance: HealthPerformance
+    error: String
+  }
+
+  type HealthPerformance {
+    responseTime: Float!
+    averageResponseTime: Float!
+    cacheHitRate: Float!
+    slowQueries: Int!
+  }
+
+  type ApiPerformanceStats {
+    totalRequests: Int!
+    averageResponseTime: Float!
+    p95ResponseTime: Float!
+    p99ResponseTime: Float!
+    slowQueries: Int!
+    errorRate: Float!
+    requestsPerMinute: Float!
+  }
+
+  type CachePerformanceStats {
+    hitRate: Float!
+    totalKeys: Int!
+    memoryUsage: Float!
+    strategiesHealth: JSON!
+  }
+
   type AnalyticsResponse {
     data: JSON!
     metadata: AnalyticsResponseMetadata!
@@ -2244,10 +2356,10 @@ export const typeDefs = `
     referrer: String
     sessionDuration: Int
     ipAddress: String!
-    africanMarketContext: AfricanMarketContextInput
+    africanMarketContext: AnalyticsAfricanContextInput
   }
 
-  input AfricanMarketContextInput {
+  input AnalyticsAfricanContextInput {
     country: String!
     exchange: String
     mobileMoneyProvider: String
@@ -2262,11 +2374,6 @@ export const typeDefs = `
     currency: String!
     transactionType: String!
     status: String!
-  }
-
-  input DateRangeInput {
-    startDate: DateTime!
-    endDate: DateTime!
   }
 
   input AnalyticsQueryInput {
@@ -2329,7 +2436,7 @@ export const typeDefs = `
     applicableFrameworks: [String!]!
   }
 
-  type CookieCategory {
+  type ComplianceCookieCategory {
     id: String!
     name: String!
     description: String!
@@ -2350,7 +2457,7 @@ export const typeDefs = `
   }
 
   type CookiePolicy {
-    categories: [CookieCategory!]!
+    categories: [ComplianceCookieCategory!]!
     totalCookies: Int!
     thirdPartyCookies: Int!
     lastUpdated: String!
@@ -2435,13 +2542,13 @@ export const typeDefs = `
     findings: [PIAFinding!]!
   }
 
-  type DataPortabilityRequest {
+  type DataPortabilityRequestStatus {
     requestId: String!
     status: String!
     estimatedCompletion: String
   }
 
-  type ComplianceReport {
+  type ComplianceReportSummary {
     reportId: String!
     framework: String!
     period: String!
@@ -2538,9 +2645,156 @@ export const typeDefs = `
     dryRun: Boolean
   }
 
-  input ComplianceReportInput {
+  input ComplianceReportRequestInput {
     framework: String!
     startDate: String!
     endDate: String!
+  }
+
+  # ============================================================================
+  # Wallet Modal Types - Hybrid Wallet System
+  # ============================================================================
+
+  """Result of CE to JY conversion"""
+  type ConversionResult {
+    success: Boolean!
+    jyAmount: Float
+    transactionId: String
+    error: String
+  }
+
+  """Result of wallet deposit operation"""
+  type DepositResult {
+    success: Boolean!
+    txHash: String
+    transactionId: String
+    error: String
+  }
+
+  """Result of internal transfer operation"""
+  type TransferResult {
+    success: Boolean!
+    txId: String
+    error: String
+  }
+
+  """User search result for transfers"""
+  type UserSearchResult {
+    id: ID!
+    username: String!
+    displayName: String!
+    avatar: String
+    role: String!
+  }
+
+  """Exchange rate information from payment provider"""
+  type ExchangeRate {
+    fromCurrency: String!
+    toCurrency: String!
+    rate: Float!
+    fee: Float!
+    estimatedTime: String!
+    provider: String!
+  }
+
+  """Swap transaction status"""
+  type SwapStatus {
+    success: Boolean!
+    txHash: String
+    error: String
+  }
+
+  """Type of internal transfer"""
+  enum TransferType {
+    USER
+    SERVICE
+    CONTENT
+  }
+
+  """Payment provider for currency exchange"""
+  enum PaymentProvider {
+    YellowCard
+    ChangeNOW
+  }
+
+  # Withdrawal Management Types
+  """Withdrawal request for JY tokens"""
+  type WithdrawalRequest {
+    id: ID!
+    userId: String!
+    walletId: String!
+    amount: Float!
+    destinationAddress: String!
+    status: WithdrawalStatus!
+    notes: String
+    adminNotes: String
+    requestedAt: DateTime!
+    processedAt: DateTime
+    approvedBy: String
+    approvedAt: DateTime
+    rejectedBy: String
+    rejectedAt: DateTime
+    rejectionReason: String
+    txHash: String
+    user: User
+    wallet: UserWallet
+  }
+
+  """Status of withdrawal request"""
+  enum WithdrawalStatus {
+    PENDING
+    APPROVED
+    REJECTED
+    COMPLETED
+    FAILED
+  }
+
+  """Input for creating withdrawal request"""
+  input WithdrawalRequestInput {
+    walletId: ID!
+    amount: Float!
+    destinationAddress: String!
+    notes: String
+  }
+
+  """Input for approving withdrawal"""
+  input ApproveWithdrawalInput {
+    requestId: ID!
+    adminNotes: String
+    txHash: String
+  }
+
+  """Input for rejecting withdrawal"""
+  input RejectWithdrawalInput {
+    requestId: ID!
+    reason: String!
+    adminNotes: String
+  }
+
+  """Withdrawal statistics for admin dashboard"""
+  type WithdrawalStats {
+    pendingCount: Int!
+    approvedCount: Int!
+    rejectedCount: Int!
+    totalApprovedAmount: Float!
+    averageProcessingTime: Float
+  }
+
+  """Response for withdrawal request creation"""
+  type WithdrawalRequestResponse {
+    success: Boolean!
+    message: String!
+    request: WithdrawalRequest
+    nextAvailableDate: DateTime
+    hoursUntilNextRequest: Float
+  }
+
+  """User wallet information for withdrawal"""
+  type UserWallet {
+    id: ID!
+    type: String!
+    balance: Float!
+    joyTokens: Float!
+    whitelistedAddresses: [String!]
   }
 `;

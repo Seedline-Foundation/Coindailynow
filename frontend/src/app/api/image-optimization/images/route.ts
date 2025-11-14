@@ -1,32 +1,29 @@
 /**
- * Image Optimization - Images API Proxy
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/image-optimization/images');
 
 export async function GET(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams;
-    const queryString = searchParams.toString();
+  return handler(request);
+}
 
-    const response = await fetch(
-      `${BACKEND_URL}/api/image-optimization/images${queryString ? `?${queryString}` : ''}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Images proxy error:', error);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
-  }
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

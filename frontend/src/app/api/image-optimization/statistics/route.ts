@@ -1,26 +1,29 @@
 /**
- * Image Optimization Statistics API Proxy
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/image-optimization/statistics');
 
-export async function GET() {
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/image-optimization/statistics`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Statistics proxy error:', error);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
-  }
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
+
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

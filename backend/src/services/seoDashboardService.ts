@@ -171,7 +171,9 @@ export class SEODashboardService {
     };
 
     // Cache for 5 minutes
-    await redisClient.setex(cacheKey, this.cacheTTL, JSON.stringify(stats));
+    if (redisClient && redisClient.setex) {
+      await redisClient.setex(cacheKey, this.cacheTTL, JSON.stringify(stats));
+    }
 
     return stats;
   }
@@ -414,7 +416,9 @@ export class SEODashboardService {
       ? keywordData.filter(k => k.trend === filters.trend)
       : keywordData;
 
-    await redisClient.setex(cacheKey, this.cacheTTL, JSON.stringify(filteredData));
+    if (redisClient && redisClient.setex) {
+      await redisClient.setex(cacheKey, this.cacheTTL, JSON.stringify(filteredData));
+    }
 
     return filteredData;
   }
@@ -602,7 +606,9 @@ export class SEODashboardService {
       ? pageData.filter(p => p.issues.length > 0)
       : pageData;
 
-    await redisClient.setex(cacheKey, this.cacheTTL, JSON.stringify(filteredData));
+    if (redisClient && redisClient.setex) {
+      await redisClient.setex(cacheKey, this.cacheTTL, JSON.stringify(filteredData));
+    }
 
     return filteredData;
   }

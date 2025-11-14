@@ -1,27 +1,29 @@
 /**
- * Image Optimization - Optimize Image API Proxy
+ * API Route Proxy
+ * Proxies requests to backend API
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { createProxyHandler } from '@/lib/api-proxy';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/image-optimization/optimize');
+
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
 
 export async function POST(request: NextRequest) {
-  try {
-    const formData = await request.formData();
+  return handler(request);
+}
 
-    const response = await fetch(`${BACKEND_URL}/api/image-optimization/optimize`, {
-      method: 'POST',
-      body: formData,
-    });
+export async function PUT(request: NextRequest) {
+  return handler(request);
+}
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Optimize proxy error:', error);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
-  }
+export async function DELETE(request: NextRequest) {
+  return handler(request);
+}
+
+export async function PATCH(request: NextRequest) {
+  return handler(request);
 }

@@ -16,39 +16,10 @@
 
 import { Router, Request, Response } from 'express';
 import aiAuditService from '../services/aiAuditService';
+import { authMiddleware } from '../middleware/auth';
+import { adminMiddleware } from '../middleware/admin';
 
 const router = Router();
-
-// ================================
-// MIDDLEWARE
-// ================================
-
-/**
- * Authentication middleware (placeholder - implement based on your auth system)
- */
-function authenticate(req: Request, res: Response, next: Function) {
-  // TODO: Implement authentication
-  // For now, assume user is authenticated
-  (req as any).user = { id: 'user-123', role: 'admin' };
-  next();
-}
-
-/**
- * Admin authorization middleware
- */
-function requireAdmin(req: Request, res: Response, next: Function): void {
-  const user = (req as any).user;
-  if (!user || user.role !== 'admin') {
-    res.status(403).json({
-      error: {
-        code: 'FORBIDDEN',
-        message: 'Admin access required',
-      },
-    });
-    return;
-  }
-  next();
-}
 
 // ================================
 // AUDIT LOG ENDPOINTS
@@ -58,7 +29,7 @@ function requireAdmin(req: Request, res: Response, next: Function): void {
  * GET /api/ai/audit/logs
  * Get audit logs with filtering and pagination
  */
-router.get('/logs', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.get('/logs', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
@@ -77,20 +48,28 @@ router.get('/logs', authenticate,${3}async (req: Request, res: Response): Promis
       sortOrder = 'desc',
     } = req.query;
     
-    const options = {
+    const options: any = {
       operationType: operationType as string,
       operationCategory: operationCategory as string,
       agentType: agentType as string,
       userId: userId as string,
       status: status as string,
-      startDate: startDate ? new Date(startDate as string) : undefined,
-      endDate: endDate ? new Date(endDate as string) : undefined,
-      humanReviewed: humanReviewed === 'true' ? true : humanReviewed === 'false' ? false : undefined,
       limit: parseInt(limit as string),
       offset: parseInt(offset as string),
       sortBy: sortBy as 'createdAt' | 'processingTimeMs' | 'actualCost',
       sortOrder: sortOrder as 'asc' | 'desc',
     };
+    
+    // Only add optional date fields if they exist
+    if (startDate) {
+      options.startDate = new Date(startDate as string);
+    }
+    if (endDate) {
+      options.endDate = new Date(endDate as string);
+    }
+    if (humanReviewed !== undefined) {
+      options.humanReviewed = humanReviewed === 'true' ? true : humanReviewed === 'false' ? false : undefined;
+    }
     
     const result = await aiAuditService.getAuditLogs(options);
     
@@ -140,7 +119,7 @@ router.get('/logs', authenticate,${3}async (req: Request, res: Response): Promis
  * GET /api/ai/audit/logs/:id
  * Get a specific audit log by ID
  */
-router.get('/logs/:id', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.get('/logs/:id', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
@@ -204,13 +183,22 @@ router.get('/logs/:id', authenticate,${3}async (req: Request, res: Response): Pr
  * POST /api/ai/audit/logs/:id/review
  * Record human review of an AI operation
  */
-router.post('/logs/:id/review', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.post('/logs/:id/review', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
     const { id } = req.params;
     const { decision, overrideReason, feedbackToAI } = req.body;
     const user = (req as any).user;
+    
+    if (!id) {
+      return res.status(400).json({
+        error: {
+          code: 'MISSING_ID',
+          message: 'Log ID is required',
+        },
+      });
+    }
     
     if (!decision || !['approved', 'rejected', 'modified'].includes(decision)) {
       return res.status(400).json({
@@ -262,11 +250,21 @@ router.post('/logs/:id/review', authenticate,${3}async (req: Request, res: Respo
  * GET /api/ai/audit/decisions/:id
  * Get a specific decision log with full reasoning
  */
-router.get('/decisions/:id', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.get('/decisions/:id', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
     const { id } = req.params;
+    
+    if (!id) {
+      return res.status(400).json({
+        error: {
+          code: 'MISSING_ID',
+          message: 'Decision ID is required',
+        },
+      });
+    }
+    
     const decision = await aiAuditService.getDecisionById(id);
     
     const duration = Date.now() - startTime;
@@ -310,11 +308,21 @@ router.get('/decisions/:id', authenticate,${3}async (req: Request, res: Response
  * GET /api/ai/audit/logs/:auditLogId/decisions
  * Get all decision logs for an audit log
  */
-router.get('/logs/:auditLogId/decisions', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.get('/logs/:auditLogId/decisions', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
     const { auditLogId } = req.params;
+    
+    if (!auditLogId) {
+      return res.status(400).json({
+        error: {
+          code: 'MISSING_ID',
+          message: 'Audit log ID is required',
+        },
+      });
+    }
+    
     const decisions = await aiAuditService.getDecisionLogs(auditLogId);
     
     const duration = Date.now() - startTime;
@@ -362,7 +370,7 @@ router.get('/logs/:auditLogId/decisions', authenticate,${3}async (req: Request, 
  * POST /api/ai/audit/export
  * Generate a compliance report
  */
-router.post('/export', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.post('/export', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
@@ -447,12 +455,21 @@ router.post('/export', authenticate,${3}async (req: Request, res: Response): Pro
  * GET /api/ai/audit/export/:id
  * Get a compliance report
  */
-router.get('/export/:id', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.get('/export/:id', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
     const { id } = req.params;
     const { format } = req.query;
+    
+    if (!id) {
+      return res.status(400).json({
+        error: {
+          code: 'MISSING_ID',
+          message: 'Report ID is required',
+        },
+      });
+    }
     
     if (format && !['JSON', 'CSV', 'XML'].includes(format as string)) {
       return res.status(400).json({
@@ -514,7 +531,7 @@ router.get('/export/:id', authenticate,${3}async (req: Request, res: Response): 
  * GET /api/ai/audit/consent
  * Get user consents (for authenticated user)
  */
-router.get('/consent', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.get('/consent', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
@@ -559,7 +576,7 @@ router.get('/consent', authenticate,${3}async (req: Request, res: Response): Pro
  * POST /api/ai/audit/consent
  * Record user consent
  */
-router.post('/consent', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.post('/consent', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
@@ -636,12 +653,21 @@ router.post('/consent', authenticate,${3}async (req: Request, res: Response): Pr
  * POST /api/ai/audit/consent/:id/withdraw
  * Withdraw user consent
  */
-router.post('/consent/:id/withdraw', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.post('/consent/:id/withdraw', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
     const { id } = req.params;
     const { reason, deleteData = false } = req.body;
+    
+    if (!id) {
+      return res.status(400).json({
+        error: {
+          code: 'MISSING_ID',
+          message: 'Consent ID is required',
+        },
+      });
+    }
     
     const consent = await aiAuditService.withdrawUserConsent(
       id,
@@ -686,7 +712,7 @@ router.post('/consent/:id/withdraw', authenticate,${3}async (req: Request, res: 
  * GET /api/ai/audit/statistics
  * Get audit statistics for dashboard
  */
-router.get('/statistics', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.get('/statistics', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
@@ -722,7 +748,7 @@ router.get('/statistics', authenticate,${3}async (req: Request, res: Response): 
  * GET /api/ai/audit/retention
  * Get data retention statistics
  */
-router.get('/retention', authenticate,${3}async (req: Request, res: Response): Promise<any> => {
+router.get('/retention', authMiddleware, async (req: Request, res: Response): Promise<any> => {
   const startTime = Date.now();
   
   try {
@@ -766,3 +792,4 @@ router.get('/health', async (req: Request, res: Response) => {
 });
 
 export default router;
+

@@ -364,3 +364,4 @@ export default function ComplianceMonitoringWidget() {
     </Paper>
   );
 }
+

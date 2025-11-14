@@ -377,3 +377,4 @@ function StatCard({ icon, label, value, bgColor, subtitle }: StatCardProps) {
     </div>
   );
 }
+
