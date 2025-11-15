@@ -1,3 +1,7 @@
+# Documentation files (keep only README.md in repo)
+*.md
+!README.md
+
 # Dependencies
 node_modules/
 npm-debug.log*
