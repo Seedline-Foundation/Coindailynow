@@ -1478,7 +1478,7 @@ This systematic approach ensures you're building both the technical infrastructu
 
 **Acceptance Criteria**
 
-* Contract passes comprehensive security audit by at least 2 reputable firms (CertiK, OpenZeppelin, Trail of Bits).
+* Contract passes comprehensive security audit by at least 2 reputable firms (Cyberscope, OpenZeppelin, Trail of Bits).
 * Maximum supply verifiable on-chain as immutable (5,000,000 JY).
 * All OpenZeppelin dependencies up-to-date and security-reviewed.
 * Gas-optimized functions (transfer cost < 50,000 gas).
@@ -1815,7 +1815,7 @@ This systematic approach ensures you're building both the technical infrastructu
   * Integration testing on testnet (Goerli, Mumbai) for 30+ days.
 
 * **Professional Audits:**
-  * Engage 2-3 reputable firms (CertiK, OpenZeppelin, Trail of Bits, Consensys Diligence).
+  * Engage 2-3 reputable firms (Cyberscope, OpenZeppelin, Trail of Bits, Consensys Diligence).
   * Comprehensive scope: all smart contracts, tokenomics model, economic attack vectors.
   * Public audit report publication with issue remediation transparency.
   * Bug bounty program (Immunefi) with rewards up to $100,000.

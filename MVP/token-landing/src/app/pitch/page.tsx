@@ -187,22 +187,23 @@ const slides = [
           <div>
             <h3 className="text-xl font-bold text-primary-400 mb-4">Supply Allocation</h3>
             <div className="space-y-3">
-              <AllocationRow label="Ecosystem & Staking" percentage={36} color="bg-blue-500" />
-              <AllocationRow label="Reserve Fund (10yr)" percentage={20} color="bg-purple-500" />
-              <AllocationRow label="Public Sale" percentage={16} color="bg-green-500" />
-              <AllocationRow label="Team (4yr vest)" percentage={14} color="bg-yellow-500" />
-              <AllocationRow label="Seed (2yr vest)" percentage={10} color="bg-pink-500" />
-              <AllocationRow label="Liquidity Locked" percentage={4} color="bg-red-500" />
+              <AllocationRow label="Public Sale" percentage={28.3} color="bg-blue-500" />
+              <AllocationRow label="Treasury" percentage={23.3} color="bg-purple-500" />
+              <AllocationRow label="Ecosystem" percentage={18.3} color="bg-orange-500" />
+              <AllocationRow label="Team (6yr total)" percentage={11.7} color="bg-green-500" />
+              <AllocationRow label="Legal" percentage={8.3} color="bg-yellow-500" />
+              <AllocationRow label="Liquidity (Locked)" percentage={5} color="bg-pink-500" />
+              <AllocationRow label="Seed" percentage={5} color="bg-cyan-500" />
             </div>
           </div>
 
           <div>
             <h3 className="text-xl font-bold text-accent-400 mb-4">Staking Tiers</h3>
             <div className="space-y-3">
-              <StakingRow period="24 Months" apr="70%" multiplier="3x" highlight />
-              <StakingRow period="12 Months" apr="30%" multiplier="2x" highlight />
-              <StakingRow period="6 Months" apr="8%" multiplier="1.5x" />
-              <StakingRow period="Flexible" apr="2%" multiplier="1x" />
+              <StakingRow period="24 Months" apr="90%" multiplier="2.5x" highlight />
+              <StakingRow period="9 Months" apr="70%" multiplier="1.5x" highlight />
+              <StakingRow period="6 Months" apr="10%" multiplier="1.2x" />
+              <StakingRow period="Flexible (7d)" apr="1%" multiplier="0x" />
             </div>
           </div>
         </div>
@@ -220,7 +221,7 @@ const slides = [
           />
           <KeyFeature 
             title="Long-Term Aligned"
-            description="Team: 4yr vest. Reserve: 10yr vest"
+            description="Team: 6yr total (24mo cliff + 4yr vest). Treasury: 10yr sinkhole"
             icon="🔒"
           />
         </div>
@@ -401,19 +402,22 @@ const slides = [
     content: (
       <div className="space-y-8">
         <div className="text-center">
-          <div className="text-5xl font-bold gradient-text mb-4">$350,000</div>
-          <p className="text-2xl text-gray-300 mb-8">Presale Target (16% of total supply)</p>
+          <div className="text-5xl font-bold gradient-text mb-4">$917,500</div>
+          <p className="text-2xl text-gray-300 mb-8">Presale Target (28.3% of total supply)</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           <div>
             <h3 className="text-2xl font-bold text-primary-400 mb-4">Use of Funds</h3>
             <div className="space-y-3">
-              <FundRow label="Liquidity Lock (permanently)" amount="$200,000" percentage={57} />
-              <FundRow label="Legal & Compliance" amount="$50,000" percentage={14} />
-              <FundRow label="Platform Development" amount="$50,000" percentage={14} />
-              <FundRow label="Marketing & Growth" amount="$50,000" percentage={14} />
+              <FundRow label="Liquidity Locking (permanently)" amount="$270,000" percentage={29} />
+              <FundRow label="CEX Listings (MEXC + Bybit)" amount="$300,000" percentage={33} />
+              <FundRow label="12-Month Runway" amount="$120,000" percentage={13} />
+              <FundRow label="Marketing" amount="$100,000" percentage={11} />
+              <FundRow label="Legal & Compliance" amount="$50,000" percentage={5} />
+              <FundRow label="Contingencies" amount="$77,500" percentage={8} />
             </div>
+            <p className="text-sm text-gray-500 mt-4">100% community-funded • No VC backing</p>
           </div>
 
           <div>
@@ -483,7 +487,7 @@ const slides = [
             title="Extreme Scarcity"
             points={[
               "Only 5M tokens (vs. billions for competitors)",
-              "14% team allocation locked for 4 years",
+              "11.7% team allocation locked for 6 years (24-month cliff + 4-year vest)",
               "Quarterly burns reduce supply permanently"
             ]}
           />

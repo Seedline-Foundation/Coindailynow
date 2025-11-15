@@ -10,7 +10,7 @@ export default function HowToBuy() {
 
   const steps = [
     { step: '1', title: 'Join Whitelist', description: 'Enter your email to get whitelist access and presale notifications.' },
-    { step: '2', title: 'Prepare Wallet', description: 'Set up MetaMask or compatible Web3 wallet with USDC or ETH.' },
+    { step: '2', title: 'Prepare Wallet', description: 'Set up MetaMask or compatible Web3 wallet with USDC.' },
     { step: '3', title: 'Visit PinkSale', description: 'Click the PinkSale link when presale goes live.' },
     { step: '4', title: 'Buy JY Tokens', description: 'Connect wallet, enter amount, confirm transaction, and receive tokens.' },
   ];

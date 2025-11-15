@@ -611,7 +611,7 @@ Follow checklist in `ERC20_TOKEN_INTEGRATION_GUIDE.md`:
 ### Security
 
 1. **Smart Contract Audit** (Critical)
-   - Use CertiK, OpenZeppelin, or Trail of Bits
+   - Use Cyberscope, OpenZeppelin, or Trail of Bits
    - Budget: $15k-$50k
    - Timeline: 2-4 weeks
    - Required before mainnet deployment

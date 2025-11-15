@@ -459,7 +459,7 @@ contract MultiSigAdmin {
 
 ### **Phase 1: Smart Contract Development (3 weeks)**
 - Week 1: Write and test contracts locally
-- Week 2: Security audit (CertiK, OpenZeppelin)
+- Week 2: Security audit (Cyberscope, OpenZeppelin)
 - Week 3: Deploy to testnet, testing
 
 ### **Phase 2: Backend Integration (3 weeks)**

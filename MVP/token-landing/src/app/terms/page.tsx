@@ -109,9 +109,10 @@ export default function TermsPage() {
               <li><strong>Premium Content Access:</strong> Unlock exclusive market analysis, whale alerts, investigative reports</li>
               <li><strong>Advertising Discounts:</strong> Pay for platform advertising at 50% discount compared to fiat</li>
               <li><strong>Staking for Rewards:</strong> Lock tokens to earn rewards from platform revenue allocation (NOT investment returns)</li>
-              <li><strong>Governance Voting:</strong> Participate in platform decisions (content priorities, feature development, treasury allocation)</li>
+              <li><strong>Governance Voting:</strong> Participate in platform decisions with everlasting voting power (content priorities, feature development, treasury allocation, partnership approvals, regional expansion, editorial guidelines). Core team retains veto power for critical security matters.</li>
               <li><strong>Transaction Fee Reduction:</strong> Reduced or waived fees for certain platform actions</li>
               <li><strong>Early Feature Access:</strong> Beta testing and early access to new platform features</li>
+              <li><strong>Community Recognition:</strong> Highly engaged token holders can be celebrated, recognized, and invited to join core team roles as the platform matures</li>
             </ul>
 
             <h3 className="text-2xl font-bold text-primary-400 mb-4">2.3 What $JY Is NOT</h3>
@@ -121,7 +122,7 @@ export default function TermsPage() {
               <li>❌ Rights to dividends, profits, or revenue shares</li>
               <li>❌ Debt obligation, loan, or promise of repayment</li>
               <li>❌ Investment opportunity or financial instrument</li>
-              <li>❌ Voting rights over corporate governance or management decisions</li>
+              <li>❌ Voting rights over corporate governance, management decisions, or entity control (governance voting is limited to platform operations only)</li>
               <li>❌ Legal or beneficial ownership of platform assets or intellectual property</li>
               <li>❌ Right to participate in liquidation proceeds or asset distribution</li>
             </ul>

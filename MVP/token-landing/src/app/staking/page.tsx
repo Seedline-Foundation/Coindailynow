@@ -7,33 +7,33 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid';
 export default function StakingPage() {
   const stakingTiers = [
     { 
-      name: 'Flexible', 
-      apr: '2%', 
-      lockPeriod: '7 days notice', 
-      multiplier: '1x',
-      description: 'Unstake anytime with 7-day cooldown'
+      name: '7 Days (Flexible)', 
+      apr: '1%', 
+      lockPeriod: 'Flexible unlock', 
+      multiplier: '0x',
+      description: 'Test the waters - Low commitment, low rewards'
     },
     { 
-      name: '6 Months', 
-      apr: '8%', 
-      lockPeriod: '6 months', 
+      name: '6 Months (Steady)', 
+      apr: '10%', 
+      lockPeriod: '6 months cliff', 
+      multiplier: '1.2x',
+      description: 'Medium commitment - Steady returns'
+    },
+    { 
+      name: '9 Months (Whale Prison)', 
+      apr: '70%', 
+      lockPeriod: '9 months cliff', 
       multiplier: '1.5x',
-      description: 'Medium-term commitment'
-    },
-    { 
-      name: '12 Months', 
-      apr: '30%', 
-      lockPeriod: '12 months', 
-      multiplier: '2x',
-      description: 'Long-term holder rewards',
+      description: 'Whale Prison - Earn 70% APR for 9 months',
       highlight: true
     },
     { 
-      name: '24 Months', 
-      apr: '70%', 
-      lockPeriod: '24 months', 
-      multiplier: '3x',
-      description: 'Maximum rewards & governance',
+      name: '24 Months (Diamond Hands)', 
+      apr: '90%', 
+      lockPeriod: '24 months cliff', 
+      multiplier: '2.5x',
+      description: 'Diamond Hands - 90% APR after 9th month',
       highlight: true
     },
   ];
@@ -44,12 +44,59 @@ export default function StakingPage() {
     'Governance voting power (multiplied by tier)',
     'No early unstaking allowed (maintains scarcity)',
     '7-day cooldown after lock expires (security measure)',
-    'Rewards paid in $JY + protocol revenue (USDC/ETH)',
+    'Rewards paid in $JY + protocol revenue in USDC',
+    'OG perks: 2.5x APY multipliers for early stakers',
+    'Whale Laddering: Top 12 wallets earn 120K bonus JY',
   ];
 
   return (
-    <div className="min-h-screen bg-black py-20">
-      <div className="container mx-auto px-4 max-w-7xl">
+    <div className="min-h-screen bg-black py-20 relative overflow-hidden">
+      {/* Animated Background - Mining Treasury */}
+      <div className="absolute inset-0 pointer-events-none opacity-30 z-0">
+        <svg className="absolute w-full h-full" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <g className="animate-pulse-slow">
+            <ellipse cx="600" cy="450" rx="130" ry="150" fill="url(#bagGradient)" opacity="0.6" />
+            <path d="M 540 360 Q 600 320 660 360 L 660 480 Q 600 520 540 480 Z" fill="url(#bagGradient)" opacity="0.7" stroke="#FCD34D" strokeWidth="2" />
+            <circle cx="600" cy="380" r="8" fill="#D97706" opacity="0.5" />
+            <circle cx="580" cy="395" r="6" fill="#D97706" opacity="0.5" />
+            <circle cx="620" cy="395" r="6" fill="#D97706" opacity="0.5" />
+            <text x="600" y="450" textAnchor="middle" fill="#FCD34D" fontSize="42" fontWeight="bold" opacity="0.8">JY</text>
+          </g>
+          <g className="token-from-top"><circle cx="600" cy="50" r="18" fill="#FCD34D" opacity="0.7" stroke="#F59E0B" strokeWidth="2"><animateTransform attributeName="transform" type="translate" values="0 0; 0 400; 0 400" dur="4s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.9;0" dur="4s" repeatCount="indefinite" /></circle></g>
+          <g className="token-from-left"><circle cx="50" cy="450" r="18" fill="#FBBF24" opacity="0.7" stroke="#F59E0B" strokeWidth="2"><animateTransform attributeName="transform" type="translate" values="0 0; 550 0; 550 0" dur="4.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.9;0" dur="4.5s" repeatCount="indefinite" /></circle></g>
+          <g className="token-from-right"><circle cx="1150" cy="450" r="18" fill="#FCD34D" opacity="0.7" stroke="#F59E0B" strokeWidth="2"><animateTransform attributeName="transform" type="translate" values="0 0; -550 0; -550 0" dur="5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.9;0" dur="5s" repeatCount="indefinite" /></circle></g>
+          <g className="token-from-bottom"><circle cx="600" cy="750" r="18" fill="#FBBF24" opacity="0.7" stroke="#F59E0B" strokeWidth="2"><animateTransform attributeName="transform" type="translate" values="0 0; 0 -300; 0 -300" dur="4.2s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.9;0" dur="4.2s" repeatCount="indefinite" /></circle></g>
+          <g className="token-diagonal-1"><circle cx="200" cy="100" r="15" fill="#FCD34D" opacity="0.6" stroke="#F59E0B" strokeWidth="1.5"><animateTransform attributeName="transform" type="translate" values="0 0; 400 350; 400 350" dur="4.8s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.8;0" dur="4.8s" repeatCount="indefinite" /></circle></g>
+          <g className="token-diagonal-2"><circle cx="1000" cy="100" r="15" fill="#FBBF24" opacity="0.6" stroke="#F59E0B" strokeWidth="1.5"><animateTransform attributeName="transform" type="translate" values="0 0; -400 350; -400 350" dur="5.2s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.8;0" dur="5.2s" repeatCount="indefinite" /></circle></g>
+          <g className="token-diagonal-3"><circle cx="250" cy="700" r="15" fill="#FCD34D" opacity="0.6" stroke="#F59E0B" strokeWidth="1.5"><animateTransform attributeName="transform" type="translate" values="0 0; 350 -250; 350 -250" dur="4.6s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.8;0" dur="4.6s" repeatCount="indefinite" /></circle></g>
+          <g className="token-diagonal-4"><circle cx="950" cy="700" r="15" fill="#FBBF24" opacity="0.6" stroke="#F59E0B" strokeWidth="1.5"><animateTransform attributeName="transform" type="translate" values="0 0; -350 -250; -350 -250" dur="5.4s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.8;0" dur="5.4s" repeatCount="indefinite" /></circle></g>
+          <g className="animate-bounce-slow">
+            <ellipse cx="400" cy="470" rx="35" ry="25" fill="url(#handGradient)" opacity="0.6" />
+            <path d="M 370 450 Q 365 470 380 485 L 420 480 Q 425 465 410 450 Z" fill="url(#handGradient)" opacity="0.7" stroke="#FBBF24" strokeWidth="1.5"><animateTransform attributeName="transform" type="translate" values="0 0; 30 -15; 0 0" dur="2s" repeatCount="indefinite" /></path>
+            <rect x="415" y="450" width="8" height="20" rx="4" fill="#FCD34D" opacity="0.5" />
+            <rect x="405" y="455" width="8" height="18" rx="4" fill="#FCD34D" opacity="0.5" />
+          </g>
+          <g className="animate-bounce-slow">
+            <ellipse cx="800" cy="470" rx="35" ry="25" fill="url(#handGradient)" opacity="0.6" />
+            <path d="M 830 450 Q 835 470 820 485 L 780 480 Q 775 465 790 450 Z" fill="url(#handGradient)" opacity="0.7" stroke="#FBBF24" strokeWidth="1.5"><animateTransform attributeName="transform" type="translate" values="0 0; -30 -15; 0 0" dur="2.3s" repeatCount="indefinite" /></path>
+            <rect x="777" y="450" width="8" height="20" rx="4" fill="#FCD34D" opacity="0.5" />
+            <rect x="787" y="455" width="8" height="18" rx="4" fill="#FCD34D" opacity="0.5" />
+          </g>
+          <defs>
+            <linearGradient id="bagGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#F59E0B" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#D97706" stopOpacity="0.6" />
+            </linearGradient>
+            <linearGradient id="handGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FDE68A" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#FCD34D" stopOpacity="0.6" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div className="container mx-auto px-4 max-w-7xl relative z-10">
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -61,10 +108,10 @@ export default function StakingPage() {
             <span className="gradient-text">Staking Rewards</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-4 max-w-3xl mx-auto">
-            Earn up to 70% APR by staking $JY tokens
+            Earn up to 90% APR by staking $JY tokens
           </p>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Real yield backed by platform revenue, not inflation
+            70% APR for 9 months, then 90% APR for 24-month Diamond Hands. Real yield backed by platform revenue.
           </p>
         </motion.div>
 
@@ -76,19 +123,19 @@ export default function StakingPage() {
           className="grid md:grid-cols-3 gap-6 mb-16"
         >
           <div className="bg-gradient-to-br from-primary-600/20 to-primary-400/20 border border-primary-500/50 rounded-2xl p-8 text-center">
-            <div className="text-5xl font-bold gradient-text mb-3">70%</div>
+            <div className="text-5xl font-bold gradient-text mb-3">90%</div>
             <div className="text-xl text-white mb-2">Max APR</div>
-            <div className="text-sm text-gray-400">24-month lock</div>
+            <div className="text-sm text-gray-400">After 9th month for 24-month stakers</div>
           </div>
           <div className="bg-gradient-to-br from-accent-600/20 to-accent-400/20 border border-accent-500/50 rounded-2xl p-8 text-center">
-            <div className="text-5xl font-bold gradient-text mb-3">1.8M</div>
-            <div className="text-xl text-white mb-2">Reward Pool</div>
-            <div className="text-sm text-gray-400">36% of supply (5 years)</div>
+            <div className="text-5xl font-bold gradient-text mb-3">1.1M</div>
+            <div className="text-xl text-white mb-2">Ecosystem Pool</div>
+            <div className="text-sm text-gray-400">18.3% of supply (48 months)</div>
           </div>
           <div className="bg-gradient-to-br from-green-600/20 to-green-400/20 border border-green-500/50 rounded-2xl p-8 text-center">
-            <div className="text-5xl font-bold text-green-400 mb-3">3x</div>
+            <div className="text-5xl font-bold text-green-400 mb-3">2.5x</div>
             <div className="text-xl text-white mb-2">Voting Power</div>
-            <div className="text-sm text-gray-400">Top tier stakers</div>
+            <div className="text-sm text-gray-400">Diamond Hands stakers</div>
           </div>
         </motion.div>
 
@@ -197,24 +244,24 @@ export default function StakingPage() {
           className="bg-gray-900 border border-gray-800 rounded-2xl p-8 mb-16"
         >
           <h2 className="text-3xl font-bold text-white mb-6 text-center">Real Yield Sources</h2>
-          <p className="text-gray-400 text-center mb-8">Rewards funded by actual revenue, not token inflation</p>
+          <p className="text-gray-400 text-center mb-8">Rewards funded by actual revenue, not token inflation:</p>
           <div className="grid md:grid-cols-3 gap-6">
+            <div className="p-6 bg-gray-800/50 rounded-lg text-center">
+              <div className="text-4xl mb-4">🎁</div>
+              <h3 className="text-xl font-bold text-accent-400 mb-3">Ecosystem Fund</h3>
+              <p className="text-gray-300 mb-2">1.1M $JY dedicated reward pool</p>
+              <p className="text-sm text-gray-400">Vested over 48 months</p>
+            </div>
             <div className="p-6 bg-gray-800/50 rounded-lg text-center">
               <div className="text-4xl mb-4">💰</div>
               <h3 className="text-xl font-bold text-primary-400 mb-3">Protocol Revenue</h3>
               <p className="text-gray-300 mb-2">Platform fees & transaction revenue</p>
-              <p className="text-sm text-gray-400">Paid in USDC/ETH</p>
+              <p className="text-sm text-gray-400">Paid in USDC</p>
             </div>
             <div className="p-6 bg-gray-800/50 rounded-lg text-center">
-              <div className="text-4xl mb-4">🎁</div>
-              <h3 className="text-xl font-bold text-accent-400 mb-3">Ecosystem Fund</h3>
-              <p className="text-gray-300 mb-2">1.8M $JY dedicated reward pool</p>
-              <p className="text-sm text-gray-400">Vested over 5+ years</p>
-            </div>
-            <div className="p-6 bg-gray-800/50 rounded-lg text-center">
-              <div className="text-4xl mb-4">�</div>
+              <div className="text-4xl mb-4">🔄</div>
               <h3 className="text-xl font-bold text-green-400 mb-3">Buyback Revenue</h3>
-              <p className="text-gray-300 mb-2">50% of platform revenue</p>
+              <p className="text-gray-300 mb-2">25% of platform revenue</p>
               <p className="text-sm text-gray-400">Used for buyback & distribution</p>
             </div>
           </div>
@@ -243,8 +290,8 @@ export default function StakingPage() {
               <p className="text-gray-300">After lock expires, mandatory 7-day unstaking period prevents rapid market exits.</p>
             </div>
             <div className="p-6 bg-black/30 rounded-lg">
-              <h3 className="text-xl font-bold text-green-400 mb-3">🔐 CertiK Audited</h3>
-              <p className="text-gray-300">Smart contracts audited by CertiK, industry-leading blockchain security firm.</p>
+              <h3 className="text-xl font-bold text-green-400 mb-3">🔐 Cyberscope Audited</h3>
+              <p className="text-gray-300">Smart contracts to be audited by Cyberscope, industry-leading blockchain security firm.</p>
             </div>
             <div className="p-6 bg-black/30 rounded-lg">
               <h3 className="text-xl font-bold text-blue-400 mb-3">📊 100% Transparent</h3>

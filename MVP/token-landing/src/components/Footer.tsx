@@ -11,10 +11,10 @@ export default function Footer() {
       { name: 'Whitepaper', href: '/whitepaper' },
     ],
     community: [
-      { name: 'Ambassador Program', href: '/ambassador' },
+      { name: 'OG Champs', href: '/ambassador' },
+      { name: 'Bounties', href: '/bounty' },
+      { name: 'Dashboard', href: '/dashboard' },
       { name: 'Careers', href: '/careers' },
-      { name: 'Twitter', href: 'https://twitter.com/coindaily001' },
-      { name: 'Telegram', href: 'https://t.me/coindailynewz' },
     ],
     resources: [
       { name: 'How to Buy', href: '/#how-to-buy' },
@@ -22,14 +22,18 @@ export default function Footer() {
       { name: 'FAQs', href: '/faq' },
       { name: 'Contact', href: '/contact' },
     ],
+    social: [
+      { name: 'Twitter', href: 'https://twitter.com/coindaily001' },
+      { name: 'Telegram', href: 'https://t.me/coindailynewz' },
+    ],
   };
 
   return (
     <footer className="bg-gray-900 border-t border-gray-800 py-12">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
-          <div>
+          <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xl">JY</span>
@@ -87,9 +91,20 @@ export default function Footer() {
             <ul className="space-y-2">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-gray-400 hover:text-primary-500 transition-colors text-sm">
-                    {link.name}
-                  </Link>
+                  {link.href.startsWith('http') ? (
+                    <a 
+                      href={link.href} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-gray-400 hover:text-primary-500 transition-colors text-sm"
+                    >
+                      {link.name}
+                    </a>
+                  ) : (
+                    <Link href={link.href} className="text-gray-400 hover:text-primary-500 transition-colors text-sm">
+                      {link.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

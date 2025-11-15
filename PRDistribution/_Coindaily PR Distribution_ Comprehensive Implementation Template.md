@@ -685,7 +685,7 @@ Table 2: Custom DA Factors and Weights (Example)
    * Affiliate Bypass: Conditional skips in contracts.  
 3. **Challenges/Risks**:  
    * Risk: Smart contract bugs leading to fund loss—e.g., reentrancy attacks.  
-     * Solution: Audit via firms like Certik; use OpenZeppelin libraries for secure escrow.  
+     * Solution: Audit via firms like Cyberscope; use OpenZeppelin libraries for secure escrow.  
    * Risk: Scalability—Polygon TPS limits for millions of txs.  
      * Solution: Batch distributions; layer-2 rollups; monitor gas fees.
 

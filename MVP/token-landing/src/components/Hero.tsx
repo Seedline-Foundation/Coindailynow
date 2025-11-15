@@ -27,7 +27,7 @@ export default function Hero() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
             </span>
-            <span className="font-bold text-sm">ONLY 5M SUPPLY • $11.4B MARKET OPPORTUNITY</span>
+            <span className="font-bold text-sm">ONLY 6M SUPPLY • ONLY 4M EVER CIRCULATING</span>
           </motion.div>
 
           {/* Main Headline */}
@@ -37,9 +37,9 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
           >
-            <span className="gradient-text">Powering Africa's Largest</span>
+            <span className="gradient-text">Africa's Largest Web3</span>
             <br />
-            <span className="text-white">Web3 Distribution Network</span>
+            <span className="text-white">PR & Ad Distribution Network</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -49,8 +49,8 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto"
           >
-            The exclusive payment token for <span className="text-primary-500 font-bold">21.1M publisher partnerships</span> across Africa's booming crypto market. 
-            Real infrastructure. Real utility. <span className="text-accent-500 font-bold">Up to 70% APR</span> from protocol revenue.
+            Connecting crypto industry with <span className="text-primary-500 font-bold">premium publishers</span> across global explosive Web3 market. 
+            <span className="text-accent-500 font-bold"> Up to 90% APR</span>. Real revenue. Zero VCs. Built by the community.
           </motion.p>
 
           {/* Key Stats */}
@@ -61,19 +61,19 @@ export default function Hero() {
             className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 max-w-4xl mx-auto"
           >
             <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
-              <p className="text-3xl font-bold text-primary-500">21.1M</p>
-              <p className="text-gray-400 text-sm">Target Partnerships</p>
+              <p className="text-3xl font-bold text-primary-500">6M</p>
+              <p className="text-gray-400 text-sm">Total Supply</p>
             </div>
             <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
-              <p className="text-3xl font-bold text-accent-500">$11.4B</p>
-              <p className="text-gray-400 text-sm">Market TAM</p>
+              <p className="text-3xl font-bold text-accent-500">4M</p>
+              <p className="text-gray-400 text-sm">Ever Circulating</p>
             </div>
             <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
-              <p className="text-3xl font-bold text-green-500">5M</p>
-              <p className="text-gray-400 text-sm">Fixed Supply</p>
+              <p className="text-3xl font-bold text-green-500">1.7M</p>
+              <p className="text-gray-400 text-sm">Presale Tokens</p>
             </div>
             <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
-              <p className="text-3xl font-bold text-blue-500">70%</p>
+              <p className="text-3xl font-bold text-blue-500">90%</p>
               <p className="text-gray-400 text-sm">Max APR</p>
             </div>
           </motion.div>

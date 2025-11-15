@@ -25,12 +25,12 @@ export default function WhyJoyToken() {
     {
       icon: CurrencyDollarIcon,
       title: 'Real Yield from Network Fees',
-      description: 'Earn up to 70% APR from actual platform transaction fees, not inflation. As distribution volume scales to millions of PRs monthly, so do stakeholder returns.',
+      description: 'Earn up to 90% APR from actual platform transaction fees, not inflation. As distribution volume scales to millions of PRs monthly, so do stakeholder returns.',
     },
     {
       icon: ChartBarIcon,
       title: 'Network Effect Economics',
-      description: 'Metcalfe\'s Law in action: value grows exponentially as network scales. 21M partnerships × transaction velocity = compounding token demand against 5M fixed supply.',
+      description: 'Metcalfe\'s Law in action: value grows exponentially as network scales. 21M partnerships × transaction velocity = compounding token demand against 6M fixed supply.',
     },
     {
       icon: GlobeAltIcon,
@@ -107,7 +107,7 @@ export default function WhyJoyToken() {
             <div>
               <p className="mb-4">
                 <span className="text-accent-500 font-bold">→</span> Joy Token is the exclusive payment method—
-                no fiat, no alternatives. Every transaction flows through our 5M token supply.
+                no fiat, no alternatives. Every transaction flows through our 6M token supply.
               </p>
               <p>
                 <span className="text-accent-500 font-bold">→</span> Early holders capture exponential value: 

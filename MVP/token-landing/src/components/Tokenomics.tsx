@@ -10,21 +10,23 @@ export default function Tokenomics() {
   const isInView = useInView(ref, { once: true });
 
   const allocationData = [
-    { name: 'Ecosystem & Staking', value: 36, amount: '1,800,000', color: '#f97316' },
-    { name: 'Reserve Fund', value: 20, amount: '1,000,000', color: '#d946ef' },
-    { name: 'Public Sale', value: 16, amount: '800,000', color: '#3b82f6' },
-    { name: 'Team & Advisors', value: 13.54, amount: '677,000', color: '#10b981' },
-    { name: 'Seed Investors', value: 10, amount: '500,000', color: '#f59e0b' },
-    { name: 'Liquidity Lock', value: 4.46, amount: '223,000', color: '#8b5cf6' },
+    { name: 'Public Sale', value: 28.3, amount: '1,700,000', color: '#3b82f6' },
+    { name: 'Treasury', value: 23.3, amount: '1,400,000', color: '#d946ef' },
+    { name: 'Ecosystem', value: 18.3, amount: '1,100,000', color: '#f97316' },
+    { name: 'Team', value: 11.7, amount: '700,000', color: '#10b981' },
+    { name: 'Legal', value: 8.3, amount: '500,000', color: '#f59e0b' },
+    { name: 'Liquidity', value: 5, amount: '300,000', color: '#8b5cf6' },
+    { name: 'Seed', value: 5, amount: '300,000', color: '#06b6d4' },
   ];
 
   const vestingSchedule = [
-    { category: 'Public Sale', vesting: '100% unlocked at launch', cliff: 'None' },
-    { category: 'Liquidity Lock', vesting: 'Locked permanently', cliff: 'Permanent' },
-    { category: 'Ecosystem & Staking', vesting: '5+ years linear', cliff: 'None' },
-    { category: 'Team & Advisors', vesting: '3 years linear', cliff: '1 year' },
-    { category: 'Seed Investors', vesting: 'Linear over remaining period', cliff: '6-12 months' },
-    { category: 'Reserve Fund', vesting: '10 years quarterly (DAO controlled)', cliff: '2 years' },
+    { category: 'Public Sale', vesting: '9-month cliff, 24-month linear', cliff: '9 months' },
+    { category: 'Liquidity', vesting: 'Locked permanently', cliff: 'Permanent' },
+    { category: 'Ecosystem', vesting: '48-month linear (60% in 10-year sinkhole)', cliff: 'None' },
+    { category: 'Team', vesting: '4-year linear', cliff: '24 months' },
+    { category: 'Seed', vesting: '12-month linear', cliff: '9 months' },
+    { category: 'Treasury', vesting: '10-year sinkhole (2-year start)', cliff: '2 years' },
+    { category: 'Legal', vesting: 'Monthly (6-month start) + quarterly (12-month start)', cliff: '6-12 months' },
   ];
 
   return (
@@ -52,19 +54,19 @@ export default function Tokenomics() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 max-w-5xl mx-auto"
         >
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
-            <p className="text-5xl font-bold gradient-text mb-2">5,000,000</p>
+            <p className="text-5xl font-bold gradient-text mb-2">6,000,000</p>
             <p className="text-gray-400 mb-2">Total Max Supply</p>
-            <p className="text-sm text-primary-500 font-semibold">No More Can Ever Be Minted</p>
+            <p className="text-sm text-primary-500 font-semibold">Only 4M Will Ever Circulate</p>
           </div>
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
-            <p className="text-5xl font-bold gradient-text mb-2">800,000</p>
+            <p className="text-5xl font-bold gradient-text mb-2">1,700,000</p>
             <p className="text-gray-400 mb-2">Public Sale Allocation</p>
-            <p className="text-sm text-accent-500 font-semibold">16% of Total Supply</p>
+            <p className="text-sm text-accent-500 font-semibold">28.3% of Total Supply</p>
           </div>
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
-            <p className="text-5xl font-bold gradient-text mb-2">$350K</p>
-            <p className="text-gray-400 mb-2">Fundraising Target</p>
-            <p className="text-sm text-green-500 font-semibold">All Allocated to Growth</p>
+            <p className="text-5xl font-bold gradient-text mb-2">$917K</p>
+            <p className="text-gray-400 mb-2">Presale Target</p>
+            <p className="text-sm text-green-500 font-semibold">100% Community-Funded</p>
           </div>
         </motion.div>
 
@@ -162,37 +164,54 @@ export default function Tokenomics() {
           transition={{ duration: 0.8, delay: 1 }}
           className="mt-12 bg-gradient-to-br from-primary-600/20 to-accent-600/20 border border-primary-500/50 rounded-2xl p-8 max-w-5xl mx-auto"
         >
-          <h3 className="text-2xl font-bold text-white mb-6 text-center">Use of Funds ($350K USDC)</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h3 className="text-2xl font-bold text-white mb-6 text-center">Use of Funds ($917.5K USDC)</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center text-2xl font-bold">57%</div>
+              <div className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center text-lg font-bold">29%</div>
               <div>
                 <p className="text-white font-bold">Liquidity Locking</p>
-                <p className="text-gray-400 text-sm">$200,000 USDC permanently locked</p>
+                <p className="text-gray-400 text-sm">$270K permanently locked</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-accent-500 rounded-full flex items-center justify-center text-2xl font-bold">14%</div>
+              <div className="w-16 h-16 bg-accent-500 rounded-full flex items-center justify-center text-lg font-bold">33%</div>
+              <div>
+                <p className="text-white font-bold">CEX Listings</p>
+                <p className="text-gray-400 text-sm">$300K MEXC + Bybit</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-lg font-bold">13%</div>
+              <div>
+                <p className="text-white font-bold">12-Month Runway</p>
+                <p className="text-gray-400 text-sm">$120K operations</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center text-lg font-bold">11%</div>
+              <div>
+                <p className="text-white font-bold">Marketing</p>
+                <p className="text-gray-400 text-sm">$100K growth campaigns</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-lg font-bold">5%</div>
               <div>
                 <p className="text-white font-bold">Legal & Compliance</p>
-                <p className="text-gray-400 text-sm">$50,000 USDC for regulatory setup</p>
+                <p className="text-gray-400 text-sm">$50K regulatory setup</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-2xl font-bold">14%</div>
+              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center text-lg font-bold">8%</div>
               <div>
-                <p className="text-white font-bold">MVP Development</p>
-                <p className="text-gray-400 text-sm">$50,000 USDC for platform features</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-2xl font-bold">14%</div>
-              <div>
-                <p className="text-white font-bold">Marketing & Growth</p>
-                <p className="text-gray-400 text-sm">$50,000 USDC for user acquisition</p>
+                <p className="text-white font-bold">Contingencies</p>
+                <p className="text-gray-400 text-sm">$77.5K buffer</p>
               </div>
             </div>
           </div>
+          <p className="text-center text-gray-400 text-sm mt-6">
+            100% community-funded • No VC backing • Full transparency
+          </p>
         </motion.div>
       </div>
     </section>

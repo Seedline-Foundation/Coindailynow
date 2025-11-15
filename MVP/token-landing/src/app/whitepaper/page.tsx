@@ -199,22 +199,23 @@ export default function WhitepaperPage() {
               support across 13+ African countries.
             </p>
             <div className="grid md:grid-cols-3 gap-6 my-8">
-              <StatBox label="Max Supply" value="5,000,000 JY" highlight />
-              <StatBox label="Target Network" value="21.1M Partners" highlight />
+              <StatBox label="Max Supply" value="6,000,000 JY" highlight />
+              <StatBox label="Ever Circulating" value="4,000,000 JY" highlight />
               <StatBox label="Market Opportunity" value="$11.4B TAM" highlight />
             </div>
             <p className="text-gray-300 mb-4">
               Unlike speculative tokens, JY derives mandatory demand from infrastructure-level utility: every PR 
-              distribution, ad placement, and partnership transaction across our 21.1 million target partnerships 
-              requires Joy Token. Our revenue model combines platform transaction fees (from distribution network) 
-              with premium content subscriptions, funding industry-leading staking rewards up to 70% APR.
+              distribution, ad placement, and partnership transaction across our distribution network 
+              requires Joy Token. With only 4M tokens ever circulating from a 6M supply, extreme scarcity is built into the model. 
+              Our revenue model combines platform transaction fees with premium content subscriptions, funding industry-leading staking rewards up to 90% APR.
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-300">
-              <li><strong className="text-white">Infrastructure Monopoly:</strong> Exclusive payment token for the largest Web3 distribution network in Africa</li>
+              <li><strong className="text-white">Infrastructure Monopoly:</strong> Exclusive payment token for the largest Web3 PR distribution network in Africa</li>
               <li><strong className="text-white">$11.4B Market:</strong> Targeting combined $7.2B PR distribution + $4.2B crypto advertising markets</li>
-              <li><strong className="text-white">Extreme Scarcity:</strong> Only 5M tokens for 21.1M partnerships—built-in supply shock</li>
-              <li><strong className="text-white">Real Yield Model:</strong> Staking rewards from actual transaction fees, not inflation (up to 70% APR)</li>
-              <li><strong className="text-white">Network Effects:</strong> Value compounds exponentially as partnerships scale from 10K to 21M</li>
+              <li><strong className="text-white">Extreme Scarcity:</strong> Only 6M total supply, with only 4M ever circulating—built-in supply shock</li>
+              <li><strong className="text-white">Real Yield Model:</strong> Staking rewards from actual transaction fees, not inflation (up to 90% APR)</li>
+              <li><strong className="text-white">Community-Funded:</strong> Zero VCs. 100% funded by the community through transparent presale</li>
+              <li><strong className="text-white">Network Effects:</strong> Value compounds exponentially as distribution network scales</li>
             </ul>
           </Section>
 
@@ -384,11 +385,11 @@ export default function WhitepaperPage() {
                 Security Measures
               </h4>
               <ul className="space-y-2 text-gray-300">
-                <li>✓ Audited by CertiK (Q1 2026)</li>
+                <li>✓ Audited by Cyberscope (Q1 2026)</li>
                 <li>✓ Multi-signature wallet for treasury (3/5)</li>
                 <li>✓ Timelock on governance actions (48 hours)</li>
                 <li>✓ Bug bounty program ($50K pool)</li>
-                <li>✓ Gradual decentralization plan</li>
+                <li>✓ Balanced governance with community participation</li>
               </ul>
             </div>
           </Section>
@@ -399,12 +400,13 @@ export default function WhitepaperPage() {
               <div>
                 <h3 className="text-2xl font-bold mb-4 text-primary-400">Supply Distribution</h3>
                 <div className="space-y-3">
-                  <AllocationBar label="Ecosystem & Staking" percentage={36} amount="1,800,000 JY" />
-                  <AllocationBar label="Reserve Fund" percentage={20} amount="1,000,000 JY" />
-                  <AllocationBar label="Public Sale" percentage={16} amount="800,000 JY" />
-                  <AllocationBar label="Team & Advisors" percentage={13.34} amount="667,000 JY" />
-                  <AllocationBar label="Seed Investors" percentage={10} amount="500,000 JY" />
-                  <AllocationBar label="Liquidity" percentage={4.46} amount="223,000 JY" />
+                  <AllocationBar label="Public Sale" percentage={28.3} amount="1,700,000 JY" />
+                  <AllocationBar label="Treasury" percentage={23.3} amount="1,400,000 JY" />
+                  <AllocationBar label="Ecosystem" percentage={18.3} amount="1,100,000 JY" />
+                  <AllocationBar label="Team" percentage={11.7} amount="700,000 JY" />
+                  <AllocationBar label="Legal" percentage={8.3} amount="500,000 JY" />
+                  <AllocationBar label="Liquidity" percentage={5} amount="300,000 JY" />
+                  <AllocationBar label="Seed" percentage={5} amount="300,000 JY" />
                 </div>
               </div>
 
@@ -413,40 +415,49 @@ export default function WhitepaperPage() {
                 <div className="space-y-4 text-gray-300">
                   <VestingItem 
                     category="Public Sale" 
-                    schedule="100% unlocked at TGE (Token Generation Event)"
-                  />
-                  <VestingItem 
-                    category="Team & Advisors" 
-                    schedule="4-year vest, 1-year cliff (3.125% quarterly)"
-                  />
-                  <VestingItem 
-                    category="Seed Investors" 
-                    schedule="2-year vest, 6-month cliff (6.25% quarterly)"
-                  />
-                  <VestingItem 
-                    category="Reserve Fund" 
-                    schedule="10-year vest, 2-year cliff (2.5% quarterly)"
-                  />
-                  <VestingItem 
-                    category="Ecosystem" 
-                    schedule="Released based on platform milestones"
+                    schedule="9-month cliff, then 24-month linear vesting"
                   />
                   <VestingItem 
                     category="Liquidity" 
-                    schedule="Locked on PinkSale for 1 year"
+                    schedule="Locked permanently (paired with $270K USDC)"
+                  />
+                  <VestingItem 
+                    category="Ecosystem" 
+                    schedule="48-month linear (60% committed to 10-year sinkhole)"
+                  />
+                  <VestingItem 
+                    category="Team" 
+                    schedule="24-month cliff, then 4-year linear vesting"
+                  />
+                  <VestingItem 
+                    category="Seed" 
+                    schedule="9-month cliff, then 12-month linear vesting"
+                  />
+                  <VestingItem 
+                    category="Treasury" 
+                    schedule="1M in 10-year sinkhole (2-year start), 400K for runway (6-month start)"
+                  />
+                  <VestingItem 
+                    category="Legal" 
+                    schedule="100K monthly after 6 months, 400K quarterly after 12 months"
                   />
                 </div>
               </div>
             </div>
 
             <div className="mt-8 p-6 bg-gradient-to-r from-primary-500/20 to-accent-500/20 rounded-lg border border-primary-500/30">
-              <h4 className="text-2xl font-bold mb-4">Use of Funds ($350K Presale)</h4>
-              <div className="grid md:grid-cols-2 gap-6">
-                <UseOfFunds label="Liquidity Lock" amount="$200,000" percentage={57} />
-                <UseOfFunds label="Legal & Compliance" amount="$50,000" percentage={14} />
-                <UseOfFunds label="Platform Development" amount="$50,000" percentage={14} />
-                <UseOfFunds label="Marketing & Growth" amount="$50,000" percentage={14} />
+              <h4 className="text-2xl font-bold mb-4">Use of Funds ($917.5K USDC)</h4>
+              <div className="grid md:grid-cols-3 gap-6">
+                <UseOfFunds label="Liquidity Locking" amount="$270K" percentage={29} />
+                <UseOfFunds label="CEX Listings" amount="$300K" percentage={33} />
+                <UseOfFunds label="12-Month Runway" amount="$120K" percentage={13} />
+                <UseOfFunds label="Marketing" amount="$100K" percentage={11} />
+                <UseOfFunds label="Legal & Compliance" amount="$50K" percentage={5} />
+                <UseOfFunds label="Contingencies" amount="$77.5K" percentage={8} />
               </div>
+              <p className="text-center text-gray-400 text-sm mt-6">
+                100% community-funded • No VC backing • Full transparency
+              </p>
             </div>
           </Section>
 
@@ -458,34 +469,34 @@ export default function WhitepaperPage() {
 
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <StakingTier
-                name="Flexible"
-                apr="2%"
-                lockPeriod="None"
-                govMultiplier="1x"
-                description="Unstake anytime with no penalties. Perfect for liquidity-conscious holders."
+                name="Flexible (7 days)"
+                apr="1%"
+                lockPeriod="7 days"
+                govMultiplier="0x"
+                description="Minimal lock with minimal rewards. Perfect for short-term liquidity needs."
               />
               <StakingTier
                 name="6-Month Lock"
-                apr="8%"
+                apr="10%"
                 lockPeriod="180 days"
-                govMultiplier="1.5x"
-                description="Moderate commitment with boosted rewards and governance power."
+                govMultiplier="1.2x"
+                description="Moderate commitment with steady rewards and increased governance power."
               />
               <StakingTier
-                name="12-Month Lock"
-                apr="30%"
-                lockPeriod="365 days"
-                govMultiplier="2x"
+                name="9-Month Lock"
+                apr="70%"
+                lockPeriod="270 days"
+                govMultiplier="1.5x"
                 popular
-                description="Most popular tier. Strong APR with doubled voting power."
+                description="Whale Prison tier with significantly boosted APR and governance weight."
               />
               <StakingTier
                 name="24-Month Lock"
-                apr="70%"
+                apr="90%"
                 lockPeriod="730 days"
-                govMultiplier="3x"
+                govMultiplier="2.5x"
                 popular
-                description="Maximum rewards for long-term believers. Triple governance weight."
+                description="Diamond Hands tier. Maximum rewards (90% APR after 9th month) with 2.5x governance weight."
               />
             </div>
 
@@ -505,13 +516,14 @@ export default function WhitepaperPage() {
             </div>
 
             <div className="p-6 bg-gray-900 rounded-lg">
-              <h4 className="text-xl font-bold mb-4 text-primary-400">Example: 12-Month Staking</h4>
+              <h4 className="text-xl font-bold mb-4 text-primary-400">Example: 24-Month Staking (Diamond Hands)</h4>
               <div className="space-y-2 text-gray-300">
                 <p>• Stake: 10,000 JY tokens</p>
-                <p>• Lock Period: 365 days</p>
-                <p>• Target APR: 30%</p>
-                <p className="text-white font-semibold">→ Expected Rewards: 3,000 JY ($600 at $0.20/token)</p>
-                <p className="text-accent-400">→ Governance Power: 20,000 votes (2x multiplier)</p>
+                <p>• Lock Period: 730 days (24 months)</p>
+                <p>• Target APR: 90% (after 9th month)</p>
+                <p className="text-white font-semibold">→ Expected Rewards: 9,000 JY ($1,800 at $0.20/token)</p>
+                <p className="text-accent-400">→ Governance Power: 25,000 votes (2.5x multiplier)</p>
+                <p className="text-sm text-gray-500 mt-4">* Rewards come from platform revenue, not inflation</p>
               </div>
             </div>
           </Section>
@@ -519,44 +531,64 @@ export default function WhitepaperPage() {
           {/* Governance */}
           <Section id="governance" icon={<UserGroupIcon />} title="Governance">
             <p className="text-gray-300 mb-6">
-              Joy Token implements a progressive decentralization model, gradually shifting control to the community.
+              Joy Token implements a balanced governance model combining community participation with core team oversight for long-term platform stability and security.
             </p>
 
             <div className="space-y-6">
               <PhaseCard
-                phase="Phase 1: Launch (0-6 months)"
+                phase="Phase 1: Foundation (0-6 months)"
                 description="Core team retains governance control with emergency veto power. Focus on stability and security."
                 rights={[
                   'Community can submit proposals',
                   'Core team votes on behalf of treasury',
-                  'Emergency multisig active'
+                  'Emergency multisig active',
+                  'Building governance infrastructure'
                 ]}
               />
 
               <PhaseCard
-                phase="Phase 2: Transition (6-18 months)"
-                description="Community voting goes live. Core team veto power reduced to critical security issues only."
+                phase="Phase 2: Community Voting (6+ months)"
+                description="Community voting goes live. Core team retains veto power for critical security issues to ensure platform stability."
                 rights={[
-                  'Token holders vote directly',
+                  'Token holders vote directly on proposals',
                   '10,000 JY threshold to submit proposals',
                   '7-day voting period',
-                  'Simple majority (>50%) to pass'
-                ]}
-              />
-
-              <PhaseCard
-                phase="Phase 3: Full Decentralization (18+ months)"
-                description="Complete community control. Team multisig disbanded. On-chain governance only."
-                rights={[
-                  'No team veto power',
-                  'Time-weighted voting (longer stakes = more weight)',
-                  'Treasury controlled by governance',
-                  'On-chain execution of proposals'
+                  'Simple majority (>50%) to pass',
+                  'Core team maintains emergency veto power'
                 ]}
               />
             </div>
 
-            <div className="mt-8 p-6 bg-gray-800/50 rounded-lg">
+            <div className="mt-8 p-6 bg-gradient-to-r from-primary-500/20 to-accent-500/20 rounded-lg border border-primary-500/30">
+              <h4 className="text-xl font-bold mb-4 text-white">🏆 Token Holder Benefits</h4>
+              <p className="text-gray-300 mb-4">
+                Joy Token holders are valued partners in the ecosystem with permanent governance rights and recognition:
+              </p>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start gap-2">
+                  <span className="text-primary-400 font-bold">✓</span>
+                  <span><strong className="text-white">Everlasting Voting Power</strong> - Your voice matters in every major platform decision</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary-400 font-bold">✓</span>
+                  <span><strong className="text-white">Governance Multipliers</strong> - Longer stakes = greater voting weight (up to 2.5x)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary-400 font-bold">✓</span>
+                  <span><strong className="text-white">Community Recognition</strong> - Top contributors celebrated and highlighted</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary-400 font-bold">✓</span>
+                  <span><strong className="text-white">Executive Opportunities</strong> - Highly engaged holders can join core team roles as platform matures</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary-400 font-bold">✓</span>
+                  <span><strong className="text-white">Direct Platform Influence</strong> - Shape the future of Africa's premier crypto news platform</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="mt-6 p-6 bg-gray-800/50 rounded-lg">
               <h4 className="text-xl font-bold mb-4 text-accent-400">Governance Scope</h4>
               <p className="text-gray-300 mb-4">Token holders can vote on:</p>
               <ul className="grid md:grid-cols-2 gap-3 text-gray-300">
@@ -585,6 +617,9 @@ export default function WhitepaperPage() {
                   Regional expansion plans
                 </li>
               </ul>
+              <p className="text-sm text-gray-500 mt-4 italic">
+                * Core team retains veto power to ensure platform security and long-term stability
+              </p>
             </div>
           </Section>
 
@@ -596,7 +631,7 @@ export default function WhitepaperPage() {
                 status="CURRENT"
                 milestones={[
                   { title: 'Token Smart Contracts Development', done: true },
-                  { title: 'Security Audit by CertiK', done: false },
+                  { title: 'Security Audit by Cyberscope', done: false },
                   { title: 'Presale Launch on PinkSale', done: false },
                   { title: 'Community Building & Whitelist', done: false }
                 ]}
@@ -657,13 +692,13 @@ export default function WhitepaperPage() {
             <div className="mt-8 p-6 bg-gray-900 rounded-lg">
               <h4 className="text-xl font-bold mb-4">Team Token Allocation</h4>
               <p className="text-gray-300 mb-4">
-                13.34% of total supply (667,000 JY) allocated to core team with industry-leading vesting:
+                11.7% of total supply (700,000 JY) allocated to core team with industry-leading vesting:
               </p>
               <ul className="space-y-2 text-gray-300">
-                <li>• <strong className="text-white">4-year vesting period</strong> (industry standard is 2 years)</li>
-                <li>• <strong className="text-white">1-year cliff</strong> ensures long-term commitment</li>
-                <li>• <strong className="text-white">Quarterly unlocks</strong> (3.125% every 3 months after cliff)</li>
-                <li>• Tokens locked in multi-sig contract (audited by CertiK)</li>
+                <li>• <strong className="text-white">24-month cliff</strong> ensures long-term commitment</li>
+                <li>• <strong className="text-white">4-year linear vesting</strong> after cliff (industry standard is 2 years)</li>
+                <li>• <strong className="text-white">No early unlocks</strong> - full alignment with long-term success</li>
+                <li>• Tokens locked in multi-sig contract (audited by Cyberscope)</li>
               </ul>
             </div>
           </Section>
@@ -674,7 +709,7 @@ export default function WhitepaperPage() {
               <div className="p-6 bg-gray-800/50 rounded-lg">
                 <h4 className="text-xl font-bold mb-4 text-primary-400">Regulatory Status</h4>
                 <p className="text-gray-300 mb-4">
-                  Joy Token is structured as a utility token with no expectation of profit from the efforts of others. 
+                  Joy Token is structured as a <Link href="/terms" className="text-primary-400 hover:text-primary-300 underline">utility token</Link> with no expectation of profit from the efforts of others. 
                   Token sale conducted under Reg D (506c) exemption for accredited investors and international participants.
                 </p>
                 <ul className="space-y-2 text-gray-300">

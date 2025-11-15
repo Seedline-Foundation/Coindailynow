@@ -1232,7 +1232,7 @@ npx hardhat coverage
 
 ### Smart Contract Security
 
-- [ ] Audit by reputable firm (CertiK, OpenZeppelin, Trail of Bits)
+- [ ] Audit by reputable firm (Cyberscope, OpenZeppelin, Trail of Bits)
 - [ ] Multi-sig wallet for admin functions (Gnosis Safe)
 - [ ] Time-lock for critical parameter changes
 - [ ] Emergency pause mechanism tested
@@ -1347,7 +1347,7 @@ npx hardhat coverage
 - Ethers.js Docs: https://docs.ethers.org
 
 ### Audit Firms
-- CertiK: https://www.certik.com
+- Cyberscope: https://www.cyberscope.io
 - OpenZeppelin: https://www.openzeppelin.com/security-audits
 - Trail of Bits: https://www.trailofbits.com
 

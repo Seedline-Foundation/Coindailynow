@@ -11,8 +11,8 @@ export default function Stats() {
   const stats = [
     { value: '21.1M', label: 'Publisher Partnerships', trend: 'Target by Year 5' },
     { value: '$11.4B', label: 'Market Opportunity', trend: 'PR + Crypto Ads' },
-    { value: '5M', label: 'Fixed Token Supply', trend: 'Never increases' },
-    { value: '70%', label: 'Max Staking APR', trend: 'Real yield model' },
+    { value: '6M', label: 'Fixed Token Supply', trend: 'Never increases' },
+    { value: '90%', label: 'Max Staking APR', trend: 'Real yield model' },
   ];
 
   return (
@@ -52,7 +52,7 @@ export default function Stats() {
             <span className="text-primary-500 font-bold">🎯 The Opportunity:</span> Exclusive payment token for Africa's largest Web3 distribution network
           </p>
           <p className="text-lg text-gray-400">
-            Presale at <span className="text-accent-500 font-bold">$0.25</span> • Estimated launch at <span className="text-green-500 font-bold">$0.90+</span> • Network effects compound value as partnerships scale
+            Presale at <span className="text-accent-500 font-bold">$0.29</span> • Estimated launch at <span className="text-green-500 font-bold">$0.97</span> • Network effects compound value as partnerships scale
           </p>
         </motion.div>
       </div>

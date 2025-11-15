@@ -180,7 +180,7 @@ export default function MarketOpportunity() {
               <h4 className="text-xl font-bold text-white mb-3">Real Revenue, Real Yield</h4>
               <p className="text-gray-400">
                 Staking rewards come directly from platform transaction fees—not inflation. 
-                As network volume grows, so do stakeholder returns. Sustainable up to 70% APR.
+                As network volume grows, so do stakeholder returns. Sustainable up to 90% APR.
               </p>
             </div>
 

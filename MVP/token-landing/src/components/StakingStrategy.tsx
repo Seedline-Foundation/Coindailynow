@@ -10,38 +10,41 @@ export default function StakingStrategy() {
 
   const stakingTiers = [
     {
-      period: 'Flexible',
-      lockup: '7 days notice',
-      apr: '2%',
-      multiplier: '1x',
+      period: '7 Days',
+      lockup: 'Flexible unlock',
+      apr: '1%',
+      multiplier: '0x',
       color: 'from-gray-600 to-gray-700',
-      description: 'Unstake anytime with 7-day cooldown',
+      description: 'Test the waters - Low commitment, low rewards',
+      badge: 'FLEXIBLE',
     },
     {
       period: '6 Months',
       lockup: '6 months cliff',
-      apr: '8%',
-      multiplier: '1.5x',
-      color: 'from-blue-600 to-blue-700',
-      description: 'Medium-term commitment, decent rewards',
+      apr: '10%',
+      multiplier: '1.2x',
+      color: 'from-green-600 to-green-700',
+      description: 'Medium commitment - Steady returns',
+      badge: 'STEADY',
     },
     {
-      period: '12 Months',
-      lockup: '12 months cliff',
-      apr: '30%',
-      multiplier: '2x',
-      color: 'from-primary-600 to-primary-700',
-      description: 'Long-term holder, excellent returns',
-      popular: true,
+      period: '9 Months',
+      lockup: '9 months cliff',
+      apr: '70%',
+      multiplier: '1.5x',
+      color: 'from-blue-600 to-blue-700',
+      description: 'Whale Prison - Earn 70% APR for 9 months',
+      badge: 'WHALE PRISON',
     },
     {
       period: '24 Months',
       lockup: '24 months cliff',
-      apr: '70%',
-      multiplier: '3x',
+      apr: '90%',
+      multiplier: '2.5x',
       color: 'from-accent-600 to-accent-700',
-      description: 'Maximum commitment, maximum rewards',
+      description: 'Diamond Hands - 90% APR after 9th month',
       popular: true,
+      badge: 'DIAMOND HANDS',
     },
   ];
 
@@ -57,13 +60,16 @@ export default function StakingStrategy() {
           <h2 className="text-4xl md:text-6xl font-bold mb-6">
             <span className="gradient-text">Staking Strategy</span>
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-4">
             Real yield rewards from protocol revenue. Choose your commitment level.
+          </p>
+          <p className="text-lg text-primary-400 max-w-2xl mx-auto">
+            <span className="font-bold">Flexible Options:</span> From 7 days at 1% to 24 months at 90% APR. Higher commitment, higher rewards.
           </p>
         </motion.div>
 
         {/* Staking Tiers */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {stakingTiers.map((tier, index) => (
             <motion.div
               key={index}
@@ -72,32 +78,40 @@ export default function StakingStrategy() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               className={`relative bg-gray-900 border ${
                 tier.popular ? 'border-primary-500' : 'border-gray-800'
-              } rounded-2xl p-6 hover:scale-105 transition-all glow-box`}
+              } rounded-2xl p-8 hover:scale-105 transition-all glow-box`}
             >
-              {tier.popular && (
+              {tier.badge && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-primary-500 text-white px-4 py-1 rounded-full text-xs font-bold">
-                    POPULAR
+                  <span className={`${
+                    tier.popular ? 'bg-gradient-to-r from-primary-500 to-accent-500' : 'bg-blue-600'
+                  } text-white px-4 py-1 rounded-full text-xs font-bold`}>
+                    {tier.badge}
                   </span>
                 </div>
               )}
               
-              <div className={`bg-gradient-to-br ${tier.color} rounded-xl p-4 mb-4`}>
-                <p className="text-white text-2xl font-bold mb-1">{tier.period}</p>
+              <div className={`bg-gradient-to-br ${tier.color} rounded-xl p-6 mb-6`}>
+                <p className="text-white text-3xl font-bold mb-2">{tier.period}</p>
                 <p className="text-white/80 text-sm">{tier.lockup}</p>
               </div>
 
-              <div className="mb-4">
-                <p className="text-5xl font-bold gradient-text mb-2">{tier.apr}</p>
-                <p className="text-gray-400 text-sm">Annual APR</p>
+              <div className="mb-6">
+                <p className="text-6xl font-bold gradient-text mb-2">{tier.apr}</p>
+                <p className="text-gray-400">Annual APR</p>
               </div>
 
-              <div className="mb-4 pb-4 border-b border-gray-800">
+              <div className="mb-6 pb-6 border-b border-gray-800">
                 <p className="text-white font-semibold mb-1">Governance Power</p>
-                <p className="text-primary-500 text-xl font-bold">{tier.multiplier}</p>
+                <p className="text-primary-500 text-2xl font-bold">{tier.multiplier}</p>
               </div>
 
-              <p className="text-gray-400 text-sm">{tier.description}</p>
+              <p className="text-gray-300 mb-4">{tier.description}</p>
+              
+              {tier.popular && (
+                <p className="text-sm text-accent-400 font-semibold">
+                  ✨ Most popular choice for OG Champs
+                </p>
+              )}
             </motion.div>
           ))}
         </div>

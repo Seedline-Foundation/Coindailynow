@@ -134,3 +134,43 @@ body {
     print-color-adjust: exact;
   }
 }
+
+/* Treasury Mining Animation - Lightweight */
+@keyframes animate-pulse-slow {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes animate-bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-pulse-slow {
+  animation: animate-pulse-slow 3s ease-in-out infinite;
+}
+
+.animate-bounce-slow {
+  animation: animate-bounce-slow 2s ease-in-out infinite;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-slow,
+  .animate-bounce-slow {
+    animation: none;
+  }
+  
+  svg animateTransform,
+  svg animate {
+    display: none;
+  }
+}

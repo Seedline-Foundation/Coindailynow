@@ -13,10 +13,10 @@ export default function Navigation() {
     { name: 'Presale', href: '/presale' },
     { name: 'Tokenomics', href: '/tokenomics' },
     { name: 'Staking', href: '/staking' },
+    { name: 'Bounties', href: '/bounty' },
+    { name: 'Dashboard', href: '/dashboard' },
+    { name: 'OG Champs', href: '/ambassador' },
     { name: 'Whitepaper', href: '/whitepaper' },
-    { name: 'Pitch', href: '/pitch' },
-    { name: 'Ambassador', href: '/ambassador' },
-    { name: 'Careers', href: '/careers' },
     { name: 'FAQ', href: '/faq' },
     { name: 'Contact', href: '/contact' },
   ];

@@ -12,11 +12,11 @@ export default function SocialProof() {
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         <div>
-          <p className="text-4xl font-bold gradient-text mb-2">5M</p>
+          <p className="text-4xl font-bold gradient-text mb-2">6M</p>
           <p className="text-gray-400">Max Token Supply</p>
         </div>
         <div>
-          <p className="text-4xl font-bold gradient-text mb-2">70%</p>
+          <p className="text-4xl font-bold gradient-text mb-2">90%</p>
           <p className="text-gray-400">Max Staking APR</p>
         </div>
         <div>

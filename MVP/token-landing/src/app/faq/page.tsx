@@ -52,7 +52,7 @@ All transactions are processed securely through PinkSale, a trusted launchpad pl
       question: 'Is Joy Token safe and audited?',
       answer: `Absolutely. Security is our top priority:
 
-✅ Smart contract audited by CertiK (top blockchain security firm)
+✅ Smart contract audited by Cyberscope (top blockchain security firm)
 ✅ Team KYC verified through PinkSale
 ✅ Liquidity locked for 2 years on PinkLock
 ✅ No backdoors or malicious functions

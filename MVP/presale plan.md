@@ -2,7 +2,7 @@
 
 To support your 45-day presale on PinkSale and underscore our commitment to transparency as a fully community-funded project (with no venture capital involvement), I have developed a milestone-based structure that directly links fundraising progress to verifiable achievements. This plan reinforces OG Champs' confidence by demonstrating efficient, accountable use of funds, while fostering immediate public trust through real-time disclosures and on-chain verifications. Each phase's milestones are gated—advancing only after prior goals are met and publicly confirmed—highlighting our disciplined approach to building a sustainable African crypto news platform.
 
-Transparency is embedded at every step via a dedicated public dashboard (e.g., hosted on Notion or a Polygon dApp) for fund tracking, weekly X/Telegram updates, and live AMAs for community Q\&A. Funds are held in a multisig escrow wallet, with third-party audits (e.g., by Certik) for quarterly reviews. Allocations prioritize liquidity ($270,000 USDC), CEX listings on MEXC and Bybit ($300,000, including listing fees, staking campaigns, and liquidity boosting), a 12-month runway (minimum $10,000 USDC/month, totaling $120,000), legal buffers ($50,000), marketing ($100,000 for targeted campaigns and OG bounties), and contingencies ($30,000 for unforeseen issues like additional audits or tech upgrades). Total raise target: Approximately $1,000,000 USDC, ensuring self-sufficiency without external dependencies.
+Transparency is embedded at every step via a dedicated public dashboard (e.g., hosted on Notion or a Polygon dApp) for fund tracking, weekly X/Telegram updates, and live AMAs for community Q\&A. Funds are held in a multisig escrow wallet, with third-party audits (e.g., by Cyberscope) for quarterly reviews. Allocations prioritize liquidity ($270,000 USDC), CEX listings on MEXC and Bybit ($300,000, including listing fees, staking campaigns, and liquidity boosting), a 12-month runway (minimum $10,000 USDC/month, totaling $120,000), legal buffers ($50,000), marketing ($100,000 for targeted campaigns and OG bounties), and contingencies ($30,000 for unforeseen issues like additional audits or tech upgrades). Total raise target: Approximately $1,000,000 USDC, ensuring self-sufficiency without external dependencies.
 
 FOMO is amplified through escalating prices (e.g., \+62% from Phase 1 to 2, \+68% to Phase 3), time-sensitive unlocks (next phase activates only at 80% fill), limited bonuses, and early closure possibilities—creating urgency as participants witness rapid, community-powered progress toward the $0.97 CEX listing.
 
@@ -56,7 +56,7 @@ We break the 45-day campaign into three clear phases, each with a public, verifi
 
 \*\*Milestone Triggers (Transparency Dashboard):\*\*
 
-\*   \*\*At 25% Sold ($32,625):\*\* \*\*Smart Contract Audit & KYC.\*\* We immediately submit the contract for a top-tier audit (like CertiK or Hacken) and the team does a public KYC with a reputable firm (e.g., Pinksale). \*This builds instant legitimacy and kills scam FUD.\*  
+\*   \*\*At 25% Sold ($32,625):\*\* \*\*Smart Contract Audit & KYC.\*\* We immediately submit the contract for a top-tier audit (like Cyberscope or Hacken) and the team does a public KYC with a reputable firm (e.g., Pinksale). \*This builds instant legitimacy and kills scam FUD.\*  
 \*   \*\*At 75% Sold ($97,875):\*\* \*\*Liquidity Pool Locked & Initial Marketing Blitz.\*\* We formally create and \*\*lock the $270k USDC liquidity pool for 4 years\*\*, with the TX hash published for all to see. Simultaneously, we launch the first wave of marketing: targeted Twitter Spaces, initial influencer collaborations, and community growth campaigns.  
 \*   \*\*At 100% Sold ($130,500):\*\* \*\*PHASE 2 UNLOCKS.\*\* The Foundation is forged. The project is now audited, KYC'd, and has locked liquidity. The path to Phase 2 is clear.
 
@@ -176,12 +176,12 @@ This is how we build truth.
 
 ### **2\. Security Milestone — Audit in Motion (Public Proof: audit booking receipt)**
 
-* Book full smart contract audit (Certik, Peckshield, or Hacken)
+* Book full smart contract audit (Cyberscope, Peckshield, or Hacken)
 
 * Publish expected delivery timeline
 
 ➡️ *Signal:*  
- “Safety before hype — real builders care about user protection.”
+ "Safety before hype — real builders care about user protection."
 
 ---
 
