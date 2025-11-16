@@ -20,18 +20,16 @@ export default function EmailCapture({ variant = 'default' }: EmailCaptureProps)
     setError('');
 
     try {
-      // Replace with your Brevo API endpoint
       const response = await axios.post('/api/subscribe', {
         email,
-        listId: process.env.NEXT_PUBLIC_BREVO_LIST_ID,
       });
 
       if (response.data.success) {
         setSuccess(true);
         setEmail('');
         
-        // Reset after 5 seconds
-        setTimeout(() => setSuccess(false), 5000);
+        // Reset after 10 seconds to give user time to read message
+        setTimeout(() => setSuccess(false), 10000);
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');
@@ -50,10 +48,15 @@ export default function EmailCapture({ variant = 'default' }: EmailCaptureProps)
         <svg className="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <h3 className="text-2xl font-bold text-white mb-2">You're on the list!</h3>
-        <p className="text-gray-300">
-          Check your email for whitelist confirmation and next steps.
+        <h3 className="text-2xl font-bold text-white mb-2">Check Your Email!</h3>
+        <p className="text-gray-300 mb-4">
+          We've sent a verification email to your inbox. Please verify your email address to receive the whitelist form.
         </p>
+        <div className="bg-blue-600/20 border border-blue-500 rounded-lg p-4 mt-4">
+          <p className="text-sm text-blue-200">
+            <strong>Next Steps:</strong> After verifying your email, you'll receive another email with a link to complete the whitelist application form.
+          </p>
+        </div>
       </motion.div>
     );
   }
