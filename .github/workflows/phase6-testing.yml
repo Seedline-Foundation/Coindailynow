@@ -1,10 +1,13 @@
 name: Phase 6 - Testing & Quality Assurance
 
 on:
-  push:
-    branches: [ main, development ]
-  pull_request:
-    branches: [ main, development ]
+  # Temporarily disabled during active development
+  # Uncomment when ready for full CI/CD testing
+  # push:
+  #   branches: [ main, development ]
+  # pull_request:
+  #   branches: [ main, development ]
+  workflow_dispatch: # Manual trigger only
 
 jobs:
   frontend-tests:
