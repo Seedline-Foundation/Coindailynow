@@ -24,15 +24,42 @@ export default function ContactPage() {
         </motion.div>
 
         {/* Contact Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          {/* Telegram */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          {/* Discord */}
           <motion.a
-            href="https://t.me/CoindailyNewz"
+            href="https://discord.gg/srgWv7nCSr"
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
+            className="bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border-2 border-indigo-500 rounded-2xl p-8 hover:scale-105 transition-transform group"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center text-3xl">
+                💬
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">Discord</h3>
+                <p className="text-indigo-300">Join our server</p>
+              </div>
+            </div>
+            <p className="text-gray-300 mb-4">
+              Connect with the Joy Token community, get support, and participate in exclusive events.
+            </p>
+            <div className="text-indigo-400 font-mono font-bold text-lg group-hover:text-indigo-300 transition-colors">
+              discord.gg/srgWv7nCSr
+            </div>
+          </motion.a>
+
+          {/* Telegram */}
+          <motion.a
+            href="https://t.me/CoindailyNewz"
+            target="_blank"
+            rel="noopener noreferrer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
             className="bg-gradient-to-br from-blue-600/20 to-blue-400/20 border-2 border-blue-500 rounded-2xl p-8 hover:scale-105 transition-transform group"
           >
             <div className="flex items-center gap-4 mb-4">
@@ -59,7 +86,7 @@ export default function ContactPage() {
             rel="noopener noreferrer"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             className="bg-gradient-to-br from-gray-700/20 to-gray-500/20 border-2 border-gray-400 rounded-2xl p-8 hover:scale-105 transition-transform group"
           >
             <div className="flex items-center gap-4 mb-4">
