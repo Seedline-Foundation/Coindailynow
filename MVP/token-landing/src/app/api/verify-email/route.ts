@@ -4,6 +4,8 @@ import { getWelcomeEmailTemplate } from '@/lib/email-templates';
 import { formatScheduledAt, EMAIL_SEQUENCE } from '@/lib/email-scheduler';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
