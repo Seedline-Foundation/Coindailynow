@@ -63,7 +63,7 @@ Our contract address will be published before presale. You can verify everything
     },
     {
       question: 'What are the tokenomics and vesting schedules?',
-      answer: `Total Supply: 5,000,000 $JOY
+      answer: `Total Supply: 6,000,000 $JOY
 
 Allocation:
 • 30% - Presale (800,000 tokens)

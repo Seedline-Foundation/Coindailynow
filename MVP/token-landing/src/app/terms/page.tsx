@@ -198,9 +198,9 @@ export default function TermsPage() {
             <h3 className="text-xl font-bold text-primary-400 mb-4">4.1 Presale Structure</h3>
             <div className="p-6 bg-gray-800/50 rounded-lg mb-6">
               <ul className="space-y-2 text-gray-300">
-                <li><strong>Total Supply:</strong> 5,000,000 $JY (fixed, immutable)</li>
+                <li><strong>Total Supply:</strong> 6,000,000 $JY (fixed, immutable)</li>
                 <li><strong>Presale Allocation:</strong> 800,000 $JY (16% of total supply)</li>
-                <li><strong>Presale Target:</strong> $350,000 USD</li>
+                <li><strong>Presale Target:</strong> $917,500 USD</li>
                 <li><strong>Pricing:</strong> 3 rounds at $0.25, $0.40, $0.78 per token</li>
                 <li><strong>Listing Price:</strong> $0.90 per token (subject to market forces)</li>
                 <li><strong>Vesting:</strong> 100% unlocked at Token Generation Event (TGE)</li>

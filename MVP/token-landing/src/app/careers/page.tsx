@@ -18,9 +18,9 @@ export default function CareersPage() {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   const perksStandard = [
-    '💻 Laptop provided (Macbook or equivalent)',
-    '🌐 Monthly internet bill coverage ($100)',
-    '⚡ Electricity bill subsidy ($80/month)',
+    '💻 Laptop provided',
+    '🌐 Monthly internet bill Support',
+    '⚡ Electricity bill subsidy support',
     '🎁 Welcome pack (company swag, setup bonus)',
     '🪙 Joy Token allocation (vesting over 2 years)',
     '🏝️ Flexible remote work',
@@ -352,7 +352,7 @@ export default function CareersPage() {
                     </div>
 
                     <div className="mb-6">
-                      <p className="text-sm font-semibold text-gray-400 mb-2">Sample Perks:</p>
+                      <p className="text-sm font-semibold text-gray-400 mb-2">Unbeatable Perks:</p>
                       <ul className="space-y-1">
                         {role.perks.slice(0, 4).map((perk, perkIndex) => (
                           <li key={perkIndex} className="text-sm text-gray-400">

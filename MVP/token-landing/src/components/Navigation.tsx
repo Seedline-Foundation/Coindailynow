@@ -2,23 +2,32 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [aboutUsOpen, setAboutUsOpen] = useState(false);
 
   const navigation = [
     { name: 'Home', href: '/' },
+    { 
+      name: 'About Us', 
+      href: '/about',
+      dropdown: [
+        { name: 'About Us', href: '/about' },
+        { name: 'Dashboard', href: '/dashboard' },
+        { name: 'FAQ', href: '/faq' },
+        { name: 'Contact Us', href: '/contact' },
+      ]
+    },
     { name: 'Presale', href: '/presale' },
     { name: 'Tokenomics', href: '/tokenomics' },
     { name: 'Staking', href: '/staking' },
-    { name: 'Bounties', href: '/bounty' },
-    { name: 'Dashboard', href: '/dashboard' },
-    { name: 'OG Champs', href: '/ambassador' },
     { name: 'Whitepaper', href: '/whitepaper' },
-    { name: 'FAQ', href: '/faq' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Pitch', href: '/pitch' },
+    { name: 'Bounties', href: '/bounty' },
+    { name: 'OG Champs', href: '/ambassador' },
   ];
 
   return (
@@ -36,22 +45,48 @@ export default function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-gray-300 hover:text-primary-500 transition-colors font-medium"
-              >
-                {item.name}
-              </Link>
+              item.dropdown ? (
+                <div 
+                  key={item.name} 
+                  className="relative"
+                  onMouseEnter={() => setAboutUsOpen(true)}
+                  onMouseLeave={() => setAboutUsOpen(false)}
+                >
+                  <button className="text-gray-300 hover:text-primary-500 transition-colors font-medium flex items-center space-x-1">
+                    <span>{item.name}</span>
+                    <ChevronDownIcon className="h-4 w-4" />
+                  </button>
+                  <AnimatePresence>
+                    {aboutUsOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute top-full left-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl overflow-hidden"
+                      >
+                        {item.dropdown.map((subItem) => (
+                          <Link
+                            key={subItem.name}
+                            href={subItem.href}
+                            className="block px-4 py-3 text-gray-300 hover:text-primary-500 hover:bg-gray-800 transition-colors"
+                          >
+                            {subItem.name}
+                          </Link>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-gray-300 hover:text-primary-500 transition-colors font-medium"
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
-            <a
-              href="https://coindaily.online"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-300 hover:text-primary-500 transition-colors font-medium"
-            >
-              Visit CoinDaily
-            </a>
             <Link
               href="/presale"
               className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-6 py-2 rounded-full font-bold hover:shadow-lg hover:shadow-primary-500/50 transition-all"
@@ -85,23 +120,48 @@ export default function Navigation() {
         >
           <div className="container mx-auto px-4 py-4 space-y-4">
             {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="block text-gray-300 hover:text-primary-500 transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
+              item.dropdown ? (
+                <div key={item.name}>
+                  <button
+                    onClick={() => setAboutUsOpen(!aboutUsOpen)}
+                    className="flex items-center justify-between w-full text-gray-300 hover:text-primary-500 transition-colors py-2"
+                  >
+                    <span>{item.name}</span>
+                    <ChevronDownIcon className={`h-4 w-4 transition-transform ${aboutUsOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  <AnimatePresence>
+                    {aboutUsOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="pl-4 space-y-2"
+                      >
+                        {item.dropdown.map((subItem) => (
+                          <Link
+                            key={subItem.name}
+                            href={subItem.href}
+                            className="block text-gray-400 hover:text-primary-500 transition-colors py-2"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {subItem.name}
+                          </Link>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="block text-gray-300 hover:text-primary-500 transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
-            <a
-              href="https://coindaily.online"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-gray-300 hover:text-primary-500 transition-colors py-2"
-            >
-              Visit CoinDaily
-            </a>
             <Link
               href="/presale"
               className="block bg-gradient-to-r from-primary-500 to-accent-500 text-white px-6 py-3 rounded-full font-bold text-center"

@@ -9,6 +9,7 @@ export default function Footer() {
       { name: 'Staking', href: '/staking' },
       { name: 'Presale', href: '/presale' },
       { name: 'Whitepaper', href: '/whitepaper' },
+      { name: 'Pitch', href: '/pitch' },
     ],
     community: [
       { name: 'OG Champs', href: '/ambassador' },
@@ -17,6 +18,7 @@ export default function Footer() {
       { name: 'Careers', href: '/careers' },
     ],
     resources: [
+      { name: 'About Us', href: '/about' },
       { name: 'How to Buy', href: '/#how-to-buy' },
       { name: 'CoinDaily Platform', href: 'https://coindaily.online' },
       { name: 'FAQs', href: '/faq' },

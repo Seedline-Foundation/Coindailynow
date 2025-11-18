@@ -305,7 +305,7 @@ export default function WhitepaperPage() {
                 <p>→ More distributors = better reach = more value for publishers</p>
                 <p>→ Transaction volume increases exponentially (not linearly)</p>
                 <p>→ Staking rewards grow from real fees, attracting token holders</p>
-                <p>→ Token scarcity increases (5M supply vs 21M partnerships)</p>
+                <p>→ Token scarcity increases (6M supply vs 21M partnerships)</p>
                 <p className="text-primary-400 font-semibold">→ Metcalfe's Law: Network value = n² = exponential growth</p>
               </div>
             </div>
@@ -316,7 +316,7 @@ export default function WhitepaperPage() {
                 <div>
                   <p className="mb-2">✓ <strong>Exclusive Payment Method:</strong> No USD, no alternatives—only JY accepted</p>
                   <p className="mb-2">✓ <strong>Mandatory Demand:</strong> Every transaction across 21M partnerships requires JY</p>
-                  <p>✓ <strong>Supply Shock Economics:</strong> 5M tokens for network projected to handle millions of monthly PRs</p>
+                  <p>✓ <strong>Supply Shock Economics:</strong> 6M tokens for network projected to handle millions of monthly PRs</p>
                 </div>
                 <div>
                   <p className="mb-2">✓ <strong>First-Mover Dominance:</strong> No competitor building at this scale in Africa</p>
@@ -339,7 +339,7 @@ export default function WhitepaperPage() {
               <TechCard
                 title="Token Contract (ERC-20)"
                 features={[
-                  'Fixed supply of 5,000,000 JY (immutable)',
+                  'Fixed supply of 6,000,000 JY (immutable)',
                   'Pausable for emergency situations',
                   'Blacklist function for regulatory compliance',
                   'Gas-optimized transfers'
@@ -630,10 +630,10 @@ export default function WhitepaperPage() {
                 quarter="Q4 2025"
                 status="CURRENT"
                 milestones={[
-                  { title: 'Token Smart Contracts Development', done: true },
-                  { title: 'Security Audit by Cyberscope', done: false },
-                  { title: 'Presale Launch on PinkSale', done: false },
-                  { title: 'Community Building & Whitelist', done: false }
+                  { title: 'Smart contracts development & audit', done: true },
+                  { title: 'Presale launch ($917.5K target)', done: false },
+                  { title: 'Whitelist campaign & community building', done: false },
+                  { title: 'Exchange partnership discussions', done: false }
                 ]}
               />
 
@@ -641,10 +641,10 @@ export default function WhitepaperPage() {
                 quarter="Q1 2026"
                 status="UPCOMING"
                 milestones={[
-                  { title: 'Token Generation Event (TGE)', done: false },
-                  { title: 'DEX Launch (Uniswap V3)', done: false },
-                  { title: 'Staking Platform Live', done: false },
-                  { title: 'Premium Content Integration', done: false }
+                  { title: 'TGE + DEX launch (Uniswap V3)', done: false },
+                  { title: 'Staking platform goes live', done: false },
+                  { title: 'Premium content integration', done: false },
+                  { title: 'Mobile app v1.0 released', done: false }
                 ]}
               />
 
@@ -652,10 +652,10 @@ export default function WhitepaperPage() {
                 quarter="Q2 2026"
                 status="PLANNED"
                 milestones={[
-                  { title: 'CEX Listings (Target: Tier 2 exchanges)', done: false },
-                  { title: 'Mobile App with Token Features', done: false },
-                  { title: 'Governance Launch (Phase 2)', done: false },
-                  { title: 'First Quarterly Burn Event', done: false }
+                  { title: 'CEX listings (2+ Tier 2 exchanges)', done: false },
+                  { title: 'Governance launch (community voting)', done: false },
+                  { title: 'First quarterly burn event', done: false },
+                  { title: 'Target 50K+ active users milestone', done: false }
                 ]}
               />
 
@@ -663,10 +663,10 @@ export default function WhitepaperPage() {
                 quarter="Q3 2026"
                 status="PLANNED"
                 milestones={[
-                  { title: 'BSC Bridge Launch', done: false },
-                  { title: '1M+ Platform Users Milestone', done: false },
-                  { title: 'Revenue Sharing Distribution Begins', done: false },
-                  { title: 'Africa Expansion Fund Launch', done: false }
+                  { title: 'BSC bridge + multi-chain expansion', done: false },
+                  { title: 'Revenue sharing distribution begins', done: false },
+                  { title: 'Africa expansion fund ($500K)', done: false },
+                  { title: 'Partnerships with 3+ African govts', done: false }
                 ]}
               />
             </div>
@@ -675,18 +675,79 @@ export default function WhitepaperPage() {
           {/* Team */}
           <Section id="team" icon={<UserGroupIcon />} title="Team & Advisors">
             <p className="text-gray-300 mb-8">
-              Joy Token is built by the proven CoinDaily team with deep Africa crypto market expertise.
+              Joy Token is built by an experienced team with deep crypto industry expertise and a proven track record in blockchain development, UI/UX design, and system architecture.
             </p>
-            <div className="p-6 bg-gradient-to-r from-primary-500/10 to-accent-500/10 rounded-lg border border-primary-500/20">
+            
+            {/* Team Members */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {/* Niceface */}
+              <div className="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border border-gray-700">
+                <h4 className="text-xl font-bold text-white mb-2">Niceface</h4>
+                <p className="text-primary-400 font-semibold mb-3">Founder/CEO</p>
+                <p className="text-gray-300 text-sm mb-3">
+                  Developer, Blockchain Analyst And Growth executor. Experienced Crypto developer and innovator building Web3 products, media platforms, and smart-contract solutions with a focus on impact, clarity, and excellence.
+                </p>
+                <ul className="space-y-1 text-sm text-gray-400">
+                  <li>• Founder of Nice Studio</li>
+                  <li>• Dune Analytics Wizard</li>
+                  <li>• <a href="https://twitter.com/Iheanyichima" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">@Iheanyichima</a></li>
+                </ul>
+              </div>
+
+              {/* Denis */}
+              <div className="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border border-gray-700">
+                <h4 className="text-xl font-bold text-white mb-2">Denis</h4>
+                <p className="text-primary-400 font-semibold mb-3">UI/UX Specialist</p>
+                <p className="text-gray-300 text-sm mb-3">
+                  Highly-motivated, creative and pro-active designer and web developer able to research, design and develop user experiences for various digital products including mobile applications, websites and web applications.
+                </p>
+                <ul className="space-y-1 text-sm text-gray-400">
+                  <li>• Expert in User Experience Design</li>
+                  <li>• Full-Stack Web Developer</li>
+                  <li>• <a href="https://www.denniskimathi.dev/resume" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">Portfolio</a></li>
+                </ul>
+              </div>
+
+              {/* Elhassan */}
+              <div className="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border border-gray-700">
+                <h4 className="text-xl font-bold text-white mb-2">Elhassan</h4>
+                <p className="text-primary-400 font-semibold mb-3">Fullstack Developer</p>
+                <p className="text-gray-300 text-sm mb-3">
+                  Experienced software engineer, successful in project management for software and system development. Looking for challenges that allow joining dynamic, ambitious organisations to build new products and solve technical problems.
+                </p>
+                <ul className="space-y-1 text-sm text-gray-400">
+                  <li>• Expert in Project Management</li>
+                  <li>• System Development Specialist</li>
+                  <li>• <a href="https://hassandiv.github.io/" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">Portfolio</a></li>
+                </ul>
+              </div>
+
+              {/* Warren */}
+              <div className="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border border-gray-700">
+                <h4 className="text-xl font-bold text-white mb-2">Warren</h4>
+                <p className="text-primary-400 font-semibold mb-3">Fullstack Developer</p>
+                <p className="text-gray-300 text-sm mb-3">
+                  Computer Science graduate from Technical University of Mombasa. Versatile Full-Stack Developer with expertise in both traditional web and Web3 technologies. Passionate about building the decentralized future through innovative blockchain solutions.
+                </p>
+                <ul className="space-y-1 text-sm text-gray-400">
+                  <li>• Web3 Technology Expert</li>
+                  <li>• Frontend & Backend Specialist</li>
+                  <li>• <a href="https://github.com/warrenshiv" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">GitHub</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="p-6 bg-gradient-to-r from-primary-500/10 to-accent-500/10 rounded-lg border border-primary-500/20 mb-8">
               <p className="text-gray-300 mb-4">
                 <strong className="text-white">Team Experience & Vision:</strong>
               </p>
               <ul className="space-y-2 text-gray-300">
-                <li>• 10+ years combined experience in African crypto and fintech markets</li>
+                <li>• <strong className="text-white">10+ years combined experience</strong> in crypto industry, blockchain development, and African fintech markets</li>
                 <li>• Building relationships with major exchanges (Binance, Luno, Quidax) for partnerships</li>
                 <li>• Pre-launch stage with comprehensive go-to-market strategy</li>
                 <li>• Focus on sustainable revenue: ads, premium subs, token utility, partnerships</li>
                 <li>• Target: 100K users Year 1, scaling to 500K+ by Year 3</li>
+                <li>• <strong className="text-white">Growing team:</strong> Actively seeking more senior professionals to join our mission</li>
               </ul>
             </div>
             <div className="mt-8 p-6 bg-gray-900 rounded-lg">

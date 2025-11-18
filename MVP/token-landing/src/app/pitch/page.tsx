@@ -34,7 +34,7 @@ const slides = [
             <p className="text-gray-400 mt-2">Market TAM</p>
           </div>
           <div className="p-6 bg-gray-800/50 rounded-lg">
-            <p className="text-4xl font-bold text-green-500">5M</p>
+            <p className="text-4xl font-bold text-green-500">6M</p>
             <p className="text-gray-400 mt-2">Fixed Supply</p>
           </div>
         </div>
@@ -172,7 +172,7 @@ const slides = [
           <p className="text-xl text-gray-300">
             <strong className="text-white">The Thesis:</strong> Capture 1% of $11.4B market = <strong className="text-primary-400">$114M annual transaction volume</strong>
           </p>
-          <p className="text-gray-400 mt-2">With 5M token supply, even conservative adoption creates supply shock</p>
+          <p className="text-gray-400 mt-2">With 6M token supply, even conservative adoption creates supply shock</p>
         </div>
       </div>
     )
@@ -180,50 +180,69 @@ const slides = [
   {
     id: 5,
     title: "Tokenomics",
-    subtitle: "Extreme Scarcity Meets Real Utility",
+    subtitle: "Only 4M Tokens Will Ever Circulate",
     content: (
       <div className="space-y-6">
+        {/* Key Insight Banner */}
+        <div className="p-6 bg-gradient-to-r from-primary-500/20 to-accent-500/20 border border-primary-500/50 rounded-lg text-center mb-6">
+          <h3 className="text-2xl font-bold text-white mb-3">
+            🔒 Extreme Scarcity By Design
+          </h3>
+          <p className="text-lg text-gray-300">
+            Only 4M tokens will <span className="text-primary-400 font-bold">ever</span> circulate. 
+            The rest: staked, locked, or burned. <span className="text-accent-400 font-bold">No mercenary capital—only believers.</span>
+          </p>
+        </div>
+
         <div className="grid md:grid-cols-2 gap-8">
           <div>
-            <h3 className="text-xl font-bold text-primary-400 mb-4">Supply Allocation</h3>
+            <h3 className="text-xl font-bold text-primary-400 mb-4">Supply Allocation (6M Total)</h3>
             <div className="space-y-3">
-              <AllocationRow label="Public Sale" percentage={28.3} color="bg-blue-500" />
-              <AllocationRow label="Treasury" percentage={23.3} color="bg-purple-500" />
-              <AllocationRow label="Ecosystem" percentage={18.3} color="bg-orange-500" />
-              <AllocationRow label="Team (6yr total)" percentage={11.7} color="bg-green-500" />
-              <AllocationRow label="Legal" percentage={8.3} color="bg-yellow-500" />
-              <AllocationRow label="Liquidity (Locked)" percentage={5} color="bg-pink-500" />
-              <AllocationRow label="Seed" percentage={5} color="bg-cyan-500" />
+              <AllocationRow label="Public Sale (1.7M)" percentage={28.3} color="bg-blue-500" />
+              <AllocationRow label="Treasury (1.4M)" percentage={23.3} color="bg-purple-500" />
+              <AllocationRow label="Ecosystem (1.1M)" percentage={18.3} color="bg-orange-500" />
+              <AllocationRow label="Team (700K)" percentage={11.7} color="bg-green-500" />
+              <AllocationRow label="Legal (500K)" percentage={8.3} color="bg-yellow-500" />
+              <AllocationRow label="Liquidity (300K)" percentage={5} color="bg-pink-500" />
+              <AllocationRow label="Seed (300K)" percentage={5} color="bg-cyan-500" />
             </div>
+            <p className="text-xs text-gray-500 mt-4">* Liquidity locked permanently with $270K USDC</p>
           </div>
 
           <div>
-            <h3 className="text-xl font-bold text-accent-400 mb-4">Staking Tiers</h3>
+            <h3 className="text-xl font-bold text-accent-400 mb-4">Staking Tiers (Real Yield)</h3>
             <div className="space-y-3">
-              <StakingRow period="24 Months" apr="90%" multiplier="2.5x" highlight />
-              <StakingRow period="9 Months" apr="70%" multiplier="1.5x" highlight />
-              <StakingRow period="6 Months" apr="10%" multiplier="1.2x" />
-              <StakingRow period="Flexible (7d)" apr="1%" multiplier="0x" />
+              <StakingRow period="24 Months (Diamond)" apr="90%" multiplier="2.5x" highlight />
+              <StakingRow period="9 Months (Whale)" apr="70%" multiplier="1.5x" highlight />
+              <StakingRow period="6 Months (Steady)" apr="10%" multiplier="1.2x" />
+              <StakingRow period="7 Days (Flexible)" apr="1%" multiplier="0x" />
             </div>
+            <p className="text-xs text-gray-500 mt-4">* APR from revenue, not inflation</p>
           </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mt-8">
           <KeyFeature 
             title="Real Yield"
-            description="Rewards from platform revenue, not inflation"
+            description="70% of revenue → stakers. 20% → treasury. 10% → burns"
             icon="💎"
           />
           <KeyFeature 
             title="Deflationary"
-            description="Quarterly burns reduce supply permanently"
+            description="Quarterly burns + 10-year treasury sinkhole reduces supply"
             icon="🔥"
           />
           <KeyFeature 
             title="Long-Term Aligned"
-            description="Team: 6yr total (24mo cliff + 4yr vest). Treasury: 10yr sinkhole"
+            description="Team: 24mo cliff + 4yr vest. No early unlocks"
             icon="🔒"
           />
+        </div>
+
+        <div className="p-4 bg-gray-900 rounded-lg mt-6 text-center">
+          <p className="text-gray-300">
+            <strong className="text-white">Vesting:</strong> Public (9mo cliff + 24mo), Team (24mo cliff + 4yr), Liquidity (locked forever)
+          </p>
         </div>
       </div>
     )
@@ -308,7 +327,7 @@ const slides = [
           status="CURRENT"
           items={[
             { text: "Smart contracts development & audit", done: true },
-            { text: "Presale launch ($350K target)", done: false },
+            { text: "Presale launch ($917.5K target)", done: false },
             { text: "Whitelist campaign & community building", done: false },
             { text: "Exchange partnership discussions", done: false }
           ]}
@@ -397,6 +416,80 @@ const slides = [
   },
   {
     id: 9,
+    title: "The Team",
+    subtitle: "Experienced Builders with 10+ Years Combined Crypto Experience",
+    content: (
+      <div className="space-y-8">
+        <div className="grid md:grid-cols-2 gap-6">
+          <TeamMemberCard 
+            name="Niceface"
+            role="Founder/CEO"
+            description="Developer, Blockchain Analyst And Growth executor. Experienced Crypto developer and innovator building Web3 products, media platforms, and smart-contract solutions."
+            achievements={[
+              "Founder of Nice Studio",
+              "Dune Analytics Wizard",
+              "Twitter: @Iheanyichima"
+            ]}
+          />
+          <TeamMemberCard 
+            name="Denis"
+            role="UI/UX Specialist"
+            description="Highly-motivated, creative and pro-active designer and web developer able to research, design and develop user experiences for various digital products."
+            achievements={[
+              "Expert in User Experience Design",
+              "Full-Stack Web Developer",
+              "Portfolio: denniskimathi.dev"
+            ]}
+          />
+          <TeamMemberCard 
+            name="Elhassan"
+            role="Fullstack Developer"
+            description="Experienced software engineer, successful in project management for software and system development. Building new products and solving technical problems."
+            achievements={[
+              "Expert in Project Management",
+              "System Development Specialist",
+              "Portfolio: hassandiv.github.io"
+            ]}
+          />
+          <TeamMemberCard 
+            name="Warren"
+            role="Fullstack Developer"
+            description="Computer Science graduate from Technical University of Mombasa. Versatile Full-Stack Developer with expertise in both traditional web and Web3 technologies."
+            achievements={[
+              "Web3 Technology Expert",
+              "Frontend & Backend Specialist",
+              "GitHub: warrenshiv"
+            ]}
+          />
+        </div>
+
+        <div className="p-6 bg-gradient-to-r from-primary-500/20 to-accent-500/20 rounded-lg mt-8">
+          <div className="text-center">
+            <h4 className="text-2xl font-bold text-white mb-4">Combined Team Strengths</h4>
+            <div className="grid md:grid-cols-3 gap-6 mt-6">
+              <div className="text-center">
+                <p className="text-4xl font-bold text-primary-500 mb-2">10+</p>
+                <p className="text-gray-300">Years Combined Experience</p>
+              </div>
+              <div className="text-center">
+                <p className="text-4xl font-bold text-accent-500 mb-2">4</p>
+                <p className="text-gray-300">Senior Developers</p>
+              </div>
+              <div className="text-center">
+                <p className="text-4xl font-bold text-green-500 mb-2">100%</p>
+                <p className="text-gray-300">Africa-Focused</p>
+              </div>
+            </div>
+            <p className="text-gray-400 mt-6">
+              We're actively seeking more senior professionals to join our mission of building Africa's premier crypto ecosystem
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 10,
     title: "The Ask",
     subtitle: "Presale Investment Opportunity",
     content: (
@@ -467,7 +560,7 @@ const slides = [
     )
   },
   {
-    id: 10,
+    id: 11,
     title: "Investment Highlights",
     subtitle: "Why Joy Token Wins",
     content: (
@@ -486,7 +579,7 @@ const slides = [
             number="2"
             title="Extreme Scarcity"
             points={[
-              "Only 5M tokens (vs. billions for competitors)",
+              "Only 6M tokens (vs. billions for competitors)",
               "11.7% team allocation locked for 6 years (24-month cliff + 4-year vest)",
               "Quarterly burns reduce supply permanently"
             ]}
@@ -539,7 +632,7 @@ const slides = [
     )
   },
   {
-    id: 11,
+    id: 12,
     title: "Contact & Next Steps",
     subtitle: "Let's Build Africa's Crypto Future Together",
     content: (
@@ -1117,5 +1210,28 @@ function LinkButton({ href, label, external }: { href: string; label: string; ex
     >
       {label}
     </Link>
+  );
+}
+
+function TeamMemberCard({ name, role, description, achievements }: { 
+  name: string; 
+  role: string; 
+  description: string; 
+  achievements: string[] 
+}) {
+  return (
+    <div className="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border border-gray-700">
+      <h4 className="text-xl font-bold text-white mb-2">{name}</h4>
+      <p className="text-primary-400 font-semibold mb-3">{role}</p>
+      <p className="text-gray-300 text-sm mb-4">{description}</p>
+      <ul className="space-y-1 text-sm text-gray-400">
+        {achievements.map((achievement, i) => (
+          <li key={i} className="flex items-start gap-2">
+            <span className="text-primary-500 mt-0.5">•</span>
+            <span>{achievement}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

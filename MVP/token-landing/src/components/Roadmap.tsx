@@ -9,10 +9,50 @@ export default function Roadmap() {
   const isInView = useInView(ref, { once: true });
 
   const milestones = [
-    { quarter: 'Q4 2025', title: 'Foundation', items: ['Token Launch', 'Presale Completion', 'DEX Listing', 'Staking Live'], status: 'active' },
-    { quarter: 'Q1 2026', title: 'Expansion', items: ['CEX Listings', 'Mobile App', 'Governance Launch', 'Partnership Deals'], status: 'upcoming' },
-    { quarter: 'Q2 2026', title: 'Growth', items: ['1M Users', 'Africa Expansion', 'New Features', 'Strategic Investments'], status: 'upcoming' },
-    { quarter: 'Q3 2026', title: 'Maturity', items: ['Revenue Sharing', 'Global Reach', 'Ecosystem Fund', 'Major Partnerships'], status: 'upcoming' },
+    { 
+      quarter: 'Q4 2025', 
+      title: 'Foundation', 
+      items: [
+        'Smart contracts development & audit',
+        'Presale launch ($917.5K target)',
+        'Whitelist campaign & community building',
+        'Exchange partnership discussions'
+      ], 
+      status: 'active' 
+    },
+    { 
+      quarter: 'Q1 2026', 
+      title: 'Launch', 
+      items: [
+        'TGE + DEX launch (Uniswap V3)',
+        'Staking platform goes live',
+        'Premium content integration',
+        'Mobile app v1.0 released'
+      ], 
+      status: 'upcoming' 
+    },
+    { 
+      quarter: 'Q2 2026', 
+      title: 'Growth', 
+      items: [
+        'CEX listings (2+ Tier 2 exchanges)',
+        'Governance launch (community voting)',
+        'First quarterly burn event',
+        'Target 50K+ active users milestone'
+      ], 
+      status: 'upcoming' 
+    },
+    { 
+      quarter: 'Q3 2026', 
+      title: 'Expansion', 
+      items: [
+        'BSC bridge + multi-chain expansion',
+        'Revenue sharing distribution begins',
+        'Africa expansion fund ($500K)',
+        'Partnerships with 3+ African govts'
+      ], 
+      status: 'upcoming' 
+    },
   ];
 
   return (
