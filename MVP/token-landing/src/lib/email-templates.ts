@@ -131,7 +131,8 @@ export function getVerificationEmailTemplate(params: TemplateParams): EmailTempl
  * Welcome Email Template (Day 0 - After Verification)
  */
 export function getWelcomeEmailTemplate(params: TemplateParams): EmailTemplate {
-  const { whitelistFormUrl, siteUrl = 'https://token.coindaily.online' } = params;
+  const { siteUrl = 'https://token.coindaily.online' } = params;
+  const whitelistFormUrl = 'https://forms.gle/YrgdEfMSeL9TWGYG9';
 
   return {
     subject: '🎉 Welcome to Joy Token - Complete Your Whitelist Application',

@@ -87,13 +87,6 @@ function VerifyEmailContent() {
               >
                 🏠 Return to Homepage
               </Link>
-              
-              <Link 
-                href="/whitelist"
-                className="inline-block w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
-              >
-                📝 Complete Whitelist Application
-              </Link>
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-700">
