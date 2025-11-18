@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Favicon</title>
+</head>
+<body>
+    <canvas id="canvas" width="256" height="256"></canvas>
+    <script>
+        // Generate a simple favicon for CoinDaily
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 256, 256);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        
+        // Fill background
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 256, 256);
+        
+        // Draw "CD" text
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 120px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('CD', 128, 128);
+        
+        // Add a circle border
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(128, 128, 110, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Download as PNG
+        console.log('Favicon generated! Right-click the canvas above and save as "favicon.png"');
+        console.log('Then convert to .ico using an online converter');
+        console.log('Or use this canvas data URL in your Next.js app');
+    </script>
+</body>
+</html>

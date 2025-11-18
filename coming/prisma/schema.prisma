@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model WaitlistSubscriber {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  ipAddress     String?
+  userAgent     String?
+  referralSource String?
+  subscribedAt  DateTime @default(now())
+  notified      Boolean  @default(false)
+  notifiedAt    DateTime?
+  
+  @@index([email])
+  @@index([subscribedAt])
+  @@map("waitlist_subscribers")
+}
