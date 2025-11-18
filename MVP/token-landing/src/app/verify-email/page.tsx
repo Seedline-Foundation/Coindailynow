@@ -19,19 +19,20 @@ function VerifyEmailContent() {
 
     // Call the verification API
     fetch(`/api/verify-email?token=${token}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
+      .then(async res => {
+        const data = await res.json();
+        
+        if (res.ok && data.success) {
           setStatus('success');
           setMessage(data.message || 'Your email has been verified successfully!');
         } else {
           setStatus('error');
-          setMessage(data.error || 'Verification failed. Please try again.');
+          setMessage(data.error || data.message || 'Verification failed. Please try again.');
         }
       })
       .catch(err => {
         setStatus('error');
-        setMessage('An error occurred during verification. Please try again.');
+        setMessage('Network error occurred. Please check your connection and try again.');
         console.error('Verification error:', err);
       });
   }, [token]);

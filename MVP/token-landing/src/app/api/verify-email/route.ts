@@ -145,15 +145,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Redirect to success page
-    return NextResponse.redirect(`${SITE_URL}/?success=email_verified`);
+    // Return success response
+    return NextResponse.json(
+      { 
+        success: true, 
+        message: 'Your email has been verified successfully! Check your inbox for the welcome email.' 
+      },
+      { status: 200 }
+    );
 
   } catch (error: any) {
     console.error('Verification error:', error);
     return NextResponse.json(
       { 
         success: false, 
-        message: error.message || 'Verification failed. Please try again.' 
+        error: error.message || 'Verification failed. Please try again.' 
       },
       { status: 500 }
     );
