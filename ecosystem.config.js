@@ -43,6 +43,27 @@ module.exports = {
       watch: false,
       max_restarts: 10,
       min_uptime: '10s'
+    },
+    {
+      name: 'coindaily-coming-soon',
+      cwd: './coming',
+      script: 'npm',
+      args: 'start',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001
+      },
+      error_file: './logs/coming-error.log',
+      out_file: './logs/coming-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      max_memory_restart: '300M',
+      autorestart: true,
+      watch: false,
+      max_restarts: 10,
+      min_uptime: '10s'
     }
   ]
 };
