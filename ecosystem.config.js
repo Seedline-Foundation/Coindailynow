@@ -53,7 +53,7 @@ module.exports = {
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3001
+        PORT: 3002
       },
       error_file: './logs/coming-error.log',
       out_file: './logs/coming-out.log',
