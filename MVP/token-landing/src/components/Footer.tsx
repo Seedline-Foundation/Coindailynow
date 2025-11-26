@@ -13,6 +13,7 @@ export default function Footer() {
     ],
     community: [
       { name: 'OG Champs', href: '/ambassador' },
+      { name: 'Affiliate Program', href: '/affiliate/register' },
       { name: 'Bounties', href: '/bounty' },
       { name: 'Dashboard', href: '/dashboard' },
       { name: 'Careers', href: '/careers' },

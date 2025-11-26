@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import AffiliateLinkCard from '@/components/AffiliateLinkCard';
+import AffiliateLeaderboard from '@/components/AffiliateLeaderboard';
 import { 
   CheckCircleIcon,
   ClockIcon,
@@ -36,7 +38,73 @@ interface BountySubmission {
 }
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'milestones' | 'bounties'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'milestones' | 'bounties' | 'affiliate'>('overview');
+  const [isAffiliate, setIsAffiliate] = useState(true);
+  const [affiliateData, setAffiliateData] = useState<any>(null);
+  const [affiliateStats, setAffiliateStats] = useState<any>(null);
+  const [affiliateLink, setAffiliateLink] = useState<string>('');
+
+  useEffect(() => {
+    // Check if user is logged in as affiliate
+    const token = localStorage.getItem('affiliateToken');
+    const storedData = localStorage.getItem('affiliateData');
+    
+    if (token && storedData) {
+      setIsAffiliate(true);
+      setAffiliateData(JSON.parse(storedData));
+      fetchAffiliateStats(token);
+      fetchAffiliateLink(token);
+    }
+
+    // Check URL params for affiliate tab
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('tab') === 'affiliate') {
+      setActiveTab('affiliate');
+    }
+  }, []);
+
+  const fetchAffiliateStats = async (token: string) => {
+    try {
+      const response = await fetch('/api/affiliate/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAffiliateStats(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch affiliate stats:', error);
+    }
+  };
+
+  const fetchAffiliateLink = async (token: string) => {
+    try {
+      const response = await fetch('/api/affiliate/link', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAffiliateLink(data.affiliateLink);
+      }
+    } catch (error) {
+      console.error('Failed to fetch affiliate link:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('affiliateToken');
+    localStorage.removeItem('affiliateData');
+    setIsAffiliate(false);
+    setAffiliateData(null);
+    setAffiliateStats(null);
+    setActiveTab('overview');
+  };
 
   // Project milestones for investors
   const projectMilestones: ProjectMilestone[] = [
@@ -207,10 +275,10 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-gray-800">
+        <div className="flex gap-4 mb-8 border-b border-gray-800 overflow-x-auto">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-6 py-3 font-bold transition-all ${
+            className={`px-6 py-3 font-bold transition-all whitespace-nowrap ${
               activeTab === 'overview'
                 ? 'text-primary-400 border-b-2 border-primary-400'
                 : 'text-gray-400 hover:text-white'
@@ -220,7 +288,7 @@ export default function DashboardPage() {
           </button>
           <button
             onClick={() => setActiveTab('milestones')}
-            className={`px-6 py-3 font-bold transition-all ${
+            className={`px-6 py-3 font-bold transition-all whitespace-nowrap ${
               activeTab === 'milestones'
                 ? 'text-primary-400 border-b-2 border-primary-400'
                 : 'text-gray-400 hover:text-white'
@@ -230,13 +298,23 @@ export default function DashboardPage() {
           </button>
           <button
             onClick={() => setActiveTab('bounties')}
-            className={`px-6 py-3 font-bold transition-all ${
+            className={`px-6 py-3 font-bold transition-all whitespace-nowrap ${
               activeTab === 'bounties'
                 ? 'text-primary-400 border-b-2 border-primary-400'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
             Bounty Activity
+          </button>
+          <button
+            onClick={() => setActiveTab('affiliate')}
+            className={`px-6 py-3 font-bold transition-all whitespace-nowrap ${
+              activeTab === 'affiliate'
+                ? 'text-primary-400 border-b-2 border-primary-400'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Affiliate Dashboard
           </button>
         </div>
 
@@ -420,6 +498,139 @@ export default function DashboardPage() {
                 Browse Bounties
               </Link>
             </div>
+          </motion.div>
+        )}
+
+        {/* Affiliate Dashboard Tab */}
+        {activeTab === 'affiliate' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            {affiliateData && (
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Welcome, {affiliateData.name || affiliateData.email}!</h2>
+                    <p className="text-gray-400">Affiliate Code: <span className="text-primary-400 font-mono">{affiliateData.affiliateCode}</span></p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Affiliate Stats Grid */}
+            {affiliateStats && (
+              <div className="grid md:grid-cols-4 gap-6 mb-8">
+                <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/50 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <UsersIcon className="w-6 h-6 text-blue-400" />
+                    <p className="text-sm text-gray-400">Total Clicks</p>
+                  </div>
+                  <p className="text-4xl font-bold text-white">{affiliateStats.stats.totalClicks}</p>
+                  <p className="text-sm text-gray-400 mt-1">Link visits</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 border border-green-500/50 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <CheckCircleIcon className="w-6 h-6 text-green-400" />
+                    <p className="text-sm text-gray-400">Total Referrals</p>
+                  </div>
+                  <p className="text-4xl font-bold text-white">{affiliateStats.stats.totalReferrals}</p>
+                  <p className="text-sm text-gray-400 mt-1">Sign-ups</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-800/20 border border-yellow-500/50 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <ChartBarIcon className="w-6 h-6 text-yellow-400" />
+                    <p className="text-sm text-gray-400">Conversion Rate</p>
+                  </div>
+                  <p className="text-4xl font-bold text-white">{affiliateStats.stats.conversionRate}%</p>
+                  <p className="text-sm text-gray-400 mt-1">Click to sign-up</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border border-purple-500/50 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <TrophyIcon className="w-6 h-6 text-purple-400" />
+                    <p className="text-sm text-gray-400">Approved</p>
+                  </div>
+                  <p className="text-4xl font-bold text-white">{affiliateStats.stats.approvedReferrals}</p>
+                  <p className="text-sm text-gray-400 mt-1">Verified buyers</p>
+                </div>
+              </div>
+            )}
+
+            {/* Affiliate Link Card */}
+            {affiliateLink && affiliateData && (
+              <div className="mb-8">
+                <AffiliateLinkCard 
+                  affiliateCode={affiliateData.affiliateCode}
+                  affiliateLink={affiliateLink}
+                />
+              </div>
+            )}
+
+            {/* Recent Referrals */}
+            {affiliateStats && affiliateStats.recentReferrals && affiliateStats.recentReferrals.length > 0 && (
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-8">
+                <h3 className="text-2xl font-bold text-white mb-4">Recent Referrals</h3>
+                <div className="space-y-3">
+                  {affiliateStats.recentReferrals.map((referral: any) => (
+                    <div key={referral.id} className="flex items-center justify-between py-3 border-b border-gray-800 last:border-0">
+                      <div className="flex-1">
+                        <p className="text-white font-medium">{referral.email}</p>
+                        {referral.name && <p className="text-sm text-gray-400">{referral.name}</p>}
+                        <p className="text-xs text-gray-500">
+                          {new Date(referral.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span className={`text-xs px-3 py-1 rounded-full font-bold ${
+                        referral.status === 'APPROVED' 
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                          : referral.status === 'PENDING'
+                          ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'
+                          : 'bg-red-500/20 text-red-400 border border-red-500/50'
+                      }`}>
+                        {referral.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Leaderboard */}
+            <div className="mb-8">
+              <AffiliateLeaderboard isPublic={false} limit={10} />
+            </div>
+
+            {/* Call to Action */}
+            {!isAffiliate && (
+              <div className="bg-gradient-to-br from-primary-600/20 to-accent-600/20 border border-primary-500/50 rounded-2xl p-8 text-center">
+                <h3 className="text-2xl font-bold text-white mb-2">Become an Affiliate</h3>
+                <p className="text-gray-300 mb-6">Earn rewards by promoting JY Token presale</p>
+                <div className="flex gap-4 justify-center">
+                  <Link
+                    href="/affiliate/register"
+                    className="inline-block bg-gradient-to-r from-primary-500 to-accent-500 text-white px-8 py-4 rounded-full font-bold hover:shadow-2xl hover:shadow-primary-500/50 transition-all"
+                  >
+                    Register Now
+                  </Link>
+                  <Link
+                    href="/affiliate/login"
+                    className="inline-block border border-gray-700 text-white px-8 py-4 rounded-full font-bold hover:bg-gray-900 transition-all"
+                  >
+                    Login
+                  </Link>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </div>

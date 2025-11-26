@@ -120,3 +120,94 @@ enum EmailEventType {
   CLICKED
   UNSUBSCRIBED
 }
+
+// Affiliate System Models
+
+model Affiliate {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String?
+  affiliateCode   String   @unique
+  
+  // Authentication
+  password        String
+  verified        Boolean  @default(false)
+  verificationToken String? @unique
+  tokenExpiresAt  DateTime?
+  
+  // Tracking
+  totalClicks     Int      @default(0)
+  totalReferrals  Int      @default(0)
+  conversionRate  Float    @default(0)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  verifiedAt      DateTime?
+  
+  // Relations
+  referrals       Referral[]
+  clickTracking   AffiliateClick[]
+  
+  @@index([affiliateCode])
+  @@index([email])
+  @@index([totalReferrals])
+  @@map("affiliates")
+}
+
+model Referral {
+  id              String   @id @default(cuid())
+  affiliateId     String
+  affiliate       Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  
+  // Referred user info
+  referredEmail   String
+  referredName    String?
+  
+  // Whitelist tracking
+  whitelistStatus WhitelistStatus @default(PENDING)
+  approvedAt      DateTime?
+  
+  // Source tracking
+  ipAddress       String?
+  userAgent       String?
+  source          String?  // utm_source or tracking param
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([affiliateId])
+  @@index([referredEmail])
+  @@index([whitelistStatus])
+  @@map("referrals")
+}
+
+model AffiliateClick {
+  id              String   @id @default(cuid())
+  affiliateId     String
+  affiliate       Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  
+  // Click tracking
+  ipAddress       String
+  userAgent       String?
+  referer         String?
+  
+  // Conversion tracking
+  converted       Boolean  @default(false)
+  convertedAt     DateTime?
+  
+  // Timestamps
+  clickedAt       DateTime @default(now())
+  
+  @@index([affiliateId])
+  @@index([ipAddress])
+  @@index([clickedAt])
+  @@map("affiliate_clicks")
+}
+
+enum WhitelistStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
