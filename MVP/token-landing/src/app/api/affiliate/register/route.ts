@@ -113,8 +113,11 @@ export async function POST(request: NextRequest) {
     // Send verification email
     const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/affiliate/verify?token=${verificationToken}`;
     
+    let emailSent = false;
+    let emailError = null;
+    
     try {
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: 'JOY Token Affiliate <noreply@coindaily.online>',
         to: email,
         subject: 'Verify Your Affiliate Account - JOY Token',
@@ -164,15 +167,26 @@ export async function POST(request: NextRequest) {
           </html>
         `,
       });
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-      // Continue anyway - user can request resend later
+      
+      console.log('Verification email sent successfully:', result);
+      emailSent = true;
+    } catch (error) {
+      emailError = error;
+      console.error('Failed to send verification email:', error);
+      console.error('Email error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : '',
+        resendApiKey: process.env.RESEND_API_KEY ? 'Set (hidden)' : 'NOT SET',
+        appUrl: process.env.NEXT_PUBLIC_APP_URL || 'NOT SET',
+      });
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Affiliate registered successfully. Please check your email to verify your account.',
+        message: emailSent 
+          ? 'Affiliate registered successfully. Please check your email to verify your account.'
+          : 'Affiliate registered successfully. However, we could not send the verification email. Please contact support.',
         code: affiliate.affiliateCode,
         affiliate: {
           id: affiliate.id,
@@ -182,6 +196,8 @@ export async function POST(request: NextRequest) {
           verified: affiliate.verified,
         },
         requiresVerification: true,
+        emailSent,
+        emailError: emailError ? (emailError instanceof Error ? emailError.message : 'Unknown error') : null,
       },
       { status: 201 }
     );
