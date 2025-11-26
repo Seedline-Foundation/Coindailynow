@@ -103,6 +103,11 @@ export async function POST(request: NextRequest) {
         id: true,
         email: true,
         name: true,
+        affiliateCode: true,
+        verified: true,
+      },
+    });
+
     return NextResponse.json(
       {
         success: true,
@@ -115,15 +120,6 @@ export async function POST(request: NextRequest) {
           code: affiliate.affiliateCode,
           verified: affiliate.verified,
         },
-      },
-      { status: 201 }
-    );    id: affiliate.id,
-          email: affiliate.email,
-          name: affiliate.name,
-          affiliateCode: affiliate.affiliateCode,
-          verified: affiliate.verified,
-        },
-        verificationRequired: true,
       },
       { status: 201 }
     );
