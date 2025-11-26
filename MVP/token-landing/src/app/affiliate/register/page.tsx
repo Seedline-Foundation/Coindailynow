@@ -129,12 +129,20 @@ export default function AffiliateRegisterPage() {
             <CheckCircleIcon className="w-20 h-20 text-green-400 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-white mb-2">Registration Successful!</h1>
             <p className="text-gray-300 mb-6">
-              Your affiliate account has been created. Please check your email to verify your account.
+              Your affiliate account has been created. Please check your email to verify your account before logging in.
             </p>
+            
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-6">
+              <p className="text-yellow-400 font-semibold mb-1">📧 Verification Email Sent</p>
+              <p className="text-sm text-yellow-200">
+                Check your inbox and click the verification link to activate your account. The link expires in 24 hours.
+              </p>
+            </div>
             
             <div className="bg-black/50 rounded-xl p-6 mb-6">
               <p className="text-sm text-gray-400 mb-2">Your Affiliate Code</p>
               <p className="text-2xl font-bold gradient-text">{affiliateCode}</p>
+              <p className="text-xs text-gray-500 mt-2">Save this code - you'll need it after verification</p>
             </div>
 
             <div className="space-y-3">

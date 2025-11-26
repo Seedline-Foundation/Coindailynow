@@ -30,6 +30,26 @@ export default function AffiliateLoginPage() {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
+
+  const handleResendVerification = async () => {
+    try {
+      const response = await fetch('/api/affiliate/resend-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      if (response.ok) {
+        setResendSuccess(true);
+        setTimeout(() => setResendSuccess(false), 5000);
+      }
+    } catch (error) {
+      console.error('Failed to resend verification:', error);
+    }
+  };
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -68,7 +88,24 @@ export default function AffiliateLoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setErrors({ general: data.error || 'Login failed' });
+        // Check if it's a verification error
+        if (data.requiresVerification) {
+          setErrors({ 
+            general: (
+              <span>
+                {data.error}{' '}
+                <button
+                  onClick={handleResendVerification}
+                  className="text-primary-400 hover:text-primary-300 underline"
+                >
+                  Resend verification email
+                </button>
+              </span>
+            ) as any
+          });
+        } else {
+          setErrors({ general: data.error || 'Login failed' });
+        }
         return;
       }
 
@@ -125,6 +162,14 @@ export default function AffiliateLoginPage() {
             <ArrowRightOnRectangleIcon className="w-8 h-8 text-primary-400" />
             <h2 className="text-2xl font-bold text-white">Login to Your Account</h2>
           </div>
+
+          {resendSuccess && (
+            <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+              <p className="text-green-400 text-sm">
+                ✓ Verification email sent! Check your inbox.
+              </p>
+            </div>
+          )}
 
           {errors.general && (
             <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 mb-6 flex items-start gap-3">

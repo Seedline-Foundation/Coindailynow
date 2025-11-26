@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { Resend } from 'resend';
 
 const prisma = new PrismaClient();
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Generate unique affiliate code
 function generateAffiliateCode(): string {
@@ -108,10 +110,69 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Send verification email
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/affiliate/verify?token=${verificationToken}`;
+    
+    try {
+      await resend.emails.send({
+        from: 'JOY Token Affiliate <noreply@coindaily.online>',
+        to: email,
+        subject: 'Verify Your Affiliate Account - JOY Token',
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                <h1 style="color: white; margin: 0;">JOY Token Affiliate Program</h1>
+              </div>
+              
+              <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+                <h2 style="color: #667eea; margin-top: 0;">Verify Your Email Address</h2>
+                
+                <p>Hi ${name || 'there'},</p>
+                
+                <p>Thank you for joining the JOY Token Affiliate Program! Please verify your email address to activate your account and start earning commissions.</p>
+                
+                <p><strong>Your Affiliate Code:</strong> <code style="background: #fff; padding: 5px 10px; border-radius: 3px;">${affiliate.affiliateCode}</code></p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${verificationUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                    Verify Email Address
+                  </a>
+                </div>
+                
+                <p style="color: #666; font-size: 14px;">Or copy and paste this link into your browser:</p>
+                <p style="background: #fff; padding: 15px; border-radius: 5px; word-break: break-all; font-size: 14px;">
+                  ${verificationUrl}
+                </p>
+                
+                <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                  This verification link will expire in 24 hours.
+                </p>
+                
+                <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+                
+                <p style="color: #999; font-size: 12px; text-align: center;">
+                  If you didn't create this account, please ignore this email.
+                </p>
+              </div>
+            </body>
+          </html>
+        `,
+      });
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      // Continue anyway - user can request resend later
+    }
+
     return NextResponse.json(
       {
         success: true,
-        message: 'Affiliate registered successfully',
+        message: 'Affiliate registered successfully. Please check your email to verify your account.',
         code: affiliate.affiliateCode,
         affiliate: {
           id: affiliate.id,
@@ -120,6 +181,7 @@ export async function POST(request: NextRequest) {
           code: affiliate.affiliateCode,
           verified: affiliate.verified,
         },
+        requiresVerification: true,
       },
       { status: 201 }
     );
