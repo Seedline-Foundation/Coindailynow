@@ -93,10 +93,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Step 3: Schedule Day 1-9 email sequence
+    // Step 3: Schedule Day 1-9 email sequence in database (NOT via Resend scheduledAt)
+    // Resend can only schedule up to 24 hours in advance, so we'll use a cron job
     const baseTime = new Date(); // Welcome email sent now, start counting from here
     
-    // Schedule all emails in the sequence using Resend's scheduledAt
+    // Create pending scheduled emails in database
     for (const emailDef of EMAIL_SEQUENCE) {
       try {
         // Calculate total hours from welcome email
@@ -105,43 +106,22 @@ export async function GET(request: NextRequest) {
           .reduce((sum, e) => sum + e.delayHours, 0);
         
         const scheduledDate = new Date(baseTime.getTime() + totalHours * 60 * 60 * 1000);
-        const scheduledAt = formatScheduledAt(scheduledDate);
 
-        // TODO: Get actual HTML template for each day (placeholder for now)
-        const emailHtml = `<h1>Day ${emailDef.sequence}: ${emailDef.subject}</h1>
-<p>This is a placeholder. Replace with actual email template.</p>`;
-
-        // Schedule email with Resend
-        const scheduleResponse = await resend.emails.send({
-          from: 'Joy Token Team <noreply@coindaily.online>',
-          to: subscriber.email,
-          subject: emailDef.subject,
-          html: emailHtml,
-          scheduledAt: scheduledAt
-        });
-
-        if (scheduleResponse.error) {
-          console.error(`Error scheduling ${emailDef.type}:`, scheduleResponse.error);
-        } else {
-          console.log(`Scheduled ${emailDef.type} for ${scheduledDate.toISOString()}`);
-          
-          // Store in database for tracking
-          if (scheduleResponse.data?.id) {
-            await prisma.scheduledEmail.create({
-              data: {
-                subscriberId: subscriber.id,
-                emailType: emailDef.type,
-                emailSequence: emailDef.sequence,
-                subject: emailDef.subject,
-                scheduledFor: scheduledDate,
-                resendEmailId: scheduleResponse.data.id,
-                status: 'SENT',
-              }
-            });
+        // Store in database with PENDING status for cron job to process
+        await prisma.scheduledEmail.create({
+          data: {
+            subscriberId: subscriber.id,
+            emailType: emailDef.type,
+            emailSequence: emailDef.sequence,
+            subject: emailDef.subject,
+            scheduledFor: scheduledDate,
+            status: 'PENDING', // Will be sent by cron job
           }
-        }
+        });
+        
+        console.log(`Queued ${emailDef.type} for ${scheduledDate.toISOString()}`);
       } catch (error) {
-        console.error(`Failed to schedule ${emailDef.type}:`, error);
+        console.error(`Failed to queue ${emailDef.type}:`, error);
       }
     }
 
