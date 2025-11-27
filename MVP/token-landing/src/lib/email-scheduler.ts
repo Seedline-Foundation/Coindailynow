@@ -246,7 +246,8 @@ export async function processPendingEmails(): Promise<{
             where: { id: scheduledEmail.id },
             data: { 
               status: 'FAILED',
-              error: JSON.stringify(response.error)
+              lastError: JSON.stringify(response.error),
+              attempts: scheduledEmail.attempts + 1
             }
           });
           failed++;
@@ -272,7 +273,8 @@ export async function processPendingEmails(): Promise<{
           where: { id: scheduledEmail.id },
           data: { 
             status: 'FAILED',
-            error: error.message
+            lastError: error.message,
+            attempts: scheduledEmail.attempts + 1
           }
         });
         failed++;
@@ -477,29 +479,405 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
         </div>
       `;
       
-    // Placeholder templates for remaining days
     case 'day_4_tokenomics':
-    case 'day_5_presale_walkthrough':
-    case 'day_6_community_power':
-    case 'day_7_final_countdown':
-    case 'day_8_testimonials':
-    case 'day_9_careers':
       return `${baseStyles}
         <div class="container">
           <div class="header">
-            <h1>💎 Joy Token Update</h1>
+            <h1>💎 Joy Token Tokenomics: Your Path to Wealth</h1>
           </div>
           <div class="content">
             <h2>Hi ${name},</h2>
-            <p>Important update about the Joy Token presale...</p>
-            <center><a href="https://token.coindaily.online" class="cta-button">Join the Presale →</a></center>
+            <p>Numbers don't lie. Today, I'm showing you the exact tokenomics that make Joy Token a SMART investment.</p>
+            
+            <h3>The Numbers That Matter</h3>
+            
+            <div class="highlight">
+              <p style="margin: 0;"><strong>Total Supply:</strong> 1,000,000,000 $JY (1 Billion tokens)</p>
+              <p style="margin: 5px 0 0 0;"><strong>Presale Price:</strong> $0.001 per token</p>
+              <p style="margin: 5px 0 0 0;"><strong>Launch Price Target:</strong> $0.01+ per token</p>
+              <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: bold; color: #FFA500;">That's 10x potential for presale buyers!</p>
+            </div>
+            
+            <h3>Token Allocation (Smart Distribution)</h3>
+            <ul>
+              <li>💰 <strong>40% Presale:</strong> Reserved for early believers like YOU</li>
+              <li>🔒 <strong>20% Locked Liquidity:</strong> Ensures price stability and trust</li>
+              <li>🎁 <strong>15% Community Rewards:</strong> Airdrops, staking, engagement bonuses</li>
+              <li>👥 <strong>15% Team:</strong> Vested over 24 months (aligned with YOUR success)</li>
+              <li>📈 <strong>10% Marketing & Growth:</strong> Expanding CoinDaily ecosystem</li>
+            </ul>
+            
+            <h3>Why These Numbers Win</h3>
+            <p>✅ <strong>Majority to presale buyers</strong> - You control the supply<br>
+            ✅ <strong>Locked liquidity</strong> - No rug pulls, ever<br>
+            ✅ <strong>Team vesting</strong> - We succeed when YOU succeed<br>
+            ✅ <strong>Deflationary mechanics</strong> - Token burns increase scarcity</p>
+            
+            <div class="highlight">
+              <p style="margin: 0; font-size: 16px;"><strong>Real Math:</strong></p>
+              <p style="margin: 5px 0;">If you invest $100 at presale ($0.001), you get 100,000 $JY</p>
+              <p style="margin: 5px 0;">If launch price hits $0.01, your $100 becomes <strong>$1,000</strong></p>
+              <p style="margin: 5px 0;">If it hits $0.10, your $100 becomes <strong>$10,000</strong></p>
+            </div>
+            
+            <center><a href="https://token.coindaily.online" class="cta-button">Secure Your Allocation →</a></center>
+            
+            <p>Tomorrow: Step-by-step guide on exactly how to participate in the presale.</p>
+            
             <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
           </div>
           ${footer}
         </div>
       `;
       
+    case 'day_5_presale_walkthrough':
+      return `${baseStyles}
+        <div class="container">
+          <div class="header">
+            <h1>📝 How to Participate in Joy Token Presale</h1>
+          </div>
+          <div class="content">
+            <h2>Hi ${name},</h2>
+            <p>No confusion. No complicated steps. Here's your EXACT roadmap to securing Joy Token at presale prices.</p>
+            
+            <h3>Step-by-Step Presale Guide</h3>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFD700;">
+              <h4 style="margin: 0 0 10px 0;">🔹 Step 1: Create Your Wallet</h4>
+              <p style="margin: 0;">Download MetaMask or Trust Wallet (free mobile apps or browser extensions)</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFD700;">
+              <h4 style="margin: 0 0 10px 0;">🔹 Step 2: Fund Your Wallet</h4>
+              <p style="margin: 0;">Buy USDT, ETH, or BNB from any exchange (Binance, Luno, Quidax recommended for Africa)</p>
+              <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">Tip: Start with as little as $10 to test the process!</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFD700;">
+              <h4 style="margin: 0 0 10px 0;">🔹 Step 3: Connect to Joy Token Presale</h4>
+              <p style="margin: 0;">Visit <a href="https://token.coindaily.online" style="color: #FFA500; font-weight: bold;">token.coindaily.online</a></p>
+              <p style="margin: 5px 0 0 0;">Click "Connect Wallet" and select your wallet</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFD700;">
+              <h4 style="margin: 0 0 10px 0;">🔹 Step 4: Buy $JY Tokens</h4>
+              <p style="margin: 0;">Enter the amount of USDT/ETH/BNB you want to spend</p>
+              <p style="margin: 5px 0 0 0;">Confirm transaction in your wallet</p>
+              <p style="margin: 5px 0 0 0; font-weight: bold; color: #FFA500;">🎉 Done! Your $JY tokens are yours!</p>
+            </div>
+            
+            <h3>Important Reminders</h3>
+            <ul>
+              <li>🔐 Never share your wallet seed phrase with ANYONE</li>
+              <li>💰 Minimum purchase: $10 worth of crypto</li>
+              <li>⚡ Tokens delivered instantly to your wallet</li>
+              <li>📊 Track your balance on the presale dashboard</li>
+            </ul>
+            
+            <div class="highlight">
+              <strong>⏰ Presale Bonus:</strong> First 1,000 buyers get 10% extra tokens!<br>
+              Don't miss out on free money.
+            </div>
+            
+            <center><a href="https://token.coindaily.online" class="cta-button">Start Buying Now →</a></center>
+            
+            <p>Tomorrow: Meet the community that's building wealth together.</p>
+            
+            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+          </div>
+          ${footer}
+        </div>
+      `;
+      
+    case 'day_6_community_power':
+      return `${baseStyles}
+        <div class="container">
+          <div class="header">
+            <h1>💪 Join the Joy Token Community</h1>
+          </div>
+          <div class="content">
+            <h2>Hi ${name},</h2>
+            <p>Crypto isn't just about tokens. It's about PEOPLE. And the Joy Token community is where wealth is built together.</p>
+            
+            <h3>Why Community Matters</h3>
+            <p>Look at every successful crypto project:</p>
+            <ul>
+              <li>🐕 <strong>Dogecoin:</strong> Community memes took it to $0.70</li>
+              <li>🔥 <strong>Shiba Inu:</strong> ShibArmy drove 1000x gains</li>
+              <li>🌙 <strong>SafeMoon:</strong> Community holders became millionaires</li>
+            </ul>
+            
+            <p><strong>The pattern?</strong> Strong community = Strong price action.</p>
+            
+            <h3>What Makes Joy Token Community Special</h3>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <h4 style="margin: 0 0 10px 0;">🌍 Africa-First Mindset</h4>
+              <p style="margin: 0;">We're not just another global project. We understand African crypto challenges and opportunities.</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <h4 style="margin: 0 0 10px 0;">📰 CoinDaily Integration</h4>
+              <p style="margin: 0;">Exclusive news, memecoin alerts, and market insights for $JY holders.</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <h4 style="margin: 0 0 10px 0;">🎁 Holder Rewards</h4>
+              <p style="margin: 0;">Airdrops, staking bonuses, and voting rights on platform decisions.</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <h4 style="margin: 0 0 10px 0;">💰 Referral Program</h4>
+              <p style="margin: 0;">Earn 5% of every referral's purchase. Build your wealth by helping others.</p>
+            </div>
+            
+            <h3>Join the Movement</h3>
+            <p>Connect with thousands of African crypto enthusiasts:</p>
+            <ul>
+              <li>💬 <strong>Telegram:</strong> Daily updates, AMA sessions, market discussions</li>
+              <li>🐦 <strong>Twitter/X:</strong> Latest news, memes, and community highlights</li>
+              <li>📱 <strong>Discord:</strong> Deep dives, analysis, and direct team access</li>
+            </ul>
+            
+            <div class="highlight">
+              <p style="margin: 0; font-size: 18px; font-weight: bold;">Together, we're not just buying tokens.</p>
+              <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: bold;">We're building generational wealth for Africa.</p>
+            </div>
+            
+            <center><a href="https://token.coindaily.online" class="cta-button">Become a Holder →</a></center>
+            
+            <p>Tomorrow: The final countdown begins. Presale launching soon!</p>
+            
+            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+          </div>
+          ${footer}
+        </div>
+      `;
+      
+    case 'day_7_final_countdown':
+      return `${baseStyles}
+        <div class="container">
+          <div class="header">
+            <h1>⏰ Final Countdown: Presale Launching Soon!</h1>
+          </div>
+          <div class="content">
+            <h2>Hi ${name},</h2>
+            <p>This is it. The moment we've been building toward.</p>
+            
+            <div class="highlight" style="background: #fff3cd; border-left: 4px solid #ff6b6b; padding: 20px;">
+              <p style="margin: 0; font-size: 24px; font-weight: bold; color: #ff6b6b; text-align: center;">🚨 PRESALE LAUNCHING IN 48 HOURS 🚨</p>
+            </div>
+            
+            <h3>What Happens Next</h3>
+            
+            <p><strong>📅 Launch Date:</strong> [INSERT EXACT DATE]<br>
+            <strong>⏰ Launch Time:</strong> 12:00 PM GMT<br>
+            <strong>💰 Starting Price:</strong> $0.001 per $JY<br>
+            <strong>🎁 Early Bonus:</strong> 10% extra tokens for first 1,000 buyers</p>
+            
+            <h3>Why You Should Act FAST</h3>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <p style="margin: 0;"><strong>⚡ Limited Supply:</strong> Only 400 million tokens in presale</p>
+              <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">When they're gone, you'll pay higher prices on exchanges</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <p style="margin: 0;"><strong>📈 Price Tiers:</strong> Price increases every 50 million tokens sold</p>
+              <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">Early buyers get the absolute best deal</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <p style="margin: 0;"><strong>🔥 FOMO is Real:</strong> Our community is 10,000+ strong and growing</p>
+              <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">Presale could sell out in days, not months</p>
+            </div>
+            
+            <h3>Your Pre-Launch Checklist</h3>
+            <ul>
+              <li>✅ Wallet ready (MetaMask or Trust Wallet)</li>
+              <li>✅ Funds available (USDT, ETH, or BNB)</li>
+              <li>✅ Bookmark <a href="https://token.coindaily.online" style="color: #FFA500;">token.coindaily.online</a></li>
+              <li>✅ Join our Telegram for launch announcement</li>
+              <li>✅ Set alarm for launch time</li>
+            </ul>
+            
+            <div class="highlight">
+              <p style="margin: 0; font-size: 18px; text-align: center;"><strong>The next 48 hours will define your crypto future.</strong></p>
+              <p style="margin: 10px 0 0 0; font-size: 16px; text-align: center;">Will you be an early believer or a spectator?</p>
+            </div>
+            
+            <center><a href="https://token.coindaily.online" class="cta-button">Get Ready for Launch →</a></center>
+            
+            <p>Tomorrow: Real stories from early crypto believers who changed their lives.</p>
+            
+            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+          </div>
+          ${footer}
+        </div>
+      `;
+      
+    case 'day_8_testimonials':
+      return `${baseStyles}
+        <div class="container">
+          <div class="header">
+            <h1>🌟 Real People, Real Results</h1>
+          </div>
+          <div class="content">
+            <h2>Hi ${name},</h2>
+            <p>Don't take my word for it. Listen to the people who got in early on crypto and never looked back.</p>
+            
+            <h3>Early Believer Stories</h3>
+            
+            <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+              <p style="margin: 0; font-style: italic;">"I invested $500 in Ethereum at $10. Everyone said I was crazy. Two years later, I cashed out $150,000. Best decision of my life."</p>
+              <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">— Michael K., Nigeria</p>
+            </div>
+            
+            <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+              <p style="margin: 0; font-style: italic;">"Shiba Inu presale changed everything. $100 became $30,000 in 6 months. Now I'm looking for the NEXT Shiba."</p>
+              <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">— Sarah T., Kenya</p>
+            </div>
+            
+            <div style="background: #fefce8; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #eab308;">
+              <p style="margin: 0; font-style: italic;">"I bought Solana at $1.50 during their presale. Sold at $200. Used profits to quit my job and start my own business."</p>
+              <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">— David M., South Africa</p>
+            </div>
+            
+            <h3>What These Stories Have in Common</h3>
+            <p>✅ They got in EARLY<br>
+            ✅ They believed in the project<br>
+            ✅ They held through FUD<br>
+            ✅ They took ACTION when others hesitated</p>
+            
+            <div class="highlight">
+              <p style="margin: 0; font-size: 18px; font-weight: bold;">Joy Token is YOUR Early Opportunity</p>
+              <p style="margin: 10px 0 0 0;">In 2 years, will you be telling YOUR success story?<br>
+              Or will you be saying "I wish I had bought when I had the chance"?</p>
+            </div>
+            
+            <h3>Why People Trust CoinDaily</h3>
+            <ul>
+              <li>📰 <strong>10,000+ Daily Readers:</strong> Africa's most trusted crypto news</li>
+              <li>🎯 <strong>Proven Track Record:</strong> Called 5 memecoin pumps in 2024</li>
+              <li>🔒 <strong>Transparent Team:</strong> Public identities, no anonymous devs</li>
+              <li>💎 <strong>Real Utility:</strong> $JY powers actual platform features</li>
+            </ul>
+            
+            <center><a href="https://token.coindaily.online" class="cta-button">Write Your Success Story →</a></center>
+            
+            <p>Tomorrow: FINAL email. Join our team or earn 100 $JY for referrals!</p>
+            
+            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+          </div>
+          ${footer}
+        </div>
+      `;
+      
+    case 'day_9_careers':
+      return `${baseStyles}
+        <div class="container">
+          <div class="header">
+            <h1>💼 Join CoinDaily or Win 100 $JY!</h1>
+          </div>
+          <div class="content">
+            <h2>Hi ${name},</h2>
+            <p>This is the final email in our series. But it's not goodbye—it's an invitation to go DEEPER.</p>
+            
+            <h3>Option 1: Work With Us 🚀</h3>
+            <p>CoinDaily is growing FAST. We're hiring talented Africans who believe in crypto's power to transform lives.</p>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <h4 style="margin: 0 0 10px 0;">🖊️ Content Writers</h4>
+              <p style="margin: 0; font-size: 14px;">Cover crypto news, memecoins, and African market trends</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <h4 style="margin: 0 0 10px 0;">📱 Social Media Managers</h4>
+              <p style="margin: 0; font-size: 14px;">Grow our community on Twitter, Telegram, and TikTok</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <h4 style="margin: 0 0 10px 0;">💻 Developers</h4>
+              <p style="margin: 0; font-size: 14px;">Build features for Africa's premier crypto platform</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <h4 style="margin: 0 0 10px 0;">🎨 Graphic Designers</h4>
+              <p style="margin: 0; font-size: 14px;">Create viral graphics and memes for crypto content</p>
+            </div>
+            
+            <p><strong>Perks:</strong> Competitive salary + $JY token bonuses + Remote work + Be part of Africa's crypto revolution</p>
+            
+            <center><a href="https://coindaily.online/careers" class="cta-button">View Open Positions →</a></center>
+            
+            <h3>Option 2: Earn 100 $JY Tokens! 💰</h3>
+            <p>Not ready to join the team? Earn FREE tokens by referring friends!</p>
+            
+            <div class="highlight">
+              <p style="margin: 0; font-weight: bold;">Referral Rewards:</p>
+              <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                <li>Refer 1 friend who joins whitelist = <strong>10 $JY</strong></li>
+                <li>Refer 5 friends = <strong>50 $JY</strong></li>
+                <li>Refer 10 friends = <strong>100 $JY</strong> (worth $100+ at launch!)</li>
+              </ul>
+              <p style="margin: 10px 0 0 0; font-size: 14px;"><strong>PLUS:</strong> 5% of every referral's presale purchase!</p>
+            </div>
+            
+            <p><strong>How it works:</strong></p>
+            <ol>
+              <li>Get your unique referral link</li>
+              <li>Share with friends, family, social media</li>
+              <li>They sign up for whitelist using your link</li>
+              <li>You earn $JY tokens automatically!</li>
+            </ol>
+            
+            <center><a href="https://token.coindaily.online/affiliate" class="cta-button">Get My Referral Link →</a></center>
+            
+            <h3>Thank You for This Journey</h3>
+            <p>Over the past 9 days, you've learned:</p>
+            <ul>
+              <li>✅ What makes CoinDaily special</li>
+              <li>✅ Why Joy Token is a smart investment</li>
+              <li>✅ The power of getting in early</li>
+              <li>✅ Exact tokenomics and presale details</li>
+              <li>✅ How to participate step-by-step</li>
+              <li>✅ The strength of our community</li>
+              <li>✅ Real success stories from early believers</li>
+            </ul>
+            
+            <div class="highlight">
+              <p style="margin: 0; font-size: 20px; font-weight: bold; text-align: center;">The choice is yours:</p>
+              <p style="margin: 10px 0 0 0; text-align: center;">Act now and potentially change your life.<br>
+              Or wait and watch others succeed.</p>
+            </div>
+            
+            <p><strong>Presale launches in [X HOURS].</strong></p>
+            
+            <center><a href="https://token.coindaily.online" class="cta-button">Secure My Joy Tokens →</a></center>
+            
+            <p>To your success,</p>
+            <p><strong>The CoinDaily Team</strong></p>
+            
+            <p style="font-size: 12px; color: #666; margin-top: 30px;">P.S. This is the last scheduled email. But you'll still get important updates about presale milestones, exchange listings, and community events. Stay connected!</p>
+          </div>
+          ${footer}
+        </div>
+      `;
+      
     default:
-      return `<p>Email content for ${emailType}</p>`;
+      return `${baseStyles}
+        <div class="container">
+          <div class="header">
+            <h1>💎 Joy Token</h1>
+          </div>
+          <div class="content">
+            <h2>Hi ${name},</h2>
+            <p>Important update about Joy Token...</p>
+            <center><a href="https://token.coindaily.online" class="cta-button">Visit Joy Token →</a></center>
+            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+          </div>
+          ${footer}
+        </div>
+      `;
   }
 }
