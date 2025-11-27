@@ -138,6 +138,8 @@ model Affiliate {
   // Tracking
   totalClicks     Int      @default(0)
   totalReferrals  Int      @default(0)
+  totalConversions Int     @default(0)  // Number of referrals who bought tokens
+  totalTokensEarned Float  @default(0)  // 5% of referral purchases
   conversionRate  Float    @default(0)
   
   // Timestamps
@@ -167,6 +169,12 @@ model Referral {
   // Whitelist tracking
   whitelistStatus WhitelistStatus @default(PENDING)
   approvedAt      DateTime?
+  
+  // Conversion tracking
+  converted       Boolean  @default(false)
+  convertedAt     DateTime?
+  tokensPurchased Float    @default(0)  // Amount of tokens purchased by referral
+  tokensEarned    Float    @default(0)  // 5% commission for affiliate
   
   // Source tracking
   ipAddress       String?

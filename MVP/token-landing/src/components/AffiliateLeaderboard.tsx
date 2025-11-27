@@ -13,6 +13,8 @@ interface LeaderboardEntry {
   affiliateCode: string;
   name: string;
   totalReferrals: number;
+  totalConversions: number;
+  totalTokensEarned: number;
   totalClicks: number;
   conversionRate: number;
 }
@@ -129,15 +131,27 @@ export default function AffiliateLeaderboard({ isPublic = true, limit = 10 }: Le
                 <p className="text-xs text-gray-300 opacity-75">Code: {entry.affiliateCode}</p>
               </div>
 
-              {/* Stats */}
+              {/* Referrals */}
               <div className="text-right">
-                <p className="text-2xl font-bold text-white">{entry.totalReferrals}</p>
+                <p className="text-xl font-bold text-white">{entry.totalReferrals}</p>
                 <p className="text-xs text-gray-300 opacity-75">Referrals</p>
               </div>
 
-              {/* Conversion Rate */}
+              {/* Conversions */}
+              <div className="text-right hidden sm:block">
+                <p className="text-xl font-bold text-green-400">{entry.totalConversions}</p>
+                <p className="text-xs text-gray-300 opacity-75">Conversions</p>
+              </div>
+
+              {/* Earnings */}
               <div className="text-right hidden md:block">
-                <p className="text-lg font-bold text-white">{entry.conversionRate.toFixed(1)}%</p>
+                <p className="text-lg font-bold text-yellow-400">{entry.totalTokensEarned.toLocaleString()} JY</p>
+                <p className="text-xs text-gray-300 opacity-75">Earned</p>
+              </div>
+
+              {/* Conversion Rate */}
+              <div className="text-right hidden lg:block">
+                <p className="text-sm font-bold text-white">{entry.conversionRate.toFixed(1)}%</p>
                 <p className="text-xs text-gray-300 opacity-75">Conv. Rate</p>
               </div>
             </motion.div>

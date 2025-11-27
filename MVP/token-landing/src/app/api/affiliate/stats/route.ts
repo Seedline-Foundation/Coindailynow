@@ -67,13 +67,17 @@ export async function GET(request: NextRequest) {
 
     // Calculate stats
     const totalReferrals = affiliate.referrals.length;
+    const totalConversions = affiliate.referrals.filter((r: any) => r.converted).length;
     const approvedReferrals = affiliate.referrals.filter((r: any) => r.whitelistStatus === 'APPROVED').length;
     const pendingReferrals = affiliate.referrals.filter((r: any) => r.whitelistStatus === 'PENDING').length;
     const rejectedReferrals = affiliate.referrals.filter((r: any) => r.whitelistStatus === 'REJECTED').length;
+    const totalTokensEarned = affiliate.referrals
+      .filter((r: any) => r.converted)
+      .reduce((sum: number, r: any) => sum + (r.tokensEarned || 0), 0);
 
     // Calculate conversion rate
     const conversionRate = affiliate.totalClicks > 0 
-      ? (totalReferrals / affiliate.totalClicks) * 100 
+      ? (totalConversions / affiliate.totalClicks) * 100 
       : 0;
 
     // Get recent activity
@@ -89,8 +93,12 @@ export async function GET(request: NextRequest) {
       email: referral.referredEmail,
       name: referral.referredName,
       status: referral.whitelistStatus,
+      converted: referral.converted,
+      tokensPurchased: referral.tokensPurchased || 0,
+      tokensEarned: referral.tokensEarned || 0,
       createdAt: referral.createdAt,
       approvedAt: referral.approvedAt,
+      convertedAt: referral.convertedAt,
     }));
 
     return NextResponse.json(
@@ -100,6 +108,8 @@ export async function GET(request: NextRequest) {
           affiliateCode: affiliate.affiliateCode,
           totalClicks: affiliate.totalClicks,
           totalReferrals,
+          totalConversions,
+          totalTokensEarned: Math.round(totalTokensEarned * 100) / 100,
           approvedReferrals,
           pendingReferrals,
           rejectedReferrals,

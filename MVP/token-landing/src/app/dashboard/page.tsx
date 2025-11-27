@@ -527,7 +527,7 @@ export default function DashboardPage() {
 
             {/* Affiliate Stats Grid */}
             {affiliateStats && (
-              <div className="grid md:grid-cols-4 gap-6 mb-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                 <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/50 rounded-xl p-6">
                   <div className="flex items-center gap-3 mb-2">
                     <UsersIcon className="w-6 h-6 text-blue-400" />
@@ -546,22 +546,31 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-400 mt-1">Sign-ups</p>
                 </div>
 
-                <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-800/20 border border-yellow-500/50 rounded-xl p-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <ChartBarIcon className="w-6 h-6 text-yellow-400" />
-                    <p className="text-sm text-gray-400">Conversion Rate</p>
-                  </div>
-                  <p className="text-4xl font-bold text-white">{affiliateStats.stats.conversionRate}%</p>
-                  <p className="text-sm text-gray-400 mt-1">Click to sign-up</p>
-                </div>
-
                 <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border border-purple-500/50 rounded-xl p-6">
                   <div className="flex items-center gap-3 mb-2">
                     <TrophyIcon className="w-6 h-6 text-purple-400" />
-                    <p className="text-sm text-gray-400">Approved</p>
+                    <p className="text-sm text-gray-400">Conversions</p>
                   </div>
-                  <p className="text-4xl font-bold text-white">{affiliateStats.stats.approvedReferrals}</p>
-                  <p className="text-sm text-gray-400 mt-1">Verified buyers</p>
+                  <p className="text-4xl font-bold text-white">{affiliateStats.stats.totalConversions || 0}</p>
+                  <p className="text-sm text-gray-400 mt-1">Tokens purchased</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-800/20 border border-yellow-500/50 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-2xl">💰</span>
+                    <p className="text-sm text-gray-400">Tokens Earned</p>
+                  </div>
+                  <p className="text-3xl font-bold text-yellow-400">{(affiliateStats.stats.totalTokensEarned || 0).toLocaleString()}</p>
+                  <p className="text-sm text-gray-400 mt-1">JY tokens (5%)</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-600/20 to-orange-800/20 border border-orange-500/50 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <ChartBarIcon className="w-6 h-6 text-orange-400" />
+                    <p className="text-sm text-gray-400">Conv. Rate</p>
+                  </div>
+                  <p className="text-4xl font-bold text-white">{affiliateStats.stats.conversionRate}%</p>
+                  <p className="text-sm text-gray-400 mt-1">Click to purchase</p>
                 </div>
               </div>
             )}
