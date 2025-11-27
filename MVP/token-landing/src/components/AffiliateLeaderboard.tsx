@@ -97,7 +97,10 @@ export default function AffiliateLeaderboard({ isPublic = true, limit = 10 }: Le
     <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
       <div className="flex items-center gap-3 mb-6">
         <FireIcon className="w-8 h-8 text-accent-400" />
-        <h3 className="text-2xl font-bold text-white">Top Affiliates</h3>
+        <div className="flex-1">
+          <h3 className="text-2xl font-bold text-white">Top Affiliates</h3>
+          <p className="text-sm text-gray-400">Earn 5% of tokens from each referral's purchase</p>
+        </div>
       </div>
 
       {leaderboard.length === 0 ? (

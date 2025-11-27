@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate affiliate link
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://joytoken.io';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://token.coindaily.online';
     const affiliateLink = `${baseUrl}?ref=${affiliate.affiliateCode}`;
 
     return NextResponse.json(

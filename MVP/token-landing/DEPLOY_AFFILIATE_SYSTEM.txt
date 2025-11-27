@@ -1,0 +1,218 @@
+═══════════════════════════════════════════════════════════════
+  DEPLOY AFFILIATE SYSTEM TO CONTABO SERVER
+═══════════════════════════════════════════════════════════════
+
+STEP 1: SSH INTO CONTABO SERVER
+─────────────────────────────────────────────────────────────
+ssh root@your-server-ip
+# OR if you have a domain:
+ssh root@token.coindaily.online
+
+
+STEP 2: NAVIGATE TO PROJECT & PULL LATEST CODE
+─────────────────────────────────────────────────────────────
+cd /var/www/token-landing
+# OR wherever your project is located
+
+# Pull latest changes
+git pull origin main
+
+
+STEP 3: INSTALL NEW DEPENDENCIES
+─────────────────────────────────────────────────────────────
+npm install
+# This installs: bcryptjs, jsonwebtoken, and their types
+
+
+STEP 4: UPDATE ENVIRONMENT VARIABLES
+─────────────────────────────────────────────────────────────
+nano .env.local
+# OR
+vim .env.local
+
+# Add these lines if not present:
+DATABASE_URL="your-neon-database-url"
+JWT_SECRET="lkCmLY1hAx+p9iDPhHzNlo4Gz2ZR2vthFMCOQ4XciJc="
+
+# Save and exit (Ctrl+X, then Y, then Enter for nano)
+
+
+STEP 5: UPDATE DATABASE SCHEMA
+─────────────────────────────────────────────────────────────
+npx prisma generate
+npx prisma db push
+
+# This creates:
+# - affiliates table
+# - referrals table
+# - affiliate_clicks table
+
+
+STEP 6: BUILD THE APPLICATION
+─────────────────────────────────────────────────────────────
+npm run build
+
+
+STEP 7: RESTART THE APPLICATION
+─────────────────────────────────────────────────────────────
+
+# If using PM2:
+pm2 restart token-landing
+# OR
+pm2 restart all
+
+# If using systemd:
+sudo systemctl restart token-landing
+
+# If using Docker:
+docker-compose down
+docker-compose up -d --build
+
+
+STEP 8: VERIFY DEPLOYMENT
+─────────────────────────────────────────────────────────────
+# Check if service is running:
+pm2 status
+# OR
+systemctl status token-landing
+
+# Check logs:
+pm2 logs token-landing
+# OR
+journalctl -u token-landing -f
+
+# Test the endpoints:
+curl -X POST https://token.coindaily.online/api/affiliate/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"TestPass123!","name":"Test"}'
+
+
+STEP 9: TEST IN BROWSER
+─────────────────────────────────────────────────────────────
+Visit these URLs:
+✓ https://token.coindaily.online/affiliate/register
+✓ https://token.coindaily.online/affiliate/login
+✓ https://token.coindaily.online/dashboard (check Affiliate tab)
+
+
+═══════════════════════════════════════════════════════════════
+  TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+ERROR: Database connection failed
+─────────────────────────────────────────────────────────────
+→ Check DATABASE_URL in .env.local
+→ Verify Neon database is accessible from server
+→ Check if IP is whitelisted in Neon dashboard
+
+ERROR: JWT_SECRET not found
+─────────────────────────────────────────────────────────────
+→ Add JWT_SECRET to .env.local
+→ Restart the application
+
+ERROR: Table does not exist
+─────────────────────────────────────────────────────────────
+→ Run: npx prisma db push
+→ Check Prisma schema is up to date
+
+ERROR: Build failed
+─────────────────────────────────────────────────────────────
+→ Clear .next folder: rm -rf .next
+→ Reinstall dependencies: rm -rf node_modules && npm install
+→ Build again: npm run build
+
+Port already in use
+─────────────────────────────────────────────────────────────
+→ Stop existing process: pm2 stop token-landing
+→ Or kill port 3001: lsof -ti:3001 | xargs kill -9
+→ Start again: pm2 start ecosystem.config.js
+
+
+═══════════════════════════════════════════════════════════════
+  QUICK DEPLOYMENT SCRIPT
+═══════════════════════════════════════════════════════════════
+
+You can create a deployment script on the server:
+
+#!/bin/bash
+# save as: deploy-affiliate.sh
+
+echo "🚀 Deploying Affiliate System..."
+
+# Pull latest code
+git pull origin main
+
+# Install dependencies
+npm install
+
+# Update database
+npx prisma generate
+npx prisma db push
+
+# Build application
+npm run build
+
+# Restart PM2
+pm2 restart token-landing
+
+echo "✅ Deployment complete!"
+
+# Make it executable:
+chmod +x deploy-affiliate.sh
+
+# Run it:
+./deploy-affiliate.sh
+
+
+═══════════════════════════════════════════════════════════════
+  NGINX CONFIGURATION (if needed)
+═══════════════════════════════════════════════════════════════
+
+If you need to update Nginx config:
+
+sudo nano /etc/nginx/sites-available/token.coindaily.online
+
+# Ensure these locations are included:
+location /affiliate {
+    proxy_pass http://localhost:3001;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+}
+
+location /api/affiliate {
+    proxy_pass http://localhost:3001;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+}
+
+# Restart Nginx:
+sudo nginx -t
+sudo systemctl reload nginx
+
+
+═══════════════════════════════════════════════════════════════
+  POST-DEPLOYMENT CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+□ Server is accessible via SSH
+□ Latest code pulled from GitHub
+□ Dependencies installed (bcryptjs, jsonwebtoken)
+□ Environment variables updated (.env.local)
+□ Database schema pushed (npx prisma db push)
+□ Application built successfully
+□ Service restarted (PM2/systemd/Docker)
+□ No errors in logs
+□ Registration page loads
+□ Login page loads
+□ Dashboard shows affiliate tab
+□ Test registration works
+□ Test login works
+□ Footer shows affiliate link
+
+═══════════════════════════════════════════════════════════════

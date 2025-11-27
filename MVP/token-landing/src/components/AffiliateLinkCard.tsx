@@ -97,6 +97,16 @@ export default function AffiliateLinkCard({ affiliateCode, affiliateLink }: Affi
       <p className="text-xs text-gray-500 mt-4">
         Share this link on social media, blogs, or with friends to earn rewards for every presale buyer you refer!
       </p>
+      
+      <div className="mt-4 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-2xl">🎁</span>
+          <h4 className="font-bold text-yellow-400">Affiliate Reward</h4>
+        </div>
+        <p className="text-sm text-yellow-200">
+          Earn <span className="font-bold text-yellow-300">5% of the total tokens</span> purchased by each referral during the presale!
+        </p>
+      </div>
     </div>
   );
 }
