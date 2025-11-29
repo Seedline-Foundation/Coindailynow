@@ -470,60 +470,217 @@ export default function WhitepaperPage() {
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <StakingTier
                 name="Flexible (7 days)"
-                apr="1%"
-                lockPeriod="7 days"
-                govMultiplier="0x"
-                description="Minimal lock with minimal rewards. Perfect for short-term liquidity needs."
+                apr="2%"
+                lockPeriod="None (7 days notice)"
+                govMultiplier="1x"
+                description="Continuous earning with minimal lock. Perfect for short-term liquidity needs."
               />
               <StakingTier
                 name="6-Month Lock"
-                apr="10%"
+                apr="8%"
                 lockPeriod="180 days"
-                govMultiplier="1.2x"
+                govMultiplier="1.5x"
                 description="Moderate commitment with steady rewards and increased governance power."
               />
               <StakingTier
-                name="9-Month Lock"
-                apr="70%"
-                lockPeriod="270 days"
-                govMultiplier="1.5x"
-                popular
-                description="Whale Prison tier with significantly boosted APR and governance weight."
+                name="12-Month Lock"
+                apr="30%"
+                lockPeriod="365 days"
+                govMultiplier="2x"
+                description="Long-term commitment with substantial rewards and strong governance weight."
               />
               <StakingTier
-                name="24-Month Lock"
-                apr="90%"
-                lockPeriod="730 days"
-                govMultiplier="2.5x"
+                name="Whale Prison (12-Month)"
+                apr="210% Effective"
+                lockPeriod="12 months (9-month cliff + 3-month earning)"
+                govMultiplier="1.5x"
                 popular
-                description="Diamond Hands tier. Maximum rewards (90% APR after 9th month) with 2.5x governance weight."
+                description="90% base APY with up to 2.1x effective multiplier. Earns months 9-12 only. Example: 500 JY → 1,050 JY reward."
+              />
+              <StakingTier
+                name="Diamond Hands (24-Month)"
+                apr="720% Effective"
+                lockPeriod="24 months (24-month cliff + 8-month earning at month 16-24)"
+                govMultiplier="3x"
+                popular
+                description="90% base APY with up to 7.2x effective multiplier. Earns months 16-24 only. Example: 500 JY → 3,600 JY reward."
               />
             </div>
 
+            {/* Reward Calculation Formulas */}
+            <div className="mb-8 p-6 bg-gradient-to-r from-primary-500/10 to-accent-500/10 rounded-lg border border-primary-500/20">
+              <h4 className="text-2xl font-bold mb-4 text-primary-400">Staking Reward Calculation</h4>
+              <div className="space-y-4">
+                <div className="p-4 bg-gray-900/50 rounded-lg">
+                  <p className="text-lg font-semibold text-white mb-2">Base Formula</p>
+                  <code className="text-accent-400 text-sm">Total Reward = Staked Amount × Multiplier × (Earning Period / 365)</code>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-4 mt-4">
+                  <div className="p-4 bg-gray-900/30 rounded-lg">
+                    <p className="text-white font-semibold mb-2">Flexible (2% APY)</p>
+                    <ul className="text-gray-300 text-sm space-y-1">
+                      <li>• Formula: stakedAmount × 0.02 × (days/365)</li>
+                      <li>• Example: 500 JY × 365 days = <span className="text-primary-400">10 JY</span></li>
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-gray-900/30 rounded-lg">
+                    <p className="text-white font-semibold mb-2">6-Month (8% APY)</p>
+                    <ul className="text-gray-300 text-sm space-y-1">
+                      <li>• Formula: stakedAmount × 0.08 × (days/365)</li>
+                      <li>• Example: 500 JY × 180 days = <span className="text-primary-400">20 JY</span></li>
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-gray-900/30 rounded-lg">
+                    <p className="text-white font-semibold mb-2">12-Month (30% APY)</p>
+                    <ul className="text-gray-300 text-sm space-y-1">
+                      <li>• Formula: stakedAmount × 0.30 × (days/365)</li>
+                      <li>• Example: 500 JY × 365 days = <span className="text-primary-400">150 JY</span></li>
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-gray-900/30 rounded-lg">
+                    <p className="text-white font-semibold mb-2">Whale Prison (210% Effective)</p>
+                    <ul className="text-gray-300 text-sm space-y-1">
+                      <li>• Lock: 12 months (earn months 9-12)</li>
+                      <li>• Formula: stakedAmount × 2.1</li>
+                      <li>• Example: <span className="text-accent-400 font-bold">500 JY → 1,050 JY</span></li>
+                      <li className="text-xs">• 90% base × (3/12) × up to 12x multipliers</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-gradient-to-r from-accent-500/20 to-primary-500/20 rounded-lg border border-accent-500/30">
+                  <p className="text-white font-semibold mb-2">💎 Diamond Hands (720% Effective)</p>
+                  <ul className="text-gray-300 text-sm space-y-1">
+                    <li>• Lock: 24 months (earn months 16-24)</li>
+                    <li>• Formula: stakedAmount × 7.2</li>
+                    <li>• Example: <span className="text-accent-400 font-bold text-lg">500 JY → 3,600 JY</span></li>
+                    <li className="text-xs">• 90% base × (8/24) × up to 12x multipliers = 720% effective return</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Multiplier Stacking System */}
+            <div className="mb-8 p-6 bg-gray-900 rounded-lg">
+              <h4 className="text-2xl font-bold mb-4 text-accent-400">Multiplier Stacking System</h4>
+              <p className="text-gray-300 mb-4">Multipliers combine to create effective APYs for Whale Prison and Diamond Hands tiers:</p>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="p-4 bg-gray-800/50 rounded-lg">
+                  <p className="text-white font-semibold mb-2">🎯 OG Access Multiplier</p>
+                  <p className="text-gray-400 text-sm">1.5x - 3x for early stakers and community members</p>
+                </div>
+                <div className="p-4 bg-gray-800/50 rounded-lg">
+                  <p className="text-white font-semibold mb-2">🏆 Top Staker Bonus</p>
+                  <p className="text-gray-400 text-sm">1.2x - 2x for largest stakes in tier</p>
+                </div>
+                <div className="p-4 bg-gray-800/50 rounded-lg">
+                  <p className="text-white font-semibold mb-2">💪 Loyalty Reward</p>
+                  <p className="text-gray-400 text-sm">1.1x - 1.5x for consecutive re-stakes</p>
+                </div>
+                <div className="p-4 bg-gray-800/50 rounded-lg">
+                  <p className="text-white font-semibold mb-2">🤝 Referral Bonus</p>
+                  <p className="text-gray-400 text-sm">1.05x - 1.2x for successful referrals</p>
+                </div>
+              </div>
+              <p className="text-center text-accent-400 font-bold mt-4">Maximum Combined Multiplier: 12x (requires all bonuses at maximum levels)</p>
+            </div>
+
+            {/* Dynamic APY Adjustment */}
+            <div className="mb-8 p-6 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-lg border border-red-500/20">
+              <h4 className="text-2xl font-bold mb-4 text-red-400">⚠️ Dynamic APY Adjustment Mechanism</h4>
+              <p className="text-gray-300 mb-4">
+                Automatically reduces APY rates when reward pool utilization exceeds safe thresholds, preventing protocol insolvency while protecting existing stakers.
+              </p>
+              
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-gray-800">
+                    <tr>
+                      <th className="px-4 py-3 text-white">Utilization Rate</th>
+                      <th className="px-4 py-3 text-white">Status</th>
+                      <th className="px-4 py-3 text-white">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-700">
+                    <tr className="bg-gray-900/30">
+                      <td className="px-4 py-3 text-gray-300">0-60%</td>
+                      <td className="px-4 py-3 text-green-400">Safe Zone</td>
+                      <td className="px-4 py-3 text-gray-400">Normal APYs maintained</td>
+                    </tr>
+                    <tr className="bg-gray-900/30">
+                      <td className="px-4 py-3 text-gray-300">60-80%</td>
+                      <td className="px-4 py-3 text-yellow-400">Warning Zone</td>
+                      <td className="px-4 py-3 text-gray-400">Monitoring increased, no changes</td>
+                    </tr>
+                    <tr className="bg-gray-900/30">
+                      <td className="px-4 py-3 text-gray-300">80-90%</td>
+                      <td className="px-4 py-3 text-orange-400">Critical Zone</td>
+                      <td className="px-4 py-3 text-orange-300"><strong>Auto-reduce APYs by 15%</strong></td>
+                    </tr>
+                    <tr className="bg-gray-900/30">
+                      <td className="px-4 py-3 text-gray-300">90-95%</td>
+                      <td className="px-4 py-3 text-red-400">Emergency Zone</td>
+                      <td className="px-4 py-3 text-red-300"><strong>Auto-reduce APYs by 30%</strong></td>
+                    </tr>
+                    <tr className="bg-gray-900/30">
+                      <td className="px-4 py-3 text-gray-300">&gt;95%</td>
+                      <td className="px-4 py-3 text-red-500 font-bold">Crisis Mode</td>
+                      <td className="px-4 py-3 text-red-400">New staking paused, DAO emergency meeting</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-gray-900/50 rounded-lg">
+                  <p className="text-white font-semibold mb-2">Critical Zone (80% utilization)</p>
+                  <ul className="text-gray-300 text-sm space-y-1">
+                    <li>• Whale Prison: 210% → <span className="text-orange-400">180%</span> effective APY</li>
+                    <li>• Diamond Hands: 720% → <span className="text-orange-400">640%</span> effective APY</li>
+                    <li>• 7-day notice to community</li>
+                    <li className="text-green-400">• Existing stakes grandfathered at original rates</li>
+                  </ul>
+                </div>
+                
+                <div className="p-4 bg-gray-900/50 rounded-lg">
+                  <p className="text-white font-semibold mb-2">Emergency Zone (90% utilization)</p>
+                  <ul className="text-gray-300 text-sm space-y-1">
+                    <li>• Whale Prison: 210% → <span className="text-red-400">150%</span> effective APY</li>
+                    <li>• Diamond Hands: 720% → <span className="text-red-400">550%</span> effective APY</li>
+                    <li>• 24-hour notice to community</li>
+                    <li>• DAO vote required for further reductions</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Staker Protections */}
             <div className="space-y-4 mb-6">
               <InfoBox
                 title="How Rewards are Funded"
-                content="Staking rewards come from platform revenue (premium subscriptions, advertising, partnerships), NOT token inflation. This creates sustainable, real yield that grows with platform adoption."
+                content="Staking rewards come from platform revenue (premium subscriptions, advertising, partnerships), NOT token inflation. This creates sustainable, real yield that grows with platform adoption. Protocol revenue: $83M projected over 10 years with weekly token buybacks."
               />
               <InfoBox
-                title="Dynamic APR"
-                content="Displayed APRs are target rates. Actual APR adjusts monthly based on total staked supply and revenue. Lower staking participation = higher individual rewards."
+                title="Staker Protections"
+                content="1) Grandfathering: Existing stakes maintain original APY rates regardless of adjustments. 2) Notice Periods: 7-day warning for critical adjustments, 24-hour for emergencies. 3) Early Unstake Option: 10% penalty allows exit if APY changes unacceptable. 4) DAO Override: Community can vote to restore rates if utilization improves."
               />
               <InfoBox
-                title="Early Unlock Penalty"
-                content="Unstaking before lock period ends forfeits 50% of earned rewards. This ensures staking pool stability and discourages mercenary capital."
+                title="Automated Smart Contract Checks"
+                content="Chainlink Keeper runs weekly utilization checks. calculateUtilizationRate() = (committedRewards × 100) / (rewardPoolBalance + projectedRevenue). Automated adjustments create DAO proposals for transparency and community oversight."
               />
             </div>
 
             <div className="p-6 bg-gray-900 rounded-lg">
-              <h4 className="text-xl font-bold mb-4 text-primary-400">Example: 24-Month Staking (Diamond Hands)</h4>
-              <div className="space-y-2 text-gray-300">
-                <p>• Stake: 10,000 JY tokens</p>
-                <p>• Lock Period: 730 days (24 months)</p>
-                <p>• Target APR: 90% (after 9th month)</p>
-                <p className="text-white font-semibold">→ Expected Rewards: 9,000 JY ($1,800 at $0.20/token)</p>
-                <p className="text-accent-400">→ Governance Power: 25,000 votes (2.5x multiplier)</p>
-                <p className="text-sm text-gray-500 mt-4">* Rewards come from platform revenue, not inflation</p>
+              <h4 className="text-xl font-bold mb-4 text-primary-400">Real-World Example: Protocol Reaches 85% Utilization in Year 4</h4>
+              <div className="space-y-2 text-gray-300 text-sm">
+                <p><strong className="text-white">Week 1:</strong> Automated monitoring detects 85% utilization</p>
+                <p><strong className="text-white">Week 1 (Day 1):</strong> 7-day community notice issued via Discord/Telegram/Email</p>
+                <p><strong className="text-white">Week 2:</strong> New Whale Prison stakes earn 180% instead of 210%</p>
+                <p className="text-green-400"><strong>Week 2:</strong> Existing Whale Prison stakers continue earning 210% (grandfathered)</p>
+                <p><strong className="text-white">Month 2:</strong> Utilization drops to 75% due to reduced new staking</p>
+                <p><strong className="text-white">Month 3:</strong> DAO proposal to restore 210% for new stakes (requires 51% approval)</p>
+                <p className="text-xs text-gray-500 mt-4">* Revenue-funded rewards: 11.3M JY equivalent over protocol lifetime from Cointelegram platform</p>
               </div>
             </div>
           </Section>

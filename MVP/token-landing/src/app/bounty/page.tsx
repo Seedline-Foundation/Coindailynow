@@ -299,6 +299,12 @@ export default function BountyPage() {
           <p className="text-xl md:text-2xl text-gray-300 mb-4 max-w-3xl mx-auto">
             Earn up to 20,000 JY tokens by contributing to the Coindaily ecosystem
           </p>
+          <div className="mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg max-w-2xl mx-auto">
+            <p className="text-red-400 font-semibold mb-2">⚠️ Important: US Jurisdiction Notice</p>
+            <p className="text-gray-300 text-sm">
+              Due to regulatory compliance, citizens and residents of the United States are not eligible to participate in the bounty program. This restriction is in place to comply with US securities laws and regulations.
+            </p>
+          </div>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Total Pool: <span className="text-primary-500 font-bold">600,000 JY</span> distributed over 12 months
           </p>

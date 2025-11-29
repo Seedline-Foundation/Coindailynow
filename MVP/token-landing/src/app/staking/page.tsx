@@ -25,7 +25,7 @@ export default function StakingPage() {
       apr: '70%', 
       lockPeriod: '9 months cliff', 
       multiplier: '1.5x',
-      description: 'Whale Prison - Earn 70% APR for 9 months',
+      description: 'Whale Prison - Earn 70% APR from 9 months',
       highlight: true
     },
     { 
@@ -33,7 +33,7 @@ export default function StakingPage() {
       apr: '90%', 
       lockPeriod: '24 months cliff', 
       multiplier: '2.5x',
-      description: 'Diamond Hands - 90% APR after 9th month',
+      description: 'Diamond Hands - 90% APR after 16th month',
       highlight: true
     },
   ];

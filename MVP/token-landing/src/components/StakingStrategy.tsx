@@ -33,7 +33,7 @@ export default function StakingStrategy() {
       apr: '70%',
       multiplier: '1.5x',
       color: 'from-blue-600 to-blue-700',
-      description: 'Whale Prison - Earn 70% APR for 9 months',
+      description: 'Whale Prison - Earn 70% APR from 9months',
       badge: 'WHALE PRISON',
     },
     {
@@ -42,7 +42,7 @@ export default function StakingStrategy() {
       apr: '90%',
       multiplier: '2.5x',
       color: 'from-accent-600 to-accent-700',
-      description: 'Diamond Hands - 90% APR after 9th month',
+      description: 'Diamond Hands - 90% APR after 16th month',
       popular: true,
       badge: 'DIAMOND HANDS',
     },
