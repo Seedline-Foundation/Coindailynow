@@ -470,32 +470,32 @@ export default function WhitepaperPage() {
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <StakingTier
                 name="FLEXIBLE"
-                apr="1%"
+                apr="20%"
                 lockPeriod="7 Days - Flexible unlock"
                 govMultiplier="0x"
                 description="Test the waters - Low commitment, low rewards"
               />
               <StakingTier
                 name="STEADY"
-                apr="10%"
+                apr="70%"
                 lockPeriod="6 months cliff"
                 govMultiplier="1.2x"
                 description="Medium commitment - Steady returns"
               />
               <StakingTier
                 name="WHALE PRISON"
-                apr="70%"
+                apr="90%"
                 lockPeriod="9 months cliff"
                 govMultiplier="1.5x"
-                description="Whale Prison - Earn 70% APR from 9 months"
+                description="Whale Prison - Earn 90% APR from 9 months"
               />
               <StakingTier
                 name="DIAMOND HANDS"
-                apr="90%"
+                apr="166%"
                 lockPeriod="24 months cliff"
                 govMultiplier="2.5x"
                 popular
-                description="Diamond Hands - 90% APR after 16th month. ✨ Most popular choice for OG Champs"
+                description="Diamond Hands - 166% APR for 24 month. ✨ Most popular choice for OG Champs"
               />
             </div>
 
