@@ -9,7 +9,7 @@ export default function StakingPage() {
     { 
       name: 'FLEXIBLE', 
       period: '7 Days',
-      apr: '1%', 
+      apr: '20%', 
       lockPeriod: 'Flexible unlock', 
       multiplier: '0x',
       description: 'Test the waters - Low commitment, low rewards'
@@ -17,7 +17,7 @@ export default function StakingPage() {
     { 
       name: 'STEADY', 
       period: '6 Months',
-      apr: '10%', 
+      apr: '70%', 
       lockPeriod: '6 months cliff', 
       multiplier: '1.2x',
       description: 'Medium commitment - Steady returns'
@@ -25,19 +25,19 @@ export default function StakingPage() {
     { 
       name: 'WHALE PRISON', 
       period: '9 Months',
-      apr: '70%', 
+      apr: '90%', 
       lockPeriod: '9 months cliff', 
       multiplier: '1.5x',
-      description: 'Whale Prison - Earn 70% APR from 9 months',
+      description: 'Whale Prison - Earn 90% APR from 9 months',
       highlight: true
     },
     { 
       name: 'DIAMOND HANDS', 
       period: '24 Months',
-      apr: '90%', 
+      apr: '166%', 
       lockPeriod: '24 months cliff', 
       multiplier: '2.5x',
-      description: 'Diamond Hands - 90% APR after 16th month',
+      description: 'Diamond Hands - 166% APR for 24 month',
       highlight: true,
       popular: true
     },
