@@ -1,0 +1,25 @@
+{
+  "servers": {
+    "github-mcp": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp"
+    },
+    "Canva": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "https://mcp.canva.com/mcp"
+      ]
+    },
+    
+    "unsplash": {
+      "command": "uv",
+      "args": ["run", "--with", "fastmcp", "fastmcp", "run", "unsplash-mcp-server/server.py"],
+      "env": {
+        "UNSPLASH_ACCESS_KEY": "PZWVZJUctLUSsQ8dYJWNPL5scFg3WqKbSSj09LyHDH0"
+      }
+    }
+  }
+}

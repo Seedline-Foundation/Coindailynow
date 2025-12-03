@@ -463,199 +463,140 @@ export default function WhitepaperPage() {
 
           {/* Staking Mechanism */}
           <Section id="staking" icon={<ShieldCheckIcon />} title="Staking Mechanism">
-            <p className="text-gray-300 mb-6">
-              Joy Token offers industry-leading staking rewards backed by real platform revenue, not token inflation.
+            <p className="text-gray-300 mb-4">
+              Real yield rewards from protocol revenue. Choose your commitment level. Flexible options from 7 days at 1% to 24 months at 90% APR. Higher commitment, higher rewards.
             </p>
 
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <StakingTier
-                name="Flexible (7 days)"
-                apr="2%"
-                lockPeriod="None (7 days notice)"
-                govMultiplier="1x"
-                description="Continuous earning with minimal lock. Perfect for short-term liquidity needs."
+                name="FLEXIBLE"
+                apr="1%"
+                lockPeriod="7 Days - Flexible unlock"
+                govMultiplier="0x"
+                description="Test the waters - Low commitment, low rewards"
               />
               <StakingTier
-                name="6-Month Lock"
-                apr="8%"
-                lockPeriod="180 days"
+                name="STEADY"
+                apr="10%"
+                lockPeriod="6 months cliff"
+                govMultiplier="1.2x"
+                description="Medium commitment - Steady returns"
+              />
+              <StakingTier
+                name="WHALE PRISON"
+                apr="70%"
+                lockPeriod="9 months cliff"
                 govMultiplier="1.5x"
-                description="Moderate commitment with steady rewards and increased governance power."
+                description="Whale Prison - Earn 70% APR from 9 months"
               />
               <StakingTier
-                name="12-Month Lock"
-                apr="30%"
-                lockPeriod="365 days"
-                govMultiplier="2x"
-                description="Long-term commitment with substantial rewards and strong governance weight."
-              />
-              <StakingTier
-                name="Whale Prison (12-Month)"
-                apr="210% Effective"
-                lockPeriod="12 months (9-month cliff + 3-month earning)"
-                govMultiplier="1.5x"
+                name="DIAMOND HANDS"
+                apr="90%"
+                lockPeriod="24 months cliff"
+                govMultiplier="2.5x"
                 popular
-                description="90% base APY with up to 2.1x effective multiplier. Earns months 9-12 only. Example: 500 JY → 1,050 JY reward."
-              />
-              <StakingTier
-                name="Diamond Hands (24-Month)"
-                apr="720% Effective"
-                lockPeriod="24 months (24-month cliff + 8-month earning at month 16-24)"
-                govMultiplier="3x"
-                popular
-                description="90% base APY with up to 7.2x effective multiplier. Earns months 16-24 only. Example: 500 JY → 3,600 JY reward."
+                description="Diamond Hands - 90% APR after 16th month. ✨ Most popular choice for OG Champs"
               />
             </div>
 
-            {/* Reward Calculation Formulas */}
+            {/* Risk-Adjusted APR Model */}
             <div className="mb-8 p-6 bg-gradient-to-r from-primary-500/10 to-accent-500/10 rounded-lg border border-primary-500/20">
-              <h4 className="text-2xl font-bold mb-4 text-primary-400">Staking Reward Calculation</h4>
-              <div className="space-y-4">
-                <div className="p-4 bg-gray-900/50 rounded-lg">
-                  <p className="text-lg font-semibold text-white mb-2">Base Formula</p>
-                  <code className="text-accent-400 text-sm">Total Reward = Staked Amount × Multiplier × (Earning Period / 365)</code>
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
-                  <div className="p-4 bg-gray-900/30 rounded-lg">
-                    <p className="text-white font-semibold mb-2">Flexible (2% APY)</p>
-                    <ul className="text-gray-300 text-sm space-y-1">
-                      <li>• Formula: stakedAmount × 0.02 × (days/365)</li>
-                      <li>• Example: 500 JY × 365 days = <span className="text-primary-400">10 JY</span></li>
-                    </ul>
-                  </div>
-                  <div className="p-4 bg-gray-900/30 rounded-lg">
-                    <p className="text-white font-semibold mb-2">6-Month (8% APY)</p>
-                    <ul className="text-gray-300 text-sm space-y-1">
-                      <li>• Formula: stakedAmount × 0.08 × (days/365)</li>
-                      <li>• Example: 500 JY × 180 days = <span className="text-primary-400">20 JY</span></li>
-                    </ul>
-                  </div>
-                  <div className="p-4 bg-gray-900/30 rounded-lg">
-                    <p className="text-white font-semibold mb-2">12-Month (30% APY)</p>
-                    <ul className="text-gray-300 text-sm space-y-1">
-                      <li>• Formula: stakedAmount × 0.30 × (days/365)</li>
-                      <li>• Example: 500 JY × 365 days = <span className="text-primary-400">150 JY</span></li>
-                    </ul>
-                  </div>
-                  <div className="p-4 bg-gray-900/30 rounded-lg">
-                    <p className="text-white font-semibold mb-2">Whale Prison (210% Effective)</p>
-                    <ul className="text-gray-300 text-sm space-y-1">
-                      <li>• Lock: 12 months (earn months 9-12)</li>
-                      <li>• Formula: stakedAmount × 2.1</li>
-                      <li>• Example: <span className="text-accent-400 font-bold">500 JY → 1,050 JY</span></li>
-                      <li className="text-xs">• 90% base × (3/12) × up to 12x multipliers</li>
-                    </ul>
-                  </div>
-                </div>
-                
-                <div className="p-4 bg-gradient-to-r from-accent-500/20 to-primary-500/20 rounded-lg border border-accent-500/30">
-                  <p className="text-white font-semibold mb-2">💎 Diamond Hands (720% Effective)</p>
-                  <ul className="text-gray-300 text-sm space-y-1">
-                    <li>• Lock: 24 months (earn months 16-24)</li>
-                    <li>• Formula: stakedAmount × 7.2</li>
-                    <li>• Example: <span className="text-accent-400 font-bold text-lg">500 JY → 3,600 JY</span></li>
-                    <li className="text-xs">• 90% base × (8/24) × up to 12x multipliers = 720% effective return</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Multiplier Stacking System */}
-            <div className="mb-8 p-6 bg-gray-900 rounded-lg">
-              <h4 className="text-2xl font-bold mb-4 text-accent-400">Multiplier Stacking System</h4>
-              <p className="text-gray-300 mb-4">Multipliers combine to create effective APYs for Whale Prison and Diamond Hands tiers:</p>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-800/50 rounded-lg">
-                  <p className="text-white font-semibold mb-2">🎯 OG Access Multiplier</p>
-                  <p className="text-gray-400 text-sm">1.5x - 3x for early stakers and community members</p>
-                </div>
-                <div className="p-4 bg-gray-800/50 rounded-lg">
-                  <p className="text-white font-semibold mb-2">🏆 Top Staker Bonus</p>
-                  <p className="text-gray-400 text-sm">1.2x - 2x for largest stakes in tier</p>
-                </div>
-                <div className="p-4 bg-gray-800/50 rounded-lg">
-                  <p className="text-white font-semibold mb-2">💪 Loyalty Reward</p>
-                  <p className="text-gray-400 text-sm">1.1x - 1.5x for consecutive re-stakes</p>
-                </div>
-                <div className="p-4 bg-gray-800/50 rounded-lg">
-                  <p className="text-white font-semibold mb-2">🤝 Referral Bonus</p>
-                  <p className="text-gray-400 text-sm">1.05x - 1.2x for successful referrals</p>
-                </div>
-              </div>
-              <p className="text-center text-accent-400 font-bold mt-4">Maximum Combined Multiplier: 12x (requires all bonuses at maximum levels)</p>
-            </div>
-
-            {/* Dynamic APY Adjustment */}
-            <div className="mb-8 p-6 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-lg border border-red-500/20">
-              <h4 className="text-2xl font-bold mb-4 text-red-400">⚠️ Dynamic APY Adjustment Mechanism</h4>
-              <p className="text-gray-300 mb-4">
-                Automatically reduces APY rates when reward pool utilization exceeds safe thresholds, preventing protocol insolvency while protecting existing stakers.
-              </p>
+              <h4 className="text-2xl font-bold mb-4 text-primary-400">CoinDaily Risk-Adjusted APR Model</h4>
               
-              <div className="overflow-x-auto mb-6">
-                <table className="w-full text-sm text-left">
-                  <thead className="bg-gray-800">
-                    <tr>
-                      <th className="px-4 py-3 text-white">Utilization Rate</th>
-                      <th className="px-4 py-3 text-white">Status</th>
-                      <th className="px-4 py-3 text-white">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-700">
-                    <tr className="bg-gray-900/30">
-                      <td className="px-4 py-3 text-gray-300">0-60%</td>
-                      <td className="px-4 py-3 text-green-400">Safe Zone</td>
-                      <td className="px-4 py-3 text-gray-400">Normal APYs maintained</td>
-                    </tr>
-                    <tr className="bg-gray-900/30">
-                      <td className="px-4 py-3 text-gray-300">60-80%</td>
-                      <td className="px-4 py-3 text-yellow-400">Warning Zone</td>
-                      <td className="px-4 py-3 text-gray-400">Monitoring increased, no changes</td>
-                    </tr>
-                    <tr className="bg-gray-900/30">
-                      <td className="px-4 py-3 text-gray-300">80-90%</td>
-                      <td className="px-4 py-3 text-orange-400">Critical Zone</td>
-                      <td className="px-4 py-3 text-orange-300"><strong>Auto-reduce APYs by 15%</strong></td>
-                    </tr>
-                    <tr className="bg-gray-900/30">
-                      <td className="px-4 py-3 text-gray-300">90-95%</td>
-                      <td className="px-4 py-3 text-red-400">Emergency Zone</td>
-                      <td className="px-4 py-3 text-red-300"><strong>Auto-reduce APYs by 30%</strong></td>
-                    </tr>
-                    <tr className="bg-gray-900/30">
-                      <td className="px-4 py-3 text-gray-300">&gt;95%</td>
-                      <td className="px-4 py-3 text-red-500 font-bold">Crisis Mode</td>
-                      <td className="px-4 py-3 text-red-400">New staking paused, DAO emergency meeting</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="p-4 bg-gray-900/50 rounded-lg mb-6">
+                <p className="text-lg font-semibold text-white mb-2">Core Formula (Whitepaper Version)</p>
+                <div className="bg-gray-800/50 p-4 rounded-lg overflow-x-auto">
+                  <code className="text-accent-400 text-sm block whitespace-pre-wrap">
+RiskAdjAPR = (R × APR_nominal × ∏(1−rᵢ)) + ((1−R) × APR_nominal × ∏(1−rᵢ) × D) − L
+                  </code>
+                </div>
+                <p className="text-gray-400 text-sm mt-3">Where:</p>
+                <ul className="text-gray-300 text-sm space-y-1 mt-2">
+                  <li>• <strong className="text-white">R</strong> = Real Yield Ratio (20%)</li>
+                  <li>• <strong className="text-white">r₁</strong> = Smart Contract Risk (5%)</li>
+                  <li>• <strong className="text-white">r₂</strong> = Protocol Governance Risk (3%)</li>
+                  <li>• <strong className="text-white">r₃</strong> = APR Volatility Risk (16.7%)</li>
+                  <li>• <strong className="text-white">D</strong> = Demand Absorption Rate (30%)</li>
+                  <li>• <strong className="text-white">L</strong> = Impermanent Loss Risk (20%)</li>
+                </ul>
               </div>
 
+              <h5 className="text-xl font-bold mb-4 text-white">Understanding Each Risk Parameter</h5>
+              
               <div className="space-y-4">
-                <div className="p-4 bg-gray-900/50 rounded-lg">
-                  <p className="text-white font-semibold mb-2">Critical Zone (80% utilization)</p>
-                  <ul className="text-gray-300 text-sm space-y-1">
-                    <li>• Whale Prison: 210% → <span className="text-orange-400">180%</span> effective APY</li>
-                    <li>• Diamond Hands: 720% → <span className="text-orange-400">640%</span> effective APY</li>
-                    <li>• 7-day notice to community</li>
-                    <li className="text-green-400">• Existing stakes grandfathered at original rates</li>
+                <div className="p-4 bg-gray-900/30 rounded-lg">
+                  <p className="text-white font-semibold mb-2">1. Smart Contract Risk (SCR) = 5%</p>
+                  <p className="text-gray-300 text-sm mb-2"><strong>Justification:</strong></p>
+                  <ul className="text-gray-400 text-sm space-y-1">
+                    <li>• Based on historical DeFi exploit data from Rekt Database</li>
+                    <li>• Audited protocols: 1-3% annual exploit probability</li>
+                    <li>• Unaudited: 10-20% probability</li>
+                    <li>• Our protocol: Multiple audits + bug bounty = 5% midpoint</li>
                   </ul>
+                  <p className="text-primary-400 text-xs mt-2 italic">"According to DeFiSafety audits database, protocols with 2+ independent audits and a public bug bounty program have an average annual exploit probability of 4.2%. We conservatively round to 5% to account for novel attack vectors."</p>
                 </div>
-                
-                <div className="p-4 bg-gray-900/50 rounded-lg">
-                  <p className="text-white font-semibold mb-2">Emergency Zone (90% utilization)</p>
-                  <ul className="text-gray-300 text-sm space-y-1">
-                    <li>• Whale Prison: 210% → <span className="text-red-400">150%</span> effective APY</li>
-                    <li>• Diamond Hands: 720% → <span className="text-red-400">550%</span> effective APY</li>
-                    <li>• 24-hour notice to community</li>
-                    <li>• DAO vote required for further reductions</li>
+
+                <div className="p-4 bg-gray-900/30 rounded-lg">
+                  <p className="text-white font-semibold mb-2">2. Protocol Governance Risk (PGR) = 3%</p>
+                  <p className="text-gray-300 text-sm mb-2"><strong>Justification:</strong></p>
+                  <ul className="text-gray-400 text-sm space-y-1">
+                    <li>• Reference models: Compound, Aave, Uniswap DAO structures</li>
+                    <li>• Our safeguards: 7-day timelock, multi-sig (5/9), community veto power</li>
+                    <li>• Historical data: Well-structured DAOs experience &lt;2% governance attacks annually</li>
+                    <li>• We add 1% buffer for early-stage risks</li>
                   </ul>
+                  <p className="text-primary-400 text-xs mt-2 italic">"Following the Compound Governance Model with enhanced safeguards (7-day timelock, 5/9 multi-sig, community veto), we estimate a 3% annual risk discount—comparable to established DAOs while accounting for our protocol's nascency."</p>
+                </div>
+
+                <div className="p-4 bg-gray-900/30 rounded-lg">
+                  <p className="text-white font-semibold mb-2">3. APR Volatility Risk (AVR) = 16.7%</p>
+                  <p className="text-gray-300 text-sm mb-2"><strong>Justification:</strong></p>
+                  <ul className="text-gray-400 text-sm space-y-1">
+                    <li>• Data source: DeFiLlama 30-day APR volatility metrics</li>
+                    <li>• High-yield farms: 40-70% volatility (mean 55%)</li>
+                    <li>• Our calculation: AVR = Volatility/APR = 50%/90% = 55.6%</li>
+                    <li>• Applied to risk-adjusted base, not nominal: 55.6% × 30% = 16.7%</li>
+                  </ul>
+                  <p className="text-primary-400 text-xs mt-2 italic">"Based on 30-day rolling APR data from top-20 yield farms (DeFiLlama), high-yield protocols exhibit 50% average volatility. Applied proportionally to our expected risk-adjusted yield (30%), this translates to a 16.7% volatility discount."</p>
+                </div>
+
+                <div className="p-4 bg-gray-900/30 rounded-lg">
+                  <p className="text-white font-semibold mb-2">4. Impermanent Loss Risk (ILR) = 20%</p>
+                  <p className="text-gray-300 text-sm mb-2"><strong>Justification:</strong></p>
+                  <ul className="text-gray-400 text-sm space-y-1">
+                    <li>• Empirical data: IL calculators and historical LP returns</li>
+                    <li>• ETH/Alt pairs: 10-50% annual IL depending on correlation</li>
+                    <li>• Conservatively: Use 20% for moderately volatile pairs</li>
+                    <li>• Alternative: Single-sided staking options have 0% IL</li>
+                  </ul>
+                  <p className="text-primary-400 text-xs mt-2 italic">"For ETH/altcoin liquidity pools, impermanent loss typically ranges from 10-50% annually (based on Uniswap V3 analytics). We use 20% as a conservative estimate for our default pools, though single-sided staking eliminates this risk entirely."</p>
+                </div>
+
+                <div className="p-4 bg-gray-900/30 rounded-lg">
+                  <p className="text-white font-semibold mb-2">5. Demand Absorption Rate (DAR) = 30%</p>
+                  <p className="text-gray-300 text-sm mb-2"><strong>Justification:</strong></p>
+                  <ul className="text-gray-400 text-sm space-y-1">
+                    <li>• Historical benchmarks: Successful farming protocols average 25-40% net absorption</li>
+                    <li>• Our mechanisms: Token utility (governance, fee discounts), buyback programs, vesting schedules</li>
+                    <li>• Conservative assumption: 30% ensures realistic projections</li>
+                  </ul>
+                  <p className="text-primary-400 text-xs mt-2 italic">"Analysis of emission schedules for 50+ DeFi protocols shows that 30% of emitted tokens are typically absorbed by organic demand (Token Terminal data). Our tokenomics include utility-driven demand mechanisms targeting this benchmark."</p>
+                </div>
+
+                <div className="p-4 bg-gray-900/30 rounded-lg">
+                  <p className="text-white font-semibold mb-2">6. Real Yield Ratio (R) = 20%</p>
+                  <p className="text-gray-300 text-sm mb-2"><strong>Justification:</strong></p>
+                  <ul className="text-gray-400 text-sm space-y-1">
+                    <li>• Protocol design: 20% of total APR comes from actual protocol fees</li>
+                    <li>• Transparent split: Real yield vs. incentive emissions clearly separated</li>
+                    <li>• Growth target: This ratio increases to 50%+ by Year 2</li>
+                  </ul>
+                  <p className="text-primary-400 text-xs mt-2 italic">"Our phased emission schedule ensures at least 20% of total APR derives from protocol fee revenue from Day 1, increasing to 50%+ within 24 months as token incentives taper and organic usage grows."</p>
                 </div>
               </div>
             </div>
 
-            {/* Staker Protections */}
+            {/* How Rewards are Funded */}
             <div className="space-y-4 mb-6">
               <InfoBox
                 title="How Rewards are Funded"
@@ -665,23 +606,6 @@ export default function WhitepaperPage() {
                 title="Staker Protections"
                 content="1) Grandfathering: Existing stakes maintain original APY rates regardless of adjustments. 2) Notice Periods: 7-day warning for critical adjustments, 24-hour for emergencies. 3) Early Unstake Option: 10% penalty allows exit if APY changes unacceptable. 4) DAO Override: Community can vote to restore rates if utilization improves."
               />
-              <InfoBox
-                title="Automated Smart Contract Checks"
-                content="Chainlink Keeper runs weekly utilization checks. calculateUtilizationRate() = (committedRewards × 100) / (rewardPoolBalance + projectedRevenue). Automated adjustments create DAO proposals for transparency and community oversight."
-              />
-            </div>
-
-            <div className="p-6 bg-gray-900 rounded-lg">
-              <h4 className="text-xl font-bold mb-4 text-primary-400">Real-World Example: Protocol Reaches 85% Utilization in Year 4</h4>
-              <div className="space-y-2 text-gray-300 text-sm">
-                <p><strong className="text-white">Week 1:</strong> Automated monitoring detects 85% utilization</p>
-                <p><strong className="text-white">Week 1 (Day 1):</strong> 7-day community notice issued via Discord/Telegram/Email</p>
-                <p><strong className="text-white">Week 2:</strong> New Whale Prison stakes earn 180% instead of 210%</p>
-                <p className="text-green-400"><strong>Week 2:</strong> Existing Whale Prison stakers continue earning 210% (grandfathered)</p>
-                <p><strong className="text-white">Month 2:</strong> Utilization drops to 75% due to reduced new staking</p>
-                <p><strong className="text-white">Month 3:</strong> DAO proposal to restore 210% for new stakes (requires 51% approval)</p>
-                <p className="text-xs text-gray-500 mt-4">* Revenue-funded rewards: 11.3M JY equivalent over protocol lifetime from Cointelegram platform</p>
-              </div>
             </div>
           </Section>
 

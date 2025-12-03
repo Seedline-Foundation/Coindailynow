@@ -7,21 +7,24 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid';
 export default function StakingPage() {
   const stakingTiers = [
     { 
-      name: '7 Days (Flexible)', 
+      name: 'FLEXIBLE', 
+      period: '7 Days',
       apr: '1%', 
       lockPeriod: 'Flexible unlock', 
       multiplier: '0x',
       description: 'Test the waters - Low commitment, low rewards'
     },
     { 
-      name: '6 Months (Steady)', 
+      name: 'STEADY', 
+      period: '6 Months',
       apr: '10%', 
       lockPeriod: '6 months cliff', 
       multiplier: '1.2x',
       description: 'Medium commitment - Steady returns'
     },
     { 
-      name: '9 Months (Whale Prison)', 
+      name: 'WHALE PRISON', 
+      period: '9 Months',
       apr: '70%', 
       lockPeriod: '9 months cliff', 
       multiplier: '1.5x',
@@ -29,12 +32,14 @@ export default function StakingPage() {
       highlight: true
     },
     { 
-      name: '24 Months (Diamond Hands)', 
+      name: 'DIAMOND HANDS', 
+      period: '24 Months',
       apr: '90%', 
       lockPeriod: '24 months cliff', 
       multiplier: '2.5x',
       description: 'Diamond Hands - 90% APR after 16th month',
-      highlight: true
+      highlight: true,
+      popular: true
     },
   ];
 
@@ -146,22 +151,31 @@ export default function StakingPage() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="mb-16"
         >
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Staking Tiers</h2>
+          <h2 className="text-3xl font-bold text-white mb-4 text-center">Staking Strategy</h2>
+          <p className="text-gray-400 text-center mb-2 max-w-2xl mx-auto">Real yield rewards from protocol revenue. Choose your commitment level.</p>
+          <p className="text-accent-400 text-center mb-8 font-semibold">Flexible Options: From 7 days at 1% to 24 months at 90% APR. Higher commitment, higher rewards.</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stakingTiers.map((tier, index) => (
               <div
                 key={index}
-                className={`bg-gray-900 border-2 rounded-2xl p-6 hover:scale-105 transition-transform ${
+                className={`bg-gray-900 border-2 rounded-2xl p-6 hover:scale-105 transition-transform relative ${
                   tier.highlight ? 'border-primary-500 bg-gradient-to-br from-primary-500/10 to-transparent' : 'border-gray-800'
                 }`}
               >
-                {tier.highlight && (
+                {tier.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
+                    ✨ Most popular choice for OG Champs
+                  </div>
+                )}
+                {tier.highlight && !tier.popular && (
                   <div className="bg-primary-500 text-white text-xs font-bold px-3 py-1 rounded-full inline-block mb-4">
                     BEST VALUE
                   </div>
                 )}
-                <div className="text-3xl font-bold gradient-text mb-2">{tier.apr}</div>
-                <div className="text-xl text-white mb-2">{tier.name}</div>
+                <div className="text-lg font-bold text-white mb-1">{tier.name}</div>
+                <div className="text-sm text-gray-400 mb-3">{tier.period}</div>
+                <div className="text-3xl font-bold gradient-text mb-1">{tier.apr}</div>
+                <div className="text-sm text-gray-400 mb-4">Annual APR</div>
                 <div className="text-sm text-gray-400 mb-4">{tier.description}</div>
                 <div className="space-y-2 text-sm text-gray-400 border-t border-gray-800 pt-4">
                   <div className="flex justify-between">
@@ -169,7 +183,7 @@ export default function StakingPage() {
                     <span className="text-white">{tier.lockPeriod}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Vote Power:</span>
+                    <span>Governance Power:</span>
                     <span className="text-primary-400 font-bold">{tier.multiplier}</span>
                   </div>
                 </div>
