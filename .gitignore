@@ -1,6 +1,7 @@
 # Documentation files (keep only README.md in repo)
 *.md
 !README.md
+!.github/copilot-instructions.md
 
 # Dependencies
 node_modules/
