@@ -2,267 +2,104 @@
 
 ## Repository Overview
 
-**CoinDaily** is Africa's premier cryptocurrency news and community platform - a full-stack web application built with Node.js/TypeScript. The platform delivers real-time cryptocurrency news, market data, and AI-driven content specifically tailored for African markets.
+**CoinDaily** - Africa's premier cryptocurrency news platform. Full-stack TypeScript monorepo (backend: Express/GraphQL, frontend: Next.js 14, MVP: token landing).
 
-- **Repository Size**: Large (~3GB with dependencies)
-- **Primary Language**: TypeScript
-- **Architecture**: Monorepo with 3 main applications (backend, frontend, MVP token landing page)
-- **Database**: Neon PostgreSQL with Prisma ORM (8,797 line schema with 80+ models)
-- **Caching**: Redis for performance optimization
-- **Node Version**: 18.0.0+ (tested with v20.19.6)
-- **Package Manager**: npm (v10.8.2+)
+- **Tech Stack**: Node 18+, PostgreSQL (Neon), Redis, Prisma ORM (8,797-line schema, 80+ models)
+- **Size**: Large (~3GB), 41 backend tests, extensive E2E coverage
 
 ## Build & Development Commands
 
-### Initial Setup (Critical Order)
+### Critical Setup Sequence
 
-**ALWAYS follow this exact sequence when setting up the project:**
-
-1. **Backend Setup:**
+**Backend:**
 ```bash
-cd backend
-npm ci  # Use npm ci for clean installs
-npm run db:generate  # Generate Prisma Client (REQUIRED before build/test)
-npm run type-check  # Verify TypeScript compilation
-npm run build  # Compiles TypeScript (uses --max-old-space-size=4096)
+cd backend && npm ci
+npm run db:generate  # REQUIRED before build/test - generates Prisma Client
+npm run type-check && npm run build  # Uses --max-old-space-size=4096
 ```
 
-2. **Frontend Setup:**
+**Frontend (npm ci fails - use this):**
 ```bash
 cd frontend
-rm -rf node_modules package-lock.json  # If npm ci fails
 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install --legacy-peer-deps
-# Note: npm ci may fail with "Invalid Version" error - use npm install --legacy-peer-deps instead
-# Frontend build requires internet access to fonts.googleapis.com (may fail in restricted environments)
+# Build needs internet (fonts.googleapis.com) - will fail in restricted networks
 ```
 
-3. **MVP Token Landing Setup:**
-```bash
-cd MVP/token-landing
-npm install
-npm run build
-```
+**MVP:** `cd MVP/token-landing && npm install && npm run build`
 
-### Common Build Issues & Workarounds
+### Build Issues & Fixes
 
-**Frontend npm Install Failure:**
-- Error: `Invalid Version` or package resolution issues
-- **Solution**: Use `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install --legacy-peer-deps`
-- **Root Cause**: Next.js SWC platform packages and Puppeteer download conflicts
-
-**Frontend Build Failure:**
-- Error: `Failed to fetch fonts from Google Fonts`
-- **Solution**: Build requires internet access to fonts.googleapis.com; cannot build in restricted networks
-- Use `SKIP_ENV_VALIDATION=true npm run build` to bypass env checks if needed
-
-**Backend Build Memory:**
-- Build uses `--max-old-space-size=4096` flag due to large TypeScript codebase
-- Type-checking also requires this flag (already configured in package.json)
+1. **Frontend npm fails**: Use `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install --legacy-peer-deps` (Next.js/Puppeteer conflicts)
+2. **Frontend build fails**: Needs fonts.googleapis.com access - unavailable in restricted networks
+3. **Backend memory**: Already uses `--max-old-space-size=4096` (large codebase)
+4. **After schema changes**: ALWAYS run `npm run db:generate`
 
 ### Development Commands
 
-**Backend:**
-```bash
-npm run dev          # Hot-reload development server (port 3001/4000)
-npm run type-check   # TypeScript validation (uses max memory flag)
-npm run lint         # ESLint (currently no .eslintrc - will fail)
-npm run db:generate  # ALWAYS run after schema changes
-npm run db:migrate   # Run database migrations
-npm run db:studio    # Open Prisma Studio GUI
-```
+**Backend:** `npm run dev` (port 3001/4000), `npm run type-check`, `npm run db:migrate`, `npm run db:studio`
+- ❌ **Don't run** `npm run lint` - no ESLint config exists
 
-**Frontend:**
-```bash
-npm run dev          # Next.js dev server (port 3000)
-npm run type-check   # TypeScript validation (has test type errors - ignore)
-npm run lint         # Next.js ESLint (may prompt for setup on first run)
-npm run build        # Production build (requires internet for fonts)
-```
-
-**MVP Token Landing:**
-```bash
-npm run dev          # Dev server (port 3001)
-npm run build        # Production build
-npm run start        # Production server
-```
+**Frontend:** `npm run dev` (port 3000), `npm run type-check`, `npm run build`
+- First `npm run lint` prompts for setup - choose "Strict"
+- Type errors in tests are expected (jest-dom matchers) - safe to ignore
 
 ### Testing
 
-**Backend Tests:**
-```bash
-npm test                    # Run all tests (Jest, 30s timeout)
-npm run test:coverage       # With coverage
-npm run test:api            # API tests only
-npm run test:api:coverage   # API tests with coverage
-npm run test:security       # Security-specific tests
-npm run test:ai             # AI integration tests
-npm run test:e2e            # End-to-end tests
-```
+**Backend:** `npm test` (Jest, 30s timeout, 41 test files), `npm run test:api:coverage`, `npm run test:security`
+- Requires: SQLite test.db, Redis (localhost:6379/1)
+- Setup: `backend/tests/setup.ts`
 
-- **Test Setup**: Tests use SQLite (`test.db`) and Redis (localhost:6379/1)
-- **41 test files** in `backend/tests/`
-- **Setup File**: `backend/tests/setup.ts` configures test environment
-- **Important**: Tests expect Redis and test database; may fail without proper setup
-
-**Frontend Tests:**
-```bash
-npm test                     # Jest tests (jsdom environment)
-npm run test:unit            # Unit tests only
-npm run test:unit:coverage   # Unit tests with coverage (85% threshold)
-npm run test:security        # Security feature tests
-npm run test:e2e             # Playwright E2E tests
-npm run test:e2e:ui          # Playwright UI mode
-```
-
-- **Coverage Requirements**: 80%+ lines (configured in jest.config.ts)
-- **Known Issue**: Test files have TypeScript errors with jest-dom matchers (toBeInTheDocument, etc.) - these are type definition issues only and tests still run
-
-### Linting
-
-**Backend:**
-- **Status**: No ESLint configuration file exists - `npm run lint` will fail
-- **Do not run** backend linting until .eslintrc is added
-
-**Frontend:**
-- First run of `npm run lint` prompts for ESLint setup (choose "Strict" recommended)
-- Uses Next.js ESLint configuration
+**Frontend:** `npm run test:unit:coverage` (85% threshold), `npm run test:e2e` (Playwright)
+- Coverage: 80%+ required (jest.config.ts)
 
 ## Project Structure
 
-### Root Directory Layout
 ```
 /
-├── .github/workflows/       # CI/CD (phase6-testing.yml - manual trigger only)
-├── backend/                 # Node.js/Express/GraphQL API
-├── frontend/                # Next.js 14 web application
-├── MVP/token-landing/       # JY Token presale site (Next.js)
-├── ai-system/               # AI orchestration system
-├── contracts/               # Solidity smart contracts (JoyToken.sol, etc.)
-├── infrastructure/          # Docker, nginx configs
-├── shared/                  # Shared TypeScript types (languages.ts)
-├── docs/                    # Documentation
-├── ecosystem.config.js      # PM2 production config (3 apps)
-└── .env.example             # Root environment template
+├── .github/workflows/phase6-testing.yml  # CI (manual trigger only)
+├── backend/src/
+│   ├── index.ts              # Main entry (Express + Apollo Server)
+│   ├── api/                  # GraphQL schema, resolvers, routes
+│   ├── services/             # finance/, security/, exchanges/, websocket/
+│   ├── middleware/           # Auth, rate limiting, caching
+│   └── prisma/schema.prisma  # 8,797 lines, 80+ models (User, Article, Wallet, etc.)
+├── frontend/src/
+│   ├── app/layout.tsx        # Next.js App Router (uses Google Fonts)
+│   ├── pages/                # Pages Router (api/, admin/, marketplace/)
+│   ├── components/           # dashboard/, wallet/, auth/, ui/
+│   └── services/             # API clients, GraphQL queries
+├── MVP/token-landing/        # JY Token presale (Next.js)
+├── infrastructure/docker/    # docker-compose.yml (Postgres, Redis, Elasticsearch)
+├── contracts/                # Solidity smart contracts
+└── ecosystem.config.js       # PM2 config (3 apps)
 ```
 
-### Backend Structure (`backend/`)
-```
-backend/
-├── src/
-│   ├── index.ts                    # Main entry point (Express + Apollo Server)
-│   ├── api/
-│   │   ├── schema/                 # GraphQL schema definitions
-│   │   ├── resolvers/              # GraphQL resolvers
-│   │   └── routes/                 # REST routes (super-admin, etc.)
-│   ├── services/                   # Business logic
-│   │   ├── finance/                # Wallet & payment services
-│   │   ├── security/               # Auth, fraud detection
-│   │   ├── providers/              # YellowCard, ChangeNOW integrations
-│   │   ├── exchanges/              # Binance, Luno, Quidax APIs
-│   │   └── websocket/              # WebSocket manager
-│   ├── middleware/                 # Auth, rate limiting, caching
-│   ├── utils/                      # Logger, helpers
-│   └── types/                      # TypeScript type definitions
-├── prisma/
-│   ├── schema.prisma               # Main Prisma schema (8,797 lines!)
-│   └── migrations/                 # Database migration files
-├── tests/                          # 41 test files
-├── scripts/                        # Utility scripts (benchmarks, demos)
-├── jest.config.js                  # Jest configuration
-├── tsconfig.json                   # TypeScript config (strict mode)
-└── package.json                    # 130+ dependencies
-```
-
-### Frontend Structure (`frontend/`)
-```
-frontend/
-├── src/
-│   ├── app/                        # Next.js App Router
-│   │   └── layout.tsx              # Root layout (uses Google Fonts)
-│   ├── pages/                      # Legacy Pages Router
-│   │   ├── api/                    # API routes
-│   │   ├── admin/                  # Admin pages
-│   │   └── marketplace/            # Marketplace features
-│   ├── components/                 # React components
-│   │   ├── dashboard/              # User dashboard
-│   │   ├── wallet/                 # Wallet UI
-│   │   ├── auth/                   # Authentication
-│   │   └── ui/                     # Reusable UI components
-│   ├── services/                   # API clients, GraphQL queries
-│   ├── hooks/                      # Custom React hooks
-│   └── utils/                      # Helper functions
-├── public/                         # Static assets
-├── tests/                          # Unit & integration tests
-├── playwright-report/              # E2E test results (gitignored)
-├── next.config.js                  # Next.js configuration
-├── tailwind.config.js              # Tailwind CSS config
-├── jest.config.ts                  # Jest configuration
-├── playwright.config.ts            # Playwright E2E config
-└── package.json                    # 120+ dependencies
-```
-
-### Key Configuration Files
-
-**Backend:**
-- `backend/prisma/schema.prisma` - Database schema (80+ models including User, Article, AIAgent, Wallet, etc.)
-- `backend/tsconfig.json` - Strict TypeScript, ES2022 target, CommonJS modules
-- `backend/jest.config.js` - ts-jest preset, 30s timeout, uses tsconfig.test.json
-- `backend/.env.production.example` - Production environment template
-
-**Frontend:**
-- `frontend/tsconfig.json` - Next.js config with path aliases (@/components, @/utils, etc.)
-- `frontend/next.config.js` - Next.js configuration
-- `frontend/tailwind.config.js` - Tailwind with custom theme
-- `frontend/playwright.config.ts` - E2E test configuration
-- `frontend/lighthouserc.js` - Performance testing (90+ score required)
+**Key Configs:**
+- `backend/tsconfig.json` - Strict TypeScript, ES2022, CommonJS
+- `backend/jest.config.js` - ts-jest, 30s timeout, tsconfig.test.json
+- `frontend/tsconfig.json` - Path aliases (@/components, @/utils, etc.)
+- `frontend/playwright.config.ts`, `lighthouserc.js` - E2E & performance (90+ score)
 
 ## CI/CD Pipeline
 
-**GitHub Actions Workflow**: `.github/workflows/phase6-testing.yml`
-- **Status**: Disabled for active development (manual trigger only via workflow_dispatch)
+`.github/workflows/phase6-testing.yml` - **Manual trigger only** (disabled during development)
 - **Jobs**: frontend-tests, backend-tests, e2e-tests, performance-tests, security-scan, code-quality
-- **Requirements**:
-  - Node 18.x and 20.x matrix
-  - PostgreSQL 15 service (test user/password, port 5432)
-  - Redis 7 service (port 6379)
-  - Coverage thresholds: 85% frontend, 80% backend
-  - Performance budget: Lighthouse score 90+
-
-**Pre-commit Validation** (when CI is enabled):
-1. Type checking (`npm run type-check`)
-2. Linting (`npm run lint` - frontend only)
-3. Unit tests with coverage
-4. Prisma client generation
-5. Database migrations (test DB)
-6. Security tests
+- **Services**: PostgreSQL 15 (port 5432), Redis 7 (port 6379)
+- **Thresholds**: 85% frontend, 80% backend coverage; Lighthouse 90+
+- **Validation**: Type-check → Lint (frontend only) → Tests → Prisma generate → Migrations → Security
 
 ## Environment Variables
 
-**Critical Environment Variables** (see `.env.example` for full list):
-- `DATABASE_URL` - PostgreSQL connection (Neon recommended)
-- `REDIS_URL` - Redis connection string
-- `JWT_SECRET`, `JWT_REFRESH_SECRET` - Authentication secrets
-- `NODE_ENV` - development/test/production
-- `PORT` - Server port (backend: 3001/4000, frontend: 3000)
-- `FRONTEND_URL`, `BACKEND_URL` - CORS and URL configuration
+**Required**: `DATABASE_URL` (Neon PostgreSQL), `REDIS_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `NODE_ENV`, `PORT`, `FRONTEND_URL`
+**Optional**: `OPENAI_API_KEY`, `GOOGLE_AI_API_KEY` (AI), `YELLOWCARD_API_KEY`, `CHANGENOW_API_KEY` (payments)
 
-**AI Services** (optional for MVP):
-- `OPENAI_API_KEY`, `GOOGLE_AI_API_KEY` - AI content generation
-- `NLLB_SERVICE_URL` - Translation service
+## Best Practices
 
-**Payment Providers**:
-- `YELLOWCARD_API_KEY` - African payments
-- `CHANGENOW_API_KEY` - International crypto
-
-## Development Workflow Best Practices
-
-1. **Always run `npm run db:generate`** after pulling schema changes
-2. **Backend builds require memory**: Commands already use `--max-old-space-size=4096`
-3. **Frontend install**: Use `--legacy-peer-deps` if npm ci fails
-4. **Type errors in tests**: Known issue with jest-dom matchers - ignore TypeScript errors in test files
-5. **No backend linting**: Skip `npm run lint` for backend until ESLint config is added
-6. **Build order matters**: Backend type-check → Frontend type-check → Tests
-7. **Docker available**: Use `docker-compose up` from `infrastructure/docker/` for local Postgres, Redis, Elasticsearch
+1. **After schema changes**: `npm run db:generate` (ALWAYS)
+2. **Frontend install**: Use `--legacy-peer-deps` (npm ci fails)
+3. **Build order**: Backend type-check → Frontend → Tests
+4. **Docker**: `infrastructure/docker/docker-compose up` for local services
+5. **Memory**: Backend already uses `--max-old-space-size=4096`
 
 ## Common Pitfalls to Avoid
 
