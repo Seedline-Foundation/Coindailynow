@@ -8,6 +8,7 @@ import { analyticsResolvers } from './graphql/resolvers/analyticsResolvers';
 import { legalResolvers } from './resolvers/legal.resolvers';
 import { walletModalResolvers } from '../graphql/resolvers/walletModalResolvers';
 import { withdrawalResolvers } from '../graphql/resolvers/withdrawalResolvers';
+import { communityResolvers } from './resolvers/communityResolvers';
 
 export const resolvers: IResolvers<any, GraphQLContext> = {
   Query: {
@@ -134,7 +135,10 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
     ...((walletModalResolvers as any).Query || {}),
 
     // Merge withdrawal management queries - Wallet System
-    ...((withdrawalResolvers as any).Query || {})
+    ...((withdrawalResolvers as any).Query || {}),
+
+    // Merge community queries - Community System
+    ...((communityResolvers as any).Query || {})
   },
 
   Mutation: {
@@ -160,7 +164,10 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
     ...((walletModalResolvers as any).Mutation || {}),
 
     // Merge withdrawal management mutations - Wallet System
-    ...((withdrawalResolvers as any).Mutation || {})
+    ...((withdrawalResolvers as any).Mutation || {}),
+
+    // Merge community mutations - Community System
+    ...((communityResolvers as any).Mutation || {})
   },
 
   // Type resolvers
@@ -223,6 +230,9 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
   ...((workflowResolvers as any).ContentWorkflow ? { ContentWorkflow: (workflowResolvers as any).ContentWorkflow } : {}),
   ...((workflowResolvers as any).WorkflowStep ? { WorkflowStep: (workflowResolvers as any).WorkflowStep } : {}),
   ...((workflowResolvers as any).WorkflowNotification ? { WorkflowNotification: (workflowResolvers as any).WorkflowNotification } : {}),
+
+  // Community field resolvers
+  ...((communityResolvers as any).CommunityPost ? { CommunityPost: (communityResolvers as any).CommunityPost } : {}),
 
   // Date scalar
   DateTime: {

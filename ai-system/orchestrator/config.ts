@@ -8,6 +8,8 @@ import {
   AgentType,
   TaskPriority
 } from '../types';
+// Minimal process env declaration to avoid relying on ambient Node types in this module.
+declare const process: { env: Record<string, string | undefined> };
 
 /**
  * Production orchestrator configuration optimized for African market

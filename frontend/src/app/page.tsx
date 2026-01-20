@@ -9,6 +9,7 @@ import {
   RightSidebar 
 } from '@/components/landing';
 import MarqueeWrapper from '@/components/landing/MarqueeWrapper';
+import MainNavigation from '@/components/navigation/MainNavigation';
 import Footer from '@/components/footer/Footer';
 
 // Mock data for demonstration
@@ -135,6 +136,9 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       {/* Header with Date/Time, Logo, Search, Auth */}
       <Header showDateTime={true} showSocialIcons={true} />
+
+      {/* Main Navigation Menu - Below Header, Above Marquee */}
+      <MainNavigation />
 
       {/* Marquee Ticker for Trending Tokens */}
       <MarqueeWrapper 
