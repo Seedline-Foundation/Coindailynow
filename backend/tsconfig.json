@@ -5,7 +5,6 @@
     "lib": ["ES2022"],
     "types": ["node", "jest"],
     "outDir": "./dist",
-    "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -35,13 +34,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "prisma/**/*",
-    // Temporarily exclude unstable moderation modules until APIs are aligned
-    "src/api/ai-moderation.ts",
-    "src/api/aiModerationResolvers.ts",
-    "src/integrations/aiModerationIntegration.ts",
-    "src/graphql/resolvers/moderation.ts",
-    "src/moderation/**/*"
+    "prisma/**/*"
   ]
 }
 

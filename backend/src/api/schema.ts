@@ -757,8 +757,7 @@ export const typeDefs = `
 
     # Community queries
     communityPost(id: ID!): CommunityPost
-    communityPosts(limit: Int = 20, offset: Int = 0, postType: String, authorId: String, parentId: String): [CommunityPost!]!
-    articleComments(articleId: ID!, limit: Int = 20, offset: Int = 0): [CommunityPost!]!
+    communityPosts(limit: Int = 20, offset: Int = 0): [CommunityPost!]!
 
     # Market data queries
     marketData: [MarketData!]!
@@ -931,8 +930,6 @@ export const typeDefs = `
     updatePost(id: ID!, content: String!): CommunityPost!
     deletePost(id: ID!): Boolean!
     votePost(postId: ID!, voteType: VoteType!): Vote!
-    shareArticle(articleId: ID!, platform: String!): ShareResult!
-    reactToArticle(articleId: ID!, reactionType: String!): ReactionResult!
 
     # Content interactions
     likeArticle(id: ID!): Article!
@@ -1216,18 +1213,6 @@ export const typeDefs = `
     post: CommunityPost!
     voteType: VoteType!
     createdAt: DateTime!
-    removed: Boolean
-    changed: Boolean
-  }
-
-  type ShareResult {
-    success: Boolean!
-    pointsEarned: Int!
-  }
-
-  type ReactionResult {
-    success: Boolean!
-    pointsEarned: Int!
   }
 
   enum VoteType {

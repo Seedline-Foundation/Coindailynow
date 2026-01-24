@@ -27,8 +27,6 @@ import { DatabaseOptimizer } from './services/databaseOptimizer';
 import { AdvancedCacheStrategy } from './services/advancedCacheStrategy';
 import { optimizedResolvers } from './api/resolvers/optimizedResolvers';
 import superAdminRouter from './api/routes/super-admin';
-import distributionRouter from './routes/distribution.routes';
-import aiContentPipelineRouter from './api/ai-content-pipeline';
 
 const PORT = process.env.PORT || 3001;
 const GRAPHQL_PATH = '/graphql';
@@ -107,12 +105,6 @@ export async function setupApp() {
 
   // Super Admin API Routes
   app.use('/api/super-admin', superAdminRouter);
-
-  // Distribution & Rewards API Routes
-  app.use('/api/distribution', distributionRouter);
-
-  // AI Content Pipeline API Routes
-  app.use('/api/content-pipeline', aiContentPipelineRouter);
 
   // GraphQL Server setup
   const schema = makeExecutableSchema({ typeDefs, resolvers: optimizedResolvers });
