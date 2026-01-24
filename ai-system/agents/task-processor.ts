@@ -3,10 +3,18 @@
  * Processes queued AI tasks from database
  */
 
-import { PrismaClient } from '@prisma/client';
+import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-const prisma = new PrismaClient();
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing SUPABASE_URL or SUPABASE_ANON_KEY environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 interface TaskResult {
@@ -136,24 +144,37 @@ async function processContentGeneration(inputData: any): Promise<TaskResult> {
  * Main task processor loop
  */
 export async function processNextTask(): Promise<boolean> {
-  const task = await prisma.aITask.findFirst({
-    where: { status: 'QUEUED' },
-    orderBy: [
-      { priority: 'desc' },
-      { createdAt: 'asc' }
-    ]
-  });
+  // Find first queued task ordered by priority and creation time
+  const { data: tasks, error: fetchError } = await supabase
+    .from('AITask')
+    .select('*')
+    .eq('status', 'QUEUED')
+    .order('priority', { ascending: false })
+    .order('createdAt', { ascending: true })
+    .limit(1);
 
-  if (!task) return false;
+  if (fetchError) {
+    console.error('Error fetching task:', fetchError);
+    return false;
+  }
+
+  if (!tasks || tasks.length === 0) return false;
+  
+  const task = tasks[0];
 
   // Mark as processing
-  await prisma.aITask.update({
-    where: { id: task.id },
-    data: {
+  const { error: updateError } = await supabase
+    .from('AITask')
+    .update({
       status: 'PROCESSING',
-      startedAt: new Date()
-    }
-  });
+      startedAt: new Date().toISOString()
+    })
+    .eq('id', task.id);
+
+  if (updateError) {
+    console.error('Error updating task status:', updateError);
+    return false;
+  }
 
   let result: TaskResult;
 
@@ -174,28 +195,38 @@ export async function processNextTask(): Promise<boolean> {
     }
 
     // Update task with result
-    await prisma.aITask.update({
-      where: { id: task.id },
-      data: {
+    const processingTimeMs = Date.now() - (task.startedAt ? new Date(task.startedAt).getTime() : Date.now());
+    
+    const { error: resultError } = await supabase
+      .from('AITask')
+      .update({
         status: result.success ? 'COMPLETED' : 'FAILED',
         outputData: JSON.stringify(result.data),
         errorMessage: result.error,
-        completedAt: new Date(),
-        processingTimeMs: Date.now() - (task.startedAt?.getTime() || Date.now())
-      }
-    });
+        processingTimeMs,
+        completedAt: new Date().toISOString()
+      })
+      .eq('id', task.id);
 
     return true;
   } catch (error) {
     // Handle processing error
-    await prisma.aITask.update({
-      where: { id: task.id },
-      data: {
+    const processingTimeMs = Date.now() - (task.startedAt ? new Date(task.startedAt).getTime() : Date.now());
+
+    const { error: errorUpdateError } = await supabase
+      .from('AITask')
+      .update({
         status: 'FAILED',
         errorMessage: error instanceof Error ? error.message : 'Unknown error',
-        completedAt: new Date()
-      }
-    });
+        processingTimeMs,
+        completedAt: new Date().toISOString()
+      })
+      .eq('id', task.id);
+
+    if (errorUpdateError) {
+      console.error('Error updating task with error:', errorUpdateError);
+    }
+
     return false;
   }
 }
