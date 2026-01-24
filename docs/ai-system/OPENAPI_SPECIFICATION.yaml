@@ -1,0 +1,1351 @@
+openapi: 3.0.3
+info:
+  title: CoinDaily AI System API
+  version: 1.0.0
+  description: |
+    Comprehensive REST API documentation for CoinDaily's AI System.
+    
+    ## Overview
+    The CoinDaily AI System provides a comprehensive suite of AI-powered features for cryptocurrency content management,
+    market analysis, social media automation, and more.
+    
+    ## Base URL
+    - Production: `https://api.coindaily.com`
+    - Staging: `https://staging-api.coindaily.com`
+    - Development: `http://localhost:4000`
+    
+    ## Authentication
+    All endpoints require JWT authentication unless otherwise specified.
+    Include the JWT token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+    
+    ## Rate Limiting
+    - Free tier: 100 requests/minute
+    - Premium tier: 500 requests/minute
+    - Enterprise tier: 2000 requests/minute
+    
+    ## Response Format
+    All responses follow this structure:
+    ```json
+    {
+      "data": {},
+      "error": null,
+      "cache": {
+        "hit": true,
+        "expires_at": "2025-10-20T12:00:00Z"
+      }
+    }
+    ```
+    
+  contact:
+    name: CoinDaily API Support
+    email: api@coindaily.com
+    url: https://docs.coindaily.com
+  license:
+    name: Proprietary
+    url: https://coindaily.com/license
+
+servers:
+  - url: https://api.coindaily.com
+    description: Production server
+  - url: https://staging-api.coindaily.com
+    description: Staging server
+  - url: http://localhost:4000
+    description: Development server
+
+tags:
+  - name: AI Agents
+    description: AI agent management and monitoring
+  - name: AI Tasks
+    description: AI task creation and tracking
+  - name: Content Pipeline
+    description: Automated content generation and publishing
+  - name: Market Insights
+    description: Real-time market analysis and predictions
+  - name: Social Media
+    description: Multi-platform social media automation
+  - name: Search
+    description: AI-powered search and recommendations
+  - name: Moderation
+    description: Content moderation and compliance
+  - name: Audit
+    description: AI audit logging and compliance
+  - name: Costs
+    description: Cost tracking and budget management
+  - name: Quality
+    description: Quality validation and performance monitoring
+  - name: Analytics
+    description: AI system analytics and reporting
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login endpoint
+    
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for programmatic access
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "Invalid input parameters"
+        details:
+          type: string
+          example: "Field 'title' is required"
+        timestamp:
+          type: string
+          format: date-time
+        request_id:
+          type: string
+          format: uuid
+
+    CacheInfo:
+      type: object
+      properties:
+        hit:
+          type: boolean
+          description: Whether the response was served from cache
+        expires_at:
+          type: string
+          format: date-time
+          description: When the cached data expires
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 150
+        total_pages:
+          type: integer
+          example: 8
+
+    AIAgent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Content Generation Agent"
+        type:
+          type: string
+          enum: [content_generation, translation, image_generation, quality_review, market_analysis, sentiment_analysis, moderation]
+        status:
+          type: string
+          enum: [active, inactive, error, maintenance]
+        model:
+          type: string
+          example: "gpt-4-turbo-preview"
+        provider:
+          type: string
+          example: "openai"
+        config:
+          type: object
+          additionalProperties: true
+        metrics:
+          type: object
+          properties:
+            success_rate:
+              type: number
+              format: float
+              example: 0.96
+            avg_response_time:
+              type: number
+              format: float
+              example: 450
+            total_tasks:
+              type: integer
+              example: 1250
+            failed_tasks:
+              type: integer
+              example: 50
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AITask:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        agent_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          example: "article_generation"
+        status:
+          type: string
+          enum: [queued, processing, completed, failed, cancelled]
+        priority:
+          type: string
+          enum: [low, normal, high, urgent]
+        input_data:
+          type: object
+          additionalProperties: true
+        output_data:
+          type: object
+          additionalProperties: true
+        metadata:
+          type: object
+          additionalProperties: true
+        quality_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        cost:
+          type: number
+          format: float
+          example: 0.05
+        retry_count:
+          type: integer
+          example: 0
+        max_retries:
+          type: integer
+          example: 3
+        error_message:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+    MarketSentiment:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "BTC"
+        sentiment:
+          type: string
+          enum: [very_bullish, bullish, neutral, bearish, very_bearish]
+        score:
+          type: number
+          format: float
+          minimum: -1
+          maximum: 1
+          example: 0.75
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          example: 0.92
+        sources:
+          type: object
+          properties:
+            social:
+              type: number
+              format: float
+            news:
+              type: number
+              format: float
+            whale:
+              type: number
+              format: float
+            technical:
+              type: number
+              format: float
+        trending_rank:
+          type: integer
+          example: 5
+        updated_at:
+          type: string
+          format: date-time
+
+    ContentPipeline:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        article_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, research, writing, review, translation, image_generation, seo_optimization, completed, failed]
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              status:
+                type: string
+              started_at:
+                type: string
+                format: date-time
+              completed_at:
+                type: string
+                format: date-time
+              duration_ms:
+                type: integer
+        metadata:
+          type: object
+          additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ==================== AI AGENTS ====================
+  /api/ai/agents:
+    get:
+      tags:
+        - AI Agents
+      summary: List all AI agents
+      description: Retrieve a paginated list of all AI agents with optional filtering
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [content_generation, translation, image_generation, quality_review, market_analysis]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, error, maintenance]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AIAgent'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                  cache:
+                    $ref: '#/components/schemas/CacheInfo'
+
+    post:
+      tags:
+        - AI Agents
+      summary: Create a new AI agent
+      description: Register a new AI agent in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - type
+                - model
+                - provider
+              properties:
+                name:
+                  type: string
+                  example: "New Content Agent"
+                type:
+                  type: string
+                  enum: [content_generation, translation, image_generation]
+                model:
+                  type: string
+                  example: "gpt-4-turbo-preview"
+                provider:
+                  type: string
+                  example: "openai"
+                config:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '201':
+          description: Agent created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AIAgent'
+
+  /api/ai/agents/{agentId}:
+    get:
+      tags:
+        - AI Agents
+      summary: Get agent details
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AIAgent'
+
+    put:
+      tags:
+        - AI Agents
+      summary: Update agent configuration
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                status:
+                  type: string
+                  enum: [active, inactive, maintenance]
+                config:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Agent updated successfully
+
+    delete:
+      tags:
+        - AI Agents
+      summary: Delete an agent
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Agent deleted successfully
+
+  /api/ai/agents/{agentId}/metrics:
+    get:
+      tags:
+        - AI Agents
+      summary: Get agent performance metrics
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [hour, day, week, month]
+            default: day
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      success_rate:
+                        type: number
+                        format: float
+                      avg_response_time:
+                        type: number
+                        format: float
+                      total_tasks:
+                        type: integer
+                      cost_total:
+                        type: number
+                        format: float
+                      quality_avg:
+                        type: number
+                        format: float
+
+  # ==================== AI TASKS ====================
+  /api/ai/tasks:
+    get:
+      tags:
+        - AI Tasks
+      summary: List AI tasks
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [queued, processing, completed, failed]
+        - name: agent_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AITask'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+
+    post:
+      tags:
+        - AI Tasks
+      summary: Create a new AI task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - agent_id
+                - type
+                - input_data
+              properties:
+                agent_id:
+                  type: string
+                  format: uuid
+                type:
+                  type: string
+                  example: "article_generation"
+                priority:
+                  type: string
+                  enum: [low, normal, high, urgent]
+                  default: normal
+                input_data:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '201':
+          description: Task created successfully
+
+  /api/ai/tasks/{taskId}:
+    get:
+      tags:
+        - AI Tasks
+      summary: Get task details
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AITask'
+
+  /api/ai/tasks/{taskId}/cancel:
+    post:
+      tags:
+        - AI Tasks
+      summary: Cancel a task
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Task cancelled successfully
+
+  /api/ai/tasks/{taskId}/retry:
+    post:
+      tags:
+        - AI Tasks
+      summary: Retry a failed task
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Task queued for retry
+
+  # ==================== CONTENT PIPELINE ====================
+  /api/ai/content-pipeline:
+    post:
+      tags:
+        - Content Pipeline
+      summary: Start content pipeline
+      description: Initiate automated content generation pipeline
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - topic
+              properties:
+                topic:
+                  type: string
+                  example: "Bitcoin ETF Approval"
+                category:
+                  type: string
+                  example: "regulation"
+                priority:
+                  type: string
+                  enum: [low, normal, high, breaking]
+                  default: normal
+                auto_publish:
+                  type: boolean
+                  default: false
+                languages:
+                  type: array
+                  items:
+                    type: string
+                  example: ["en", "sw", "ha"]
+      responses:
+        '201':
+          description: Pipeline started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ContentPipeline'
+
+  /api/ai/content-pipeline/{pipelineId}:
+    get:
+      tags:
+        - Content Pipeline
+      summary: Get pipeline status
+      parameters:
+        - name: pipelineId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ContentPipeline'
+
+  /api/ai/content-pipeline/{pipelineId}/stages/{stageName}:
+    get:
+      tags:
+        - Content Pipeline
+      summary: Get stage details
+      parameters:
+        - name: pipelineId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: stageName
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [research, writing, review, translation, image_generation, seo_optimization]
+      responses:
+        '200':
+          description: Successful response
+
+  # ==================== MARKET INSIGHTS ====================
+  /api/ai/market/sentiment:
+    get:
+      tags:
+        - Market Insights
+      summary: Get market sentiment
+      parameters:
+        - name: tokens
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          example: ["BTC", "ETH", "SOL"]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MarketSentiment'
+
+  /api/ai/market/trending:
+    get:
+      tags:
+        - Market Insights
+      summary: Get trending memecoins
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: timeframe
+          in: query
+          schema:
+            type: string
+            enum: [1h, 4h, 24h, 7d]
+            default: 24h
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        token:
+                          type: string
+                        rank:
+                          type: integer
+                        sentiment_score:
+                          type: number
+                          format: float
+                        volume_24h:
+                          type: number
+                          format: float
+                        price_change_24h:
+                          type: number
+                          format: float
+                        trending_score:
+                          type: number
+                          format: float
+
+  /api/ai/market/whale-activity:
+    get:
+      tags:
+        - Market Insights
+      summary: Get whale activity alerts
+      parameters:
+        - name: token
+          in: query
+          schema:
+            type: string
+        - name: min_amount
+          in: query
+          schema:
+            type: number
+            format: float
+      responses:
+        '200':
+          description: Successful response
+
+  # ==================== SOCIAL MEDIA ====================
+  /api/ai/social/auto-post:
+    post:
+      tags:
+        - Social Media
+      summary: Auto-post article to social platforms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - article_id
+                - platforms
+              properties:
+                article_id:
+                  type: string
+                  format: uuid
+                platforms:
+                  type: array
+                  items:
+                    type: string
+                    enum: [twitter, facebook, instagram, linkedin]
+                schedule_time:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Posts scheduled successfully
+
+  /api/ai/social/generate-content:
+    post:
+      tags:
+        - Social Media
+      summary: Generate platform-optimized content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - article_id
+                - platform
+              properties:
+                article_id:
+                  type: string
+                  format: uuid
+                platform:
+                  type: string
+                  enum: [twitter, facebook, instagram, linkedin]
+      responses:
+        '200':
+          description: Content generated successfully
+
+  /api/ai/social/engagement-prediction:
+    post:
+      tags:
+        - Social Media
+      summary: Predict engagement for content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                platform:
+                  type: string
+                post_time:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Prediction generated
+
+  # ==================== SEARCH ====================
+  /api/search/ai-enhanced:
+    post:
+      tags:
+        - Search
+      summary: AI-enhanced search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  example: "Bitcoin price prediction"
+                user_id:
+                  type: string
+                  format: uuid
+                language:
+                  type: string
+                  default: en
+                page:
+                  type: integer
+                  default: 1
+                limit:
+                  type: integer
+                  default: 20
+      responses:
+        '200':
+          description: Search results with AI enhancement
+
+  /api/search/suggestions/{query}:
+    get:
+      tags:
+        - Search
+      summary: Get AI query suggestions
+      parameters:
+        - name: query
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Query suggestions
+
+  /api/search/semantic:
+    post:
+      tags:
+        - Search
+      summary: Semantic search using embeddings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                threshold:
+                  type: number
+                  format: float
+                  default: 0.7
+      responses:
+        '200':
+          description: Semantic search results
+
+  # ==================== MODERATION ====================
+  /api/admin/moderation/queue:
+    get:
+      tags:
+        - Moderation
+      summary: Get moderation queue
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, under_review, confirmed, false_positive]
+      responses:
+        '200':
+          description: Moderation queue
+
+  /api/admin/moderation/violations/{id}/confirm:
+    post:
+      tags:
+        - Moderation
+      summary: Confirm violation and apply penalty
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                penalty_level:
+                  type: integer
+                  minimum: 1
+                  maximum: 3
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Violation confirmed
+
+  /api/ai/moderate/content:
+    post:
+      tags:
+        - Moderation
+      summary: Moderate user content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+                - user_id
+              properties:
+                content:
+                  type: string
+                content_type:
+                  type: string
+                  enum: [article, comment, post, message]
+                user_id:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Moderation result
+
+  # ==================== AUDIT ====================
+  /api/ai/audit/logs:
+    get:
+      tags:
+        - Audit
+      summary: Get audit logs
+      parameters:
+        - name: agent_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: event_type
+          in: query
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Audit logs retrieved
+
+  /api/ai/audit/export:
+    post:
+      tags:
+        - Audit
+      summary: Generate compliance report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start_date:
+                  type: string
+                  format: date-time
+                end_date:
+                  type: string
+                  format: date-time
+                format:
+                  type: string
+                  enum: [json, csv, xml]
+                  default: json
+      responses:
+        '200':
+          description: Report generated
+
+  # ==================== COSTS ====================
+  /api/ai/costs/overview:
+    get:
+      tags:
+        - Costs
+      summary: Get cost overview
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month]
+        - name: agent_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Cost overview
+
+  /api/ai/costs/budget:
+    get:
+      tags:
+        - Costs
+      summary: Get budget limits
+      responses:
+        '200':
+          description: Budget limits retrieved
+
+    post:
+      tags:
+        - Costs
+      summary: Create budget limit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - period
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  example: 1000.00
+                period:
+                  type: string
+                  enum: [daily, weekly, monthly]
+                agent_id:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Budget limit created
+
+  /api/ai/costs/forecast:
+    get:
+      tags:
+        - Costs
+      summary: Get cost forecast
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        '200':
+          description: Cost forecast
+
+  # ==================== QUALITY ====================
+  /api/ai/quality/validate/content:
+    post:
+      tags:
+        - Quality
+      summary: Validate content quality
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - article_id
+              properties:
+                article_id:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Quality validation results
+
+  /api/ai/quality/validate/agent:
+    post:
+      tags:
+        - Quality
+      summary: Validate agent performance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - agent_id
+                - period
+              properties:
+                agent_id:
+                  type: string
+                  format: uuid
+                period:
+                  type: string
+                  enum: [day, week, month]
+      responses:
+        '200':
+          description: Agent performance validation
+
+  /api/ai/quality/reports/comprehensive:
+    post:
+      tags:
+        - Quality
+      summary: Generate comprehensive quality report
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start_date:
+                  type: string
+                  format: date-time
+                end_date:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Comprehensive report generated
+
+  # ==================== ANALYTICS ====================
+  /api/ai/analytics/dashboard:
+    get:
+      tags:
+        - Analytics
+      summary: Get AI system dashboard data
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: day
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      total_tasks:
+                        type: integer
+                      success_rate:
+                        type: number
+                        format: float
+                      avg_response_time:
+                        type: number
+                        format: float
+                      total_cost:
+                        type: number
+                        format: float
+                      active_agents:
+                        type: integer
+
+  /api/ai/analytics/performance:
+    get:
+      tags:
+        - Analytics
+      summary: Get performance analytics
+      responses:
+        '200':
+          description: Performance analytics
+
+  # ==================== HEALTH CHECK ====================
+  /api/health:
+    get:
+      tags:
+        - Analytics
+      summary: System health check
+      security: []
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  services:
+                    type: object
+                    properties:
+                      database:
+                        type: string
+                        enum: [healthy, degraded, down]
+                      redis:
+                        type: string
+                        enum: [healthy, degraded, down]
+                      ai_agents:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                          active:
+                            type: integer
+                          inactive:
+                            type: integer

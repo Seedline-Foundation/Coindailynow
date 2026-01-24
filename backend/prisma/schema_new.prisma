@@ -1,0 +1,489 @@
+// Prisma schema for CoinDaily Platform (SQLite-compatible for development)
+// Based on specs/002-coindaily-africa-s/data-model.md
+// Task 1: Database Schema Implementation - Complete 20+ entities with proper indexes
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USER MANAGEMENT
+// ============================================================================
+
+model User {
+  id                    String   @id @default(cuid())
+  email                 String   @unique
+  username              String   @unique
+  passwordHash          String
+  firstName             String?
+  lastName              String?
+  avatarUrl             String?
+  bio                   String?
+  location              String?
+  preferredLanguage     String   @default("en")
+  subscriptionTier      String   @default("FREE") // FREE, PREMIUM, ENTERPRISE
+  emailVerified         Boolean  @default(false)
+  phoneVerified         Boolean  @default(false)
+  twoFactorEnabled      Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  lastLoginAt           DateTime?
+  status                String   @default("ACTIVE") // ACTIVE, SUSPENDED, BANNED, PENDING_VERIFICATION
+
+  // Relations
+  profile               UserProfile?
+  articles              Article[]
+  communityPosts        CommunityPost[]
+  votes                 Vote[]
+  userEngagements       UserEngagement[]
+  subscription          Subscription?
+  articleTranslations   ArticleTranslation[]
+  aiTasks               AITask[]
+  paymentMethods        PaymentMethod[]
+
+  // Performance indexes
+  @@index([email])
+  @@index([username])
+  @@index([subscriptionTier])
+  @@index([status])
+  @@index([preferredLanguage])
+  @@index([createdAt])
+}
+
+model UserProfile {
+  userId                String   @id
+  tradingExperience     String?  // beginner, intermediate, advanced
+  investmentPortfolioSize String? // small, medium, large
+  preferredExchanges    String?  // JSON string array
+  emailNotifications    Boolean  @default(true)
+  pushNotifications     Boolean  @default(true)
+  smsNotifications      Boolean  @default(false)
+  breakingNewsAlerts    Boolean  @default(true)
+  priceAlerts           Boolean  @default(false)
+  communityMentions     Boolean  @default(true)
+  profileVisibility     String   @default("public") // public, private, friends
+  showInvestmentData    Boolean  @default(false)
+  showTradingActivity   Boolean  @default(false)
+  allowMessageRequests  Boolean  @default(true)
+  contentCategories     String?  // JSON string array
+  contentLanguages      String?  // JSON string array
+  contentDifficulty     String   @default("intermediate") // beginner, intermediate, advanced
+  autoTranslate         Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// CONTENT MANAGEMENT
+// ============================================================================
+
+model Article {
+  id                    String   @id @default(cuid())
+  title                 String
+  slug                  String   @unique
+  excerpt               String
+  content               String   // Markdown/JSON content
+  featuredImageUrl      String?
+  authorId              String
+  categoryId            String
+  tags                  String?  // JSON string array
+  status                String   @default("DRAFT") // DRAFT, PENDING_REVIEW, APPROVED, PUBLISHED, ARCHIVED, REJECTED
+  priority              String   @default("NORMAL") // LOW, NORMAL, HIGH, BREAKING
+  isPremium             Boolean  @default(false)
+  viewCount             Int      @default(0)
+  likeCount             Int      @default(0)
+  commentCount          Int      @default(0)
+  shareCount            Int      @default(0)
+  readingTimeMinutes    Int      @default(0)
+  seoTitle              String?
+  seoDescription        String?
+  publishScheduledAt    DateTime?
+  publishedAt           DateTime?
+  deletedAt             DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  author                User     @relation(fields: [authorId], references: [id])
+  category              Category @relation(fields: [categoryId], references: [id])
+  translations          ArticleTranslation[]
+  userEngagements       UserEngagement[]
+
+  // Performance indexes for African content
+  @@index([status, publishedAt])
+  @@index([categoryId, publishedAt])
+  @@index([authorId, status])
+  @@index([isPremium])
+  @@index([priority, createdAt])
+  @@index([slug])
+  @@index([publishedAt])
+}
+
+model ArticleTranslation {
+  id                    String   @id @default(cuid())
+  articleId             String
+  languageCode          String   // ISO 639-1 (sw, fr, ar, pt, es, am, ha, ig, yo, zu, af, so, om, ti, xh, sn)
+  title                 String
+  excerpt               String
+  content               String
+  translationStatus     String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, REVIEWED, REJECTED
+  aiGenerated           Boolean  @default(false)
+  humanReviewed         Boolean  @default(false)
+  translatorId          String?
+  qualityScore          Int?     // 0-100
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  article               Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  translator            User?    @relation(fields: [translatorId], references: [id])
+
+  // African language optimization
+  @@index([articleId, languageCode])
+  @@index([languageCode, translationStatus])
+  @@index([translatorId])
+  @@unique([articleId, languageCode])
+}
+
+model Category {
+  id                    String   @id @default(cuid())
+  name                  String
+  slug                  String   @unique
+  description           String?
+  parentId              String?
+  iconUrl               String?
+  colorHex              String?
+  sortOrder             Int      @default(0)
+  isActive              Boolean  @default(true)
+  articleCount          Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  parent                Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children              Category[] @relation("CategoryHierarchy")
+  articles              Article[]
+
+  @@index([parentId, sortOrder])
+  @@index([isActive, sortOrder])
+  @@index([slug])
+}
+
+model Tag {
+  id                    String   @id @default(cuid())
+  name                  String   @unique
+  slug                  String   @unique
+  description           String?
+  usageCount            Int      @default(0)
+  trendingScore         Float    @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([trendingScore])
+  @@index([usageCount])
+  @@index([slug])
+}
+
+// ============================================================================
+// CRYPTOCURRENCY DATA
+// ============================================================================
+
+model Token {
+  id                    String   @id @default(cuid())
+  symbol                String   @unique
+  name                  String
+  slug                  String   @unique
+  description           String?
+  logoUrl               String?
+  websiteUrl            String?
+  whitepaperUrl         String?
+  blockchain            String
+  contractAddress       String?
+  tokenType             String   // CRYPTOCURRENCY, MEMECOIN, UTILITY_TOKEN, SECURITY_TOKEN, STABLECOIN
+  marketCap             Float?
+  circulatingSupply     Float?
+  totalSupply           Float?
+  maxSupply             Float?
+  isMemecoin            Boolean  @default(false)
+  isListed              Boolean  @default(true)
+  listingStatus         String   @default("APPROVED") // APPROVED, PENDING_REVIEW, REJECTED, DELISTED
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  marketData            MarketData[]
+
+  // African exchange optimization
+  @@index([symbol])
+  @@index([isListed, listingStatus])
+  @@index([isMemecoin])
+  @@index([tokenType])
+  @@index([blockchain])
+  @@index([slug])
+}
+
+model MarketData {
+  id                    String   @id @default(cuid())
+  tokenId               String
+  exchange              String
+  priceUsd              Float
+  priceChange24h        Float
+  volume24h             Float
+  marketCap             Float
+  high24h               Float
+  low24h                Float
+  tradingPairs          String?  // JSON string array
+  timestamp             DateTime @default(now())
+
+  // Relations
+  token                 Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  // Real-time data optimization
+  @@index([tokenId, timestamp])
+  @@index([exchange, timestamp])
+  @@index([timestamp])
+}
+
+model ExchangeIntegration {
+  id                    String   @id @default(cuid())
+  name                  String   @unique
+  slug                  String   @unique
+  apiEndpoint           String
+  websocketEndpoint     String?
+  region                String   // African region focus
+  supportedCountries    String   // JSON string array
+  apiKeyEncrypted       String?
+  isActive              Boolean  @default(true)
+  rateLimitPerMinute    Int      @default(60)
+  lastSyncAt            DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // African exchanges optimization
+  @@index([region, isActive])
+  @@index([isActive])
+  @@index([slug])
+}
+
+// ============================================================================
+// COMMUNITY FEATURES
+// ============================================================================
+
+model CommunityPost {
+  id                    String   @id @default(cuid())
+  authorId              String
+  title                 String?
+  content               String
+  postType              String   @default("TEXT") // TEXT, LINK, IMAGE, VIDEO, POLL
+  parentId              String?
+  tokenMentions         String?  // JSON string array
+  mediaUrls             String?  // JSON string array
+  upvoteCount           Int      @default(0)
+  downvoteCount         Int      @default(0)
+  commentCount          Int      @default(0)
+  shareCount            Int      @default(0)
+  isPinned              Boolean  @default(false)
+  isLocked              Boolean  @default(false)
+  moderationStatus      String   @default("APPROVED") // APPROVED, PENDING, FLAGGED, SHADOW_BANNED, REMOVED
+  violationReason       String?
+  penaltyApplied        String?  // WARNING, SHADOW_BAN, TEMPORARY_BAN, PERMANENT_BAN
+  deletedAt             DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  author                User     @relation(fields: [authorId], references: [id])
+  parent                CommunityPost? @relation("PostReplies", fields: [parentId], references: [id])
+  replies               CommunityPost[] @relation("PostReplies")
+  votes                 Vote[]
+  userEngagements       UserEngagement[]
+
+  // Community optimization
+  @@index([authorId, createdAt])
+  @@index([parentId, createdAt])
+  @@index([moderationStatus])
+  @@index([isPinned, createdAt])
+  @@index([postType])
+}
+
+model Vote {
+  id                    String   @id @default(cuid())
+  userId                String
+  postId                String
+  voteType              String   // upvote, downvote
+  createdAt             DateTime @default(now())
+
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post                  CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+// ============================================================================
+// AI SYSTEM
+// ============================================================================
+
+model AIAgent {
+  id                    String   @id @default(cuid())
+  name                  String
+  type                  String   // CONTENT_GENERATION, MARKET_ANALYSIS, SENTIMENT_ANALYSIS, TRANSLATION, etc.
+  modelProvider         String   // openai, google, meta
+  modelName             String   // gpt-4-turbo, gemini-pro
+  configuration         String   // JSON configuration
+  isActive              Boolean  @default(true)
+  totalRequests         Int      @default(0)
+  successfulRequests    Int      @default(0)
+  averageResponseTimeMs Float    @default(0)
+  qualityScore          Float    @default(0)
+  costPerRequest        Float    @default(0)
+  lastPerformanceCheck  DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  tasks                 AITask[]
+
+  @@index([type, isActive])
+  @@index([isActive])
+}
+
+model AITask {
+  id                    String   @id @default(cuid())
+  agentId               String
+  taskType              String
+  inputData             String   // JSON input
+  outputData            String?  // JSON output
+  status                String   @default("QUEUED") // QUEUED, PROCESSING, COMPLETED, FAILED, CANCELLED
+  priority              String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  estimatedCost         Float
+  actualCost            Float?
+  processingTimeMs      Int?
+  qualityScore          Float?
+  errorMessage          String?
+  retryCount            Int      @default(0)
+  maxRetries            Int      @default(3)
+  scheduledAt           DateTime?
+  startedAt             DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime @default(now())
+  assignedUserId        String?
+
+  // Relations
+  agent                 AIAgent  @relation(fields: [agentId], references: [id])
+  assignedUser          User?    @relation(fields: [assignedUserId], references: [id])
+
+  // AI task optimization
+  @@index([agentId, status])
+  @@index([status, priority])
+  @@index([scheduledAt])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// SUBSCRIPTION & PAYMENTS
+// ============================================================================
+
+model Subscription {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  planId                String
+  status                String   @default("ACTIVE") // ACTIVE, CANCELLED, PAST_DUE, INCOMPLETE, TRIALING
+  currentPeriodStart    DateTime
+  currentPeriodEnd      DateTime
+  trialEnd              DateTime?
+  cancelAtPeriodEnd     Boolean  @default(false)
+  cancelledAt           DateTime?
+  stripeSubscriptionId  String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                  SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@index([status])
+  @@index([currentPeriodEnd])
+}
+
+model SubscriptionPlan {
+  id                    String   @id @default(cuid())
+  name                  String
+  description           String
+  priceCents            Int
+  currency              String   @default("USD")
+  billingInterval       String   // MONTHLY, YEARLY
+  trialPeriodDays       Int      @default(0)
+  features              String?  // JSON string
+  isActive              Boolean  @default(true)
+  sortOrder             Int      @default(0)
+  stripePriceId         String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  subscriptions         Subscription[]
+
+  @@index([isActive])
+}
+
+model PaymentMethod {
+  id                    String   @id @default(cuid())
+  userId                String
+  type                  String   // CARD, MOBILE_MONEY, BANK_TRANSFER
+  provider              String   // M-Pesa, Orange Money, MTN Money, EcoCash, Stripe
+  externalId            String   // Provider's payment method ID
+  lastFour              String?
+  expiryMonth           Int?
+  expiryYear            Int?
+  isDefault             Boolean  @default(false)
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // African payment methods optimization
+  @@index([userId, isDefault])
+  @@index([provider, isActive])
+}
+
+// ============================================================================
+// ANALYTICS & ENGAGEMENT
+// ============================================================================
+
+model UserEngagement {
+  id                    String   @id @default(cuid())
+  userId                String
+  articleId             String?
+  postId                String?
+  actionType            String   // VIEW, LIKE, SHARE, COMMENT, CLICK, SCROLL
+  durationSeconds       Int?
+  scrollPercentage      Float?
+  deviceType            String?  // mobile, desktop, tablet
+  location              String?  // African country/region
+  referrer              String?
+  timestamp             DateTime @default(now())
+
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article               Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  post                  CommunityPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // Analytics optimization
+  @@index([userId, timestamp])
+  @@index([articleId, actionType, timestamp])
+  @@index([postId, actionType, timestamp])
+  @@index([actionType, timestamp])
+  @@index([timestamp])
+}

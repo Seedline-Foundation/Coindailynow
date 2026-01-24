@@ -1,0 +1,4 @@
+src/hooks/useAuth.ts(127,32): error TS1005: '>' expected.
+src/hooks/useAuth.ts(127,37): error TS1005: ';' expected.
+src/hooks/useAuth.ts(127,45): error TS1109: Expression expected.
+src/hooks/useAuth.ts(127,57): error TS1161: Unterminated regular expression literal.

@@ -1,0 +1,499 @@
+# JY Token GraphQL Schema
+# Complete API for JY token operations
+
+# ========== TYPES ==========
+
+"""
+JY Token information
+"""
+type JYToken {
+  symbol: String!
+  name: String!
+  contractAddress: String!
+  network: String!
+  totalSupply: Float!
+  circulatingSupply: Float!
+  totalBurned: Float!
+  totalStaked: Float!
+  stakingAPR: Float!
+  price: Float
+  marketCap: Float
+}
+
+"""
+User's JY stake information
+"""
+type JYStakeInfo {
+  amount: Float!
+  startTime: DateTime!
+  lastClaimTime: DateTime!
+  pendingRewards: Float!
+  estimatedDailyReward: Float!
+  estimatedMonthlyReward: Float!
+  estimatedYearlyReward: Float!
+  unstakeRequestTime: DateTime
+  unstakeUnlockTime: DateTime
+  canUnstake: Boolean!
+  cooldownRemaining: Int
+}
+
+"""
+Global staking statistics
+"""
+type JYStakingStats {
+  totalStaked: Float!
+  totalStakers: Int!
+  currentAPR: Float!
+  totalYieldDistributed: Float!
+  availableYieldPool: Float!
+  averageStakeAmount: Float!
+  stakingParticipation: Float!
+}
+
+"""
+Yield pool status (Real Yield metrics)
+"""
+type JYYieldPoolStatus {
+  availableYield: Float!
+  totalRevenueDeposited: Float!
+  totalYieldDistributed: Float!
+  currentAPR: Float!
+  projectedDaysRunway: Int!
+  lastDepositAmount: Float
+  lastDepositTime: DateTime
+  lastDepositSource: String
+  sustainability: Float!
+  healthStatus: YieldPoolHealth!
+}
+
+"""
+CE Points to JY conversion preview
+"""
+type CEConversionPreview {
+  cePoints: Float!
+  jyAmount: Float!
+  conversionRate: Int!
+  minimumCE: Int!
+  valid: Boolean!
+  message: String!
+  estimatedGasFee: Float
+}
+
+"""
+Conversion result
+"""
+type ConversionResult {
+  success: Boolean!
+  jyAmount: Float!
+  cePointsUsed: Float!
+  transactionHash: String!
+  timestamp: DateTime!
+  newJYBalance: Float!
+  newCEBalance: Float!
+}
+
+"""
+Staking transaction result
+"""
+type StakeResult {
+  success: Boolean!
+  amount: Float!
+  transactionHash: String!
+  timestamp: DateTime!
+  newStakedBalance: Float!
+  estimatedYearlyReward: Float!
+}
+
+"""
+Unstake request result
+"""
+type UnstakeRequestResult {
+  success: Boolean!
+  unlockTime: DateTime!
+  cooldownDays: Int!
+  canUnstakeAt: DateTime!
+  message: String!
+}
+
+"""
+Unstake result
+"""
+type UnstakeResult {
+  success: Boolean!
+  stakedAmount: Float!
+  rewards: Float!
+  totalAmount: Float!
+  transactionHash: String!
+  timestamp: DateTime!
+  newJYBalance: Float!
+}
+
+"""
+Claim rewards result
+"""
+type ClaimResult {
+  success: Boolean!
+  rewardsAmount: Float!
+  transactionHash: String!
+  timestamp: DateTime!
+  newJYBalance: Float!
+  totalRewardsClaimed: Float!
+}
+
+"""
+JY transaction history
+"""
+type JYTransaction {
+  id: ID!
+  type: JYTransactionType!
+  amount: Float!
+  transactionHash: String!
+  status: TransactionStatus!
+  timestamp: DateTime!
+  blockNumber: String
+  gasUsed: String
+  metadata: JSON
+}
+
+"""
+User's complete JY wallet info
+"""
+type JYWalletInfo {
+  walletAddress: String!
+  jyBalance: Float!
+  stakedBalance: Float!
+  pendingRewards: Float!
+  totalEarned: Float!
+  cePoints: Float!
+  canConvertCE: Boolean!
+  minimumCEForConversion: Int!
+}
+
+# ========== ENUMS ==========
+
+enum JYTransactionType {
+  CONVERSION
+  STAKE
+  UNSTAKE
+  CLAIM_REWARDS
+  TRANSFER
+  RECEIVE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum YieldPoolHealth {
+  EXCELLENT    # 180+ days runway
+  GOOD         # 90-180 days
+  MODERATE     # 30-90 days
+  LOW          # 7-30 days
+  CRITICAL     # <7 days
+}
+
+# ========== QUERIES ==========
+
+type Query {
+  """
+  Get JY token information
+  """
+  jyTokenInfo: JYToken!
+
+  """
+  Get current user's JY balance
+  """
+  myJYBalance: Float!
+
+  """
+  Get current user's complete JY wallet info
+  """
+  myJYWallet: JYWalletInfo!
+
+  """
+  Get current user's stake information
+  """
+  myJYStake: JYStakeInfo
+
+  """
+  Get global staking statistics
+  """
+  jyStakingStats: JYStakingStats!
+
+  """
+  Get yield pool status (Real Yield metrics)
+  """
+  jyYieldPoolStatus: JYYieldPoolStatus!
+
+  """
+  Preview CE Points to JY conversion
+  """
+  previewCEConversion(cePoints: Float!): CEConversionPreview!
+
+  """
+  Get user's JY transaction history
+  """
+  myJYTransactions(
+    limit: Int
+    offset: Int
+    type: JYTransactionType
+  ): [JYTransaction!]!
+
+  """
+  Calculate potential staking rewards
+  """
+  calculateStakingRewards(
+    amount: Float!
+    durationDays: Int!
+  ): Float!
+
+  """
+  Get JY token price (from DEX/CoinGecko)
+  """
+  jyTokenPrice: Float
+
+  """
+  Get JY market statistics
+  """
+  jyMarketStats: JYMarketStats!
+
+  """
+  Check if user can stake (has minimum balance, etc)
+  """
+  canStakeJY(amount: Float!): CanStakeResult!
+
+  """
+  Get top stakers (leaderboard)
+  """
+  topJYStakers(limit: Int): [StakerInfo!]!
+
+  """
+  Get staking APR history
+  """
+  jyAPRHistory(days: Int): [APRSnapshot!]!
+}
+
+# ========== MUTATIONS ==========
+
+type Mutation {
+  """
+  Convert CE Points to JY tokens
+  Rate: 100 CE Points = 1 JY
+  """
+  convertCEToJY(cePoints: Float!): ConversionResult!
+
+  """
+  Stake JY tokens to earn 30% APR
+  Minimum: 10 JY
+  """
+  stakeJY(amount: Float!): StakeResult!
+
+  """
+  Request to unstake JY tokens
+  Starts 7-day cooldown period
+  """
+  requestUnstakeJY: UnstakeRequestResult!
+
+  """
+  Unstake JY tokens after cooldown
+  Must call requestUnstakeJY first
+  """
+  unstakeJY: UnstakeResult!
+
+  """
+  Claim staking rewards
+  Does not unstake principal
+  """
+  claimJYRewards: ClaimResult!
+
+  """
+  Emergency unstake (with penalty)
+  Only available in specific conditions
+  """
+  emergencyUnstakeJY: UnstakeResult!
+}
+
+# ========== SUBSCRIPTIONS ==========
+
+type Subscription {
+  """
+  Subscribe to JY balance updates
+  """
+  jyBalanceUpdated: Float!
+
+  """
+  Subscribe to staking rewards updates
+  """
+  stakingRewardsUpdated: Float!
+
+  """
+  Subscribe to JY price updates
+  """
+  jyPriceUpdated: Float!
+
+  """
+  Subscribe to yield pool status changes
+  """
+  yieldPoolStatusUpdated: JYYieldPoolStatus!
+
+  """
+  Subscribe to new JY transactions
+  """
+  newJYTransaction: JYTransaction!
+}
+
+# ========== ADDITIONAL TYPES ==========
+
+type JYMarketStats {
+  price: Float!
+  priceChange24h: Float!
+  priceChange7d: Float!
+  volume24h: Float!
+  marketCap: Float!
+  fullyDilutedMarketCap: Float!
+  circulatingSupply: Float!
+  totalSupply: Float!
+  holders: Int!
+  lastUpdated: DateTime!
+}
+
+type CanStakeResult {
+  canStake: Boolean!
+  reason: String
+  currentBalance: Float!
+  minimumRequired: Float!
+  maximumAllowed: Float
+}
+
+type StakerInfo {
+  rank: Int!
+  userId: String!
+  username: String
+  stakedAmount: Float!
+  totalRewards: Float!
+  stakingDuration: Int!
+}
+
+type APRSnapshot {
+  date: DateTime!
+  apr: Float!
+  totalStaked: Float!
+  yieldPoolBalance: Float!
+}
+
+# ========== INPUT TYPES ==========
+
+input JYTransactionFilter {
+  type: JYTransactionType
+  status: TransactionStatus
+  fromDate: DateTime
+  toDate: DateTime
+  minAmount: Float
+  maxAmount: Float
+}
+
+# ========== CUSTOM SCALARS ==========
+
+scalar DateTime
+scalar JSON
+
+# ========== EXAMPLE QUERIES ==========
+
+"""
+Example Query 1: Get user's complete JY info
+query MyJYInfo {
+  myJYWallet {
+    walletAddress
+    jyBalance
+    stakedBalance
+    pendingRewards
+    totalEarned
+    cePoints
+    canConvertCE
+  }
+  myJYStake {
+    amount
+    startTime
+    pendingRewards
+    estimatedYearlyReward
+    canUnstake
+  }
+  jyStakingStats {
+    currentAPR
+    totalStaked
+    totalStakers
+    availableYieldPool
+  }
+}
+"""
+
+"""
+Example Query 2: Preview CE conversion
+query PreviewConversion {
+  previewCEConversion(cePoints: 1000) {
+    cePoints
+    jyAmount
+    conversionRate
+    valid
+    message
+    estimatedGasFee
+  }
+}
+"""
+
+"""
+Example Query 3: Get yield pool health
+query YieldPoolHealth {
+  jyYieldPoolStatus {
+    availableYield
+    projectedDaysRunway
+    sustainability
+    healthStatus
+    lastDepositAmount
+    lastDepositSource
+  }
+}
+"""
+
+"""
+Example Mutation 1: Convert CE to JY
+mutation ConvertCE {
+  convertCEToJY(cePoints: 1000) {
+    success
+    jyAmount
+    cePointsUsed
+    transactionHash
+    newJYBalance
+    newCEBalance
+  }
+}
+"""
+
+"""
+Example Mutation 2: Stake JY
+mutation StakeTokens {
+  stakeJY(amount: 100) {
+    success
+    amount
+    transactionHash
+    newStakedBalance
+    estimatedYearlyReward
+  }
+}
+"""
+
+"""
+Example Mutation 3: Claim rewards
+mutation ClaimRewards {
+  claimJYRewards {
+    success
+    rewardsAmount
+    transactionHash
+    newJYBalance
+    totalRewardsClaimed
+  }
+}
+"""

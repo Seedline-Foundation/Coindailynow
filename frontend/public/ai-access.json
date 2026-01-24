@@ -1,0 +1,288 @@
+{
+  "version": "1.0",
+  "name": "CoinDaily Knowledge API",
+  "description": "AI-optimized API for cryptocurrency and blockchain news, analysis, and data from Africa's premier crypto news platform",
+  "base_url": "https://coindaily.ai",
+  "api_base": "https://coindaily.ai/api/knowledge-api",
+  "documentation_url": "https://coindaily.ai/docs/api",
+  "api_endpoints": [
+    {
+      "path": "/api/knowledge-api/manifest",
+      "method": "GET",
+      "description": "Get AI manifest with API capabilities and endpoints",
+      "authentication": "none",
+      "rate_limit": "unlimited"
+    },
+    {
+      "path": "/api/knowledge-api/search",
+      "method": "GET",
+      "description": "Search knowledge base with structured results",
+      "authentication": "api_key",
+      "rate_limit": "tier-based",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search query"
+        },
+        {
+          "name": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10,
+          "description": "Maximum results to return"
+        }
+      ]
+    },
+    {
+      "path": "/api/knowledge-api/:articleId",
+      "method": "GET",
+      "description": "Get structured knowledge for specific article",
+      "authentication": "api_key",
+      "rate_limit": "tier-based",
+      "returns": {
+        "summary": "2-3 sentence summary",
+        "keyPoints": "array of key points",
+        "entities": "extracted entities (coins, protocols, exchanges)",
+        "facts": "verified facts",
+        "sources": "citation sources"
+      }
+    },
+    {
+      "path": "/api/knowledge-api/crypto-data/latest",
+      "method": "GET",
+      "description": "Get latest cryptocurrency news and data",
+      "authentication": "api_key",
+      "rate_limit": "tier-based",
+      "parameters": [
+        {
+          "name": "limit",
+          "type": "number",
+          "required": false,
+          "default": 50,
+          "description": "Maximum articles to return"
+        }
+      ]
+    },
+    {
+      "path": "/api/knowledge-api/feeds/rss/:feedId",
+      "method": "GET",
+      "description": "RAG-friendly RSS feed with structured data",
+      "authentication": "none",
+      "rate_limit": "unlimited",
+      "content_type": "application/rss+xml"
+    },
+    {
+      "path": "/api/knowledge-api/feeds/json/:feedId",
+      "method": "GET",
+      "description": "RAG-friendly JSON feed with structured data",
+      "authentication": "none",
+      "rate_limit": "unlimited",
+      "content_type": "application/json"
+    },
+    {
+      "path": "/api/knowledge-api/citations/track",
+      "method": "POST",
+      "description": "Track LLM citation usage",
+      "authentication": "none",
+      "rate_limit": "unlimited"
+    }
+  ],
+  "capabilities": [
+    "Structured crypto news summaries",
+    "Entity extraction (coins, protocols, exchanges, people, organizations)",
+    "Fact verification and citations",
+    "Multi-language support (15 African languages)",
+    "Real-time market data integration",
+    "LLM-optimized content structure",
+    "RAG-friendly data feeds",
+    "Semantic search with hybrid ranking"
+  ],
+  "data_types": [
+    "articles",
+    "market_data",
+    "crypto_analysis",
+    "blockchain_news",
+    "defi_updates",
+    "memecoin_trends",
+    "african_crypto_markets",
+    "exchange_data"
+  ],
+  "coverage": {
+    "regions": [
+      "Nigeria",
+      "Kenya",
+      "South Africa",
+      "Ghana",
+      "Ethiopia",
+      "Global"
+    ],
+    "languages": [
+      "en",
+      "sw",
+      "fr",
+      "ar",
+      "pt",
+      "am",
+      "ha",
+      "ig",
+      "yo",
+      "zu",
+      "af",
+      "so",
+      "om",
+      "ti",
+      "xh"
+    ],
+    "categories": [
+      "crypto",
+      "blockchain",
+      "defi",
+      "nft",
+      "memecoins",
+      "regulation",
+      "trading",
+      "mining",
+      "wallets",
+      "exchanges"
+    ]
+  },
+  "rate_limits": {
+    "free": {
+      "requests_per_hour": 100,
+      "requests_per_day": 1000,
+      "description": "Suitable for personal projects and testing"
+    },
+    "basic": {
+      "requests_per_hour": 1000,
+      "requests_per_day": 10000,
+      "description": "Suitable for small applications"
+    },
+    "pro": {
+      "requests_per_hour": 10000,
+      "requests_per_day": 100000,
+      "description": "Suitable for production applications"
+    },
+    "enterprise": {
+      "requests_per_hour": "unlimited",
+      "requests_per_day": "unlimited",
+      "description": "Custom limits for enterprise customers"
+    }
+  },
+  "authentication": {
+    "methods": [
+      {
+        "type": "api_key",
+        "description": "Include API key in X-API-Key header",
+        "example": "X-API-Key: cd_your_api_key_here"
+      }
+    ],
+    "get_api_key": "https://coindaily.ai/contact"
+  },
+  "usage_examples": [
+    {
+      "title": "Search for Bitcoin content",
+      "description": "Search knowledge base for Bitcoin-related articles",
+      "endpoint": "/api/knowledge-api/search",
+      "method": "GET",
+      "request": {
+        "url": "https://coindaily.ai/api/knowledge-api/search?query=bitcoin&limit=5",
+        "headers": {
+          "X-API-Key": "your_api_key"
+        }
+      },
+      "response_snippet": {
+        "query": "bitcoin",
+        "count": 5,
+        "results": [
+          {
+            "id": "article_id",
+            "title": "Bitcoin Adoption Surges in Nigeria",
+            "summary": "Nigerian cryptocurrency adoption reaches new heights...",
+            "keyPoints": ["...", "...", "..."],
+            "entities": ["Bitcoin", "Nigeria", "Binance"],
+            "qualityScore": 85.5
+          }
+        ]
+      }
+    },
+    {
+      "title": "Get latest crypto data",
+      "description": "Retrieve latest cryptocurrency news",
+      "endpoint": "/api/knowledge-api/crypto-data/latest",
+      "method": "GET",
+      "request": {
+        "url": "https://coindaily.ai/api/knowledge-api/crypto-data/latest?limit=20",
+        "headers": {
+          "X-API-Key": "your_api_key"
+        }
+      }
+    },
+    {
+      "title": "Subscribe to RAG feed",
+      "description": "Get RAG-optimized JSON feed for LLM training",
+      "endpoint": "/api/knowledge-api/feeds/json/:feedId",
+      "method": "GET",
+      "request": {
+        "url": "https://coindaily.ai/api/knowledge-api/feeds/json/crypto-news-feed"
+      },
+      "note": "No authentication required for public feeds"
+    }
+  ],
+  "structured_data_format": {
+    "summary": {
+      "type": "string",
+      "length": "2-3 sentences",
+      "description": "Concise article summary optimized for LLMs"
+    },
+    "keyPoints": {
+      "type": "array",
+      "items": "string",
+      "description": "3-5 key takeaways from the article"
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "name": "string",
+        "type": "coin|protocol|exchange|person|organization",
+        "confidence": "number (0-1)"
+      },
+      "description": "Extracted named entities with types"
+    },
+    "facts": {
+      "type": "array",
+      "items": "string",
+      "description": "Verified factual claims"
+    },
+    "sources": {
+      "type": "array",
+      "items": "string",
+      "description": "Citation sources and references"
+    },
+    "qualityScore": {
+      "type": "number",
+      "range": "0-100",
+      "description": "Content quality score"
+    },
+    "llmReadability": {
+      "type": "number",
+      "range": "0-100",
+      "description": "LLM readability score"
+    }
+  },
+  "best_practices": [
+    "Include X-API-Key header for authenticated endpoints",
+    "Implement exponential backoff for rate limit errors",
+    "Cache responses when appropriate to reduce API calls",
+    "Use specific queries to get more relevant results",
+    "Track citations to help us improve the service",
+    "Subscribe to feeds for real-time updates instead of polling"
+  ],
+  "support": {
+    "documentation": "https://coindaily.ai/docs/api",
+    "contact": "https://coindaily.ai/contact",
+    "status": "https://status.coindaily.ai"
+  },
+  "last_updated": "2025-10-11T14:00:00Z"
+}
