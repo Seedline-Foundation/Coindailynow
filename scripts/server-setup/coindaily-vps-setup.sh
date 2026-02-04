@@ -1131,7 +1131,7 @@ services:
         limits:
           memory: 6G
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -E 'green|yellow'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -1201,7 +1201,7 @@ services:
     command:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)(|/)'
     networks:
       - ai-network
 
