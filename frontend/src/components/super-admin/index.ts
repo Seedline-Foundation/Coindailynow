@@ -13,3 +13,4 @@ export { default as MobileSuperAdminDashboard } from './MobileSuperAdminDashboar
 export { default as PredictiveSEODashboard } from './PredictiveSEODashboard';
 export { default as ContentStrategyDashboard } from './ContentStrategyDashboard';
 export { DashboardErrorBoundary } from './DashboardErrorBoundary';
+export { default as SystemMetricsDashboard } from './SystemMetricsDashboard';

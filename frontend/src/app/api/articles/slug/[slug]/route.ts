@@ -20,7 +20,7 @@ export async function GET(
       body: JSON.stringify({
         query: `
           query GetArticleBySlug($slug: String!) {
-            article(where: { slug: $slug }) {
+            article(slug: $slug) {
               id
               title
               slug
@@ -32,8 +32,10 @@ export async function GET(
               updatedAt
               author {
                 id
-                name
-                email
+                username
+                firstName
+                lastName
+                avatarUrl
               }
               category {
                 id

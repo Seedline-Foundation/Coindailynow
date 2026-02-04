@@ -351,28 +351,14 @@ function DashboardContent() {
         </div>
       </div>
 
-      {/* Performance Metrics Chart Placeholder */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">API Performance (Last 24h)</h2>
-          <div className="flex items-center space-x-2 text-sm text-gray-400">
-            <Clock className="h-4 w-4" />
-            <span>Updated every 5 minutes</span>
-          </div>
-        </div>
-        <div className="h-64 flex items-center justify-center border border-dashed border-gray-700 rounded-lg">
-          <div className="text-center">
-            <TrendingUp className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400">Performance chart will be implemented in Phase 3</p>
-            <p className="text-sm text-gray-500 mt-1">
-              Current API requests: {platformStats.apiRequests.toLocaleString()}
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* System Metrics Dashboard - Embedded directly, no Grafana login needed! */}
+      <SystemMetricsDashboard />
     </div>
   );
 }
+
+// Import the System Metrics Dashboard
+import SystemMetricsDashboard from '@/components/super-admin/SystemMetricsDashboard';
 
 export default function SuperAdminDashboard() {
   return (
@@ -381,4 +367,3 @@ export default function SuperAdminDashboard() {
     </DashboardErrorBoundary>
   );
 }
-

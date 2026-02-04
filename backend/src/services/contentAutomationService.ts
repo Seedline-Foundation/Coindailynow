@@ -9,6 +9,7 @@ import { PrismaClient } from '@prisma/client';
 import OpenAI from 'openai';
 import Parser from 'rss-parser';
 import { Redis } from 'ioredis';
+import nllbClient from './nllbTranslationClient';
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -377,35 +378,36 @@ Provide a JSON response with:
 
     const results = [];
 
+    // Use self-hosted NLLB-200 translation service
     for (const lang of languages) {
       try {
-        const prompt = `Translate the following crypto/finance article to ${this.getLanguageName(lang)}.
+        // Translate title, excerpt, and content using NLLB
+        const titleTranslation = await nllbClient.translate(
+          article.rewrittenTitle || article.originalTitle,
+          'en',
+          lang,
+          true // preserve crypto terms
+        );
 
-Maintain:
-- Technical terms in English (Bitcoin, Ethereum, DeFi, etc.)
-- Professional tone
-- Cultural relevance for African markets
+        const excerptTranslation = article.rewrittenExcerpt 
+          ? await nllbClient.translate(article.rewrittenExcerpt, 'en', lang, true)
+          : '';
 
-Title: ${article.rewrittenTitle}
-Content: ${article.rewrittenContent}
+        const contentTranslation = await nllbClient.translate(
+          article.rewrittenContent || article.originalContent,
+          'en',
+          lang,
+          true
+        );
 
-Provide a JSON response with:
-{
-  "title": "translated title",
-  "content": "translated content",
-  "excerpt": "translated excerpt"
-}`;
-
-        const response = await openai.chat.completions.create({
-          model: 'gpt-4-turbo',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.5,
-          max_tokens: 3000,
-          response_format: { type: 'json_object' }
+        results.push({
+          language: lang,
+          title: titleTranslation,
+          excerpt: excerptTranslation,
+          content: contentTranslation
         });
 
-        const translation = JSON.parse(response.choices[0]?.message?.content || '{}');
-        results.push({ language: lang, ...translation });
+        await this.logInfo(articleId, 'TRANSLATE', `Translated to ${this.getLanguageName(lang)} using NLLB-200`);
 
       } catch (error: any) {
         await this.logError(articleId, 'TRANSLATE', `Failed to translate to ${lang}: ${error.message}`);
