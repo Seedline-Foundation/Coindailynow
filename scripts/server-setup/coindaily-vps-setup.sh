@@ -251,9 +251,6 @@ phase3_install_docker() {
         "max-file": "5"
     },
     "storage-driver": "overlay2",
-    "storage-opts": [
-        "overlay2.override_kernel_check=true"
-    ],
     "default-ulimits": {
         "nofile": {
             "Name": "nofile",
@@ -264,8 +261,7 @@ phase3_install_docker() {
     "max-concurrent-downloads": 10,
     "max-concurrent-uploads": 10,
     "default-shm-size": "1G",
-    "live-restore": true,
-    "userland-proxy": false
+    "live-restore": true
 }
 EOF
     
