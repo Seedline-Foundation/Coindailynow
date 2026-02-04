@@ -320,13 +320,15 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Install PyTorch CPU version first
+RUN pip install --no-cache-dir torch==2.1.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+
+# Install other Python dependencies
 RUN pip install --no-cache-dir \
     fastapi==0.104.1 \
     uvicorn[standard]==0.24.0 \
     transformers==4.36.0 \
     sentencepiece==0.1.99 \
-    torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu \
     pydantic==2.5.0 \
     redis==5.0.1
 
@@ -519,11 +521,14 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# Install PyTorch CPU version first
+RUN pip install --no-cache-dir torch==2.1.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+
+# Install other Python dependencies
 RUN pip install --no-cache-dir \
     fastapi==0.104.1 \
     uvicorn[standard]==0.24.0 \
     sentence-transformers==2.2.2 \
-    torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu \
     numpy \
     pydantic==2.5.0
 
@@ -613,7 +618,10 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Install Python dependencies - PyTorch first
+RUN pip install --no-cache-dir torch==2.1.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+
+# Install other dependencies
 RUN pip install --no-cache-dir \
     fastapi==0.104.1 \
     uvicorn[standard]==0.24.0 \
@@ -621,7 +629,6 @@ RUN pip install --no-cache-dir \
     transformers==4.36.0 \
     accelerate==0.25.0 \
     safetensors==0.4.1 \
-    torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu \
     pillow==10.1.0 \
     pydantic==2.5.0
 
