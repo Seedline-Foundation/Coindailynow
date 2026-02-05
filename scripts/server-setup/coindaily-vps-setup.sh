@@ -323,14 +323,16 @@ RUN apt-get update && apt-get install -y \
 # Install PyTorch CPU version first
 RUN pip install --no-cache-dir torch==2.1.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
 
-# Install other Python dependencies
+# Install other Python dependencies with compatible versions
 RUN pip install --no-cache-dir \
-    fastapi==0.104.1 \
-    uvicorn[standard]==0.24.0 \
-    transformers==4.36.0 \
-    sentencepiece==0.1.99 \
-    pydantic==2.5.0 \
-    redis==5.0.1
+    huggingface_hub==0.21.4 \
+    fastapi==0.109.0 \
+    uvicorn[standard]==0.27.0 \
+    transformers==4.38.0 \
+    sentencepiece==0.2.0 \
+    pydantic==2.6.0 \
+    redis==5.0.1 \
+    tokenizers>=0.15.0
 
 COPY nllb-service.py .
 
@@ -524,13 +526,15 @@ WORKDIR /app
 # Install PyTorch CPU version first
 RUN pip install --no-cache-dir torch==2.1.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
 
-# Install other Python dependencies
+# Install other Python dependencies with compatible versions
 RUN pip install --no-cache-dir \
-    fastapi==0.104.1 \
-    uvicorn[standard]==0.24.0 \
-    sentence-transformers==2.2.2 \
+    huggingface_hub==0.21.4 \
+    fastapi==0.109.0 \
+    uvicorn[standard]==0.27.0 \
+    sentence-transformers==2.5.0 \
     numpy \
-    pydantic==2.5.0
+    pydantic==2.6.0 \
+    tokenizers>=0.15.0
 
 COPY embeddings-service.py .
 
@@ -621,19 +625,21 @@ RUN apt-get update && apt-get install -y \
 # Install Python dependencies - PyTorch first
 RUN pip install --no-cache-dir torch==2.1.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
 
-# Install other dependencies
+# Install other dependencies with compatible versions
 RUN pip install --no-cache-dir \
-    fastapi==0.104.1 \
-    uvicorn[standard]==0.24.0 \
-    diffusers==0.24.0 \
-    transformers==4.36.0 \
-    accelerate==0.25.0 \
-    safetensors==0.4.1 \
-    pillow==10.1.0 \
-    pydantic==2.5.0
+    huggingface_hub==0.21.4 \
+    fastapi==0.109.0 \
+    uvicorn[standard]==0.27.0 \
+    diffusers==0.27.0 \
+    transformers==4.38.0 \
+    accelerate==0.27.0 \
+    safetensors==0.4.2 \
+    pillow==10.2.0 \
+    pydantic==2.6.0 \
+    tokenizers>=0.15.0
 
-# For OpenVINO optimization (Intel CPUs)
-RUN pip install --no-cache-dir openvino==2023.2.0 optimum[openvino]==1.14.0 || true
+# For OpenVINO optimization (Intel CPUs) - optional
+RUN pip install --no-cache-dir openvino==2024.0.0 optimum[openvino]==1.17.0 || true
 
 COPY sdxl-service.py .
 
