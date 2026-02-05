@@ -1863,6 +1863,73 @@ EOF
 
     chmod +x $OPT_DIR/scripts/system-monitor.sh
 
+    # Create monthly update script
+    cat > $OPT_DIR/scripts/monthly-update.sh << 'UPDATEEOF'
+#!/bin/bash
+# Monthly AI Model & System Update Script
+# Runs on 1st of each month at 3 AM
+
+LOG_FILE="/opt/coindaily/logs/monthly-update-$(date +%Y%m).log"
+OPT_DIR="/opt/coindaily"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a $LOG_FILE
+}
+
+log "=== Starting Monthly Update ==="
+
+# 1. Update Ollama models
+log "Updating Ollama models..."
+if systemctl is-active --quiet ollama 2>/dev/null; then
+    # System Ollama
+    ollama pull llama3.1:8b-instruct-q4_0 2>&1 | tee -a $LOG_FILE || log "WARN: Failed to update llama3.1"
+    ollama pull deepseek-r1:8b 2>&1 | tee -a $LOG_FILE || log "WARN: Failed to update deepseek-r1"
+else
+    # Docker Ollama
+    docker exec coindaily-ai-llama ollama pull llama3.1:8b-instruct-q4_0 2>&1 | tee -a $LOG_FILE || true
+    docker exec coindaily-ai-deepseek ollama pull deepseek-r1:8b 2>&1 | tee -a $LOG_FILE || true
+fi
+
+# 2. Update Docker images
+log "Updating Docker images..."
+cd $OPT_DIR
+docker compose pull 2>&1 | tee -a $LOG_FILE
+
+# 3. Rebuild custom images with latest packages
+log "Rebuilding custom images..."
+docker compose build --pull 2>&1 | tee -a $LOG_FILE
+
+# 4. Restart services with new images
+log "Restarting services..."
+if systemctl is-active --quiet ollama 2>/dev/null; then
+    docker compose up -d postgres redis elasticsearch prometheus grafana node-exporter nllb-translation sdxl-image bge-embeddings 2>&1 | tee -a $LOG_FILE
+else
+    docker compose up -d 2>&1 | tee -a $LOG_FILE
+fi
+
+# 5. Clean up old images
+log "Cleaning up old Docker images..."
+docker image prune -af 2>&1 | tee -a $LOG_FILE
+
+# 6. Update system packages
+log "Updating system packages..."
+apt-get update && apt-get upgrade -y 2>&1 | tee -a $LOG_FILE
+
+# 7. Verify services are running
+log "Verifying services..."
+sleep 30
+docker compose ps 2>&1 | tee -a $LOG_FILE
+
+log "=== Monthly Update Complete ==="
+
+# Send notification (optional - configure webhook)
+# curl -X POST "https://your-webhook-url" -d '{"text":"CoinDaily monthly update complete"}'
+
+exit 0
+UPDATEEOF
+
+    chmod +x $OPT_DIR/scripts/monthly-update.sh
+
     # Create log rotation config
     cat > /etc/logrotate.d/coindaily << 'EOF'
 /opt/coindaily/logs/*.log {
@@ -1895,6 +1962,9 @@ EOF
 
 # Docker cleanup - weekly (Sunday 3 AM)
 0 3 * * 0 docker system prune -af --volumes 2>/dev/null
+
+# Monthly AI model & system update - 1st of month at 3 AM
+0 3 1 * * /opt/coindaily/scripts/monthly-update.sh
 
 # Log rotation - daily at midnight
 0 0 * * * /usr/sbin/logrotate /etc/logrotate.d/coindaily
@@ -2059,13 +2129,26 @@ phase13_start_services() {
     
     cd $OPT_DIR
     
+    # Check if system Ollama is already running
+    SYSTEM_OLLAMA_RUNNING=false
+    if systemctl is-active --quiet ollama 2>/dev/null || pgrep -x ollama >/dev/null 2>&1; then
+        SYSTEM_OLLAMA_RUNNING=true
+        log_info "Detected system Ollama service running on port 11434"
+        log_info "Skipping Docker Ollama containers to avoid port conflicts"
+    fi
+    
     # Build custom images
     log_info "Building custom Docker images..."
     docker compose build --no-cache
     
-    # Start services
+    # Start services (skip Ollama if system service is running)
     log_info "Starting services..."
-    docker compose up -d
+    if [ "$SYSTEM_OLLAMA_RUNNING" = true ]; then
+        # Start everything except Ollama containers
+        docker compose up -d postgres redis elasticsearch prometheus grafana node-exporter nllb-translation sdxl-image bge-embeddings
+    else
+        docker compose up -d
+    fi
     
     # Wait for services to be ready
     log_info "Waiting for services to initialize (this may take a few minutes)..."
@@ -2084,23 +2167,41 @@ phase13_start_services() {
 phase14_pull_models() {
     log_step "PHASE 14: Pulling AI models (this will take 30-60 minutes)..."
     
-    # Wait for Ollama to be ready
-    log_info "Waiting for Ollama services to be ready..."
-    sleep 60
+    # Check if system Ollama is running
+    SYSTEM_OLLAMA_RUNNING=false
+    if systemctl is-active --quiet ollama 2>/dev/null || pgrep -x ollama >/dev/null 2>&1; then
+        SYSTEM_OLLAMA_RUNNING=true
+    fi
     
-    # Pull Llama 3.1 8B (4-bit quantized)
-    log_info "Pulling Llama 3.1 8B model (4.5GB)..."
-    docker exec coindaily-ai-llama ollama pull llama3.1:8b-instruct-q4_0 || {
-        log_warn "Failed to pull llama3.1, trying alternative..."
-        docker exec coindaily-ai-llama ollama pull llama3.1:8b
-    }
-    
-    # Pull DeepSeek-R1
-    log_info "Pulling DeepSeek-R1 8B model (5GB)..."
-    docker exec coindaily-ai-deepseek ollama pull deepseek-r1:8b || {
-        log_warn "Failed to pull deepseek-r1:8b, trying deepseek-coder..."
-        docker exec coindaily-ai-deepseek ollama pull deepseek-coder:6.7b
-    }
+    if [ "$SYSTEM_OLLAMA_RUNNING" = true ]; then
+        log_info "Using system Ollama service..."
+        
+        # Pull Llama 3.1 8B using system ollama
+        log_info "Pulling Llama 3.1 8B model (4.5GB)..."
+        ollama pull llama3.1:8b-instruct-q4_0 || ollama pull llama3.1:8b || log_warn "Failed to pull llama3.1"
+        
+        # Pull DeepSeek-R1
+        log_info "Pulling DeepSeek-R1 8B model (5GB)..."
+        ollama pull deepseek-r1:8b || ollama pull deepseek-coder:6.7b || log_warn "Failed to pull deepseek-r1"
+    else
+        # Wait for Docker Ollama to be ready
+        log_info "Waiting for Ollama services to be ready..."
+        sleep 60
+        
+        # Pull Llama 3.1 8B (4-bit quantized)
+        log_info "Pulling Llama 3.1 8B model (4.5GB)..."
+        docker exec coindaily-ai-llama ollama pull llama3.1:8b-instruct-q4_0 || {
+            log_warn "Failed to pull llama3.1, trying alternative..."
+            docker exec coindaily-ai-llama ollama pull llama3.1:8b
+        }
+        
+        # Pull DeepSeek-R1
+        log_info "Pulling DeepSeek-R1 8B model (5GB)..."
+        docker exec coindaily-ai-deepseek ollama pull deepseek-r1:8b || {
+            log_warn "Failed to pull deepseek-r1:8b, trying deepseek-coder..."
+            docker exec coindaily-ai-deepseek ollama pull deepseek-coder:6.7b
+        }
+    fi
     
     log_info "AI models pulled! NLLB and Embeddings models will download on first use."
 }
