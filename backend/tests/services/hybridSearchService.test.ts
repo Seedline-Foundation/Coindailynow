@@ -5,19 +5,12 @@
 
 import { HybridSearchService, SearchResultType, HybridSearchOptions } from '../../src/services/hybridSearchService';
 import { ElasticsearchService, SearchResult } from '../../src/services/elasticsearchService';
-import OpenAI from 'openai';
 
 // Mock implementations
 const mockElasticsearchService = {
   searchArticles: jest.fn(),
   indexExists: jest.fn().mockResolvedValue(true),
   health: jest.fn().mockResolvedValue({ status: 'green' })
-} as any;
-
-const mockOpenAI = {
-  embeddings: {
-    create: jest.fn()
-  }
 } as any;
 
 const mockLogger = {
@@ -27,6 +20,17 @@ const mockLogger = {
   debug: jest.fn()
 };
 
+// Mock the aiClient module
+jest.mock('../../src/services/aiClient', () => ({
+  generateEmbeddings: jest.fn().mockResolvedValue(new Array(384).fill(0.1)),
+  complete: jest.fn().mockResolvedValue('test response'),
+  AI_MODELS: {
+    LLAMA: 'llama3.1:8b',
+    DEEPSEEK: 'deepseek-r1:8b',
+    EMBEDDINGS: 'BAAI/bge-small-en-v1.5'
+  }
+}));
+
 describe('HybridSearchService', () => {
   let hybridSearchService: HybridSearchService;
   let mockEmbedding: number[];
@@ -34,19 +38,13 @@ describe('HybridSearchService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Create a mock embedding vector (1536 dimensions for OpenAI)
-    mockEmbedding = new Array(1536).fill(0.1);
+    // Create a mock embedding vector (384 dimensions for BGE)
+    mockEmbedding = new Array(384).fill(0.1);
     
     hybridSearchService = new HybridSearchService(
       mockElasticsearchService,
-      mockOpenAI,
       mockLogger
     );
-
-    // Default mock for OpenAI embeddings
-    mockOpenAI.embeddings.create.mockResolvedValue({
-      data: [{ embedding: mockEmbedding }]
-    });
   });
 
   describe('Semantic Search', () => {

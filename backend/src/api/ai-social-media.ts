@@ -422,5 +422,4 @@ router.use((error: Error, req: Request, res: Response, next: Function) => {
 export default router;
 
 // Import prisma
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';

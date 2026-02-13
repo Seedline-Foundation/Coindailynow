@@ -10,11 +10,8 @@
  * - Adaptation Algorithms: Automated improvements
  */
 
-import { PrismaClient } from '@prisma/client';
-import OpenAI from 'openai';
-
-const prisma = new PrismaClient();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import prisma from '../lib/prisma';
+import { reasoningComplete, complete, AI_MODELS } from './aiClient';
 
 // Types
 interface CitationSource {
@@ -343,22 +340,19 @@ Provide 3-5 specific, actionable recommendations to improve RAO performance. For
 
 Format as JSON array.`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [
-        { role: 'system', content: 'You are an RAO optimization expert. Provide recommendations in valid JSON format.' },
-        { role: 'user', content: analysisPrompt }
-      ],
+    const completion = await reasoningComplete(analysisPrompt, {
+      systemPrompt: 'You are an RAO optimization expert. Provide recommendations in valid JSON format.',
       temperature: 0.7,
-      response_format: { type: 'json_object' }
+      maxTokens: 2000
     });
 
-    const messageContent = completion.choices[0]?.message?.content;
+    const messageContent = completion.content;
     if (!messageContent) {
       return [];
     }
 
-    const result = JSON.parse(messageContent);
+    const jsonMatch = messageContent.match(/\{[\s\S]*\}/);
+    const result = jsonMatch ? JSON.parse(jsonMatch[0]) : { recommendations: [] };
     const recommendations: AdaptationRecommendation[] = (result.recommendations || []).map((rec: any) => ({
       contentId,
       priority: rec.priority || 'medium',
@@ -730,22 +724,19 @@ Canonical Answers: ${answers.length}
 
 Provide response as JSON with these exact fields: semanticRelevance, topicCoverage, entities (array), contentStructure, factualAccuracy, sourceAuthority`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [
-        { role: 'system', content: 'You are an RAO analysis expert. Provide accurate semantic analysis in JSON format.' },
-        { role: 'user', content: analysisPrompt }
-      ],
+    const completion = await reasoningComplete(analysisPrompt, {
+      systemPrompt: 'You are an RAO analysis expert. Provide accurate semantic analysis in JSON format.',
       temperature: 0.3,
-      response_format: { type: 'json_object' }
+      maxTokens: 1500
     });
 
-    const messageContent = completion.choices[0]?.message?.content;
+    const messageContent = completion.content;
     if (!messageContent) {
-      throw new Error('No response from GPT-4');
+      throw new Error('No response from AI');
     }
 
-    const analysis = JSON.parse(messageContent);
+    const jsonMatch = messageContent.match(/\{[\s\S]*\}/);
+    const analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
 
     // Update performance record
     const performance = await prisma.rAOPerformance.findFirst({

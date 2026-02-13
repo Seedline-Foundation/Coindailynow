@@ -1,3 +1,4 @@
+
 """
 NLLB-200 Translation Microservice
 Self-hosted translation API for African languages
@@ -6,7 +7,7 @@ Self-hosted translation API for African languages
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 from typing import List, Optional
 import logging
@@ -80,7 +81,6 @@ class BatchTranslationResponse(BaseModel):
 # Global model and tokenizer
 model = None
 tokenizer = None
-translator = None
 
 # Crypto terms to preserve (don't translate)
 CRYPTO_TERMS = {
@@ -96,16 +96,15 @@ CRYPTO_TERMS = {
 @app.on_event("startup")
 async def load_model():
     """Load model on startup"""
-    global model, tokenizer, translator
+    global model, tokenizer
     
     logger.info(f"Loading NLLB-200 model: {MODEL_NAME}")
     logger.info("This may take a few minutes on first run...")
     
     try:
         # Determine device
-        device = 0 if torch.cuda.is_available() else -1
-        device_name = "GPU" if device == 0 else "CPU"
-        logger.info(f"Using device: {device_name}")
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        logger.info(f"Using device: {device.upper()}")
         
         # Load tokenizer and model
         tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -118,20 +117,42 @@ async def load_model():
         else:
             logger.info("Model loaded on CPU (slower)")
         
-        # Create pipeline
-        translator = pipeline(
-            "translation",
-            model=model,
-            tokenizer=tokenizer,
-            device=device,
-            max_length=512
-        )
-        
         logger.info("✅ Model loaded successfully!")
         
     except Exception as e:
         logger.error(f"Failed to load model: {e}")
         raise
+
+
+def translate_text(text: str, src_lang: str, tgt_lang: str) -> str:
+    """Translate text using NLLB model with proper tokenizer configuration"""
+    # Set source language on tokenizer
+    tokenizer.src_lang = src_lang
+    
+    # Encode the input text
+    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+    
+    # Move to same device as model
+    device = next(model.parameters()).device
+    inputs = {k: v.to(device) for k, v in inputs.items()}
+    
+    # Get the target language token ID for forced_bos_token_id
+    forced_bos_token_id = tokenizer.convert_tokens_to_ids(tgt_lang)
+    
+    # Generate translation
+    with torch.no_grad():
+        generated_tokens = model.generate(
+            **inputs,
+            forced_bos_token_id=forced_bos_token_id,
+            max_length=512,
+            num_beams=5,
+            early_stopping=True
+        )
+    
+    # Decode the generated tokens
+    translated_text = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
+    
+    return translated_text
 
 def protect_crypto_terms(text: str) -> tuple[str, dict]:
     """Replace crypto terms with placeholders"""
@@ -185,21 +206,22 @@ async def translate(request: TranslationRequest):
         raise HTTPException(status_code=503, detail="Model not loaded yet")
     
     try:
-        # Validate language codes
-        if request.source_lang not in LANGUAGE_CODES:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Unsupported source language: {request.source_lang}"
-            )
-        if request.target_lang not in LANGUAGE_CODES:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Unsupported target language: {request.target_lang}"
-            )
+        # Helper to get NLLB code (accepts both short codes like 'en' and full codes like 'eng_Latn')
+        def get_nllb_code(lang: str) -> str:
+            # If it's already a full NLLB code (contains underscore), use it directly
+            if "_" in lang:
+                return lang
+            # Otherwise, look it up in the mapping
+            if lang not in LANGUAGE_CODES:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Unsupported language: {lang}. Use short codes (en, ha, sw) or NLLB codes (eng_Latn, hau_Latn)"
+                )
+            return LANGUAGE_CODES[lang]
         
         # Get NLLB codes
-        src_code = LANGUAGE_CODES[request.source_lang]
-        tgt_code = LANGUAGE_CODES[request.target_lang]
+        src_code = get_nllb_code(request.source_lang)
+        tgt_code = get_nllb_code(request.target_lang)
         
         # Protect crypto terms if requested
         text_to_translate = request.text
@@ -211,14 +233,7 @@ async def translate(request: TranslationRequest):
         # Perform translation
         logger.info(f"Translating: {request.source_lang} -> {request.target_lang}")
         
-        result = translator(
-            text_to_translate,
-            src_lang=src_code,
-            tgt_lang=tgt_code,
-            max_length=512
-        )
-        
-        translated_text = result[0]["translation_text"]
+        translated_text = translate_text(text_to_translate, src_code, tgt_code)
         
         # Restore crypto terms
         if request.preserve_crypto_terms:
@@ -244,8 +259,21 @@ async def translate_batch(request: BatchTranslationRequest):
     try:
         translations = {}
         
+        # Helper to get NLLB code (accepts both short codes and full codes)
+        def get_nllb_code(lang: str) -> str:
+            if "_" in lang:
+                return lang
+            if lang not in LANGUAGE_CODES:
+                return None
+            return LANGUAGE_CODES[lang]
+        
+        src_code = get_nllb_code(request.source_lang)
+        if src_code is None:
+            raise HTTPException(status_code=400, detail=f"Unsupported source language: {request.source_lang}")
+        
         for target_lang in request.target_langs:
-            if target_lang not in LANGUAGE_CODES:
+            tgt_code = get_nllb_code(target_lang)
+            if tgt_code is None:
                 logger.warning(f"Skipping unsupported language: {target_lang}")
                 continue
             
@@ -260,17 +288,7 @@ async def translate_batch(request: BatchTranslationRequest):
                     text_to_translate, replacements = protect_crypto_terms(text)
                 
                 # Translate
-                src_code = LANGUAGE_CODES[request.source_lang]
-                tgt_code = LANGUAGE_CODES[target_lang]
-                
-                result = translator(
-                    text_to_translate,
-                    src_lang=src_code,
-                    tgt_lang=tgt_code,
-                    max_length=512
-                )
-                
-                translated = result[0]["translation_text"]
+                translated = translate_text(text_to_translate, src_code, tgt_code)
                 
                 # Restore crypto terms
                 if request.preserve_crypto_terms:
@@ -294,11 +312,8 @@ async def health_check():
     """Detailed health check"""
     return {
         "status": "healthy" if model is not None else "initializing",
-        "model_loaded": model is not None,
-        "device": "cuda" if torch.cuda.is_available() else "cpu",
-        "gpu_available": torch.cuda.is_available(),
-        "gpu_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
-        "supported_languages": len(LANGUAGE_CODES)
+        "model": MODEL_NAME,
+        "supported_languages": ["hausa", "yoruba", "igbo", "swahili", "zulu", "amharic", "somali", "shona", "luganda", "wolof", "english", "french", "arabic", "portuguese"]
     }
 
 if __name__ == "__main__":

@@ -74,8 +74,7 @@ router.post('/collect', async (req: Request, res: Response) => {
 // Get all automated articles
 router.get('/articles', async (req: Request, res: Response) => {
   try {
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
+    const prisma = (await import('../lib/prisma')).default;
     
     const articles = await prisma.automatedArticle.findMany({
       include: {

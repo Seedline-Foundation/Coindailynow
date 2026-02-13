@@ -11,10 +11,8 @@
  * - Real-time engagement tracking
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import Redis from 'ioredis';
-
-const prisma = new PrismaClient();
 
 const redisConfig: any = {
   host: process.env.REDIS_HOST || 'localhost',

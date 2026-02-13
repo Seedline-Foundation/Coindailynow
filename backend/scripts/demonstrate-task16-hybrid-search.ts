@@ -5,7 +5,6 @@
 
 import { HybridSearchService, SearchResultType } from '../src/services/hybridSearchService';
 import { ElasticsearchService } from '../src/services/elasticsearchService';
-import OpenAI from 'openai';
 import { logger } from '../src/utils/logger';
 
 // Mock dependencies for demonstration
@@ -132,41 +131,14 @@ class MockElasticsearchService {
   }
 }
 
-class MockOpenAI {
-  embeddings = {
-    create: async (params: any) => {
-      // Simulate embedding generation with different vectors for different content types
-      const input = params.input.toLowerCase();
-      let baseValue = 0.1;
-      
-      // Boost embeddings for African-specific terms
-      if (input.includes('africa') || input.includes('binance africa') || input.includes('m-pesa')) {
-        baseValue = 0.3;
-      } else if (input.includes('bitcoin') || input.includes('crypto')) {
-        baseValue = 0.2;
-      }
-      
-      const embedding = new Array(1536).fill(0).map(() => 
-        baseValue + (Math.random() - 0.5) * 0.1
-      );
-
-      return {
-        data: [{ embedding }]
-      };
-    }
-  };
-}
-
 async function demonstrateHybridSearch() {
   console.log('🚀 Task 16: Hybrid Search Engine Demonstration');
   console.log('=' .repeat(60));
 
   // Initialize services
   const elasticsearchService = new MockElasticsearchService() as any;
-  const openaiService = new MockOpenAI() as any;
   const hybridSearchService = new HybridSearchService(
     elasticsearchService,
-    openaiService,
     logger
   );
 
@@ -403,7 +375,8 @@ async function demonstrateHybridSearch() {
   console.log('• Performance optimization (sub-500ms) ✅');
   
   console.log('\n🔧 Technical Implementation:');
-  console.log('• OpenAI text-embedding-3-small for semantic search');
+  console.log('• Local BGE embeddings (bge-small-en-v1.5) for semantic search');
+  console.log('• Ollama (llama3.1:8b) for query expansion');
   console.log('• Redis caching with 5-minute TTL');
   console.log('• African cryptocurrency term boosting');
   console.log('• Mobile network optimization');

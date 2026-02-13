@@ -11,11 +11,10 @@
  * - Email addresses are encrypted in environment variables
  */
 
-import { PrismaClient, WalletType, WalletStatus, UserRole } from '@prisma/client';
+import { WalletType, WalletStatus, UserRole } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { generateOTP, verifyOTP, OTPPurpose } from './OTPService';
 import crypto from 'crypto';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // CONFIGURATION - WE WALLET AUTHORIZED EMAILS (ENCRYPTED)

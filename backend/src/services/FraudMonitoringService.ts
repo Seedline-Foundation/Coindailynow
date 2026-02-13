@@ -10,13 +10,12 @@
  * - Auto-locks wallets when thresholds exceeded
  */
 
-import { PrismaClient, TransactionType, User, Wallet, WalletType } from '@prisma/client';
+import { TransactionType, User, Wallet, WalletType } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { logger } from '../utils/logger';
 import { financeAuditService, AuditAction } from './FinanceAuditService';
 import { financeEmailService } from './FinanceEmailService';
 import { Request } from 'express';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // FRAUD DETECTION CONFIGURATION

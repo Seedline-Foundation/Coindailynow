@@ -11,8 +11,8 @@
 
 import { Router, Request, Response } from 'express';
 import Redis from 'ioredis';
-import { AIReviewAgent } from '../agents/review/aiReviewAgent';
-import { AdminQueueItem, EditRequest } from '../types/admin-types';
+import { AIReviewAgent } from '../../agents/review/aiReviewAgent';
+import { AdminQueueItem, EditRequest } from '../../types/admin-types';
 
 const router = Router();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');

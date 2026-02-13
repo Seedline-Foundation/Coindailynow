@@ -4,7 +4,8 @@
   "description": "CoinDaily Platform Backend - Africa's Premier Cryptocurrency News Platform",
   "main": "dist/index.js",
   "scripts": {
-    "build": "node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc",
+    "build": "node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc --skipLibCheck",
+    "build:force": "node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc --skipLibCheck --noEmitOnError false",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "test": "jest",

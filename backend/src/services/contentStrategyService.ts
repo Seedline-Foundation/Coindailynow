@@ -13,11 +13,8 @@
  * - AI-powered content recommendations
  */
 
-import { PrismaClient } from '@prisma/client';
-import OpenAI from 'openai';
-
-const prisma = new PrismaClient();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import prisma from '../lib/prisma';
+import { complete, reasoningComplete, AI_MODELS } from './aiClient';
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -136,20 +133,18 @@ Return as JSON array with structure:
   ]
 }`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
+    const completion = await reasoningComplete(prompt, {
       temperature: 0.7,
-      max_tokens: 4000,
+      maxTokens: 4000,
     });
 
-    const content = completion.choices[0]?.message?.content;
+    const content = completion.content;
     if (!content) {
-      throw new Error('No content returned from OpenAI');
+      throw new Error('No content returned from AI');
     }
     
-    const analysis = JSON.parse(content || '{"keywords":[]}');
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    const analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : { keywords: [] };
     
     // Save keywords to database
     const savedKeywords = [];
@@ -286,19 +281,18 @@ Return as JSON:
   }
 }`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
+    const completion = await reasoningComplete(prompt, {
       temperature: 0.7,
+      maxTokens: 2000,
     });
 
-    const content = completion.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error('No content returned from OpenAI');
+    const contentStr = completion.content;
+    if (!contentStr) {
+      throw new Error('No content returned from AI');
     }
     
-    const analysis = JSON.parse(content || '{}');
+    const jsonMatch = contentStr.match(/\{[\s\S]*\}/);
+    const analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
     
     // Create cluster
     const cluster = await prisma.topicCluster.create({
@@ -507,19 +501,19 @@ Return as JSON:
   "keyTakeaways": ["point1", ...]
 }`;
 
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4-turbo-preview',
-    messages: [{ role: 'user', content: prompt }],
-    response_format: { type: 'json_object' },
+  const completion = await complete(prompt, {
+    model: AI_MODELS.LLAMA,
     temperature: 0.8,
+    maxTokens: 2000,
   });
 
-  const content = completion.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error('No content returned from OpenAI');
+  const contentStr = completion.content;
+  if (!contentStr) {
+    throw new Error('No content returned from AI');
   }
   
-  return JSON.parse(content || '{}');
+  const jsonMatch = contentStr.match(/\{[\s\S]*\}/);
+  return jsonMatch ? JSON.parse(jsonMatch[0]) : {};
 }
 
 /**
@@ -617,19 +611,18 @@ Return as JSON:
   "threatLevel": "LOW|MEDIUM|HIGH|CRITICAL"
 }`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
+    const completion = await reasoningComplete(prompt, {
       temperature: 0.7,
+      maxTokens: 3000,
     });
 
-    const content = completion.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error('No content returned from OpenAI');
+    const contentStr = completion.content;
+    if (!contentStr) {
+      throw new Error('No content returned from AI');
     }
     
-    const analysis = JSON.parse(content || '{}');
+    const jsonMatch = contentStr.match(/\{[\s\S]*\}/);
+    const analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
     
     // Save to database
     const competitor = await prisma.competitorAnalysis.upsert({
@@ -811,20 +804,19 @@ Return top 15-20 trends as JSON:
   ]
 }`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
+    const completion = await complete(prompt, {
+      model: AI_MODELS.LLAMA,
       temperature: 0.8,
-      max_tokens: 4000,
+      maxTokens: 4000,
     });
 
-    const content = completion.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error('No content returned from OpenAI');
+    const contentStr = completion.content;
+    if (!contentStr) {
+      throw new Error('No content returned from AI');
     }
     
-    const analysis = JSON.parse(content || '{"trends":[]}');
+    const jsonMatch = contentStr.match(/\{[\s\S]*\}/);
+    const analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : { trends: [] };
     
     // Save trends to database
     const savedTrends = [];

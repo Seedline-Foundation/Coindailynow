@@ -3,7 +3,7 @@
  * Task 16: Combines Elasticsearch with AI-powered semantic search for African cryptocurrency content
  */
 
-import OpenAI from 'openai';
+import { complete, generateEmbeddings, AI_MODELS } from './aiClient';
 import { ElasticsearchService, SearchResult, SearchOptions } from './elasticsearchService';
 import { logger } from '../utils/logger';
 
@@ -130,12 +130,11 @@ export class HybridSearchService {
 
   constructor(
     private elasticsearchService: ElasticsearchService,
-    private openai: OpenAI,
     private logger: any
   ) {}
 
   /**
-   * Generate embeddings for semantic search
+   * Generate embeddings for semantic search using local BGE model
    */
   async generateEmbedding(text: string): Promise<number[]> {
     const cacheKey = `embedding:${Buffer.from(text).toString('base64')}`;
@@ -146,15 +145,10 @@ export class HybridSearchService {
     }
 
     try {
-      const response = await this.openai.embeddings.create({
-        model: 'text-embedding-3-small',
-        input: text,
-        dimensions: 1536
-      });
+      const embedding = await generateEmbeddings(text);
 
-      const embedding = response.data[0]?.embedding;
-      if (!embedding) {
-        throw new Error('No embedding returned from OpenAI');
+      if (!embedding || embedding.length === 0) {
+        throw new Error('No embedding returned from embeddings service');
       }
       this.embeddingCache.set(cacheKey, {
         embedding,

@@ -4,7 +4,7 @@
  * Implements agent lifecycle management, task queuing, and African market specialization
  */
 
-import { Redis, Logger } from '../../backend/src/ai/dependencies';
+import { Redis, Logger } from './dependencies';
 import { EventEmitter } from 'events';
 import {
   AITask,

@@ -12,10 +12,9 @@
 
 import { Router, Request, Response } from 'express';
 import { aiImageService } from '../services/aiImageService';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Middleware to track cache hits
 let cacheHits = 0;

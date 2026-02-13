@@ -5,7 +5,7 @@
  * Streams real-time market data updates with rate limiting and data validation
  */
 
-import Redis from 'ioredis';
+// Use type 'any' to support both real Redis and mock
 import { logger } from '../../utils/logger';
 
 export interface MarketDataUpdate {
@@ -32,14 +32,14 @@ export interface StreamingStats {
 }
 
 export class MarketDataStreamer {
-  private redis: Redis;
+  private redis: any; // Can be Redis or MockIORedis
   private readonly STREAM_PREFIX = 'ws:stream:';
   private readonly STATS_PREFIX = 'ws:stream_stats:';
   private readonly RATE_LIMIT_PREFIX = 'ws:rate_limit:';
   private readonly MAX_UPDATES_PER_SECOND = 100; // Rate limit per symbol
   private readonly DATA_RETENTION_SECONDS = 300; // 5 minutes
 
-  constructor(redis: Redis) {
+  constructor(redis: any) {
     this.redis = redis;
   }
 

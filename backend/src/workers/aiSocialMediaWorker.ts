@@ -6,10 +6,8 @@
  * within 5 minutes of publication.
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { aiSocialMediaService } from '../services/aiSocialMediaService';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // CONFIGURATION

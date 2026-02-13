@@ -7,14 +7,13 @@
 import { PrismaClient, Article, User, UserEngagement, Category, Tag } from '@prisma/client';
 import { Logger } from 'winston';
 import { Redis } from 'ioredis';
-import OpenAI from 'openai';
+import { complete, reasoningComplete } from './aiClient';
 import { randomUUID } from 'crypto';
 import { MarketAnalysisAgent } from '../agents/marketAnalysisAgent';
 import { HybridSearchService } from './hybridSearchService';
 
 export interface ContentRecommendationConfig {
-  openaiApiKey: string;
-  model: string; // gpt-4-turbo-preview
+  model: string; // llama3.1:8b or deepseek-r1:8b
   maxTokens: number;
   temperature: number;
   diversityThreshold: number; // 0-1, higher means more diverse
@@ -132,7 +131,6 @@ export class ContentRecommendationService {
   private readonly prisma: PrismaClient;
   private readonly logger: Logger;
   private readonly redis: Redis;
-  private readonly openai: OpenAI;
   private readonly config: ContentRecommendationConfig;
   private readonly marketAnalysisAgent: MarketAnalysisAgent;
   private readonly hybridSearchService: HybridSearchService;
@@ -168,10 +166,7 @@ export class ContentRecommendationService {
     this.config = config;
     this.marketAnalysisAgent = marketAnalysisAgent;
     this.hybridSearchService = hybridSearchService;
-
-    this.openai = new OpenAI({
-      apiKey: config.openaiApiKey,
-    });
+    // Using aiClient instead of OpenAI directly
   }
 
   /**
@@ -731,32 +726,25 @@ export class ContentRecommendationService {
     const prompt = this.buildScoringPrompt(contentFeatures, userProfile, request);
 
     try {
-      const completion = await this.openai.chat.completions.create({
-        model: this.config.model,
-        messages: [
-          {
-            role: 'system',
-            content: `You are an AI expert in African cryptocurrency content recommendation. 
+      const systemPrompt = `You are an AI expert in African cryptocurrency content recommendation. 
                      Analyze content features and user profiles to generate personalized recommendation scores.
                      Focus on African market relevance, user behavior patterns, and content diversity.
-                     Return scores as JSON with explanation of reasoning.`
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: this.config.maxTokens,
-        temperature: this.config.temperature,
-        response_format: { type: 'json_object' }
-      });
+                     Return scores as JSON with explanation of reasoning.`;
 
-      const response = completion.choices[0]?.message?.content;
-      if (!response) {
-        throw new Error('No response from OpenAI');
+      const fullPrompt = `${systemPrompt}\n\n${prompt}`;
+      const responseContent = await reasoningComplete(fullPrompt);
+      
+      if (!responseContent) {
+        throw new Error('No response from AI');
       }
 
-      const aiAnalysis = JSON.parse(response);
+      // Extract JSON from response
+      const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No valid JSON in AI response');
+      }
+      
+      const aiAnalysis = JSON.parse(jsonMatch[0]);
       
       return contentFeatures.map((features, index) => {
         const analysis = aiAnalysis.recommendations?.[index] || {};

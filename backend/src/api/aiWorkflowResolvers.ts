@@ -6,9 +6,7 @@
 import { PubSub } from 'graphql-subscriptions';
 import { aiWorkflowService, workflowEvents, WorkflowState, WorkflowPriority, WorkflowType } from '../services/aiWorkflowService';
 import { logger } from '../utils/logger';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 const pubsub = new PubSub();
 
 // Subscribe to workflow events and publish to GraphQL subscriptions

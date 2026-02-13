@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { logger } from '../utils/logger';
 
 export interface LoginCredentials {
@@ -781,5 +782,4 @@ export class AuthService {
 }
 
 // Export a default instance for convenience
-const prisma = new PrismaClient();
 export const authService = new AuthService(prisma);

@@ -5,7 +5,7 @@
  * Demonstrates the complete mobile money integration functionality
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { Redis } from 'ioredis';
 import { createLogger } from 'winston';
 import { MobileMoneyService } from '../services/mobileMoneyService';
@@ -19,7 +19,6 @@ import {
 } from '../types/mobile-money';
 
 // Initialize services
-const prisma = new PrismaClient();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const logger = createLogger({
   level: 'info',

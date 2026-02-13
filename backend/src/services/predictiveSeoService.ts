@@ -1,10 +1,8 @@
 // Predictive SEO Intelligence & Data Dashboard Service - Task 68
 // E-E-A-T evaluation, competitor analysis, search forecasting, and ranking predictions
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { redisClient } from '../config/redis';
-
-const prisma = new PrismaClient();
 const CACHE_TTL = 300; // 5 minutes
 
 // ============= INTERFACES =============

@@ -15,12 +15,10 @@
  * Performance Target: < 300ms response time (cached), changes effective within 30s
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { redisClient } from '../config/redis';
 import { logger } from '../utils/logger';
 import EventEmitter from 'events';
-
-const prisma = new PrismaClient();
 const configEventEmitter = new EventEmitter();
 
 // Helper function for safe Redis operations

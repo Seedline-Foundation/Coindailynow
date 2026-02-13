@@ -2,11 +2,10 @@
 // RESTful endpoints for continuous SEO monitoring and algorithm defense
 
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { algorithmDefenseService } from '../services/algorithmDefenseService';
+import prisma from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient() as any; // Type assertion for Task 67 models
 
 // ============= ALGORITHM WATCHDOG =============
 

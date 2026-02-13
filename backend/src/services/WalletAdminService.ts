@@ -9,10 +9,9 @@
  * - Exporting financial reports
  */
 
-import { PrismaClient, Wallet, WalletType, WalletStatus, UserRole } from '@prisma/client';
+import { Wallet, WalletType, WalletStatus, UserRole } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { generateOTP, OTPPurpose } from './OTPService';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // TYPES

@@ -4,13 +4,12 @@
  */
 
 import { ethers } from 'ethers';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import prisma from '../lib/prisma';
 // import { JY_TOKEN_ABI } from '../contracts/abis/JoyToken';
 
 // Temporary ABI placeholder - replace with actual ABI
 const JY_TOKEN_ABI: any[] = [];
-
-const prisma = new PrismaClient();
 
 export interface JYTokenConfig {
   contractAddress: string;

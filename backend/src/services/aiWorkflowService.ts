@@ -17,13 +17,11 @@
  * - Comprehensive audit trail
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { redisClient } from '../config/redis';
 import { logger } from '../utils/logger';
 import EventEmitter from 'events';
 import aiTaskService, { TaskPriority } from './aiTaskService';
-
-const prisma = new PrismaClient();
 
 // ==================== TYPES AND ENUMS ====================
 

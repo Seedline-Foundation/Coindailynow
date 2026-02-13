@@ -1,11 +1,9 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import Redis from 'ioredis';
 import AIModerationService from '../services/aiModerationService';
 import { AuthenticationError, ForbiddenError, UserInputError } from 'apollo-server-express';
 import { pubsub } from '../config/pubsub';
 import { withFilter } from 'graphql-subscriptions';
-
-const prisma = new PrismaClient();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const moderationService = new AIModerationService(
   prisma,

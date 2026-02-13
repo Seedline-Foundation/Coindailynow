@@ -10,11 +10,9 @@
  * - Rich snippets optimization
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-
-const prisma = new PrismaClient();
 const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);
 

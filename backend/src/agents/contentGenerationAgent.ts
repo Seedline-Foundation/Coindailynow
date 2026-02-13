@@ -1,10 +1,10 @@
 /**
  * Content Generation Agent - Task 10
- * OpenAI GPT-4 Turbo integration for African-focused cryptocurrency content generation
+ * Ollama Llama 3.1 integration for African-focused cryptocurrency content generation
  * Implements content quality validation, plagiarism detection, and multi-format generation
  */
 
-import OpenAI from 'openai';
+import { chatComplete, AI_MODELS } from '../services/aiClient';
 import { Logger } from 'winston';
 import { PrismaClient } from '@prisma/client';
 import { 
@@ -15,8 +15,7 @@ import {
 } from '../types/ai-system';
 
 export interface ContentGenerationConfig {
-  apiKey: string;
-  model: string;
+  model?: string;
   maxTokens: number;
   temperature: number;
   enablePlagiarismCheck: boolean;
@@ -99,7 +98,6 @@ export interface AfricanExchange {
 }
 
 export class ContentGenerationAgent {
-  private readonly openai: OpenAI;
   private readonly config: ContentGenerationConfig;
   private readonly logger: Logger;
   private readonly prisma: PrismaClient;
@@ -131,16 +129,13 @@ export class ContentGenerationAgent {
     this.prisma = prisma;
     this.logger = logger;
     this.config = {
+      model: AI_MODELS.LLAMA,
       plagiarismThreshold: 80,
       similarityThreshold: 70,
       ...config
     };
 
-    this.openai = new OpenAI({
-      apiKey: this.config.apiKey,
-    });
-
-    this.logger.info('Content Generation Agent initialized', { 
+    this.logger.info('Content Generation Agent initialized with Ollama', { 
       model: this.config.model,
       qualityThreshold: this.config.qualityThreshold
     });
@@ -313,7 +308,7 @@ export class ContentGenerationAgent {
   }
 
   /**
-   * Generate content using OpenAI GPT-4 Turbo
+   * Generate content using Ollama Llama 3.1
    */
   private async generateContent(
     task: ContentGenerationTask, 
@@ -324,33 +319,37 @@ export class ContentGenerationAgent {
     // Build comprehensive prompt with African context
     const prompt = this.buildAfricanContextPrompt(payload, marketContext);
 
-    const completion = await this.openai.chat.completions.create({
-      model: this.config.model,
-      messages: [
+    const completion = await chatComplete(
+      [
         {
           role: 'system',
           content: this.getSystemPrompt(payload.contentType)
         },
         {
           role: 'user',
-          content: prompt
+          content: prompt + '\n\nRespond with valid JSON only.'
         }
       ],
-      max_tokens: this.config.maxTokens,
-      temperature: this.config.temperature,
-      response_format: { type: 'json_object' }
-    });
+      {
+        model: this.config.model || AI_MODELS.LLAMA,
+        maxTokens: this.config.maxTokens,
+        temperature: this.config.temperature
+      }
+    );
 
-    const response = completion.choices[0]?.message?.content;
+    const response = completion.content;
     if (!response) {
-      throw new Error('No response from OpenAI API');
+      throw new Error('No response from Ollama API');
     }
 
     let generatedContent: GeneratedContent;
     try {
-      generatedContent = JSON.parse(response);
+      // Extract JSON from response (Ollama may include extra text)
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON found in response');
+      generatedContent = JSON.parse(jsonMatch[0]);
     } catch (error) {
-      throw new Error('Invalid JSON response from OpenAI API');
+      throw new Error('Invalid JSON response from Ollama API');
     }
 
     // Validate content structure

@@ -6,12 +6,11 @@
  */
 
 import express, { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../../lib/prisma';
 import { authMiddleware, requireRole } from '../../../middleware/auth';
 import { redisClient } from '../../../config/redis';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // Apply admin authentication to all routes
 router.use(authMiddleware);

@@ -1,12 +1,10 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import AIModerationService from '../services/aiModerationService';
 import aiModerationRouter from '../api/ai-moderation';
 import aiModerationTypeDefs from '../api/aiModerationSchema';
 import aiModerationResolvers from '../api/aiModerationResolvers';
 import { Redis } from 'ioredis';
-
-const prisma = new PrismaClient();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const moderationService = new AIModerationService(prisma, redis, process.env.PERSPECTIVE_API_KEY || '');
 

@@ -1,11 +1,11 @@
 /**
  * Quality Review Agent - Task 12
- * Google Gemini integration for content quality review and bias detection
+ * DeepSeek R1 integration via Ollama for content quality review and bias detection
  * Implements automated content quality scoring, bias detection, African cultural sensitivity review,
  * fact-checking integration, and content improvement suggestions
  */
 
-import { VertexAI } from '@google-cloud/vertexai';
+import { reasoningComplete, AI_MODELS } from '../services/aiClient';
 import { Logger } from 'winston';
 import { PrismaClient } from '@prisma/client';
 import { 
@@ -16,9 +16,7 @@ import {
 } from '../types/ai-system';
 
 export interface QualityReviewConfig {
-  projectId: string;
-  location: string;
-  modelName: string;
+  model?: string;
   qualityThreshold: number;
   biasThreshold: number;
   culturalSensitivityThreshold: number;
@@ -122,8 +120,6 @@ export class QualityReviewAgent {
   private prisma: PrismaClient;
   private logger: Logger;
   private config: QualityReviewConfig;
-  private vertexAI: VertexAI;
-  private model: any;
   private metrics: QualityAgentMetrics;
 
   constructor(
@@ -134,25 +130,10 @@ export class QualityReviewAgent {
     this.prisma = prisma;
     this.logger = logger;
     this.config = {
+      model: AI_MODELS.DEEPSEEK,
       timeoutMs: 30000,
       ...config
     };
-
-    // Initialize Vertex AI
-    this.vertexAI = new VertexAI({
-      project: this.config.projectId,
-      location: this.config.location
-    });
-
-    this.model = this.vertexAI.getGenerativeModel({
-      model: this.config.modelName,
-      generationConfig: {
-        maxOutputTokens: this.config.maxTokens,
-        temperature: this.config.temperature,
-        topP: 0.8,
-        topK: 40
-      }
-    });
 
     // Initialize metrics
     this.metrics = {
@@ -165,8 +146,8 @@ export class QualityReviewAgent {
       factCheckAccuracy: 0
     };
 
-    this.logger.info('Quality Review Agent initialized', { 
-      model: this.config.modelName,
+    this.logger.info('Quality Review Agent initialized with DeepSeek R1', { 
+      model: this.config.model,
       qualityThreshold: this.config.qualityThreshold,
       biasThreshold: this.config.biasThreshold
     });
@@ -259,7 +240,7 @@ export class QualityReviewAgent {
   }
 
   /**
-   * Perform comprehensive quality review using Google Gemini
+   * Perform comprehensive quality review using DeepSeek R1 via Ollama
    */
   private async performQualityReview(task: QualityReviewTask): Promise<QualityReview> {
     const { content, contentType, reviewCriteria, africanContext, requiresFactCheck } = task.payload;
@@ -280,16 +261,20 @@ export class QualityReviewAgent {
       factCheckContext
     );
 
-    // Call Gemini API
-    const response = await this.model.generateContent(prompt);
-    const responseText = response.response.text();
+    // Call DeepSeek R1 via Ollama for reasoning-based review
+    const responseText = await reasoningComplete(prompt, {
+      temperature: this.config.temperature,
+      maxTokens: this.config.maxTokens
+    });
 
-    // Parse and validate response
+    // Parse and validate response - extract JSON from DeepSeek's reasoning output
     let reviewData;
     try {
-      reviewData = JSON.parse(responseText);
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON found in response');
+      reviewData = JSON.parse(jsonMatch[0]);
     } catch (error) {
-      throw new Error(`Failed to parse Gemini response as JSON: ${error}`);
+      throw new Error(`Failed to parse DeepSeek R1 response as JSON: ${error}`);
     }
 
     // Validate and normalize response structure
@@ -297,7 +282,7 @@ export class QualityReviewAgent {
   }
 
   /**
-   * Build comprehensive review prompt for Gemini
+   * Build comprehensive review prompt for DeepSeek R1
    */
   private buildReviewPrompt(
     content: string,

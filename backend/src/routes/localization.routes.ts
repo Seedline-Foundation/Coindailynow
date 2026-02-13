@@ -4,12 +4,11 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { LocalizationService } from '../services/localizationService';
 import { Logger } from 'winston';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Create logger (simplified - use your actual logger setup)
 const logger: Logger = {

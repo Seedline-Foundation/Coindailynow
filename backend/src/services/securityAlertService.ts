@@ -6,9 +6,7 @@
  * and SEO security monitoring with full CRUD operations and analytics.
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // ============================================
 // Types & Interfaces

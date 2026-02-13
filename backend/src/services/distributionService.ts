@@ -10,10 +10,8 @@
  * - Gamified engagement with leaderboards
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import crypto from 'crypto';
-
-const prisma = new PrismaClient();
 
 // ==========================================
 // DISTRIBUTION CAMPAIGNS

@@ -13,7 +13,7 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import { typeDefs } from './api/schema';
 import { resolvers } from './api/resolvers';
 import { context, formatError, prisma, redis, setOptimizationServices } from './api/context';
-import { authMiddleware, socketAuthMiddleware } from './middleware/auth';
+import { authMiddleware, socketAuthMiddleware, optionalAuthMiddleware } from './middleware/auth';
 import { rateLimitMiddleware } from './middleware/rateLimit';
 import { 
   responseTimeMiddleware, 
@@ -29,7 +29,7 @@ import { optimizedResolvers } from './api/resolvers/optimizedResolvers';
 import superAdminRouter from './api/routes/super-admin';
 import contentAutomationRouter from './routes/content-automation.routes';
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 4000;
 const GRAPHQL_PATH = '/graphql';
 
 export async function setupApp() {
@@ -65,11 +65,37 @@ export async function setupApp() {
     crossOriginEmbedderPolicy: false,
   }));
 
+  // Dynamic CORS — allow all CoinDaily subdomains and dev origins
+  const ALLOWED_ORIGINS = [
+    // Production domains
+    'https://coindaily.online',
+    'https://www.coindaily.online',
+    'https://app.coindaily.online',
+    'https://jet.coindaily.online',
+    'https://press.coindaily.online',
+    'https://ai.coindaily.online',
+    // Dev origins
+    'http://localhost:3000',
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'http://localhost:3004',
+    // Additional origins from env (comma-separated)
+    ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(o => o.trim()) : []),
+  ].filter(Boolean);
+
   app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (server-to-server, curl, health checks)
+      if (!origin) return callback(null, true);
+      if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+      // Also allow any *.coindaily.online subdomain
+      if (/^https?:\/\/([a-z0-9-]+\.)?coindaily\.online$/.test(origin)) return callback(null, true);
+      logger.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-request-id'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-request-id', 'X-Requested-With'],
   }));
 
   // Performance monitoring and caching middleware
@@ -141,9 +167,10 @@ export async function setupApp() {
   await server.start();
 
   // Apply Express middleware for Apollo Server
+  // Using optionalAuthMiddleware to allow public operations like login
   app.use(
     GRAPHQL_PATH,
-    authMiddleware,
+    optionalAuthMiddleware,
     expressMiddleware(server, { context }),
   );
 

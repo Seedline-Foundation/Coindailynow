@@ -22,12 +22,10 @@
  * - Cold storage: 1 year in Elasticsearch
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { redisClient } from '../config/redis';
 import { logger } from '../utils/logger';
 import { EventEmitter } from 'events';
-
-const prisma = new PrismaClient();
 
 // Helper functions for safe Redis operations
 const safeRedisSetex = async (key: string, ttl: number, value: string): Promise<void> => {

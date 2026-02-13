@@ -10,13 +10,12 @@
  * Updates internal database ledger in real-time when blockchain events occur
  */
 
-import { PrismaClient, TransactionType, TransactionStatus } from '@prisma/client';
+import { TransactionType, TransactionStatus } from '@prisma/client';
 import { ethers } from 'ethers';
 import { logger } from '../utils/logger';
 import { financeAuditService, AuditAction } from '../services/FinanceAuditService';
 import { financeEmailService } from '../services/FinanceEmailService';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // ============================================================================
 // CONFIGURATION

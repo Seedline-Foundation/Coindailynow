@@ -1,10 +1,8 @@
 // SEO Dashboard & Analytics Service - Task 60
 // Comprehensive SEO monitoring, keyword tracking, and RAO performance analytics
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { redisClient } from '../config/redis';
-
-const prisma = new PrismaClient();
 
 // ============= INTERFACES =============
 

@@ -15,11 +15,9 @@
  * @module aiAuditService
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { createHash } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
-
-const prisma = new PrismaClient();
 
 // ================================
 // TYPES & INTERFACES

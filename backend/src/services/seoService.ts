@@ -1,10 +1,8 @@
 // SEO Meta Tag Generation System
 // Comprehensive SEO service with AI-powered optimization and RAO metadata support
 
-import { PrismaClient } from '@prisma/client';
-import OpenAI from 'openai';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
+import { reasoningComplete, complete, AI_MODELS } from './aiClient';
 
 export interface SEOMetadata {
   title: string;
@@ -82,12 +80,8 @@ export interface RAOMetadata {
 }
 
 export class SEOService {
-  private openai: OpenAI;
-
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    // Using aiClient for all AI operations
   }
 
   /**
@@ -218,14 +212,13 @@ Generate:
 
 Format as JSON.`;
 
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
-        messages: [{ role: 'user', content: prompt }],
+      const response = await reasoningComplete(prompt, {
         temperature: 0.3,
-        max_tokens: 1000,
+        maxTokens: 1000,
       });
 
-      const result = JSON.parse(response.choices?.[0]?.message?.content || '{}');
+      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+      const result = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
 
       // Generate llms.txt content
       const llmsTxt = this.generateLLMsTxt(title, content, result);
@@ -298,14 +291,13 @@ Requirements:
 
 Return only the optimized title.`;
 
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
+      const response = await complete(prompt, {
+        model: AI_MODELS.LLAMA,
         temperature: 0.7,
-        max_tokens: 100,
+        maxTokens: 100,
       });
 
-      return response.choices?.[0]?.message?.content?.trim() || baseTitle;
+      return response.content?.trim() || baseTitle;
     } catch (error) {
       console.error('Error optimizing title:', error);
       return baseTitle;
@@ -331,11 +323,10 @@ Requirements:
 
 Return as JSON array of strings.`;
 
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
+      const response = await complete(prompt, {
+        model: AI_MODELS.LLAMA,
         temperature: 0.8,
-        max_tokens: 300,
+        maxTokens: 300,
       });
 
       const variants = JSON.parse(response.choices?.[0]?.message?.content || '[]');
@@ -370,14 +361,14 @@ Focus on:
 
 Return only the JSON array.`;
 
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
+      const response = await complete(prompt, {
+        model: AI_MODELS.LLAMA,
         temperature: 0.3,
-        max_tokens: 200,
+        maxTokens: 200,
       });
 
-      const keywords = JSON.parse(response.choices?.[0]?.message?.content || '[]');
+      const jsonMatch = response.content.match(/\[[\s\S]*\]/);
+      const keywords = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
       return [...new Set([...targetKeywords, ...keywords])].slice(0, 8);
     } catch (error) {
       console.error('Error extracting keywords:', error);

@@ -7,72 +7,85 @@ import { TranslationAgent } from '../agents/translationAgent';
 import { DatabaseOptimizer } from '../services/databaseOptimizer';
 import { AdvancedCacheStrategy } from '../services/advancedCacheStrategy';
 import { logger } from '../utils/logger';
+import prismaClient from '../lib/prisma';
 
-// Initialize Prisma client with optimizations
-export const prisma = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'],
-  ...(process.env.DATABASE_URL && {
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL,
-      },
-    },
-  }),
-});
+// Use the shared singleton PrismaClient
+export const prisma = prismaClient;
+
+// Check if Redis is enabled
+const isRedisEnabled = process.env.REDIS_ENABLED !== 'false';
 
 // Initialize Redis client with connection pooling
 let redis: Redis;
-try {
-  redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-    enableReadyCheck: false,
-    maxRetriesPerRequest: 3,
-    lazyConnect: true,
-    keepAlive: 30000,
-    connectTimeout: 10000,
-    commandTimeout: 5000,
-  });
 
-  redis.on('connect', () => {
-    logger.info('Redis connected successfully');
-  });
+// Mock Redis for when Redis is disabled or unavailable
+const createMockRedis = () => ({
+  get: async () => null,
+  set: async () => 'OK',
+  setex: async () => 'OK',
+  del: async () => 1,
+  keys: async () => [],
+  expire: async () => 1,
+  ttl: async () => -1,
+  exists: async () => 0,
+  incr: async () => 1,
+  decr: async () => 1,
+  hget: async () => null,
+  hset: async () => 1,
+  hdel: async () => 1,
+  hgetall: async () => ({}),
+  sadd: async () => 1,
+  srem: async () => 1,
+  smembers: async () => [],
+  sismember: async () => 0,
+  zadd: async () => 1,
+  zrem: async () => 1,
+  zrange: async () => [],
+  zrevrange: async () => [],
+  zscore: async () => null,
+  zrank: async () => null,
+  publish: async () => 1,
+  subscribe: () => {},
+  on: () => {},
+  quit: async () => {},
+} as any);
 
-  redis.on('error', (error) => {
-    logger.error('Redis connection error:', error);
-  });
+if (!isRedisEnabled) {
+  console.log('Redis disabled via REDIS_ENABLED=false - using in-memory fallback');
+  redis = createMockRedis();
+} else {
+  try {
+    redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+      enableReadyCheck: false,
+      maxRetriesPerRequest: 3,
+      lazyConnect: true,
+      keepAlive: 30000,
+      connectTimeout: 10000,
+      commandTimeout: 5000,
+      retryStrategy: (times) => {
+        if (times > 3) {
+          console.warn('Redis unavailable - falling back to mock');
+          return null; // Stop retrying
+        }
+        return Math.min(times * 100, 1000);
+      },
+    });
 
-} catch (error) {
-  console.warn('Redis connection failed, using mock:', (error as Error).message);
-  // Create a mock Redis for development/testing
-  redis = {
-    get: async () => null,
-    set: async () => 'OK',
-    setex: async () => 'OK',
-    del: async () => 1,
-    keys: async () => [],
-    expire: async () => 1,
-    ttl: async () => -1,
-    exists: async () => 0,
-    incr: async () => 1,
-    decr: async () => 1,
-    hget: async () => null,
-    hset: async () => 1,
-    hdel: async () => 1,
-    hgetall: async () => ({}),
-    sadd: async () => 1,
-    srem: async () => 1,
-    smembers: async () => [],
-    sismember: async () => 0,
-    zadd: async () => 1,
-    zrem: async () => 1,
-    zrange: async () => [],
-    zrevrange: async () => [],
-    zscore: async () => null,
-    zrank: async () => null,
-    publish: async () => 1,
-    subscribe: () => {},
-    on: () => {},
-    quit: async () => {},
-  } as any;
+    redis.on('connect', () => {
+      logger.info('Redis connected successfully');
+    });
+
+    redis.on('error', (error) => {
+      // Suppress repeated connection refused errors
+      if (!error.message?.includes('ECONNREFUSED')) {
+        logger.error('Redis connection error:', error);
+      }
+    });
+
+  } catch (error) {
+    console.warn('Redis connection failed, using mock:', (error as Error).message);
+    redis = createMockRedis();
+  }
 }
 
 export { redis };

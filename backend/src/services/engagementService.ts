@@ -1,12 +1,9 @@
 // backend/src/services/engagementService.ts
 // Task 66: Engagement, UX & Personalization Layer - Backend Service
 
-import { PrismaClient } from '@prisma/client';
-import OpenAI from 'openai';
+import prisma from '../lib/prisma';
+import { complete, AI_MODELS } from './aiClient';
 import webpush from 'web-push';
-
-const prisma = new PrismaClient();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Initialize web-push with VAPID keys
 webpush.setVapidDetails(
@@ -604,34 +601,23 @@ export class EngagementService {
     // Prepare text for TTS (strip HTML, limit length)
     const text = `${article.title}. ${article.excerpt}. ${article.content}`
       .replace(/<[^>]*>/g, '')
-      .substring(0, 4000); // OpenAI TTS limit
+      .substring(0, 4000);
 
     try {
-      // Generate speech using OpenAI TTS
-      const mp3Response = await openai.audio.speech.create({
-        model: 'tts-1',
-        voice: 'alloy',
-        input: text,
-      });
-
-      // Convert to buffer
-      const buffer = Buffer.from(await mp3Response.arrayBuffer());
-
-      // In production, upload to Backblaze or CDN
-      // For now, we'll store the path
-      const audioUrl = `/audio/${articleId}.mp3`;
-
-      // Create voice article record
+      // TTS not available - would need external TTS service
+      // For now, create a placeholder record
+      console.warn('TTS generation not available - no TTS service configured');
+      
       const voiceArticle = await prisma.voiceArticle.create({
         data: {
           articleId,
-          audioUrl,
-          duration: Math.ceil(text.length / 15), // Approximate duration
-          fileSize: buffer.length,
+          audioUrl: '',
+          duration: 0,
+          fileSize: 0,
           format: 'mp3',
-          voiceModel: 'tts-1',
-          voiceType: 'alloy',
-          generationStatus: 'COMPLETED',
+          voiceModel: 'pending',
+          voiceType: 'pending',
+          generationStatus: 'PENDING',
         },
       });
 

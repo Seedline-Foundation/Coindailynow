@@ -8,7 +8,8 @@
  * - Permission usage logging
  */
 
-import { PrismaClient, UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/client';
+import prisma from '../lib/prisma';
 import {
   ALL_PERMISSIONS,
   SUPER_ADMIN_EXCLUSIVE,
@@ -16,8 +17,6 @@ import {
   requiresSuperAdmin,
   getPermissionDisplayName,
 } from '../constants/permissions';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // ROLE HIERARCHY

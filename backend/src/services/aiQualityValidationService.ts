@@ -11,10 +11,8 @@
  * - Quality trend analysis and recommendations
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import Redis from 'ioredis';
-
-const prisma = new PrismaClient();
 const redisConfig: any = {
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),

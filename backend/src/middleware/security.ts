@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import { SecurityOrchestrator } from '../services/security/SecurityOrchestrator';
 import { logger } from '../utils/logger';
+import prisma from '../lib/prisma';
 
 declare global {
   namespace Express {
@@ -17,8 +17,7 @@ declare global {
   }
 }
 
-// Initialize security orchestrator instance
-const prisma = new PrismaClient();
+// Initialize security orchestrator instance (uses shared PrismaClient)
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 const securityConfig = {

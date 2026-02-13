@@ -11,9 +11,7 @@
  * - Geo-targeting and local search ranking
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // Helper function to filter out undefined values from objects
 const filterUndefined = <T extends Record<string, any>>(obj: T): Partial<T> => {

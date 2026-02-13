@@ -17,9 +17,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Redis from 'ioredis';
 import { logger } from '../utils/logger';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds

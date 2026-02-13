@@ -5,7 +5,7 @@
  * Queues messages for offline users with Redis persistence and TTL management
  */
 
-import Redis from 'ioredis';
+// Use type 'any' to support both real Redis and mock
 import { logger } from '../../utils/logger';
 
 export interface QueuedMessage {
@@ -28,13 +28,13 @@ export interface QueueStats {
 }
 
 export class MessageQueue {
-  private redis: Redis;
+  private redis: any; // Can be Redis or MockIORedis
   private readonly QUEUE_PREFIX = 'ws:queue:';
   private readonly QUEUE_METADATA_PREFIX = 'ws:queue_meta:';
   private readonly DEFAULT_TTL = 24 * 60 * 60; // 24 hours in seconds
   private readonly MAX_QUEUE_SIZE = 1000; // Maximum messages per user
 
-  constructor(redis: Redis) {
+  constructor(redis: any) {
     this.redis = redis;
   }
 

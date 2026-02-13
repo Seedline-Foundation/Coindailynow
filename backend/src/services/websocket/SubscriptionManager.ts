@@ -5,17 +5,17 @@
  * Manages user subscriptions to market data streams with Redis persistence
  */
 
-import Redis from 'ioredis';
+// Use type 'any' to support both real Redis and mock
 import { PrismaClient } from '@prisma/client';
 import { logger } from '../../utils/logger';
 
 export class SubscriptionManager {
-  private redis: Redis;
+  private redis: any;
   private prisma: PrismaClient;
   private readonly SUBSCRIPTION_PREFIX = 'ws:sub:';
   private readonly USER_SUBSCRIPTIONS_PREFIX = 'ws:user_subs:';
 
-  constructor(redis: Redis, prisma: PrismaClient) {
+  constructor(redis: any, prisma: PrismaClient) {
     this.redis = redis;
     this.prisma = prisma;
   }

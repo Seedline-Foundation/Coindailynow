@@ -2,10 +2,9 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/authService';
 import { logger } from '../utils/logger';
+import prisma from '../lib/prisma';
 
-// Create AuthService instance
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+// Use shared singleton PrismaClient
 const authService = new AuthService(prisma);
 
 // Extend Express Request interface

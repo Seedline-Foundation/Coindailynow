@@ -3,7 +3,7 @@
  * Task 30: Privacy & GDPR Compliance GraphQL API
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../lib/prisma';
 import Redis from 'ioredis';
 import { logger } from '../../utils/logger';
 import { LegalComplianceOrchestrator } from '../../services/legal/LegalComplianceOrchestrator';
@@ -11,7 +11,6 @@ import { CookieConsentManager } from '../../services/legal/CookieConsentManager'
 import { DataRetentionService } from '../../services/legal/DataRetentionService';
 
 // Initialize services
-const prisma = new PrismaClient();
 const redis = new Redis(process.env.REDIS_URL!);
 const legalOrchestrator = new LegalComplianceOrchestrator(prisma, redis);
 const cookieManager = new CookieConsentManager(prisma, redis);

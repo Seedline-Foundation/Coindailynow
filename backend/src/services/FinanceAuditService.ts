@@ -11,11 +11,10 @@
  * All logs include: timestamp, admin ID, action type, resource, IP address, and full details
  */
 
-import { PrismaClient, User, UserRole } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { logger } from '../utils/logger';
 import { Request } from 'express';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // AUDIT LOG TYPES

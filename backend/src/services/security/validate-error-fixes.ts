@@ -44,7 +44,7 @@ async function validateSecurityServicesFixes() {
   console.log('🔒 CoinDaily Security Services - Error Fix Validation');
   console.log('================================================================');
   
-  const prisma = new PrismaClient();
+  const prisma = (await import('../../lib/prisma')).default;
   const redis = new Redis({
     host: 'localhost',
     port: 6379,

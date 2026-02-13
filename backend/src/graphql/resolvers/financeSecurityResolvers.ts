@@ -10,14 +10,13 @@
  * - Wallet lock/unlock operations
  */
 
-import { PrismaClient, WalletType } from '@prisma/client';
+import { WalletType } from '@prisma/client';
+import prisma from '../../lib/prisma';
 import { financeAuditService, AuditAction, AuditLogQuery } from '../../services/FinanceAuditService';
 import { fraudMonitoringService } from '../../services/FraudMonitoringService';
 import { financeEmailService } from '../../services/FinanceEmailService';
 import { financeSecurityMiddleware } from '../../middleware/financeSecurityMiddleware';
 import { logger } from '../../utils/logger';
-
-const prisma = new PrismaClient();
 
 export const financeSecurityResolvers = {
   Query: {

@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import crypto from 'crypto';
 import { XMLBuilder } from 'fast-xml-parser';
-
-const prisma = new PrismaClient();
 
 // Type-safe interfaces for Knowledge API operations
 interface KnowledgeBaseWithArticle {

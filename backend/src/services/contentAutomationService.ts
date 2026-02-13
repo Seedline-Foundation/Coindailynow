@@ -5,14 +5,12 @@
  * Handles automated content collection, rewriting, optimization, categorization, and translation
  */
 
-import { PrismaClient } from '@prisma/client';
-import OpenAI from 'openai';
+import prisma from '../lib/prisma';
 import Parser from 'rss-parser';
 import { Redis } from 'ioredis';
 import nllbClient from './nllbTranslationClient';
+import { chatComplete } from './aiClient';
 
-const prisma = new PrismaClient();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const rssParser = new Parser();
 
@@ -194,15 +192,12 @@ Provide a JSON response with:
   "readabilityScore": 75
 }`;
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4-turbo',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        max_tokens: 3000,
-        response_format: { type: 'json_object' }
-      });
+      const response = await chatComplete(
+        [{ role: 'user', content: prompt }],
+        { temperature: 0.7, maxTokens: 3000 }
+      );
 
-      const result = JSON.parse(response.choices[0]?.message?.content || '{}');
+      const result = JSON.parse(response.content || '{}');
       const processingTime = Date.now() - startTime;
 
       // Update article with rewritten content
@@ -270,15 +265,12 @@ Provide a JSON response with:
   "suggestions": ["suggestion 1", "suggestion 2", "suggestion 3"]
 }`;
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4-turbo',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.8,
-        max_tokens: 500,
-        response_format: { type: 'json_object' }
-      });
+      const response = await chatComplete(
+        [{ role: 'user', content: prompt }],
+        { temperature: 0.8, maxTokens: 500 }
+      );
 
-      const result = JSON.parse(response.choices[0]?.message?.content || '{}');
+      const result = JSON.parse(response.content || '{}');
 
       await prisma.automatedArticle.update({
         where: { id: articleId },
@@ -335,15 +327,12 @@ Provide a JSON response with:
   "confidence": 0.95
 }`;
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4-turbo',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3,
-        max_tokens: 300,
-        response_format: { type: 'json_object' }
-      });
+      const response = await chatComplete(
+        [{ role: 'user', content: prompt }],
+        { temperature: 0.3, maxTokens: 300 }
+      );
 
-      const result = JSON.parse(response.choices[0]?.message?.content || '{}');
+      const result = JSON.parse(response.content || '{}');
 
       await prisma.automatedArticle.update({
         where: { id: articleId },

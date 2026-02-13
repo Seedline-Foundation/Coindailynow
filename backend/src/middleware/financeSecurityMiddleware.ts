@@ -10,11 +10,10 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient, UserRole, WalletType } from '@prisma/client';
+import { UserRole, WalletType } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { logger } from '../utils/logger';
 import { financeAuditService, AuditAction } from '../services/FinanceAuditService';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // CONFIGURATION

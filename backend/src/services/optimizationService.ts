@@ -1,10 +1,8 @@
 // backend/src/services/optimizationService.ts
 // Task 70: Continuous Learning & Optimization Cycle Service
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { Redis } from 'ioredis';
-
-const prisma = new PrismaClient();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 const CACHE_TTL = 300; // 5 minutes

@@ -14,24 +14,34 @@ interface Threat {
 const ThreatMonitor = () => {
   const [threats, setThreats] = useState<Threat[]>([]);
   const [loading, setLoading] = useState(true);
-  const isAuthenticated = false; // Mock auth check; replace with real logic
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check auth from cookie/token on mount
+  useEffect(() => {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('auth_token='))
+      ?.split('=')[1];
+    setIsAuthenticated(!!token);
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
-      console.log(`[${new Date().toISOString()}] Access denied: Not authenticated`);
-      alert('Access denied. Please log in as an admin.');
       setLoading(false);
       return;
     }
 
     const fetchThreats = async () => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000); // Terminate after 2 seconds
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
 
       try {
-        const response = await fetch('https://api.coindaily.online/mock-threats', {
+        const response = await fetch('/api/security-alert/threats', {
           signal: controller.signal,
           cache: 'no-store',
+          headers: {
+            'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1] || ''}`,
+          },
         });
         if (!response.ok) throw new Error('Failed to fetch threat data');
         const data = await response.json();

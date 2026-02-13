@@ -14,10 +14,8 @@
  * @module aiMarketInsightsService
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { RedisClientType } from 'redis';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // TYPES & INTERFACES

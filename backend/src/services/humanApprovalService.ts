@@ -13,13 +13,12 @@
  * @module HumanApprovalService
  */
 
-import { PrismaClient, Prisma, UserRole } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { redisClient } from '../config/redis';
 import { logger } from '../utils/logger';
 import EventEmitter from 'events';
 import aiWorkflowService from './aiWorkflowService';
-
-const prisma = new PrismaClient();
 
 // ==================== PRISMA TYPES ====================
 

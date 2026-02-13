@@ -4,6 +4,7 @@ import cron from 'node-cron';
 import AIModerationService from '../services/aiModerationService';
 import { pubsub, SUBSCRIPTION_EVENTS } from '../config/pubsub';
 import WebSocket from 'ws';
+import prisma from '../lib/prisma';
 
 /**
  * Background Monitoring Worker for AI Content Moderation
@@ -26,7 +27,7 @@ export class ModerationBackgroundWorker {
   private lastHealthCheck: Date = new Date();
   
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = prisma;
     this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
     this.moderationService = new AIModerationService(
       this.prisma,

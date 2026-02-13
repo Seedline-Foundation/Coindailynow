@@ -11,11 +11,9 @@
  * - Admin can manage all whitelists
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { generateOTP, verifyOTP, OTPPurpose } from './OTPService';
 import crypto from 'crypto';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // TYPES

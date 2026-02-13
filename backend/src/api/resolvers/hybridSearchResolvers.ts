@@ -10,7 +10,6 @@ import {
   UserPreferences 
 } from '../../services/hybridSearchService';
 import { ElasticsearchService } from '../../services/elasticsearchService';
-import OpenAI from 'openai';
 import { logger } from '../../utils/logger';
 
 // GraphQL Types
@@ -40,12 +39,10 @@ export class HybridSearchResolvers {
   private hybridSearchService: HybridSearchService;
 
   constructor(
-    private elasticsearchService: ElasticsearchService,
-    private openai: OpenAI
+    private elasticsearchService: ElasticsearchService
   ) {
     this.hybridSearchService = new HybridSearchService(
       this.elasticsearchService,
-      this.openai,
       logger
     );
   }
@@ -322,32 +319,28 @@ export const hybridSearchResolvers = {
   Query: {
     search: async (_: any, { input }: { input: SearchInput }, context: any) => {
       const resolvers = new HybridSearchResolvers(
-        context.elasticsearchService,
-        context.openai
+        context.elasticsearchService
       );
       return resolvers.search(input);
     },
 
     personalizedSearch: async (_: any, { input }: { input: PersonalizedSearchInput }, context: any) => {
       const resolvers = new HybridSearchResolvers(
-        context.elasticsearchService,
-        context.openai
+        context.elasticsearchService
       );
       return resolvers.personalizedSearch(input);
     },
 
     searchSuggestions: async (_: any, { input }: { input: SearchSuggestionInput }, context: any) => {
       const resolvers = new HybridSearchResolvers(
-        context.elasticsearchService,
-        context.openai
+        context.elasticsearchService
       );
       return resolvers.searchSuggestions(input);
     },
 
     searchAnalytics: async (_: any, { userId, timeRange }: { userId?: string; timeRange?: string }, context: any) => {
       const resolvers = new HybridSearchResolvers(
-        context.elasticsearchService,
-        context.openai
+        context.elasticsearchService
       );
       return resolvers.getSearchAnalytics(userId, timeRange);
     }

@@ -21,7 +21,7 @@ async function validateSecurityServices() {
   console.log('🔐 Starting Security Services Validation\n');
 
   // Initialize dependencies
-  const prisma = new PrismaClient();
+  const prisma = (await import('../../lib/prisma')).default;
   const redis = new Redis({
     host: 'localhost',
     port: 6379,

@@ -11,11 +11,9 @@
  * - Redis caching for optimal performance
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { redisClient } from '../config/redis';
 import { logger } from '../utils/logger';
-
-const prisma = new PrismaClient();
 
 // ==================== TYPES AND INTERFACES ====================
 

@@ -9,11 +9,9 @@
  * - Secure storage
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import crypto from 'crypto';
 import { sendEmail } from '../utils/email';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // CONFIGURATION

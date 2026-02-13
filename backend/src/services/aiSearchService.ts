@@ -18,7 +18,7 @@
 
 import { PrismaClient, Article, User } from '@prisma/client';
 import Redis from 'ioredis';
-import { OpenAI } from 'openai';
+import { complete, generateEmbeddings, AI_MODELS, AI_ENDPOINTS } from './aiClient';
 
 // ============================================================================
 // Types & Interfaces
@@ -131,7 +131,6 @@ export interface SearchAnalytics {
 export class AISearchService {
   private prisma: PrismaClient;
   private redis: Redis;
-  private openai: OpenAI;
 
   // Cache TTLs
   private readonly CACHE_TTL = {
@@ -142,10 +141,9 @@ export class AISearchService {
     userPreferences: 600, // 10 minutes
   };
 
-  constructor(prisma: PrismaClient, redis: Redis, openai: OpenAI) {
+  constructor(prisma: PrismaClient, redis: Redis) {
     this.prisma = prisma;
     this.redis = redis;
-    this.openai = openai;
   }
 
   // ==========================================================================
@@ -249,26 +247,21 @@ export class AISearchService {
         return JSON.parse(cached) as string[];
       }
 
-      // Use GPT-4 to expand query
-      const completion = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a search query expansion expert for a cryptocurrency news platform. Generate 3-5 related search queries that capture different aspects and synonyms of the user\'s intent. Return only the queries as a JSON array.',
-          },
-          {
-            role: 'user',
-            content: `Expand this search query: "${query}"`,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 200,
-      });
+      // Use Ollama to expand query
+      const completion = await complete(
+        `Expand this search query: "${query}"`,
+        {
+          systemPrompt: 'You are a search query expansion expert for a cryptocurrency news platform. Generate 3-5 related search queries that capture different aspects and synonyms of the user\'s intent. Return only the queries as a JSON array.',
+          model: AI_MODELS.LLAMA,
+          temperature: 0.7,
+          maxTokens: 200,
+        }
+      );
 
-            // Parse expansions and ensure they are valid
-      const content = completion.choices?.[0]?.message?.content;
-      const expansions = JSON.parse(content || '[]') as string[];
+      // Parse expansions and ensure they are valid
+      const content = completion.content;
+      const jsonMatch = content?.match(/\[[\s\S]*\]/);
+      const expansions = jsonMatch ? JSON.parse(jsonMatch[0]) as string[] : [];
       
       // Cache expansions
       await this.redis.setex(cacheKey, this.CACHE_TTL.suggestions, JSON.stringify(expansions));
@@ -431,14 +424,10 @@ export class AISearchService {
         return JSON.parse(cached) as number[];
       }
 
-      // Generate embedding
-      const response = await this.openai.embeddings.create({
-        model: 'text-embedding-3-small',
-        input: text,
-      });
+      // Generate embedding using local BGE model
+      const embedding = await generateEmbeddings(text);
 
-      const embedding = response.data?.[0]?.embedding;
-      if (!embedding) {
+      if (!embedding || embedding.length === 0) {
         throw new Error('Failed to generate embedding');
       }
 
@@ -553,24 +542,20 @@ export class AISearchService {
    */
   private async getAISuggestions(query: string): Promise<string[]> {
     try {
-      const completion = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a search suggestion expert for cryptocurrency news. Suggest 3 related search queries that users might find helpful. Return only the queries as a JSON array.',
-          },
-          {
-            role: 'user',
-            content: `Suggest related queries for: "${query}"`,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 150,
-      });
+      const prompt = `You are a search suggestion expert for cryptocurrency news. Suggest 3 related search queries that users might find helpful.
 
-      const content = completion.choices?.[0]?.message?.content;
-      return JSON.parse(content || '[]') as string[];
+Query: "${query}"
+
+Return ONLY a JSON array of 3 suggested queries, nothing else. Example: ["query 1", "query 2", "query 3"]`;
+
+      const response = await complete(prompt);
+      
+      // Extract JSON array from response
+      const jsonMatch = response.match(/\[[\s\S]*?\]/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]) as string[];
+      }
+      return [];
     } catch (error) {
       console.error('AI suggestions error:', error);
       return [];
@@ -1258,14 +1243,11 @@ export class AISearchService {
     }
 
     try {
-      // Check OpenAI (simple embedding test)
-      await this.openai.embeddings.create({
-        model: 'text-embedding-3-small',
-        input: 'health check',
-      });
-      checks.openai = true;
+      // Check local AI (Ollama health check)
+      const response = await fetch(`${AI_ENDPOINTS.OLLAMA}/api/tags`);
+      checks.openai = response.ok; // Keep same key for compatibility
     } catch (error) {
-      console.error('OpenAI health check failed:', error);
+      console.error('AI service health check failed:', error);
     }
 
     const allHealthy = Object.values(checks).every(c => c);

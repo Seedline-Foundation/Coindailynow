@@ -5,9 +5,7 @@
  * Seeds the database with African mobile money provider configurations
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 export async function seedMobileMoneyProviders() {
   console.log('🌱 Seeding mobile money providers...');

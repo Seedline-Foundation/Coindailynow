@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { pubsub, SUBSCRIPTION_EVENTS } from '../config/pubsub';
+import prisma from '../lib/prisma';
 
 /**
  * WebSocket Server for Real-time Moderation Alerts
@@ -24,7 +25,7 @@ export class ModerationWebSocketServer {
   private subscriptions: Map<string, Set<string>> = new Map(); // userId -> Set<subscriptionTypes>
   
   constructor(httpServer: HTTPServer) {
-    this.prisma = new PrismaClient();
+    this.prisma = prisma;
     this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
     
     this.io = new SocketIOServer(httpServer, {

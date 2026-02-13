@@ -13,12 +13,12 @@
  */
 
 import express, { Request, Response } from 'express';
-import { PrismaClient, TransactionType, TransactionStatus } from '@prisma/client';
+import { TransactionType, TransactionStatus } from '@prisma/client';
+import prisma from '../lib/prisma';
 import crypto from 'crypto';
 import { Redis } from 'ioredis';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 // ============================================================================

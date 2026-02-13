@@ -3,11 +3,9 @@
  * Task 9.2 Implementation
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { aiSocialMediaService } from '../services/aiSocialMediaService';
 import { PubSub } from 'graphql-subscriptions';
-
-const prisma = new PrismaClient();
 const pubsub = new PubSub();
 
 // ============================================================================

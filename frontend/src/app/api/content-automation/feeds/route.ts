@@ -6,7 +6,7 @@
 import { NextRequest } from 'next/server';
 import { createProxyHandler } from '@/lib/api-proxy';
 
-const handler = createProxyHandler('/apiC:/Users/onech/Desktop/news-platform/frontend/src/app/api/content-automation/feeds');
+const handler = createProxyHandler('/api/content-automation/feeds');
 
 export async function GET(request: NextRequest) {
   return handler(request);

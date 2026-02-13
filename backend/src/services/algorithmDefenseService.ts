@@ -1,11 +1,11 @@
 // Continuous SEO Update & Algorithm Defense Service - Task 67
 // Real-time algorithm monitoring, SERP volatility tracking, and automated recovery
 
-import { PrismaClient } from '@prisma/client';
+import prismaBase from '../lib/prisma';
 import { redisClient as redis } from '../config/redis';
 import axios from 'axios';
 
-const prisma = new PrismaClient() as any; // Type assertion for Task 67 models
+const prisma = prismaBase as any; // Type assertion for Task 67 models
 const redisClient = redis as any; // Type assertion for redis methods
 
 // ============= INTERFACES =============

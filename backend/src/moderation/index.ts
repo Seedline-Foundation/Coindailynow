@@ -2,6 +2,7 @@ import { Express, Router } from 'express';
 import { Server as HTTPServer } from 'http';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
+import prismaClient from '../lib/prisma';
 import AIModerationService from '../services/aiModerationService';
 import { createModerationWebSocketServer } from '../websocket/moderationWebSocket';
 import { moderationWorker } from '../workers/moderationWorker';
@@ -80,7 +81,7 @@ export class AIModerationSystem {
     this.validateConfig();
     
     // Initialize core dependencies
-    this.prisma = this.config.prisma || new PrismaClient();
+    this.prisma = this.config.prisma || prismaClient;
     this.redis = typeof this.config.redis === 'string' 
       ? new Redis(this.config.redis)
       : this.config.redis || new Redis();
@@ -106,7 +107,7 @@ export class AIModerationSystem {
    */
   private mergeWithDefaults(config: ModerationConfig): Required<ModerationConfig> {
     return {
-      prisma: config.prisma || new PrismaClient(),
+      prisma: config.prisma || prismaClient,
       redis: config.redis || 'redis://localhost:6379',
       perspectiveApiKey: config.perspectiveApiKey || process.env.PERSPECTIVE_API_KEY || '',
       backgroundMonitoring: config.backgroundMonitoring ?? true,

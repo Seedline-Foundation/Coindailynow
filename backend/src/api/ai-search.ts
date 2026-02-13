@@ -12,9 +12,8 @@
  */
 
 import express, { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import Redis from 'ioredis';
-import { OpenAI } from 'openai';
 import AISearchService, {
   SearchQuery,
   SemanticSearchParams,
@@ -27,10 +26,8 @@ const router = express.Router();
 // Initialize Services
 // ============================================================================
 
-const prisma = new PrismaClient();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const aiSearchService = new AISearchService(prisma, redis, openai);
+const aiSearchService = new AISearchService(prisma, redis);
 
 // ============================================================================
 // Middleware

@@ -4,10 +4,8 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { structuredDataService } from '../services/structuredDataService';
-
-const prisma = new PrismaClient();
 
 describe('Structured Data Service - Task 57', () => {
   let testArticleId: string;

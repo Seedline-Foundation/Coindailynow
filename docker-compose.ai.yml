@@ -259,3 +259,34 @@ volumes:
     driver: local
   redis-data:
     driver: local
+
+  # ============================================================================
+  # AI DASHBOARD - Next.js Web Interface (ai.coindaily.online)
+  # ============================================================================
+  ai-dashboard:
+    build:
+      context: .
+      dockerfile: apps/ai/Dockerfile
+    image: coindaily-ai-dashboard:latest
+    container_name: coindaily-ai-dashboard
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=production
+      - OLLAMA_API_URL=http://ollama-llama:11434
+      - DEEPSEEK_API_URL=http://ollama-deepseek:11434
+      - NLLB_API_ENDPOINT=http://nllb-translation:8080
+      - SDXL_API_ENDPOINT=http://sdxl-image:7860
+    depends_on:
+      - ollama-llama
+      - ollama-deepseek
+      - nllb-translation
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - ai-network
+

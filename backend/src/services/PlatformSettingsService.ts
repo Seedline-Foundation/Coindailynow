@@ -5,10 +5,9 @@
  * SUPER ADMIN ONLY - Critical platform settings
  */
 
-import { PrismaClient, UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { PermissionService } from './PermissionService';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // INTERFACES

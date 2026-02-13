@@ -11,7 +11,7 @@
  * ❌ Wallet Management (0/5), Gateways (0/5), Advanced (0/5)
  */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { 
   WalletType, 
   WalletStatus, 
@@ -23,11 +23,10 @@ import {
   AirdropStatus,
   UserRole
 } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { WalletService } from './WalletService';
 import { PermissionService } from './PermissionService';
 import { ALL_FINANCE_OPERATIONS, requiresOTP, requiresApproval, isHighRisk } from '../constants/financeOperations';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // TYPES AND INTERFACES

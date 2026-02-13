@@ -4,14 +4,12 @@
  * FR Coverage: FR-023, FR-577 to FR-588
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { Redis } from 'ioredis';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import { createHash } from 'crypto';
 import sharp from 'sharp';
-
-const prisma = new PrismaClient();
 
 export interface ImageProcessingOptions {
   width?: number;

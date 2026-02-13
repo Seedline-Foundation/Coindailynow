@@ -5,13 +5,12 @@
 
 import { Router } from 'express';
 import { AnalyticsService } from '../services/analyticsService';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import Redis from 'ioredis';
 import { authMiddleware } from '../middleware/auth';
 import { AnalyticsEventType, DeviceType, GroupByOptions } from '../types/analytics';
 
 const router = Router();
-const prisma = new PrismaClient();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 // Cast to compatible type
 const analyticsService = new AnalyticsService(prisma, redis as any);

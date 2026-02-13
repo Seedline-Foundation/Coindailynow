@@ -14,7 +14,6 @@ import { Express } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
-import { OpenAI } from 'openai';
 
 // Import AI Search components
 import aiSearchRouter from '../api/ai-search';
@@ -31,7 +30,6 @@ export interface AISearchIntegrationConfig {
   apolloServer?: ApolloServer;
   prisma: PrismaClient;
   redis: Redis;
-  openai: OpenAI;
   basePath?: string;
 }
 
@@ -44,7 +42,6 @@ export class AISearchIntegration {
   private apolloServer?: ApolloServer;
   private prisma: PrismaClient;
   private redis: Redis;
-  private openai: OpenAI;
   private aiSearchService: AISearchService;
   private basePath: string;
 
@@ -53,9 +50,8 @@ export class AISearchIntegration {
     this.apolloServer = config.apolloServer!;
     this.prisma = config.prisma;
     this.redis = config.redis;
-    this.openai = config.openai;
     this.basePath = config.basePath || '/api/search';
-    this.aiSearchService = new AISearchService(this.prisma, this.redis, this.openai);
+    this.aiSearchService = new AISearchService(this.prisma, this.redis);
   }
 
   /**

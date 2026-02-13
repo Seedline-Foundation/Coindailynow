@@ -76,10 +76,8 @@ class AISocialMediaIntegrationImpl implements AISocialMediaIntegration {
   }> {
     try {
       // Import dependencies
-      const { PrismaClient } = await import('@prisma/client');
+      const prisma = (await import('../lib/prisma')).default;
       const Redis = (await import('ioredis')).default;
-
-      const prisma = new PrismaClient();
       
       const redisConfig: any = {
         host: process.env.REDIS_HOST || 'localhost',

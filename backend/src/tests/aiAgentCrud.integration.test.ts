@@ -4,11 +4,9 @@
  */
 
 import request from 'supertest';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { setupApp } from '../index'; // Your Express app setup
 import { redisClient } from '../config/redis';
-
-const prisma = new PrismaClient();
 let app: any;
 
 describe('AI Agent CRUD Operations - Integration Tests', () => {

@@ -11,9 +11,7 @@
 
 import { emailService } from './emailService';
 import { logger } from '../utils/logger';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // ============================================================================
 // EMAIL TEMPLATES

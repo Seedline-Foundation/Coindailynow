@@ -7,7 +7,7 @@
 import { PrismaClient, Article, ArticleTranslation } from '@prisma/client';
 import { Logger } from 'winston';
 import Redis from 'ioredis';
-import OpenAI from 'openai';
+import { complete } from './aiClient';
 
 // ==================== TYPES ====================
 
@@ -77,7 +77,6 @@ export interface TranslationIssueReport {
 // ==================== SERVICE ====================
 
 export class AIContentPreviewService {
-  private readonly openai: OpenAI;
   private readonly CACHE_TTL = {
     SUMMARY: 7200, // 2 hours
     TRANSLATION: 3600, // 1 hour
@@ -89,9 +88,7 @@ export class AIContentPreviewService {
     private readonly redis: Redis,
     private readonly logger: Logger
   ) {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    // Using aiClient instead of OpenAI directly
   }
 
   // ==================== ARTICLE SUMMARIZATION ====================
@@ -153,10 +150,12 @@ export class AIContentPreviewService {
   }
 
   /**
-   * Generate AI summary using GPT-4 Turbo
+   * Generate AI summary using Llama 3.1
    */
   private async generateAISummary(content: string, title: string): Promise<string> {
-    const prompt = `Summarize this cryptocurrency/memecoin news article in 2-3 sentences. 
+    const prompt = `You are a cryptocurrency news summarization expert specializing in African markets.
+
+Summarize this cryptocurrency/memecoin news article in 2-3 sentences. 
 Focus on the key facts, price movements, and market impact. Keep it concise and factual.
 
 Title: ${title}
@@ -165,44 +164,34 @@ Content: ${content.substring(0, 4000)}
 
 Provide only the summary, no additional commentary.`;
 
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [
-        { role: 'system', content: 'You are a cryptocurrency news summarization expert specializing in African markets.' },
-        { role: 'user', content: prompt },
-      ],
-      max_tokens: 200,
-      temperature: 0.3,
-    });
+    const response = await complete(prompt);
 
-    return response.choices[0]?.message?.content?.trim() || 'Summary unavailable';
+    return response?.trim() || 'Summary unavailable';
   }
 
   /**
    * Extract key takeaways from article content
    */
   private async extractKeyTakeaways(content: string): Promise<string[]> {
-    const prompt = `Extract 3-5 key takeaways from this cryptocurrency article as bullet points.
+    const prompt = `You are a cryptocurrency analyst extracting key insights.
+
+Extract 3-5 key takeaways from this cryptocurrency article as bullet points.
 Focus on actionable insights, price data, and market implications.
 
 Content: ${content.substring(0, 4000)}
 
-Provide only the takeaways as a JSON array of strings.`;
+Return ONLY a JSON object with a "takeaways" array of strings. Example: {"takeaways": ["point 1", "point 2", "point 3"]}`;
 
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [
-        { role: 'system', content: 'You are a cryptocurrency analyst extracting key insights.' },
-        { role: 'user', content: prompt },
-      ],
-      max_tokens: 300,
-      temperature: 0.4,
-      response_format: { type: 'json_object' },
-    });
+    const response = await complete(prompt);
 
     try {
-      const result = JSON.parse(response.choices[0]?.message?.content || '{"takeaways":[]}');
-      return result.takeaways || [];
+      // Extract JSON from response
+      const jsonMatch = response?.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const result = JSON.parse(jsonMatch[0]);
+        return result.takeaways || [];
+      }
+      return [];
     } catch {
       return [];
     }

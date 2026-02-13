@@ -12,9 +12,10 @@
 
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
+import prismaBase from '../lib/prisma';
 
 // Extend Prisma types to include Task 74 models (VS Code cache workaround)
-const prisma = new PrismaClient() as PrismaClient & {
+const prisma = prismaBase as PrismaClient & {
   aISchemaMarkup: any;
   lLMMetadata: any;
   sourceCitation: any;

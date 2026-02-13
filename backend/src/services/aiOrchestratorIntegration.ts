@@ -9,11 +9,9 @@
  * - Enable database queries for AI operations
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { registerAgentOnStartup, updateAgentMetrics, logAIOperation } from './aiAgentService';
 import { logger } from '../utils/logger';
-
-const prisma = new PrismaClient();
 
 // ==================== AGENT REGISTRATION ====================
 

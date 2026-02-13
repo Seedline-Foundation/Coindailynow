@@ -8,17 +8,14 @@
       const entity = await (prisma as any).recognizedEntity.upsert({I retrieval.
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import Redis from 'ioredis';
-import OpenAI from 'openai';
-
-const prisma = new PrismaClient();
+import { generateEmbeddings, complete, AI_MODELS, AI_ENDPOINTS } from './aiClient';
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const CACHE_TTL = 600; // 10 minutes
-const EMBEDDING_MODEL = 'text-embedding-3-small'; // 1536 dimensions, cost-effective
-const EMBEDDING_DIMENSION = 1536;
+const EMBEDDING_MODEL = 'BAAI/bge-small-en-v1.5'; // Local BGE model
+const EMBEDDING_DIMENSION = 384; // BGE-small dimension
 const BATCH_SIZE = 100;
 
 // Types
@@ -63,28 +60,24 @@ interface HybridSearchResult {
 }
 
 /**
- * Generate embedding vector for text content
+ * Generate embedding vector for text content using local BGE model
  */
 export const generateEmbedding = async (
   text: string,
   model: string = EMBEDDING_MODEL
 ): Promise<EmbeddingResult> => {
   try {
-    const response = await openai.embeddings.create({
-      model,
-      input: text,
-    });
+    const vector = await generateEmbeddings(text);
 
-    const embedding = response.data[0];
-    if (!embedding) {
-      throw new Error('No embedding data returned from OpenAI');
+    if (!vector || vector.length === 0) {
+      throw new Error('No embedding data returned from embeddings service');
     }
     
     return {
       id: `emb_${Date.now()}`,
-      vector: embedding.embedding,
-      dimension: embedding.embedding.length,
-      tokens: response.usage.total_tokens,
+      vector: vector,
+      dimension: vector.length,
+      tokens: Math.ceil(text.split(/\s+/).length * 1.3), // Approximate token count
     };
   } catch (error: any) {
     console.error('Error generating embedding:', error);
@@ -179,17 +172,12 @@ const calculateEmbeddingQuality = (text: string, metadata?: any): number => {
 };
 
 /**
- * Recognize entities in text (coins, protocols, projects)
+ * Recognize entities in text (coins, protocols, projects) using Ollama
  */
 export const recognizeEntities = async (text: string): Promise<EntityRecognitionResult> => {
   try {
-    // Use OpenAI for entity recognition
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [
-        {
-          role: 'system',
-          content: `You are an expert cryptocurrency and blockchain entity recognizer. Extract all mentions of:
+    // Use Ollama for entity recognition
+    const systemPrompt = `You are an expert cryptocurrency and blockchain entity recognizer. Extract all mentions of:
 - Cryptocurrencies/tokens (Bitcoin, Ethereum, etc.)
 - Protocols (Uniswap, Aave, etc.)
 - Projects/platforms (Coinbase, Binance, etc.)
@@ -197,17 +185,16 @@ export const recognizeEntities = async (text: string): Promise<EntityRecognition
 - People (founders, developers)
 - Organizations
 
-Return a JSON array of entities with: type, name, category, confidence (0-1).`,
-        },
-        {
-          role: 'user',
-          content: text,
-        },
-      ],
-      response_format: { type: 'json_object' },
+Return a JSON object with an "entities" array containing objects with: type, name, category, confidence (0-1).`;
+
+    const response = await complete(text, {
+      systemPrompt,
+      model: AI_MODELS.LLAMA,
+      temperature: 0.3,
+      maxTokens: 1000,
     });
 
-    const messageContent = response.choices[0]?.message?.content;
+    const messageContent = response.content;
     if (!messageContent) {
       return {
         entities: [],
@@ -215,7 +202,8 @@ Return a JSON array of entities with: type, name, category, confidence (0-1).`,
       };
     }
 
-    const result = JSON.parse(messageContent);
+    const jsonMatch = messageContent.match(/\{[\s\S]*\}/);
+    const result = jsonMatch ? JSON.parse(jsonMatch[0]) : { entities: [] };
     const entities: RecognizedEntityData[] = [];
 
     for (const entity of result.entities || []) {

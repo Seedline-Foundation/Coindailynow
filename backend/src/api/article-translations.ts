@@ -11,14 +11,13 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { createClient } from 'redis';
 import { SUPPORTED_LANGUAGES, type LanguageCode } from '../../../shared/languages';
 
 const router = Router();
 
 // Initialize services
-const prisma = new PrismaClient();
 const redis = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
 redis.connect().catch(console.error);
 

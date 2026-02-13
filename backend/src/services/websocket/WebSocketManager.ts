@@ -10,8 +10,12 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
-import Redis from 'ioredis';
+import IORedis, { createRedisClient } from '../../config/ioredis';
 import { logger } from '../../utils/logger';
+import prisma from '../../lib/prisma';
+
+// Check if Redis is enabled
+const isRedisEnabled = process.env.REDIS_ENABLED !== 'false';
 import { SubscriptionManager } from './SubscriptionManager';
 import { MessageQueue } from './MessageQueue';
 import { MarketDataStreamer } from './MarketDataStreamer';
@@ -43,7 +47,7 @@ export interface DeliveryResult {
 
 export class WebSocketManager {
   private io: SocketIOServer;
-  private redis: Redis;
+  private redis: any; // Can be Redis or MockIORedis
   private prisma: PrismaClient;
   private subscriptionManager: SubscriptionManager;
   private messageQueue: MessageQueue;
@@ -70,9 +74,9 @@ export class WebSocketManager {
       allowEIO3: true
     });
 
-    // Initialize dependencies
-    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-    this.prisma = new PrismaClient();
+    // Initialize dependencies - use mock Redis if disabled
+    this.redis = createRedisClient();
+    this.prisma = prisma;
     this.subscriptionManager = new SubscriptionManager(this.redis, this.prisma);
     this.messageQueue = new MessageQueue(this.redis);
     this.marketDataStreamer = new MarketDataStreamer(this.redis);

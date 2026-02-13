@@ -12,10 +12,8 @@
  * - Super admin management tools
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { create } from 'xmlbuilder2';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // TYPE DEFINITIONS

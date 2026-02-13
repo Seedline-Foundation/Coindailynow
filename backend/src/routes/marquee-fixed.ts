@@ -1,10 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import MarqueeService, { MarqueeData, MarqueeItemData, MarqueeTemplateData } from '../services/MarqueeService';
 import { body, param, query, validationResult } from 'express-validator';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 const marqueeService = new MarqueeService(prisma);
 
 // Validation middleware

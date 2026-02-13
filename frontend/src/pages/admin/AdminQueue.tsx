@@ -95,7 +95,7 @@ export function AdminQueue() {
         alert('Failed to approve: ' + data.error);
       }
     } catch (error) {
-      alert('Error approving article: ' + error.message);
+      alert('Error approving article: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
@@ -129,7 +129,7 @@ export function AdminQueue() {
         alert('Failed to request edit: ' + data.error);
       }
     } catch (error) {
-      alert('Error requesting edit: ' + error.message);
+      alert('Error requesting edit: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
@@ -150,7 +150,7 @@ export function AdminQueue() {
         alert('Failed to publish: ' + data.error);
       }
     } catch (error) {
-      alert('Error publishing article: ' + error.message);
+      alert('Error publishing article: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 

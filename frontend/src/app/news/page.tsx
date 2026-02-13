@@ -5,6 +5,10 @@
 
 import Link from 'next/link';
 
+// Force dynamic rendering to prevent build-time fetch errors
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface ArticleListItem {
   id: string;
   slug: string;

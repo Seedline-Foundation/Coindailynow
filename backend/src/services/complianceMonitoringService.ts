@@ -6,9 +6,7 @@
  * Google guidelines, notifications, and comprehensive scoring.
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // ============================================
 // Types & Interfaces

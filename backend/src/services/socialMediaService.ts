@@ -13,9 +13,7 @@
  * Target: 10K+ followers in 60 days, 5%+ daily engagement rate
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // ============================================================================
 // TYPES & INTERFACES

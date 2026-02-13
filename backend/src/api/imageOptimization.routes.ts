@@ -4,13 +4,12 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import multer from 'multer';
 import { createImageOptimizationService } from '../services/imageOptimizationService';
 import { Redis } from 'ioredis';
 
 const router = Router();
-const prisma = new PrismaClient();
 const redis = new Redis({
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),

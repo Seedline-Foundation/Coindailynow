@@ -1,0 +1,45 @@
+{
+  "name": "coindaily-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CoinDaily - Africa's Premier Cryptocurrency News Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "backend",
+    "ai-system"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:news": "turbo run dev --filter=@coindaily/news",
+    "dev:admin": "turbo run dev --filter=@coindaily/admin",
+    "dev:press": "turbo run dev --filter=@coindaily/press",
+    "dev:backend": "turbo run dev --filter=backend",
+    "dev:ai": "turbo run dev --filter=ai-system",
+    "build": "turbo run build",
+    "build:news": "turbo run build --filter=@coindaily/news",
+    "build:admin": "turbo run build --filter=@coindaily/admin",
+    "build:press": "turbo run build --filter=@coindaily/press",
+    "build:backend": "turbo run build --filter=backend",
+    "build:ai": "turbo run build --filter=ai-system",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "deploy": "./infrastructure/scripts/deploy-all.sh production",
+    "deploy:news": "./infrastructure/scripts/deploy-news.sh",
+    "deploy:admin": "./infrastructure/scripts/deploy-admin.sh",
+    "deploy:press": "./infrastructure/scripts/deploy-press.sh",
+    "deploy:backend": "./infrastructure/scripts/deploy-backend.sh",
+    "deploy:ai": "./infrastructure/scripts/deploy-ai.sh"
+  },
+  "devDependencies": {
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.11.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "packageManager": "npm@10.2.0"
+}

@@ -10,11 +10,11 @@
  * - RAO content structuring (semantic chunks, canonical answers)
  */
 
-import { PrismaClient } from '@prisma/client';
-import OpenAI from 'openai';
+import prismaBase from '../lib/prisma';
+import { complete, reasoningComplete } from './aiClient';
 
 // Initialize Prisma Client with proper types
-const prisma = new PrismaClient() as any;
+const prisma = prismaBase as any;
 
 interface ContentOptimizationRequest {
   contentId: string;
@@ -69,12 +69,9 @@ interface InternalLinkSuggestion {
 }
 
 export class ContentSEOOptimizationService {
-  private openai: OpenAI;
 
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY || 'sk-test-key',
-    });
+    // Using aiClient instead of OpenAI directly
   }
 
   /**
@@ -669,23 +666,22 @@ export class ContentSEOOptimizationService {
    */
   private async generateHeadlineSuggestions(headline: string): Promise<string[]> {
     try {
-      const completion = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert copywriter specializing in high-CTR headlines for cryptocurrency news. Generate 5 optimized headline variations that are attention-grabbing, clear, and SEO-friendly.',
-          },
-          {
-            role: 'user',
-            content: `Original headline: "${headline}"\n\nGenerate 5 improved variations focusing on:\n1. Adding power words\n2. Including numbers if relevant\n3. Creating curiosity\n4. Keeping 50-60 characters\n5. Maintaining clarity\n\nReturn only the headlines, one per line.`,
-          },
-        ],
-        temperature: 0.8,
-        max_tokens: 300,
-      });
+      const prompt = `You are an expert copywriter specializing in high-CTR headlines for cryptocurrency news. Generate 5 optimized headline variations that are attention-grabbing, clear, and SEO-friendly.
 
-      const suggestions = completion.choices[0]?.message?.content
+Original headline: "${headline}"
+
+Generate 5 improved variations focusing on:
+1. Adding power words
+2. Including numbers if relevant
+3. Creating curiosity
+4. Keeping 50-60 characters
+5. Maintaining clarity
+
+Return only the headlines, one per line.`;
+
+      const content = await complete(prompt);
+
+      const suggestions = content
         ?.split('\n')
         .filter(line => line.trim().length > 0)
         .map(line => line.replace(/^\d+\.\s*/, '').replace(/^[-•]\s*/, ''))
@@ -870,28 +866,35 @@ export class ContentSEOOptimizationService {
    */
   private async generateAISuggestions(request: ContentOptimizationRequest): Promise<any> {
     try {
-      const completion = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert SEO content strategist for cryptocurrency news. Provide actionable suggestions.',
-          },
-          {
-            role: 'user',
-            content: `Analyze this content and provide:\n1. 5 optimized headlines\n2. 5 relevant keywords\n3. 3 content improvement suggestions\n\nTitle: ${request.title}\nContent: ${request.content.substring(0, 1000)}...\n\nReturn JSON format: { "headlines": [], "keywords": [], "content": [] }`,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
-        response_format: { type: 'json_object' },
-      });
+      const prompt = `You are an expert SEO content strategist for cryptocurrency news. Provide actionable suggestions.
 
-      const response = JSON.parse(completion.choices[0]?.message?.content || '{}');
+Analyze this content and provide:
+1. 5 optimized headlines
+2. 5 relevant keywords
+3. 3 content improvement suggestions
+
+Title: ${request.title}
+Content: ${request.content.substring(0, 1000)}...
+
+Return ONLY valid JSON format: { "headlines": [], "keywords": [], "content": [] }`;
+
+      const content = await reasoningComplete(prompt);
+      
+      // Extract JSON from response
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const response = JSON.parse(jsonMatch[0]);
+        return {
+          headlines: response.headlines || [],
+          keywords: response.keywords || [],
+          content: response.content || [],
+        };
+      }
+      
       return {
-        headlines: response.headlines || [],
-        keywords: response.keywords || [],
-        content: response.content || [],
+        headlines: [],
+        keywords: [],
+        content: [],
       };
     } catch (error) {
       console.error('AI suggestions error:', error);

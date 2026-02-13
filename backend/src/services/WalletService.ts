@@ -10,10 +10,9 @@
  * - Wallet queries and auditing
  */
 
-import { PrismaClient, Wallet, WalletType, WalletStatus, UserRole } from '@prisma/client';
+import { Wallet, WalletType, WalletStatus, UserRole } from '@prisma/client';
+import prisma from '../lib/prisma';
 import crypto from 'crypto';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // WALLET CREATION

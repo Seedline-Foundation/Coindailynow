@@ -14,12 +14,10 @@
  * Task Lifecycle: QUEUED → PROCESSING → COMPLETED/FAILED
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { redisClient } from '../config/redis';
 import { logger } from '../utils/logger';
 import EventEmitter from 'events';
-
-const prisma = new PrismaClient();
 
 // ==================== TYPES AND INTERFACES ====================
 

@@ -27,11 +27,10 @@
  */
 
 import cron from 'node-cron';
-import { PrismaClient, WalletStatus, Prisma } from '@prisma/client';
+import { WalletStatus, Prisma } from '@prisma/client';
 import { Redis } from 'ioredis';
 import { FinanceService } from '../services/FinanceService';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 // ============================================================================

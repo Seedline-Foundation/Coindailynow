@@ -1,11 +1,9 @@
 // Dynamic SEO & Ranking Automation Service - Task 63
 // Automated SEO monitoring, broken link detection, and real-time optimization
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { redisClient } from '../config/redis';
 import axios from 'axios';
-
-const prisma = new PrismaClient();
 
 // ============= INTERFACES =============
 

@@ -4,11 +4,9 @@
  * Production-ready with full integration: Backend ↔ Database ↔ Frontend ↔ Super Admin ↔ User Dashboard
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import axios from 'axios';
 import crypto from 'crypto';
-
-const prisma = new PrismaClient();
 
 // ===================================
 // TYPES & INTERFACES

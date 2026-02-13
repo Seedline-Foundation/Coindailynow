@@ -6,9 +6,8 @@
  * @module api/aiSearchResolvers
  */
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import Redis from 'ioredis';
-import { OpenAI } from 'openai';
 import { PubSub } from 'graphql-subscriptions';
 import AISearchService, {
   SearchQuery,
@@ -20,11 +19,9 @@ import AISearchService, {
 // Initialize Services
 // ============================================================================
 
-const prisma = new PrismaClient();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const pubsub = new PubSub();
-const aiSearchService = new AISearchService(prisma, redis, openai);
+const aiSearchService = new AISearchService(prisma, redis);
 
 // ============================================================================
 // Subscription Events
