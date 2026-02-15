@@ -1,19 +1,17 @@
 import type { Metadata } from 'next';
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: 'CoinDaily Press - PR & Ad Distribution Network',
-  description: 'Web3 PR and advertising distribution platform powered by $COIN token',
-  keywords: ['PR', 'advertising', 'crypto', 'web3', 'press release', 'distribution'],
+  metadataBase: new URL('https://press.coindaily.online'),
+  title: 'SENDPRESS - PR Distribution Network by CoinDaily',
+  description: 'Africa\'s largest automated PR distribution network. Distribute press releases to targeted websites with blockchain payments and AI verification.',
+  keywords: ['PR', 'press release', 'distribution', 'crypto', 'JOY token', 'blockchain', 'Africa', 'SENDPRESS'],
   openGraph: {
-    title: 'CoinDaily Press - PR & Ad Distribution Network',
-    description: 'Web3 PR and advertising distribution platform powered by $COIN token',
+    title: 'SENDPRESS - PR Distribution Network',
+    description: 'Instant PR distribution to targeted websites. Automated payments via JOY token. AI-powered verification.',
     url: 'https://press.coindaily.online',
-    siteName: 'CoinDaily Press',
+    siteName: 'SENDPRESS',
     type: 'website',
   },
 };
@@ -25,8 +23,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${jakarta.variable} font-sans bg-dark-950 text-white antialiased`}>
-        {children}
+      <body className="font-sans bg-dark-950 text-white antialiased">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

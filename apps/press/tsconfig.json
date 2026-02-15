@@ -20,11 +20,9 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@coindaily/ui": ["../../packages/ui/src"],
-      "@coindaily/utils": ["../../packages/utils/src"],
-      "@coindaily/types": ["../../packages/types/src"]
+      "@coindaily/ui": ["../../packages/ui/src"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "ai-verification", "backend", "contracts", "crawler", "dashboard", "sdk"]
 }

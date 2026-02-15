@@ -4,11 +4,12 @@ NLLB-200 Translation Microservice
 Self-hosted translation API for African languages
 """
 
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import torch
+# pyright: reportMissingImports=false
+from fastapi import FastAPI, HTTPException  # type: ignore
+from fastapi.middleware.cors import CORSMiddleware  # type: ignore
+from pydantic import BaseModel  # type: ignore
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM  # type: ignore
+import torch  # type: ignore
 from typing import List, Optional
 import logging
 
@@ -317,7 +318,7 @@ async def health_check():
     }
 
 if __name__ == "__main__":
-    import uvicorn
+    import uvicorn  # type: ignore
     uvicorn.run(
         app,
         host="0.0.0.0",

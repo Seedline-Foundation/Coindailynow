@@ -1,0 +1,10 @@
+{
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none",
+  "pythonVersion": "3.9",
+  "executionEnvironments": [
+    {
+      "root": "."
+    }
+  ]
+}
