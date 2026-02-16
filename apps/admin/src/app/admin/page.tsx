@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -17,8 +17,10 @@ import {
   X,
   ChevronRight,
   Bell,
-  Search
+  Search,
+  RefreshCw
 } from 'lucide-react';
+import { fetchPlatformStats, fetchAlerts, fetchAIHealth } from '@/lib/api';
 
 /**
  * Staff Admin Portal - jet.coindaily.online/admin
@@ -89,11 +91,41 @@ const CEO_ITEMS = [
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [stats, setStats] = useState<any>(null);
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [aiHealth, setAiHealth] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [statsData, alertsData] = await Promise.all([
+        fetchPlatformStats().catch(() => null),
+        fetchAlerts().catch(() => []),
+      ]);
+      setStats(statsData);
+      setAlerts(Array.isArray(alertsData) ? alertsData : alertsData?.alerts || []);
+      
+      // AI health check (may timeout)
+      fetchAIHealth().then(setAiHealth).catch(() => null);
+    } catch (err) {
+      console.error('Failed to load dashboard data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+    const interval = setInterval(loadData, 60000); // refresh every 60s
+    return () => clearInterval(interval);
+  }, []);
+
   const handleLogout = async () => {
-    // Clear session and redirect to landing
-    // In production, this would call the auth API
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('admin_token');
+    }
     router.push('/');
   };
 
@@ -212,65 +244,98 @@ export default function AdminDashboard() {
 
         {/* Dashboard Content */}
         <main className="p-6">
-          <div className="mb-8">
-            <h1 className="text-2xl font-display font-bold text-white mb-2">
-              Admin Dashboard
-            </h1>
-            <p className="text-dark-400">
-              Welcome back. Here's what's happening with CoinDaily today.
-            </p>
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-display font-bold text-white mb-2">
+                Admin Dashboard
+              </h1>
+              <p className="text-dark-400">
+                Welcome back. Here&apos;s what&apos;s happening with CoinDaily today.
+              </p>
+            </div>
+            <button
+              onClick={loadData}
+              disabled={loading}
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-dark-800 hover:bg-dark-700 text-dark-300 rounded-lg transition-colors"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
           </div>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <StatCard 
               title="Total Users" 
-              value="12,847" 
-              change="+12.5%" 
+              value={loading ? '...' : (stats?.totalUsers?.toLocaleString() || '0')} 
+              change={stats ? `${stats.totalUsers || 0} registered` : 'Loading...'} 
               positive 
             />
             <StatCard 
               title="Articles Published" 
-              value="1,234" 
-              change="+8.2%" 
+              value={loading ? '...' : (stats?.publishedArticles?.toLocaleString() || stats?.totalArticles?.toLocaleString() || '0')} 
+              change={stats ? `${stats.totalArticles || 0} total` : 'Loading...'} 
               positive 
             />
             <StatCard 
-              title="AI Tasks Today" 
-              value="456" 
-              change="+24.1%" 
+              title="AI Tasks" 
+              value={loading ? '...' : (stats?.totalAITasks?.toLocaleString() || '0')} 
+              change={stats ? `${stats.pendingAITasks || 0} pending` : 'Loading...'} 
               positive 
             />
             <StatCard 
-              title="Revenue (24h)" 
-              value="$8,432" 
-              change="-2.4%" 
-              positive={false} 
+              title="Active Agents" 
+              value={loading ? '...' : (stats?.activeAgents?.toString() || '0')} 
+              change="AI system"
+              positive 
             />
           </div>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Quick Actions & System Status */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div className="bg-dark-900 border border-dark-700 rounded-xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 gap-3">
-                <ActionButton icon={FileText} label="New Article" />
-                <ActionButton icon={Users} label="Add User" />
-                <ActionButton icon={Bot} label="AI Tasks" />
-                <ActionButton icon={BarChart3} label="Reports" />
+                <Link href="/admin/content"><ActionButton icon={FileText} label="Manage Content" /></Link>
+                <Link href="/admin/users"><ActionButton icon={Users} label="Manage Users" /></Link>
+                <Link href="/admin/ai"><ActionButton icon={Bot} label="AI System" /></Link>
+                <Link href="/admin/analytics"><ActionButton icon={BarChart3} label="Reports" /></Link>
               </div>
             </div>
 
             <div className="bg-dark-900 border border-dark-700 rounded-xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4">System Status</h2>
               <div className="space-y-3">
-                <StatusItem name="Backend API" status="operational" />
-                <StatusItem name="AI Services" status="operational" />
-                <StatusItem name="Database" status="operational" />
-                <StatusItem name="CDN" status="degraded" />
+                <StatusItem name="Backend API" status={stats ? 'operational' : 'down'} />
+                <StatusItem name="AI Services" status={
+                  aiHealth?.status === 'operational' ? 'operational' :
+                  aiHealth?.status === 'degraded' ? 'degraded' : 
+                  aiHealth ? 'degraded' : 'down'
+                } />
+                <StatusItem name="Database" status={stats ? 'operational' : 'down'} />
+                <StatusItem name="CDN" status="operational" />
               </div>
             </div>
           </div>
+
+          {/* Recent Alerts */}
+          {alerts.length > 0 && (
+            <div className="bg-dark-900 border border-dark-700 rounded-xl p-6">
+              <h2 className="text-lg font-semibold text-white mb-4">Recent Alerts</h2>
+              <div className="space-y-2">
+                {alerts.slice(0, 5).map((alert: any, i: number) => (
+                  <div key={i} className="flex items-center gap-3 py-2 border-b border-dark-800 last:border-0">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${
+                      alert.severity === 'critical' ? 'bg-red-500' :
+                      alert.severity === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                    }`} />
+                    <span className="text-sm text-dark-300 flex-1">{alert.message}</span>
+                    <span className="text-xs text-dark-500">{alert.time || ''}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>

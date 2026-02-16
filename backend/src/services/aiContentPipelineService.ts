@@ -20,6 +20,7 @@
 
 import prisma from '../lib/prisma';
 import Redis from 'ioredis';
+import { fetchAllFeeds, markArticleAsPublished, isAlreadyPublished, FeedItem } from './rssFeedAggregator';
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 // ============================================================================
@@ -591,9 +592,97 @@ export class AIContentPipelineService {
       const coinDeskTrends = await this.getCoinDeskTrends();
       trends.push(...coinDeskTrends);
 
+      // ── Global RSS Feed Aggregator (183 sources) ──
+      const rssTrends = await this.getRSSFeedTrends();
+      trends.push(...rssTrends);
+
       return trends;
     } catch (error) {
       console.error('Error fetching news trends:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get trends from the 183+ registered RSS / Atom feeds.
+   * Fetches all feeds, filters to only FRESH items, then extracts keywords.
+   */
+  private async getRSSFeedTrends(): Promise<TrendingTopic[]> {
+    try {
+      const feedItems = await fetchAllFeeds();
+
+      if (feedItems.length === 0) return [];
+
+      // Extract trending keywords from fresh headlines
+      const keywordMap = new Map<string, {
+        count: number;
+        sources: Set<string>;
+        latestDate: Date;
+        sentiment: { bullish: number; bearish: number; neutral: number };
+      }>();
+
+      const cryptoRegex = /bitcoin|ethereum|btc|eth|crypto|blockchain|defi|nft|web3|memecoin|altcoin|solana|cardano|polkadot|binance|coinbase|ripple|xrp|dogecoin|shiba|pepe|bnb|avalanche|polygon|matic/gi;
+
+      for (const item of feedItems) {
+        const text = `${item.title} ${item.description}`.toLowerCase();
+        const keywords = text.match(cryptoRegex);
+        if (!keywords) continue;
+
+        const bullishWords = (text.match(/surge|gain|rally|profit|high|up|increase|bullish|soar|boom|moon|rocket|🚀|📈/gi) || []).length;
+        const bearishWords = (text.match(/drop|loss|crash|down|decline|bearish|fall|dump|plunge|📉/gi) || []).length;
+
+        for (const kw of keywords) {
+          const key = kw.toLowerCase().replace(/^[$#]/, '');
+          const existing = keywordMap.get(key) || {
+            count: 0,
+            sources: new Set<string>(),
+            latestDate: new Date(0),
+            sentiment: { bullish: 0, bearish: 0, neutral: 0 },
+          };
+
+          existing.count += 1;
+          existing.sources.add(item.source);
+          if (item.pubDate > existing.latestDate) existing.latestDate = item.pubDate;
+          existing.sentiment.bullish += bullishWords;
+          existing.sentiment.bearish += bearishWords;
+          existing.sentiment.neutral += (bullishWords === 0 && bearishWords === 0 ? 1 : 0);
+
+          keywordMap.set(key, existing);
+        }
+      }
+
+      const trends: TrendingTopic[] = [];
+
+      for (const [keyword, stats] of keywordMap.entries()) {
+        if (stats.count < 2) continue; // noise filter
+
+        let sentiment: 'bullish' | 'bearish' | 'neutral' = 'neutral';
+        if (stats.sentiment.bullish > stats.sentiment.bearish && stats.sentiment.bullish > stats.sentiment.neutral) {
+          sentiment = 'bullish';
+        } else if (stats.sentiment.bearish > stats.sentiment.bullish) {
+          sentiment = 'bearish';
+        }
+
+        const sourceCount = stats.sources.size;
+        const urgency: 'breaking' | 'high' | 'medium' | 'low' =
+          sourceCount >= 10 ? 'breaking' :
+          sourceCount >= 5 ? 'high' :
+          sourceCount >= 3 ? 'medium' : 'low';
+
+        trends.push({
+          keyword,
+          volume: stats.count,
+          sentiment,
+          urgency,
+          sources: Array.from(stats.sources),
+          relatedTokens: [],
+          timestamp: stats.latestDate,
+        });
+      }
+
+      return trends.sort((a, b) => b.volume - a.volume).slice(0, 30);
+    } catch (error) {
+      console.error('Error fetching RSS feed trends:', error);
       return [];
     }
   }
@@ -820,6 +909,12 @@ export class AIContentPipelineService {
     try {
       const config = await this.getConfiguration();
       const pipelineId = `pipeline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      // ── Early dedup: reject topics we already published ──
+      const alreadyCovered = await isAlreadyPublished(request.topic);
+      if (alreadyCovered) {
+        throw new Error(`Topic "${request.topic}" has already been published — skipping to keep content fresh.`);
+      }
 
       // Check concurrent pipeline limit
       const activePipelines = await this.getActivePipelines();
@@ -1049,6 +1144,15 @@ export class AIContentPipelineService {
       // Wait for task completion
       const result = await this.waitForTaskCompletion(task.id, 180000); // 3 minutes
 
+      // ── Deduplication check: skip if AI generated a title we already published ──
+      if (result.title) {
+        const alreadyExists = await isAlreadyPublished(result.title);
+        if (alreadyExists) {
+          console.log(`[Pipeline] Skipping duplicate article: "${result.title}"`);
+          throw new Error(`DUPLICATE_ARTICLE: "${result.title}" has already been published`);
+        }
+      }
+
       // Create article in database
       const article = await prisma.article.create({
         data: {
@@ -1231,13 +1335,20 @@ export class AIContentPipelineService {
   private async executePublicationStage(articleId: string): Promise<void> {
     try {
       // Update article status to published
-      await prisma.article.update({
+      const article = await prisma.article.update({
         where: { id: articleId },
         data: {
           status: 'published',
           publishedAt: new Date()
-        }
+        },
+        select: { id: true, title: true, sourceUrl: true } as any
       });
+
+      // ── Register in dedup index so future feeds won't re-surface this topic ──
+      await markArticleAsPublished(
+        (article as any).title || '',
+        (article as any).sourceUrl || undefined
+      );
 
       // Invalidate caches
       await redis.del(`article:${articleId}`);

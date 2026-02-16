@@ -6,41 +6,73 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-// AI agents with actual models from ai-system/config/model-config.ts
-const agents = [
-  { id: 'content', name: 'Content Generator', status: 'running', queue: 12, completed: 245, model: 'Llama 3.1 8B' },
-  { id: 'research', name: 'Research Agent', status: 'running', queue: 5, completed: 189, model: 'DeepSeek R1' },
-  { id: 'review', name: 'Quality Reviewer', status: 'running', queue: 8, completed: 312, model: 'DeepSeek R1' },
-  { id: 'translation', name: 'Translation Agent', status: 'running', queue: 23, completed: 156, model: 'NLLB-200' },
-  { id: 'image', name: 'Image Generator', status: 'running', queue: 3, completed: 89, model: 'SDXL' },
-  { id: 'market', name: 'Market Analyst', status: 'running', queue: 0, completed: 432, model: 'DeepSeek R1' },
-  { id: 'sentiment', name: 'Sentiment Analyzer', status: 'paused', queue: 0, completed: 567, model: 'DeepSeek R1' },
-  { id: 'moderation', name: 'Content Moderator', status: 'running', queue: 2, completed: 890, model: 'DeepSeek R1' },
-];
-
-const recentTasks = [
-  { id: 1, type: 'content', title: 'Generated: Bitcoin Price Analysis', status: 'completed', time: '2 min ago' },
-  { id: 2, type: 'review', title: 'Reviewed: M-Pesa Integration Article', status: 'completed', time: '5 min ago' },
-  { id: 3, type: 'image', title: 'Created: Featured image for news', status: 'completed', time: '8 min ago' },
-  { id: 4, type: 'translation', title: 'Translating: Article to Swahili', status: 'processing', time: 'In progress' },
-  { id: 5, type: 'research', title: 'Researching: Nigerian regulations', status: 'queued', time: 'Queued' },
-];
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
 const SUPPORTED_LANGUAGES = [
   'Hausa', 'Yoruba', 'Igbo', 'Swahili', 'Amharic', 'Zulu', 'Shona', 
   'Afrikaans', 'Somali', 'Oromo', 'Arabic', 'French', 'Portuguese', 'Wolof', 'Kinyarwanda'
 ];
 
+interface Agent {
+  id: string;
+  name: string;
+  status: string;
+  queue: number;
+  completed: number;
+  model: string;
+}
+
+interface Task {
+  id: string | number;
+  type: string;
+  title: string;
+  status: string;
+  time: string;
+}
+
+interface ServiceHealth {
+  name: string;
+  status: 'healthy' | 'unhealthy';
+  latency?: number;
+  error?: string;
+}
+
 type ModalType = 'generate' | 'image' | 'translate' | 'analyze' | null;
 
+// Default agents to show when backend is unreachable
+const DEFAULT_AGENTS: Agent[] = [
+  { id: 'content', name: 'Content Generator', status: 'unknown', queue: 0, completed: 0, model: 'Llama 3.1 8B' },
+  { id: 'research', name: 'Research Agent', status: 'unknown', queue: 0, completed: 0, model: 'DeepSeek R1' },
+  { id: 'review', name: 'Quality Reviewer', status: 'unknown', queue: 0, completed: 0, model: 'DeepSeek R1' },
+  { id: 'translation', name: 'Translation Agent', status: 'unknown', queue: 0, completed: 0, model: 'NLLB-200' },
+  { id: 'image', name: 'Image Generator', status: 'unknown', queue: 0, completed: 0, model: 'SDXL' },
+  { id: 'market', name: 'Market Analyst', status: 'unknown', queue: 0, completed: 0, model: 'DeepSeek R1' },
+  { id: 'sentiment', name: 'Sentiment Analyzer', status: 'unknown', queue: 0, completed: 0, model: 'DeepSeek R1' },
+  { id: 'moderation', name: 'Content Moderator', status: 'unknown', queue: 0, completed: 0, model: 'DeepSeek R1' },
+];
+
+function timeAgo(dateStr: string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diff = Math.floor((now - then) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
+
 export default function AISystemDashboard() {
-  const [systemStatus] = useState('operational');
+  const [agents, setAgents] = useState<Agent[]>(DEFAULT_AGENTS);
+  const [recentTasks, setRecentTasks] = useState<Task[]>([]);
+  const [services, setServices] = useState<ServiceHealth[]>([]);
+  const [systemStatus, setSystemStatus] = useState<'operational' | 'degraded' | 'loading'>('loading');
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   
   // Form states
   const [articleTopic, setArticleTopic] = useState('');
@@ -49,6 +81,62 @@ export default function AISystemDashboard() {
   const [translateText, setTranslateText] = useState('');
   const [targetLanguage, setTargetLanguage] = useState('Swahili');
   const [analysisTopic, setAnalysisTopic] = useState('');
+
+  // Fetch live data from backend and health endpoint
+  const fetchDashboardData = useCallback(async () => {
+    // Fetch AI health status from local /api/health
+    try {
+      const healthRes = await fetch('/api/health');
+      const healthData = await healthRes.json();
+      setServices(healthData.services || []);
+      setSystemStatus(healthData.status === 'operational' ? 'operational' : 'degraded');
+    } catch {
+      setSystemStatus('degraded');
+    }
+
+    // Fetch agents from backend
+    try {
+      const agentRes = await fetch(`${BACKEND_URL}/api/super-admin/ai-agents`);
+      const agentData = await agentRes.json();
+      if (agentData.agents && agentData.agents.length > 0) {
+        setAgents(agentData.agents.map((a: any) => ({
+          id: a.id || a.type,
+          name: a.name,
+          status: a.status === 'ACTIVE' || a.status === 'running' ? 'running' : a.status === 'PAUSED' ? 'paused' : a.status?.toLowerCase() || 'unknown',
+          queue: a.queue ?? a.pendingTasks ?? 0,
+          completed: a.completed ?? a.completedTasks ?? 0,
+          model: a.model || a.modelVersion || 'Unknown',
+        })));
+      }
+    } catch {
+      // Keep defaults if backend unavailable
+    }
+
+    // Fetch recent tasks from backend
+    try {
+      const taskRes = await fetch(`${BACKEND_URL}/api/super-admin/ai-tasks?limit=10`);
+      const taskData = await taskRes.json();
+      if (taskData.tasks && taskData.tasks.length > 0) {
+        setRecentTasks(taskData.tasks.map((t: any) => ({
+          id: t.id,
+          type: t.type || t.taskType || 'content',
+          title: t.title || `${t.type || 'Task'}: ${t.id.slice(0, 8)}`,
+          status: t.status?.toLowerCase() || 'queued',
+          time: t.completedAt ? timeAgo(t.completedAt) : t.createdAt ? timeAgo(t.createdAt) : 'Unknown',
+        })));
+      }
+    } catch {
+      // No tasks available
+    }
+
+    setLastRefresh(new Date());
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 30000); // refresh every 30s
+    return () => clearInterval(interval);
+  }, [fetchDashboardData]);
   
   const runningAgents = agents.filter(a => a.status === 'running').length;
   const totalQueue = agents.reduce((sum, a) => sum + a.queue, 0);
@@ -181,14 +269,39 @@ export default function AISystemDashboard() {
 
         {/* System Health */}
         <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">System Health</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white">System Health</h2>
+            <div className="flex items-center gap-3">
+              {lastRefresh && (
+                <span className="text-xs text-gray-500">Updated {lastRefresh.toLocaleTimeString()}</span>
+              )}
+              <button
+                onClick={fetchDashboardData}
+                className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
+              >
+                ↻ Refresh
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            <HealthIndicator icon="🖥️" label="API Server" status="healthy" />
+            <HealthIndicator icon="🖥️" label="API Server" status={systemStatus === 'loading' ? 'degraded' : 'healthy'} />
             <HealthIndicator icon="💾" label="Database" status="healthy" />
-            <HealthIndicator icon="🦙" label="Ollama" status="healthy" />
-            <HealthIndicator icon="🧠" label="DeepSeek R1" status="healthy" />
-            <HealthIndicator icon="🖼️" label="SDXL" status="healthy" />
-            <HealthIndicator icon="🌍" label="NLLB-200" status="healthy" />
+            {services.length > 0 ? services.map((svc) => (
+              <HealthIndicator
+                key={svc.name}
+                icon={svc.name.includes('Ollama') ? '🦙' : svc.name.includes('DeepSeek') ? '🧠' : svc.name.includes('SDXL') ? '🖼️' : '🌍'}
+                label={svc.name.split('(')[0].trim()}
+                status={svc.status === 'healthy' ? 'healthy' : 'down'}
+                latency={svc.latency}
+              />
+            )) : (
+              <>
+                <HealthIndicator icon="🦙" label="Ollama" status={systemStatus === 'loading' ? 'degraded' : 'down'} />
+                <HealthIndicator icon="🧠" label="DeepSeek R1" status={systemStatus === 'loading' ? 'degraded' : 'down'} />
+                <HealthIndicator icon="🖼️" label="SDXL" status={systemStatus === 'loading' ? 'degraded' : 'down'} />
+                <HealthIndicator icon="🌍" label="NLLB-200" status={systemStatus === 'loading' ? 'degraded' : 'down'} />
+              </>
+            )}
           </div>
         </div>
 
@@ -231,7 +344,12 @@ export default function AISystemDashboard() {
               </button>
             </div>
             <div className="divide-y divide-gray-800 max-h-96 overflow-y-auto">
-              {recentTasks.map((task) => (
+              {recentTasks.length === 0 ? (
+                <div className="px-6 py-8 text-center text-gray-500">
+                  <p className="text-sm">No tasks yet</p>
+                  <p className="text-xs mt-1">Use Quick Actions below to create tasks</p>
+                </div>
+              ) : recentTasks.map((task) => (
                 <div key={task.id} className="px-6 py-3 flex items-center justify-between hover:bg-gray-800/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${
@@ -599,19 +717,22 @@ function StatCard({ title, value, icon, color }: { title: string; value: string;
   );
 }
 
-function HealthIndicator({ icon, label, status }: { icon: string; label: string; status: 'healthy' | 'degraded' | 'down' }) {
+function HealthIndicator({ icon, label, status, latency }: { icon: string; label: string; status: 'healthy' | 'degraded' | 'down'; latency?: number }) {
   return (
     <div className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
       <span className="text-xl">{icon}</span>
       <div>
         <p className="text-sm text-white">{label}</p>
-        <p className={`text-xs ${
-          status === 'healthy' ? 'text-green-400' :
-          status === 'degraded' ? 'text-yellow-400' :
-          'text-red-400'
-        }`}>
-          {status}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className={`text-xs ${
+            status === 'healthy' ? 'text-green-400' :
+            status === 'degraded' ? 'text-yellow-400' :
+            'text-red-400'
+          }`}>
+            {status}
+          </p>
+          {latency !== undefined && <span className="text-xs text-gray-500">{latency}ms</span>}
+        </div>
       </div>
     </div>
   );
