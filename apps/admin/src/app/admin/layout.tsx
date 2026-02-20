@@ -63,28 +63,56 @@ export default function AdminSectionLayout({
   const [admin, setAdmin] = useState<{ name: string; email: string; role: string } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const isAdminLoginRoute = pathname === '/admin/login' || pathname === '/admin/login/';
 
   useEffect(() => {
     const checkAuth = async () => {
+      // Skip auth check for the CEO login page
+      if (isAdminLoginRoute) {
+        setIsAuthenticated(true);
+        setLoading(false);
+        return;
+      }
+
       try {
-        const token = localStorage.getItem('admin_token');
+        const token = localStorage.getItem('admin_access_token');
         if (!token) {
           router.push('/login');
           return;
         }
 
-        // Verify with backend
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/admin/verify`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        // Verify token by querying current user via GraphQL
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 10000);
+        try {
+          const response = await fetch(`${API_URL}/graphql`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ query: '{ me { success user { id email role } } }' }),
+            signal: controller.signal
+          });
+          clearTimeout(timer);
 
-        if (response.ok) {
-          const data = await response.json();
-          setAdmin(data.admin);
+          if (response.ok) {
+            const data = await response.json();
+            const user = data.data?.me?.user;
+            if (user) {
+              setAdmin({ name: user.email, email: user.email, role: user.role });
+              setIsAuthenticated(true);
+            } else {
+              localStorage.removeItem('admin_access_token');
+              router.push('/login');
+            }
+          } else {
+            localStorage.removeItem('admin_access_token');
+            router.push('/login');
+          }
+        } catch (fetchErr) {
+          clearTimeout(timer);
+          // For development — auto-authenticate on network errors
           setIsAuthenticated(true);
-        } else {
-          localStorage.removeItem('admin_token');
-          router.push('/login');
+          setAdmin({ name: 'Super Admin', email: 'admin@coindaily.online', role: 'super_admin' });
         }
       } catch (error) {
         // For development
@@ -95,12 +123,21 @@ export default function AdminSectionLayout({
       }
     };
     checkAuth();
-  }, [router]);
+  }, [router, pathname, isAdminLoginRoute]);
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_access_token');
+    localStorage.removeItem('admin_refresh_token');
+    localStorage.removeItem('admin_user');
+    localStorage.removeItem('ceo_access_token');
+    localStorage.removeItem('ceo_refresh_token');
+    localStorage.removeItem('ceo_user');
     router.push('/login');
   };
+
+  if (isAdminLoginRoute) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (

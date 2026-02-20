@@ -5,14 +5,14 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { authMiddleware, optionalAuthMiddleware } from '../../middleware/auth';
+import { authMiddleware } from '../../middleware/auth';
 import prisma from '../../lib/prisma';
 
 const router = Router();
 
-// Helper: allow access in dev mode or for super admins
+// Helper: enforce admin access — no bypasses in production
 const requireAdmin = (req: Request, res: Response): boolean => {
-  if (process.env.NODE_ENV === 'development' || process.env.BYPASS_AUTH === 'true') return false;
+  if (process.env.NODE_ENV === 'development') return false;
   if (!req.user || (req.user.role !== 'SUPER_ADMIN' && req.user.role !== 'ADMIN')) {
     res.status(403).json({ success: false, error: 'Forbidden', message: 'Admin access required' });
     return true;
@@ -24,7 +24,7 @@ const requireAdmin = (req: Request, res: Response): boolean => {
  * GET /api/super-admin/stats
  * Get platform statistics from real database
  */
-router.get('/stats', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.get('/stats', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -101,7 +101,7 @@ router.get('/stats', optionalAuthMiddleware, async (req: Request, res: Response)
  * GET /api/super-admin/users
  * Get user list with pagination from database
  */
-router.get('/users', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.get('/users', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -175,16 +175,16 @@ router.get('/users', optionalAuthMiddleware, async (req: Request, res: Response)
  * GET /api/super-admin/alerts
  * Get system alerts from AI tasks and system events
  */
-router.get('/alerts', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.get('/alerts', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
     // Get failed AI tasks as alerts
     const failedTasks = await prisma.aITask.findMany({
       where: { status: 'FAILED' },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
       take: 10,
-      select: { id: true, taskType: true, errorMessage: true, updatedAt: true },
+      select: { id: true, taskType: true, errorMessage: true, createdAt: true },
     }).catch(() => []);
 
     const alerts = failedTasks.map(task => ({
@@ -192,7 +192,7 @@ router.get('/alerts', optionalAuthMiddleware, async (req: Request, res: Response
       type: 'error',
       title: `AI Task Failed: ${task.taskType}`,
       message: task.errorMessage || 'Unknown error',
-      timestamp: task.updatedAt,
+      timestamp: task.createdAt,
       resolved: false,
     }));
 
@@ -223,7 +223,7 @@ router.get('/alerts', optionalAuthMiddleware, async (req: Request, res: Response
  * GET /api/super-admin/articles
  * Get articles with pagination and filters
  */
-router.get('/articles', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.get('/articles', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -307,7 +307,7 @@ router.get('/articles', optionalAuthMiddleware, async (req: Request, res: Respon
  * GET /api/super-admin/ai-agents
  * Get AI agent status from database
  */
-router.get('/ai-agents', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.get('/ai-agents', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -367,7 +367,7 @@ router.get('/ai-agents', optionalAuthMiddleware, async (req: Request, res: Respo
  * GET /api/super-admin/ai-tasks
  * Get recent AI tasks
  */
-router.get('/ai-tasks', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.get('/ai-tasks', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -426,7 +426,7 @@ router.get('/ai-tasks', optionalAuthMiddleware, async (req: Request, res: Respon
  * PATCH /api/super-admin/users/:id
  * Update user status/role
  */
-router.patch('/users/:id', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.patch('/users/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -454,7 +454,7 @@ router.patch('/users/:id', optionalAuthMiddleware, async (req: Request, res: Res
  * PATCH /api/super-admin/articles/:id
  * Update article status
  */
-router.patch('/articles/:id', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.patch('/articles/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -486,7 +486,7 @@ router.patch('/articles/:id', optionalAuthMiddleware, async (req: Request, res: 
  * GET /api/super-admin/roles
  * Get all available admin roles
  */
-router.get('/roles', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.get('/roles', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -563,7 +563,7 @@ router.get('/roles', optionalAuthMiddleware, async (req: Request, res: Response)
  * POST /api/super-admin/roles
  * Create a new admin role
  */
-router.post('/roles', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.post('/roles', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -606,7 +606,7 @@ router.post('/roles', optionalAuthMiddleware, async (req: Request, res: Response
  * PUT /api/super-admin/roles/:id
  * Update an existing admin role
  */
-router.put('/roles/:id', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.put('/roles/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -640,7 +640,7 @@ router.put('/roles/:id', optionalAuthMiddleware, async (req: Request, res: Respo
  * DELETE /api/super-admin/roles/:id
  * Delete an admin role
  */
-router.delete('/roles/:id', optionalAuthMiddleware, async (req: Request, res: Response) => {
+router.delete('/roles/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 

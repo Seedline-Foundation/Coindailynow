@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Poppins } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../hooks/useAuth';
+import { LanguageProvider } from '../contexts/LanguageContext';
+import TrafficCopClient from '@/components/security/TrafficCopClient';
 
 // Font configurations
 const inter = Inter({ 
@@ -222,28 +224,33 @@ export default function RootLayout({
         </a>
         
         {/* Main app content */}
-        <AuthProvider>
-          <div id="main-content" className="min-h-screen">
-            {children}
-          </div>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <div id="main-content" className="min-h-screen">
+              {children}
+            </div>
+            <TrafficCopClient />
+          </AuthProvider>
+        </LanguageProvider>
         
-        {/* Service Worker Registration */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator && 'PushManager' in window) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                    console.log('SW registered: ', registration);
-                  }).catch(function(registrationError) {
-                    console.log('SW registration failed: ', registrationError);
+        {/* Service Worker Registration (production only) */}
+        {process.env.NODE_ENV === 'production' && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if ('serviceWorker' in navigator && 'PushManager' in window) {
+                  window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                      console.log('SW registered: ', registration);
+                    }).catch(function(registrationError) {
+                      console.log('SW registration failed: ', registrationError);
+                    });
                   });
-                });
-              }
-            `
-          }}
-        />
+                }
+              `
+            }}
+          />
+        )}
         
         {/* Performance monitoring */}
         {process.env.NODE_ENV === 'production' && (

@@ -5,6 +5,7 @@ import LanguageBannerComponent from './components/LanguageBanner';
 import LanguageSwitcher from './components/LanguageSwitcher';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://coindaily.online'),
   title: 'CoinDaily - Africa\'s Premier Crypto News',
   description: 'Real-time cryptocurrency and memecoin news for Africa. Bitcoin, Ethereum, DeFi, and Web3 coverage with market data from Binance Africa, Luno, and Quidax.',
   keywords: ['cryptocurrency', 'crypto news', 'africa', 'bitcoin', 'memecoin', 'defi', 'web3', 'luno', 'quidax'],

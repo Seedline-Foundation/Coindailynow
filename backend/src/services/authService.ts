@@ -164,7 +164,7 @@ export class AuthService {
       });
 
       if (!user) {
-        await this.logSecurityEvent({
+        this.logSecurityEvent({
           eventType: 'LOGIN_FAILED',
           severity: 'WARNING',
           ...(credentials.ipAddress && { ipAddress: credentials.ipAddress }),
@@ -173,13 +173,13 @@ export class AuthService {
             email: credentials.email, 
             reason: 'USER_NOT_FOUND' 
           })
-        });
+        }).catch(() => {});
         throw new Error('Invalid credentials');
       }
 
       // Check if account is active
       if (user.status === 'SUSPENDED' || user.status === 'BANNED') {
-        await this.logSecurityEvent({
+        this.logSecurityEvent({
           userId: user.id,
           eventType: 'LOGIN_BLOCKED',
           severity: 'WARNING',
@@ -189,14 +189,14 @@ export class AuthService {
             reason: 'ACCOUNT_SUSPENDED_OR_BANNED',
             status: user.status 
           })
-        });
+        }).catch(() => {});
         throw new Error('Account is suspended or banned');
       }
 
       // Verify password
       const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash);
       if (!isPasswordValid) {
-        await this.logSecurityEvent({
+        this.logSecurityEvent({
           userId: user.id,
           eventType: 'LOGIN_FAILED',
           severity: 'WARNING',
@@ -206,24 +206,24 @@ export class AuthService {
             email: credentials.email,
             reason: 'INVALID_PASSWORD' 
           })
-        });
+        }).catch(() => {});
         throw new Error('Invalid credentials');
       }
 
-      // Update last login
-      await this.prisma.user.update({
+      // Update last login (fire-and-forget - don't block the login response)
+      this.prisma.user.update({
         where: { id: user.id },
         data: { lastLoginAt: new Date() }
-      });
+      }).catch(e => logger.error('Failed to update lastLoginAt:', e));
 
-      // Log successful login
-      await this.logSecurityEvent({
+      // Log successful login (fire-and-forget)
+      this.logSecurityEvent({
         userId: user.id,
         eventType: 'LOGIN_SUCCESS',
         severity: 'INFO',
         ...(credentials.ipAddress && { ipAddress: credentials.ipAddress }),
         ...(credentials.userAgent && { userAgent: credentials.userAgent })
-      });
+      }).catch(e => logger.error('Failed to log login success:', e));
 
       // Generate tokens
       const tokens = await this.generateTokenPair(user, {

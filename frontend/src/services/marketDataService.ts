@@ -54,7 +54,7 @@ class MarketDataService {
   private cache = new Map<string, { data: any; expires: number }>();
 
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
   }
 
   private getCacheKey(endpoint: string, params?: any): string {

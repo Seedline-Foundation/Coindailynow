@@ -33,6 +33,7 @@ const defaultConfig: CsrfConfig = {
     '/api/auth/login',
     '/api/auth/register',
     '/api/auth/refresh',
+    '/graphql',
     '/health',
     '/metrics'
   ],

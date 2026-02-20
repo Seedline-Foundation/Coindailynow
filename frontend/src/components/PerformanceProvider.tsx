@@ -6,14 +6,18 @@ import { initializeCRO } from '@/utils/cro';
 
 export default function PerformanceProvider() {
   useEffect(() => {
+    const isLocalDev =
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
     // Initialize performance monitoring
     measurePageLoad();
     
     // Initialize conversion rate optimization
     initializeCRO();
     
-    // Preload critical resources
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+    // Preload critical resources (production only)
+    if (!isLocalDev && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then((registration) => {
         registration.active?.postMessage({
           type: 'PRELOAD_CRITICAL',
@@ -26,8 +30,21 @@ export default function PerformanceProvider() {
       });
     }
 
-    // Register service worker
-    if ('serviceWorker' in navigator) {
+    // In local development, remove stale service workers/caches to avoid chunk mismatch errors
+    if (isLocalDev && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+        .catch(() => {});
+
+      if ('caches' in window) {
+        caches.keys()
+          .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+          .catch(() => {});
+      }
+    }
+
+    // Register service worker (non-local only)
+    if (!isLocalDev && 'serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw.js').then(function(registration) {
           console.log('SW registered: ', registration);

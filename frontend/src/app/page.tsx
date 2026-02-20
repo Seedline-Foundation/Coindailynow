@@ -10,6 +10,7 @@ import {
 } from '@/components/landing';
 import MarqueeWrapper from '@/components/landing/MarqueeWrapper';
 import Footer from '@/components/footer/Footer';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock data for demonstration
 const mockTrendingTokens = [
@@ -131,10 +132,12 @@ const mockBreakingNews = [
 ];
 
 export default function Home() {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with Date/Time, Logo, Search, Auth */}
-      <Header showDateTime={true} showSocialIcons={true} />
+      <Header showDateTime={true} />
 
       {/* Marquee Ticker for Trending Tokens */}
       <MarqueeWrapper 
@@ -161,7 +164,7 @@ export default function Home() {
               {/* Featured Content Area */}
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Latest African Crypto News
+                  {t('latestAfricanCryptoNews')}
                 </h2>
                 <div className="grid gap-6">
                   {mockFeaturedNews.map((article) => (
@@ -183,7 +186,7 @@ export default function Home() {
                             {article.excerpt}
                           </p>
                           <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <span>By {article.author}</span>
+                            <span>{t('by')} {article.author}</span>
                             <span>•</span>
                             <span>{article.readTime}</span>
                           </div>
@@ -192,7 +195,7 @@ export default function Home() {
                           <div className="w-32 h-24 bg-gray-200 rounded-lg flex-shrink-0">
                             {/* Placeholder for image */}
                             <div className="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
-                              <span className="text-gray-500 text-xs">Image</span>
+                              <span className="text-gray-500 text-xs">{t('image')}</span>
                             </div>
                           </div>
                         )}
@@ -205,7 +208,7 @@ export default function Home() {
               {/* Load More Button */}
               <div className="text-center">
                 <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                  Load More Articles
+                  {t('loadMoreArticles')}
                 </button>
               </div>
             </div>

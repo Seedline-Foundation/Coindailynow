@@ -45,7 +45,7 @@ module.exports = {
     // ============================================
     {
       name: 'coindaily-news',
-      cwd: './frontend',
+      cwd: './apps/news',
       script: 'npm',
       args: 'start',
       instances: 2,

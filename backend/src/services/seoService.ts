@@ -217,7 +217,7 @@ Format as JSON.`;
         maxTokens: 1000,
       });
 
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
       const result = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
 
       // Generate llms.txt content
@@ -297,7 +297,7 @@ Return only the optimized title.`;
         maxTokens: 100,
       });
 
-      return response.content?.trim() || baseTitle;
+      return response?.trim() || baseTitle;
     } catch (error) {
       console.error('Error optimizing title:', error);
       return baseTitle;
@@ -329,7 +329,7 @@ Return as JSON array of strings.`;
         maxTokens: 300,
       });
 
-      const variants = JSON.parse(response.choices?.[0]?.message?.content || '[]');
+      const variants = JSON.parse(response || '[]');
       return {
         primary: variants[0] || this.generateDescription(content),
         variants: variants.slice(1),
@@ -367,7 +367,7 @@ Return only the JSON array.`;
         maxTokens: 200,
       });
 
-      const jsonMatch = response.content.match(/\[[\s\S]*\]/);
+      const jsonMatch = response.match(/\[[\s\S]*\]/);
       const keywords = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
       return [...new Set([...targetKeywords, ...keywords])].slice(0, 8);
     } catch (error) {

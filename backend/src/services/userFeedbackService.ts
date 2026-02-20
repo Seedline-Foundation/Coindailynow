@@ -220,7 +220,7 @@ export class UserFeedbackService {
       // Check cache
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        return JSON.parse(cached as string);
       }
 
       // Get aggregate stats
@@ -358,7 +358,7 @@ export class UserFeedbackService {
       // Check cache
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        return JSON.parse(cached as string);
       }
 
       const whereClause: any = {
@@ -506,7 +506,7 @@ export class UserFeedbackService {
       // Check cache
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        return JSON.parse(cached as string);
       }
 
       const whereClause: any = {
@@ -601,7 +601,7 @@ export class UserFeedbackService {
       // Check cache
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        return JSON.parse(cached as string);
       }
 
       // Get content quality insights

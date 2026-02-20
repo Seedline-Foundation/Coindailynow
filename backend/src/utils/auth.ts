@@ -4,8 +4,20 @@ import crypto from 'crypto';
 /**
  * JWT Secret - should be set in environment variables
  */
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+
+if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: JWT_SECRET and JWT_REFRESH_SECRET must be set in production environment');
+  }
+  console.warn('WARNING: JWT secrets not set. Using insecure defaults for development only.');
+}
+
+// Only used in development — never in production
+const DEV_SECRET = 'dev-only-secret-do-not-use-in-prod';
+const getJwtSecret = () => JWT_SECRET || DEV_SECRET;
+const getRefreshSecret = () => JWT_REFRESH_SECRET || DEV_SECRET;
 
 /**
  * Token expiration times
@@ -26,7 +38,7 @@ export function generateJWT(payload: {
 }): string {
   return jwt.sign(
     payload,
-    JWT_SECRET,
+    getJwtSecret(),
     {
       expiresIn: ACCESS_TOKEN_EXPIRY,
       issuer: 'coindaily-api',
@@ -41,7 +53,7 @@ export function generateJWT(payload: {
 export function generateRefreshToken(userId: string): string {
   return jwt.sign(
     { sub: userId, type: 'refresh' },
-    JWT_REFRESH_SECRET,
+    getRefreshSecret(),
     {
       expiresIn: REFRESH_TOKEN_EXPIRY,
       issuer: 'coindaily-api',
@@ -55,7 +67,7 @@ export function generateRefreshToken(userId: string): string {
  */
 export function verifyJWT(token: string): any {
   try {
-    return jwt.verify(token, JWT_SECRET, {
+    return jwt.verify(token, getJwtSecret(), {
       issuer: 'coindaily-api',
       audience: 'coindaily-app'
     });
@@ -69,7 +81,7 @@ export function verifyJWT(token: string): any {
  */
 export function verifyRefreshToken(token: string): any {
   try {
-    return jwt.verify(token, JWT_REFRESH_SECRET, {
+    return jwt.verify(token, getRefreshSecret(), {
       issuer: 'coindaily-api',
       audience: 'coindaily-app'
     });

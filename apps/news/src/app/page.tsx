@@ -1,4 +1,5 @@
 import { fetchArticles, fetchCategories, Article } from '@/lib/api';
+import NewsletterForm from './components/NewsletterForm';
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
@@ -160,19 +161,7 @@ export default async function HomePage() {
           <div className="bg-gradient-to-br from-primary-500/10 to-dark-900 border border-primary-500/20 rounded-xl p-5">
             <h3 className="text-sm font-semibold text-white mb-2">Stay Updated</h3>
             <p className="text-xs text-gray-400 mb-4">Get the latest African crypto news delivered to your inbox.</p>
-            <form className="space-y-2" onSubmit={(e: any) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="w-full px-3 py-2 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white placeholder-gray-500 focus:border-primary-400 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="w-full py-2 bg-primary-500 hover:bg-primary-600 text-dark-950 text-sm font-semibold rounded-lg transition-colors"
-              >
-                Subscribe
-              </button>
-            </form>
+            <NewsletterForm />
           </div>
         </aside>
       </div>

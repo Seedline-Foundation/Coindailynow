@@ -29,6 +29,8 @@ import {
   ResponseMetadata
 } from '../types/market-data';
 import { logger } from '../utils/logger';
+import { BinanceAfricaAdapter } from './exchanges/BinanceAfricaAdapter';
+import { LunoExchangeAdapter } from './exchanges/LunoExchangeAdapter';
 
 export class MarketDataAggregator extends EventEmitter implements IMarketDataAggregator {
   private prisma: PrismaClient;
@@ -182,32 +184,26 @@ export class MarketDataAggregator extends EventEmitter implements IMarketDataAgg
         return cached;
       }
 
-      // Query database with optimized indexes
-      const whereClause: any = {
-        token: { symbol },
-        ...(exchanges.length > 0 && { exchange: { in: exchanges } }),
-        ...(queryStartTime && { timestamp: { gte: queryStartTime } }),
-        ...(queryEndTime && { timestamp: { lte: queryEndTime } })
-      };
-
-      // Use raw query for better performance on large datasets
-      const historicalData = await this.prisma.$queryRaw`
-        SELECT 
-          timestamp,
-          price_usd as open,
-          high_24h as high,
-          low_24h as low,
-          price_usd as close,
-          ${includeVolume ? 'volume_24h as volume,' : ''}
-          exchange
-        FROM MarketData 
-        WHERE token_id IN (SELECT id FROM Token WHERE symbol = ${symbol})
-        ${exchanges.length > 0 ? `AND exchange IN (${exchanges.map(e => `'${e}'`).join(',')})` : ''}
-        ${queryStartTime ? `AND timestamp >= ${queryStartTime.toISOString()}` : ''}
-        ${queryEndTime ? `AND timestamp <= ${queryEndTime.toISOString()}` : ''}
-        ORDER BY timestamp DESC
-        LIMIT 1000
-      `;
+      // Use Prisma findMany for safe parameterized queries
+      const historicalData = await this.prisma.marketData.findMany({
+        where: {
+          Token: { symbol },
+          ...(exchanges.length > 0 && { exchange: { in: exchanges } }),
+          ...(queryStartTime && queryEndTime ? { timestamp: { gte: queryStartTime, lte: queryEndTime } } :
+             queryStartTime ? { timestamp: { gte: queryStartTime } } :
+             queryEndTime ? { timestamp: { lte: queryEndTime } } : {}),
+        },
+        select: {
+          timestamp: true,
+          priceUsd: true,
+          high24h: true,
+          low24h: true,
+          exchange: true,
+          ...(includeVolume && { volume24h: true }),
+        },
+        orderBy: { timestamp: 'desc' },
+        take: 1000,
+      }).catch(() => []);
 
       // Transform and cache results
       const transformedData = this.transformHistoricalData(historicalData as any[], granularity);
@@ -370,15 +366,21 @@ export class MarketDataAggregator extends EventEmitter implements IMarketDataAgg
   }
 
   private createExchangeAdapter(config: any): any {
-    // This would create specific adapters for each exchange
-    // For now, returning a placeholder
-    return {
-      name: config.integration.name,
-      fetchMarketData: async (symbols: string[]) => {
-        // Implement exchange-specific API calls
-        return [];
-      }
-    };
+    const integration = config.integration as ExchangeIntegration;
+
+    switch (integration.slug) {
+      case 'binanceAfrica':
+        return new BinanceAfricaAdapter(integration);
+      case 'luno':
+        return new LunoExchangeAdapter(integration);
+      default:
+        // Safe fallback adapter (no data) to keep service running even if misconfigured
+        return {
+          name: integration.name,
+          fetchMarketData: async () => [],
+          healthCheck: async () => integration.health,
+        };
+    }
   }
 
   private async fetchFromExchanges(symbols: string[], options: QueryOptions): Promise<MarketDataPoint[]> {

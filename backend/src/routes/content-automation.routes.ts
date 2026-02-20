@@ -5,8 +5,14 @@
 
 import { Router, Request, Response } from 'express';
 import contentAutomationService from '../services/contentAutomationService';
+import { authMiddleware } from '../middleware/auth';
+import { adminMiddleware } from '../middleware/admin';
 
 const router = Router();
+
+// All content automation routes require authentication + admin role
+router.use(authMiddleware);
+router.use(adminMiddleware);
 
 // ===== Feed Source Management =====
 

@@ -7,6 +7,7 @@
 
 import { Router, Request, Response } from 'express';
 import prisma from '../lib/prisma';
+import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 
 // Extend Request interface to include user property

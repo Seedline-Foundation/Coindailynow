@@ -165,7 +165,7 @@ export class AIMarketInsightsService {
     if (this.redis) {
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        return JSON.parse(cached as string);
       }
     }
 
@@ -258,7 +258,7 @@ export class AIMarketInsightsService {
     if (this.redis) {
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        return JSON.parse(cached as string);
       }
     }
 
@@ -336,7 +336,7 @@ export class AIMarketInsightsService {
     if (this.redis) {
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        return JSON.parse(cached as string);
       }
     }
 
@@ -392,7 +392,7 @@ export class AIMarketInsightsService {
     if (this.redis) {
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        return JSON.parse(cached as string);
       }
     }
 

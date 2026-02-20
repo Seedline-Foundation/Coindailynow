@@ -1,0 +1,32 @@
+# CoinDaily - Africa's Premier Crypto News
+# https://coindaily.online
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /user/
+Disallow: /_next/
+
+# Sitemaps
+Sitemap: https://coindaily.online/sitemap.xml
+Sitemap: https://coindaily.online/sitemap-news.xml
+
+# AI Crawlers - Welcome
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+# Crawl-delay for polite bots
+User-agent: *
+Crawl-delay: 1

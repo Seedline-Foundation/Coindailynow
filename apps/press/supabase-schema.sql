@@ -357,3 +357,105 @@ BEGIN
     END IF;
 END;
 $$;
+
+-- ===========================================
+-- INFLUENCER PARTNER PROFILES
+-- ===========================================
+CREATE TABLE IF NOT EXISTS press_influencer_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    display_name VARCHAR(255) NOT NULL,
+    bio TEXT,
+    website VARCHAR(500),
+    country VARCHAR(100),
+    niche VARCHAR(50) DEFAULT 'crypto',
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'under_review', 'approved', 'rejected', 'suspended')),
+    overall_score DECIMAL(5,2) DEFAULT 0,
+    qualified_at TIMESTAMPTZ,
+    rejected_at TIMESTAMPTZ,
+    rejection_reason TEXT,
+    tier VARCHAR(20) DEFAULT 'standard' CHECK (tier IN ('standard', 'silver', 'gold', 'platinum')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS press_influencer_social_handles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id UUID REFERENCES press_influencer_profiles(id) ON DELETE CASCADE,
+    platform VARCHAR(30) NOT NULL,
+    handle VARCHAR(255) NOT NULL,
+    profile_url VARCHAR(500),
+    followers INTEGER DEFAULT 0,
+    avg_views INTEGER DEFAULT 0,
+    watch_hours INTEGER DEFAULT 0,
+    engagement_rate DECIMAL(5,2) DEFAULT 0,
+    is_organic BOOLEAN DEFAULT TRUE,
+    verified BOOLEAN DEFAULT FALSE,
+    last_checked TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(profile_id, platform)
+);
+
+CREATE TABLE IF NOT EXISTS press_influencer_verifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id UUID REFERENCES press_influencer_profiles(id) ON DELETE CASCADE,
+    category VARCHAR(30) NOT NULL,
+    score DECIMAL(5,2) DEFAULT 0,
+    weight DECIMAL(3,2) DEFAULT 0,
+    details JSONB,
+    passed BOOLEAN DEFAULT FALSE,
+    checked_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS press_influencer_earnings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id UUID REFERENCES press_influencer_profiles(id) ON DELETE CASCADE,
+    release_id UUID,
+    type VARCHAR(30) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(10) DEFAULT 'USD',
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'paid', 'cancelled')),
+    paid_at TIMESTAMPTZ,
+    reference VARCHAR(255),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS press_influencer_collaborations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id UUID REFERENCES press_influencer_profiles(id) ON DELETE CASCADE,
+    title VARCHAR(500) NOT NULL,
+    description TEXT,
+    type VARCHAR(30) NOT NULL,
+    status VARCHAR(20) DEFAULT 'proposed' CHECK (status IN ('proposed', 'accepted', 'in_progress', 'completed', 'cancelled')),
+    budget DECIMAL(10,2),
+    deliverables JSONB,
+    deadline TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    proof_url VARCHAR(1000),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_influencer_profiles_status ON press_influencer_profiles(status);
+CREATE INDEX IF NOT EXISTS idx_influencer_profiles_tier ON press_influencer_profiles(tier);
+CREATE INDEX IF NOT EXISTS idx_influencer_handles_profile ON press_influencer_social_handles(profile_id);
+CREATE INDEX IF NOT EXISTS idx_influencer_earnings_profile ON press_influencer_earnings(profile_id);
+CREATE INDEX IF NOT EXISTS idx_influencer_earnings_status ON press_influencer_earnings(status);
+CREATE INDEX IF NOT EXISTS idx_influencer_collabs_profile ON press_influencer_collaborations(profile_id);
+CREATE INDEX IF NOT EXISTS idx_influencer_collabs_status ON press_influencer_collaborations(status);
+
+-- RLS
+ALTER TABLE press_influencer_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE press_influencer_social_handles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE press_influencer_verifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE press_influencer_earnings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE press_influencer_collaborations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own influencer profile" ON press_influencer_profiles FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own influencer profile" ON press_influencer_profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own influencer profile" ON press_influencer_profiles FOR UPDATE USING (auth.uid() = user_id);
+

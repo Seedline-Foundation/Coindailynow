@@ -70,6 +70,7 @@ export const typeDefs = `
     bio: String
     location: String
     preferredLanguage: String!
+    role: UserRole!
     subscriptionTier: SubscriptionTier!
     emailVerified: Boolean!
     phoneVerified: Boolean!
@@ -82,6 +83,15 @@ export const typeDefs = `
     articles: [Article!]!
     communityPosts: [CommunityPost!]!
     subscription: UserSubscription
+  }
+
+  enum UserRole {
+    USER
+    ADMIN
+    CONTENT_ADMIN
+    MARKETING_ADMIN
+    TECH_ADMIN
+    SUPER_ADMIN
   }
 
   enum SubscriptionTier {

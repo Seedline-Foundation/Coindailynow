@@ -48,7 +48,6 @@ const productionConfig: SecurityHeadersConfig = {
       scriptSrc: [
         "'self'",
         "'unsafe-inline'", // Required for Next.js in production
-        "'unsafe-eval'", // Required for development, remove in production
         'https://cdn.jsdelivr.net',
         'https://cdnjs.cloudflare.com',
         'https://www.googletagmanager.com',

@@ -16,10 +16,11 @@ export function RouteGuard({ children }: RouteGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const mode = getAppMode();
+  const safePathname = pathname || '/';
 
   useEffect(() => {
-    if (!isRouteEnabled(pathname)) {
-      console.warn(`Route ${pathname} is disabled in ${mode} mode`);
+    if (!isRouteEnabled(safePathname)) {
+      console.warn(`Route ${safePathname} is disabled in ${mode} mode`);
       
       // Redirect based on mode
       switch (mode) {
@@ -33,10 +34,10 @@ export function RouteGuard({ children }: RouteGuardProps) {
           router.replace('/');
       }
     }
-  }, [pathname, mode, router]);
+  }, [safePathname, mode, router]);
 
   // If route is disabled, show nothing while redirecting
-  if (!isRouteEnabled(pathname)) {
+  if (!isRouteEnabled(safePathname)) {
     return null;
   }
 

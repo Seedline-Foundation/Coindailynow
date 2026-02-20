@@ -25,7 +25,7 @@ import {
  * - Audit logging
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export default function CEOLoginPage() {
   const router = useRouter();
@@ -107,6 +107,9 @@ export default function CEOLoginPage() {
       localStorage.setItem('ceo_access_token', data.tokens.accessToken);
       localStorage.setItem('ceo_refresh_token', data.tokens.refreshToken);
       localStorage.setItem('ceo_user', JSON.stringify(data.user));
+      localStorage.setItem('admin_access_token', data.tokens.accessToken);
+      localStorage.setItem('admin_refresh_token', data.tokens.refreshToken);
+      localStorage.setItem('admin_user', JSON.stringify(data.user));
 
       // Redirect to CEO dashboard
       router.push('/admin/CEO');

@@ -566,22 +566,15 @@ export const responseTimeMiddleware = (req: Request, res: Response, next: NextFu
       logger.warn(`Slow request detected: ${req.method} ${req.path} (${responseTime}ms)`);
     }
     
-    // Add response time header
-    res.setHeader('X-Response-Time', `${responseTime}ms`);
+    // Add response time header (only if headers not yet sent)
+    if (!res.headersSent) {
+      res.setHeader('X-Response-Time', `${responseTime}ms`);
+    }
     
-    // Enforce 2-second timeout (terminate long requests)
+    // Log timeout warnings but don't try to replace the response
+    // (replacing response from inside res.end causes infinite recursion with other middleware)
     if (responseTime > 2000) {
       logger.error(`Request timeout: ${req.method} ${req.path} (${responseTime}ms)`);
-      if (!res.headersSent) {
-        res.status(408).json({
-          error: {
-            code: 'REQUEST_TIMEOUT',
-            message: 'Request took too long to process',
-            responseTime: responseTime,
-          }
-        });
-        return res;
-      }
     }
     
     return originalEnd(chunk as any, encoding as BufferEncoding, cb);

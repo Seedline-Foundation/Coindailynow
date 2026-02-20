@@ -124,7 +124,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_access_token');
     }
     router.push('/');
   };

@@ -71,7 +71,7 @@ router.get('/:id/translations', async (req: Request, res: Response) => {
       const responseTime = Date.now() - startTime;
       
       return res.json({
-        ...JSON.parse(cached),
+        ...JSON.parse(cached as string),
         cache: {
           hit: true,
           expiresAt: new Date(Date.now() + 1800000), // 30 min
@@ -231,7 +231,7 @@ router.get('/:id/translations/:lang', async (req: Request, res: Response) => {
       const responseTime = Date.now() - startTime;
       
       return res.json({
-        ...JSON.parse(cached),
+        ...JSON.parse(cached as string),
         cache: {
           hit: true,
           expiresAt: new Date(Date.now() + 3600000), // 1 hour

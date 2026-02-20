@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -9,6 +10,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
+import depthLimit from 'graphql-depth-limit';
 
 import { typeDefs } from './api/schema';
 import { resolvers } from './api/resolvers';
@@ -21,6 +23,7 @@ import {
 } from './middleware/cache';
 import { performanceMiddleware } from './middleware/performance';
 import { errorHandler } from './middleware/errorHandler';
+import { csrfProtection } from './middleware/csrf';
 import { logger } from './utils/logger';
 import { WebSocketManager } from './services/websocket/WebSocketManager';
 import { DatabaseOptimizer } from './services/databaseOptimizer';
@@ -28,6 +31,21 @@ import { AdvancedCacheStrategy } from './services/advancedCacheStrategy';
 import { optimizedResolvers } from './api/resolvers/optimizedResolvers';
 import superAdminRouter from './api/routes/super-admin';
 import contentAutomationRouter from './routes/content-automation.routes';
+import userDashboardRouter from './routes/user-dashboard.routes';
+import v1MarketRouter from './api/routes/v1Market.routes';
+import marketCompatRouter from './api/routes/marketCompat.routes';
+import v1RegulationsRouter from './api/routes/v1Regulations.routes';
+import v1TaxRouter from './api/routes/v1Tax.routes';
+import v1RemittanceRouter from './api/routes/v1Remittance.routes';
+import v1OnrampRouter from './api/routes/v1Onramp.routes';
+import v1TrafficRouter from './api/routes/v1Traffic.routes';
+import v1ReputationRouter from './api/routes/v1Reputation.routes';
+import v1BountyRouter from './api/routes/v1Bounty.routes';
+import v1PressReleaseRouter from './api/routes/v1PressRelease.routes';
+import v1InfluencerRouter from './api/routes/v1Influencer.routes';
+import { MarketDataAggregator } from './services/marketDataAggregator';
+import { ReputationService } from './services/reputation/ReputationService';
+import { AuthType, ExchangeRegion, ExchangeType, HealthStatus, ComplianceLevel } from './types/market-data';
 
 const PORT = process.env.PORT || 4000;
 const GRAPHQL_PATH = '/graphql';
@@ -47,6 +65,126 @@ export async function setupApp() {
   });
 
   const cacheStrategy = new AdvancedCacheStrategy(redis);
+
+  // Initialize Market Data Aggregator (Feature 01 foundation)
+  const marketDataAggregator = new MarketDataAggregator(prisma, redis as any, {
+    exchanges: [
+      {
+        integration: {
+          id: 'binanceAfrica',
+          name: 'Binance Africa',
+          slug: 'binanceAfrica',
+          type: ExchangeType.REGIONAL,
+          region: ExchangeRegion.AFRICA_WIDE,
+          apiEndpoint: 'https://api.binance.com',
+          websocketEndpoint: 'wss://stream.binance.com:9443',
+          supportedCountries: ['NG', 'GH', 'KE', 'ZA'],
+          supportedCurrencies: ['USD', 'NGN', 'GHS', 'KES', 'ZAR'],
+          rateLimitPerMinute: 1200,
+          isActive: true,
+          health: {
+            status: HealthStatus.HEALTHY,
+            uptime: 100,
+            avgResponseTime: 200,
+            lastCheck: new Date(),
+            consecutiveFailures: 0,
+          },
+          authentication: { type: AuthType.PUBLIC, testnet: false },
+        },
+        priority: 10,
+        timeout: 4000,
+        retryPolicy: {
+          maxRetries: 2,
+          initialDelay: 200,
+          maxDelay: 1500,
+          backoffMultiplier: 2,
+          retryableErrors: ['ETIMEDOUT', 'ECONNRESET', 'Timeout'],
+        },
+        circuitBreaker: {
+          failureThreshold: 5,
+          recoveryTimeout: 30000,
+          monitoringWindow: 60000,
+        },
+      },
+      {
+        integration: {
+          id: 'luno',
+          name: 'Luno',
+          slug: 'luno',
+          type: ExchangeType.AFRICAN,
+          region: ExchangeRegion.SOUTH_AFRICA,
+          apiEndpoint: 'https://api.luno.com/api/1',
+          websocketEndpoint: 'wss://ws.luno.com/api/1',
+          supportedCountries: ['ZA', 'NG', 'KE', 'UG', 'GH'],
+          supportedCurrencies: ['ZAR', 'NGN', 'KES', 'UGX', 'GHS', 'USD'],
+          rateLimitPerMinute: 120,
+          isActive: true,
+          health: {
+            status: HealthStatus.HEALTHY,
+            uptime: 100,
+            avgResponseTime: 250,
+            lastCheck: new Date(),
+            consecutiveFailures: 0,
+          },
+          authentication: { type: AuthType.PUBLIC, testnet: false },
+        },
+        priority: 7,
+        timeout: 4000,
+        retryPolicy: {
+          maxRetries: 2,
+          initialDelay: 250,
+          maxDelay: 2000,
+          backoffMultiplier: 2,
+          retryableErrors: ['ETIMEDOUT', 'ECONNRESET', 'Timeout'],
+        },
+        circuitBreaker: {
+          failureThreshold: 5,
+          recoveryTimeout: 30000,
+          monitoringWindow: 60000,
+        },
+      },
+    ],
+    caching: {
+      hotDataTtl: 15,
+      warmDataTtl: 60,
+      coldDataTtl: 300,
+      maxHotItems: 2000,
+      compressionEnabled: true,
+    },
+    validation: {
+      maxPriceDeviation: 25,
+      maxVolumeDeviation: 80,
+      minDataAge: 120,
+      crossExchangeValidation: true,
+      anomalyDetection: true,
+    },
+    performance: {
+      maxResponseTime: 500,
+      concurrentRequests: 6,
+      batchSize: 25,
+      memoryLimit: 256,
+      compressionThreshold: 2048,
+    },
+    africanOptimizations: {
+      prioritizeAfricanExchanges: true,
+      localCurrencySupport: ['NGN', 'GHS', 'KES', 'ZAR', 'XOF', 'XAF'],
+      mobileMoneyIntegration: true,
+      regionalFailover: true,
+      complianceMode: ComplianceLevel.PARTIAL,
+    },
+  } as any);
+
+  // Make shared services available to REST routes via app.locals
+  (app as any).locals.prisma = prisma;
+  (app as any).locals.redis = redis;
+  (app as any).locals.marketDataAggregator = marketDataAggregator;
+
+  // Initialize Reputation Service (Feature 07: On-Chain Reputation)
+  const reputationService = new ReputationService(prisma);
+  reputationService.initialize().catch((err: Error) => {
+    console.warn('[ReputationService] Initialization warning:', err.message);
+  });
+  (app as any).locals.reputationService = reputationService;
 
   // Set optimization services in context
   setOptimizationServices(dbOptimizer, cacheStrategy);
@@ -76,6 +214,7 @@ export async function setupApp() {
     'https://ai.coindaily.online',
     // Dev origins
     'http://localhost:3000',
+    'http://localhost:3001',
     'http://localhost:3002',
     'http://localhost:3003',
     'http://localhost:3004',
@@ -88,8 +227,11 @@ export async function setupApp() {
       // Allow requests with no origin (server-to-server, curl, health checks)
       if (!origin) return callback(null, true);
       if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-      // Also allow any *.coindaily.online subdomain
-      if (/^https?:\/\/([a-z0-9-]+\.)?coindaily\.online$/.test(origin)) return callback(null, true);
+      // Also allow any *.coindaily.online subdomain (HTTPS only in production)
+      const subdomainRegex = process.env.NODE_ENV === 'production'
+        ? /^https:\/\/([a-z0-9-]+\.)?coindaily\.online$/
+        : /^https?:\/\/([a-z0-9-]+\.)?coindaily\.online$/;
+      if (subdomainRegex.test(origin)) return callback(null, true);
       logger.warn(`CORS blocked origin: ${origin}`);
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     },
@@ -113,6 +255,20 @@ export async function setupApp() {
   // Rate limiting
   app.use(rateLimitMiddleware);
 
+  // CSRF protection for state-changing requests
+  // GraphQL has its own auth via Authorization header + CORS
+  app.use(csrfProtection({
+    excludedPaths: [
+      '/api/auth/login',
+      '/api/auth/register',
+      '/api/auth/refresh',
+      '/api/v1/traffic',
+      '/health',
+      '/metrics',
+      '/graphql'
+    ]
+  }));
+
   // Health check endpoint with detailed status
   app.get('/health', (req, res) => {
     res.json({
@@ -133,11 +289,52 @@ export async function setupApp() {
   // Super Admin API Routes
   app.use('/api/super-admin', superAdminRouter);
 
+  // Blueprint REST APIs (Feature 01+): /api/v1/...
+  app.use('/api/v1', v1MarketRouter);
+  app.use('/api/v1/regulations', v1RegulationsRouter);
+  app.use('/api/v1/tax', v1TaxRouter);
+  app.use('/api/v1/remittance', v1RemittanceRouter);
+  app.use('/api/v1/onramp', v1OnrampRouter);
+  app.use('/api/v1/traffic', v1TrafficRouter);
+  app.use('/api/v1/reputation', v1ReputationRouter);
+  app.use('/api/v1/bounty', v1BountyRouter);
+  app.use('/api/v1/press', v1PressReleaseRouter);
+  app.use('/api/v1/influencer', v1InfluencerRouter);
+
+  // Frontend compatibility REST endpoints: /api/market-data, /api/african-exchanges, ...
+  app.use('/api', marketCompatRouter);
+
   // Content Automation Routes
   app.use('/api/content-automation', contentAutomationRouter);
 
-  // GraphQL Server setup
-  const schema = makeExecutableSchema({ typeDefs, resolvers: optimizedResolvers });
+  // User Dashboard Routes (bookmarks, reading history, notifications, profile)
+  app.use('/api/user', userDashboardRouter);
+
+  // GraphQL Server setup with depth limiting to prevent DoS
+  // Merge all resolvers: optimized (performance) + base (auth, CMS, etc.)
+  // Use resolvers from resolvers.ts (has auth, CMS, workflows) as base,
+  // then overlay optimized versions for performance-critical queries
+  const mergedResolvers = {
+    ...resolvers,
+    Query: {
+      ...((resolvers as any).Query || {}),
+      ...((optimizedResolvers as any).Query || {}),
+    },
+    Mutation: {
+      ...((resolvers as any).Mutation || {}),
+      ...((optimizedResolvers as any).Mutation || {}),
+    },
+  };
+  const schema = makeExecutableSchema({
+    typeDefs,
+    resolvers: mergedResolvers,
+    resolverValidationOptions: {
+      requireResolversToMatchSchema: 'ignore' as any,
+    },
+  });
+
+  // Apply validation rules
+  const validationRules = [depthLimit(10)]; // Max query depth of 10
 
   // WebSocket server for subscriptions
   const wsServer = new WebSocketServer({
@@ -148,6 +345,7 @@ export async function setupApp() {
 
   const server = new ApolloServer({
     schema,
+    validationRules,
     formatError,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),

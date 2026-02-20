@@ -1,138 +1,185 @@
-/**
- * User Bookmarks Page
- * Saved articles and content
- */
-
 'use client';
 
-import React, { useState } from 'react';
-import { Star, Trash2, ExternalLink, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Star, Trash2, ExternalLink } from 'lucide-react';
+import { fetchBookmarks, removeBookmark } from '@/lib/userApi';
 
-// Mock bookmarks data
-const mockBookmarks = [
-  {
-    id: '1',
-    title: 'Bitcoin Reaches New All-Time High as African Adoption Surges',
-    excerpt: 'Bitcoin has hit a new record high of $43,250 as adoption across African countries continues to accelerate.',
-    category: 'Bitcoin',
-    savedAt: '2024-01-15T10:30:00Z',
-    slug: 'bitcoin-ath-african-adoption',
-    imageUrl: '/images/news/bitcoin.jpg',
-  },
-  {
-    id: '2',
-    title: 'M-Pesa Crypto Integration Goes Live in Kenya',
-    excerpt: 'Safaricom launches crypto buying and selling directly through M-Pesa.',
-    category: 'Mobile Money',
-    savedAt: '2024-01-14T15:45:00Z',
-    slug: 'mpesa-crypto-integration-kenya',
-    imageUrl: '/images/news/mpesa.jpg',
-  },
-  {
-    id: '3',
-    title: 'Nigerian SEC Announces New Crypto Regulations',
-    excerpt: 'New regulatory framework aims to protect investors while encouraging innovation.',
-    category: 'Regulation',
-    savedAt: '2024-01-13T08:20:00Z',
-    slug: 'nigeria-sec-crypto-regulations',
-    imageUrl: '/images/news/regulation.jpg',
-  },
-];
-
-export default function UserBookmarksPage() {
-  const [bookmarks, setBookmarks] = useState(mockBookmarks);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const filteredBookmarks = bookmarks.filter(bookmark =>
-    bookmark.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    bookmark.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const removeBookmark = (id: string) => {
-    setBookmarks(bookmarks.filter(b => b.id !== id));
+interface Bookmark {
+  id: string;
+  articleId: string;
+  createdAt: string;
+  article: {
+    id: string;
+    title: string;
+    slug: string;
+    excerpt: string;
+    featuredImageUrl: string | null;
+    publishedAt: string | null;
+    readingTimeMinutes: number;
+    viewCount: number;
+    Category: { id: string; name: string; slug: string } | null;
+    User: { id: string; username: string; displayName: string | null; avatarUrl: string | null } | null;
   };
+}
+
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export default function BookmarksPage() {
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [removing, setRemoving] = useState<string | null>(null);
+
+  async function load(p: number) {
+    setLoading(true);
+    try {
+      const res = await fetchBookmarks(p);
+      setBookmarks(res.data);
+      setPagination(res.pagination);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    load(page);
+  }, [page]);
+
+  async function handleRemove(articleId: string) {
+    setRemoving(articleId);
+    try {
+      await removeBookmark(articleId);
+      setBookmarks((prev) => prev.filter((b) => b.articleId !== articleId));
+    } catch (err: any) {
+      alert('Failed to remove bookmark: ' + err.message);
+    } finally {
+      setRemoving(null);
+    }
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-display font-bold text-white">Bookmarks</h1>
-          <p className="text-dark-400 mt-1">{bookmarks.length} saved articles</p>
+          <p className="text-dark-400 mt-1">Articles you&apos;ve saved for later</p>
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
-          <input
-            type="text"
-            placeholder="Search bookmarks..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-4 py-2 bg-dark-800 border border-dark-700 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 w-full sm:w-64"
-          />
-        </div>
+        {pagination && (
+          <span className="text-sm text-dark-400">{pagination.total} saved</span>
+        )}
       </div>
 
-      {filteredBookmarks.length > 0 ? (
+      {loading ? (
         <div className="space-y-4">
-          {filteredBookmarks.map((bookmark) => (
-            <div
-              key={bookmark.id}
-              className="bg-dark-900 border border-dark-700 rounded-xl p-4 flex gap-4 hover:border-dark-600 transition-colors"
-            >
-              <div className="w-24 h-24 rounded-lg bg-dark-800 flex-shrink-0 overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-br from-primary-500/20 to-primary-600/20 flex items-center justify-center">
-                  <Star className="w-8 h-8 text-primary-500/50" />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <span className="inline-block px-2 py-0.5 bg-primary-500/10 text-primary-500 text-xs rounded-full mb-2">
-                      {bookmark.category}
-                    </span>
-                    <h3 className="text-lg font-semibold text-white line-clamp-1">
-                      <Link href={`/news/${bookmark.slug}`} className="hover:text-primary-500">
-                        {bookmark.title}
-                      </Link>
-                    </h3>
-                    <p className="text-dark-400 text-sm line-clamp-2 mt-1">{bookmark.excerpt}</p>
-                    <p className="text-dark-500 text-xs mt-2">
-                      Saved on {new Date(bookmark.savedAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/news/${bookmark.slug}`}
-                      className="p-2 text-dark-400 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </Link>
-                    <button
-                      onClick={() => removeBookmark(bookmark.id)}
-                      className="p-2 text-dark-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-28 bg-dark-800 rounded-xl animate-pulse" />
           ))}
         </div>
-      ) : (
+      ) : error ? (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
+          <p className="text-red-400">{error}</p>
+        </div>
+      ) : bookmarks.length === 0 ? (
         <div className="bg-dark-900 border border-dark-700 rounded-xl p-12 text-center">
-          <Star className="w-12 h-12 text-dark-600 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">No bookmarks found</h3>
-          <p className="text-dark-400 mb-4">
-            {searchQuery ? 'Try a different search term.' : 'Start saving articles you want to read later.'}
-          </p>
-          <Link
-            href="/news"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-dark-950 font-semibold rounded-lg transition-colors"
-          >
-            Browse News
+          <Star className="w-10 h-10 text-dark-600 mx-auto mb-4" />
+          <p className="text-dark-400 mb-3">No bookmarks yet</p>
+          <Link href="/" className="text-sm text-primary-500 hover:text-primary-400">
+            Browse articles to bookmark &rarr;
           </Link>
         </div>
+      ) : (
+        <>
+          <div className="space-y-4">
+            {bookmarks.map((bm) => (
+              <div
+                key={bm.id}
+                className="flex gap-4 bg-dark-900 border border-dark-700 rounded-xl p-4 hover:border-primary-500/20 transition-colors"
+              >
+                {/* Thumbnail */}
+                <Link href={`/news/${bm.article.slug}`} className="shrink-0">
+                  {bm.article.featuredImageUrl ? (
+                    <img
+                      src={bm.article.featuredImageUrl}
+                      alt={bm.article.title}
+                      className="w-24 h-24 object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 bg-dark-800 rounded-lg flex items-center justify-center">
+                      <Star className="w-6 h-6 text-dark-600" />
+                    </div>
+                  )}
+                </Link>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <Link href={`/news/${bm.article.slug}`}>
+                    <h3 className="text-sm font-semibold text-white line-clamp-2 hover:text-primary-400 transition-colors">
+                      {bm.article.title}
+                    </h3>
+                  </Link>
+                  <p className="text-xs text-dark-400 line-clamp-2 mt-1">{bm.article.excerpt}</p>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-dark-500">
+                    {bm.article.Category && (
+                      <span className="px-2 py-0.5 bg-primary-500/10 text-primary-400 rounded-full">
+                        {bm.article.Category.name}
+                      </span>
+                    )}
+                    <span>{bm.article.readingTimeMinutes} min read</span>
+                    <span>Saved {new Date(bm.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                {/* Remove Button */}
+                <button
+                  onClick={() => handleRemove(bm.articleId)}
+                  disabled={removing === bm.articleId}
+                  className="shrink-0 self-start p-2 rounded-lg text-dark-400 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                  title="Remove bookmark"
+                >
+                  {removing === bm.articleId ? (
+                    <div className="w-4 h-4 border-2 border-dark-500 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-4">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="px-3 py-1.5 text-sm rounded-lg bg-dark-800 text-dark-300 hover:text-white disabled:opacity-40 transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-sm text-dark-400">
+                Page {page} of {pagination.totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+                disabled={page >= pagination.totalPages}
+                className="px-3 py-1.5 text-sm rounded-lg bg-dark-800 text-dark-300 hover:text-white disabled:opacity-40 transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -115,6 +115,8 @@ model Article {
   KnowledgeBase      KnowledgeBase?
   UserFeedback       UserFeedback[]
   ContentRevisions   ContentRevision[]
+  UserBookmarks      UserBookmark[]
+  ReadingHistories   ReadingHistory[]
 
   @@index([slug])
   @@index([isPremium])
@@ -786,7 +788,7 @@ model Token {
 
 enum UserRole {
   USER
-  ADMIN             // Platform managers
+  ADMIN // Platform managers
   CONTENT_ADMIN
   MARKETING_ADMIN
   TECH_ADMIN
@@ -794,27 +796,27 @@ enum UserRole {
 }
 
 model User {
-  id                           String                   @id
-  email                        String                   @unique
-  username                     String                   @unique
+  id                           String                     @id
+  email                        String                     @unique
+  username                     String                     @unique
   passwordHash                 String
-  role                         UserRole                 @default(USER)
+  role                         UserRole                   @default(USER)
   firstName                    String?
   lastName                     String?
   avatarUrl                    String?
   bio                          String?
   location                     String?
-  preferredLanguage            String                   @default("en")
-  subscriptionTier             String                   @default("FREE")
-  emailVerified                Boolean                  @default(false)
-  phoneVerified                Boolean                  @default(false)
-  twoFactorEnabled             Boolean                  @default(false)
+  preferredLanguage            String                     @default("en")
+  subscriptionTier             String                     @default("FREE")
+  emailVerified                Boolean                    @default(false)
+  phoneVerified                Boolean                    @default(false)
+  twoFactorEnabled             Boolean                    @default(false)
   twoFactorSecret              String?
-  createdAt                    DateTime                 @default(now())
-  updatedAt                    DateTime                 @updatedAt
+  createdAt                    DateTime                   @default(now())
+  updatedAt                    DateTime                   @updatedAt
   lastLoginAt                  DateTime?
-  status                       String                   @default("ACTIVE")
-  isShadowBanned               Boolean                  @default(false)
+  status                       String                     @default("ACTIVE")
+  isShadowBanned               Boolean                    @default(false)
   AnalyticsEvent               AnalyticsEvent[]
   Article                      Article[]
   ArticleTranslation           ArticleTranslation[]
@@ -835,26 +837,39 @@ model User {
   WorkflowStep                 WorkflowStep[]
   AdminPermission              AdminPermission[]
   AuditLog                     AuditLog[]
-  ApprovedAutomatedArticles    AutomatedArticle[]       @relation("AutomatedArticleApprover")
+  ApprovedAutomatedArticles    AutomatedArticle[]         @relation("AutomatedArticleApprover")
   APIKey                       APIKey[]
   UserFeedback                 UserFeedback[]
   ViolationReport              ViolationReport[]
   UserPenalty                  UserPenalty[]
-  AppliedPenalties             UserPenalty[]            @relation("AppliedPenalties")
+  AppliedPenalties             UserPenalty[]              @relation("AppliedPenalties")
   UserReputation               UserReputation?
   FalsePositive                FalsePositive[]
   AIAIOperationLog             AIOperationLog[]
   ComplianceReport             ComplianceReport[]
   UserConsent                  UserConsent[]
-  DelegatedPermissionsReceived DelegatedPermission[]    @relation("DelegatedPermissionsReceived")
-  DelegatedPermissionsGranted  DelegatedPermission[]    @relation("DelegatedPermissionsGranted")
+  DelegatedPermissionsReceived DelegatedPermission[]      @relation("DelegatedPermissionsReceived")
+  DelegatedPermissionsGranted  DelegatedPermission[]      @relation("DelegatedPermissionsGranted")
   Wallets                      Wallet[]
   ContentRevisions             ContentRevision[]
   SecurityLogs                 SecurityLog[]
   FraudAlerts                  FraudAlert[] // Fraud detection alerts
   WithdrawalRequests           WithdrawalRequest[] // Withdrawal requests
   WhitelistChanges             WhitelistChange[] // Whitelist change history
-  AdminActions                 AdminAction[]            @relation("AdminActionsPerformed")
+  AdminActions                 AdminAction[]              @relation("AdminActionsPerformed")
+  UserBookmarks                UserBookmark[]
+  ReadingHistories             ReadingHistory[]
+  UserNotifications            UserNotification[]
+  MerchantReputations          MerchantReputation[]
+  RegulatorySubmissions        RegulatorySubmission[]
+  RegulatorySubscriptions      RegulatorySubscription[]
+  RemittanceProviderReviews    RemittanceProviderReview[]
+  TaxTransactions              TaxTransaction[]
+  TaxReports                   TaxReport[]
+  PressReleases                PressRelease[]
+  BountyClaims                 BountyClaim[]
+  BountySubmissions            BountySubmission[]
+  InfluencerPartnerProfile     InfluencerPartnerProfile?
 
   @@index([lastLoginAt])
   @@index([emailVerified])
@@ -4241,8 +4256,18 @@ model APIKey {
   expiresAt        DateTime?
   lastUsedAt       DateTime?
   totalRequests    Int       @default(0)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+
+  // Institutional billing fields (Bloomberg of Crypto)
+  monthlyLimit      Int       @default(0) // 0 = unlimited per tier; basic=3000, premium=300000, enterprise=unlimited
+  usageCount        Int       @default(0) // rolling month usage
+  billingCycleStart DateTime? // start of current billing cycle
+  clientName        String? // institutional client name
+  clientEmail       String? // billing contact
+  amountPaid        Decimal?  @db.Decimal(10, 2)
+  invoiceUrl        String? // link to last invoice PDF
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   User        User?         @relation(fields: [userId], references: [id])
   APIUsage    APIUsage[]
@@ -7289,16 +7314,16 @@ model ModerationQueue {
   authorRole String // from UserRole enum
 
   // Moderation details
-  status         String   @default("PENDING") // pending, in_review, approved, rejected
-  priority       Int      @default(1) // 1-5, 5 being highest
-  flagReason     String? // reason for flagging
-  assignedTo     String? // moderator user ID
-  assignedAt     DateTime?
-  reviewedBy     String? // moderator user ID
-  reviewedAt     DateTime?
-  reviewNotes    String?
-  autoFlagged    Boolean  @default(false)
-  aiConfidence   Float? // 0-1, confidence score from AI
+  status       String    @default("PENDING") // pending, in_review, approved, rejected
+  priority     Int       @default(1) // 1-5, 5 being highest
+  flagReason   String? // reason for flagging
+  assignedTo   String? // moderator user ID
+  assignedAt   DateTime?
+  reviewedBy   String? // moderator user ID
+  reviewedAt   DateTime?
+  reviewNotes  String?
+  autoFlagged  Boolean   @default(false)
+  aiConfidence Float? // 0-1, confidence score from AI
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -7327,7 +7352,7 @@ model AdminAction {
   previousState String? // JSON: state before action
   newState      String? // JSON: state after action
   reason        String?
-  
+
   // Timestamps
   createdAt DateTime @default(now())
 
@@ -7970,13 +7995,13 @@ model Wallet {
   lastTransactionAt DateTime?
 
   // Relations
-  user             User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactionsFrom WalletTransaction[] @relation("TransactionsFrom")
-  transactionsTo   WalletTransaction[] @relation("TransactionsTo")
-  whitelists       WalletWhitelist[] // Whitelisted addresses
-  fraudAlerts      FraudAlert[] // Fraud detection alerts
+  user               User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactionsFrom   WalletTransaction[] @relation("TransactionsFrom")
+  transactionsTo     WalletTransaction[] @relation("TransactionsTo")
+  whitelists         WalletWhitelist[] // Whitelisted addresses
+  fraudAlerts        FraudAlert[] // Fraud detection alerts
   withdrawalRequests WithdrawalRequest[] // Withdrawal requests
-  whitelistChanges WhitelistChange[] // Whitelist change history
+  whitelistChanges   WhitelistChange[] // Whitelist change history
 
   @@index([userId])
   @@index([walletType])
@@ -8059,8 +8084,8 @@ model WalletTransaction {
   updatedAt   DateTime  @updatedAt
 
   // Relations
-  fromWallet Wallet? @relation("TransactionsFrom", fields: [fromWalletId], references: [id])
-  toWallet   Wallet? @relation("TransactionsTo", fields: [toWalletId], references: [id])
+  fromWallet        Wallet?            @relation("TransactionsFrom", fields: [fromWalletId], references: [id])
+  toWallet          Wallet?            @relation("TransactionsTo", fields: [toWalletId], references: [id])
   withdrawalRequest WithdrawalRequest? // Link to withdrawal request if applicable
 
   @@index([transactionHash])
@@ -8689,21 +8714,21 @@ model SecurityLog {
 // ============================================================================
 
 model FraudAlert {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   walletId    String
   userId      String
-  alertType   String   // UNUSUAL_WITHDRAWAL_AMOUNT, RAPID_TRANSACTIONS, NEW_WALLET_WITHDRAWAL, etc.
-  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
-  fraudScore  Float    // 0-100 risk score
+  alertType   String // UNUSUAL_WITHDRAWAL_AMOUNT, RAPID_TRANSACTIONS, NEW_WALLET_WITHDRAWAL, etc.
+  severity    String // LOW, MEDIUM, HIGH, CRITICAL
+  fraudScore  Float // 0-100 risk score
   description String
-  evidence    String   // JSON - Detailed evidence (transaction IDs, IPs, amounts, timestamps, etc.)
-  autoFrozen  Boolean  @default(false) // Was wallet auto-frozen due to this alert
-  resolved    Boolean  @default(false) // Has admin reviewed and resolved this alert
-  resolvedBy  String?  // Admin user ID who resolved the alert
+  evidence    String // JSON - Detailed evidence (transaction IDs, IPs, amounts, timestamps, etc.)
+  autoFrozen  Boolean   @default(false) // Was wallet auto-frozen due to this alert
+  resolved    Boolean   @default(false) // Has admin reviewed and resolved this alert
+  resolvedBy  String? // Admin user ID who resolved the alert
   resolvedAt  DateTime?
-  resolution  String?  // Admin notes on resolution
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  resolution  String? // Admin notes on resolution
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   // Relations
   wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
@@ -8718,23 +8743,23 @@ model FraudAlert {
 }
 
 model WithdrawalRequest {
-  id                 String    @id @default(cuid())
+  id                 String   @id @default(cuid())
   walletId           String
   userId             String
   amount             Float
-  currency           String    @default("JY") // JY token
-  destinationAddress String    // Whitelisted wallet address
-  status             String    @default("PENDING") // PENDING, APPROVED, REJECTED, PROCESSED, CANCELLED
-  requestedAt        DateTime  @default(now())
+  currency           String   @default("JY") // JY token
+  destinationAddress String // Whitelisted wallet address
+  status             String   @default("PENDING") // PENDING, APPROVED, REJECTED, PROCESSED, CANCELLED
+  requestedAt        DateTime @default(now())
 
   // Admin approval
-  reviewedBy  String? // Admin user ID
-  reviewedAt  DateTime?
-  adminNotes  String? // Admin notes on approval/rejection
+  reviewedBy String? // Admin user ID
+  reviewedAt DateTime?
+  adminNotes String? // Admin notes on approval/rejection
 
   // Processing
   processedAt     DateTime?
-  transactionId   String?  @unique // WalletTransaction ID after processing
+  transactionId   String?   @unique // WalletTransaction ID after processing
   transactionHash String? // Blockchain transaction hash (if applicable)
 
   // Cooldown tracking
@@ -8763,10 +8788,10 @@ model WithdrawalRequest {
 }
 
 model WhitelistChange {
-  id       String @id @default(cuid())
-  userId   String
-  walletId String
-  address  String // Wallet address being whitelisted/removed
+  id        String  @id @default(cuid())
+  userId    String
+  walletId  String
+  address   String // Wallet address being whitelisted/removed
   operation String // ADD or REMOVE
   reason    String? // Optional reason for the change
 
@@ -8795,4 +8820,735 @@ model WhitelistChange {
   @@index([walletId, operation])
   @@index([operation, createdAt])
   @@map("whitelist_changes")
+}
+
+// ============================================================================
+// USER DASHBOARD MODELS — Bookmarks, Reading History, Notifications
+// ============================================================================
+
+model UserBookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, articleId])
+  @@index([userId, createdAt])
+  @@index([articleId])
+}
+
+model ReadingHistory {
+  id              String   @id @default(cuid())
+  userId          String
+  articleId       String
+  readAt          DateTime @default(now())
+  readDurationSec Int?
+  scrollPercent   Float?
+  completed       Boolean  @default(false)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, articleId])
+  @@index([userId, readAt])
+  @@index([articleId])
+}
+
+model UserNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String // ARTICLE_PUBLISHED, PRICE_ALERT, SYSTEM, REWARD, etc.
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt])
+  @@index([userId, createdAt])
+}
+
+// ============================================================================
+// FEATURE 03: PAN-AFRICAN CRYPTO REGULATORY PASSPORT
+// ============================================================================
+
+model RegulatoryCountry {
+  id      String  @id @default(cuid())
+  name    String
+  code    String  @unique @db.Char(2)
+  capital String?
+  region  String?
+
+  statuses      RegulatoryStatus[]
+  events        RegulatoryEvent[]
+  requirements  LicensingRequirement[]
+  submissions   RegulatorySubmission[]
+  subscriptions RegulatorySubscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([region])
+  @@map("countries")
+}
+
+model RegulatoryStatus {
+  id                String    @id @default(cuid())
+  countryCode       String    @db.Char(2)
+  status            String // friendly, restricted, hostile, uncertain, regulated, evolving, cautious
+  cryptoLegal       Boolean?
+  exchangesLegal    Boolean?
+  licensingRequired Boolean?
+  taxRegime         String?
+  lastUpdated       DateTime?
+  sourceUrl         String?
+  notes             String?
+
+  country RegulatoryCountry @relation(fields: [countryCode], references: [code], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([countryCode, lastUpdated])
+  @@index([status])
+  @@map("regulatory_status")
+}
+
+model LicensingRequirement {
+  id                 String   @id @default(cuid())
+  countryCode        String   @db.Char(2)
+  licenseType        String
+  authority          String?
+  minCapital         Decimal? @db.Decimal(20, 2)
+  capitalCurrency    String?
+  processingTimeDays Int?
+  fees               Decimal? @db.Decimal(20, 2)
+  requirements       Json?
+
+  country RegulatoryCountry @relation(fields: [countryCode], references: [code], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([countryCode, licenseType])
+  @@map("licensing_requirements")
+}
+
+model RegulatoryEvent {
+  id          String   @id @default(cuid())
+  countryCode String   @db.Char(2)
+  eventDate   DateTime
+  eventType   String
+  title       String
+  description String?
+  impactScore Int?
+
+  country RegulatoryCountry @relation(fields: [countryCode], references: [code], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([countryCode, eventDate])
+  @@index([eventType])
+  @@map("regulatory_events")
+}
+
+model RegulatorySubmission {
+  id            String    @id @default(cuid())
+  countryCode   String    @db.Char(2)
+  userId        String?
+  title         String
+  details       String
+  sourceUrl     String?
+  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  reviewerNotes String?
+
+  country RegulatoryCountry @relation(fields: [countryCode], references: [code], onDelete: Cascade)
+  user    User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([countryCode, status, createdAt])
+  @@map("regulatory_submissions")
+}
+
+model RegulatorySubscription {
+  id             String    @id @default(cuid())
+  countryCode    String    @db.Char(2)
+  userId         String?
+  channel        String // EMAIL, TELEGRAM, WHATSAPP, PUSH
+  destination    String // email address, telegram chat id, etc
+  severity       String    @default("ALL") // ALL, HIGH, MEDIUM, LOW
+  languageCode   String    @default("en")
+  isActive       Boolean   @default(true)
+  lastNotifiedAt DateTime?
+
+  country RegulatoryCountry @relation(fields: [countryCode], references: [code], onDelete: Cascade)
+  user    User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([countryCode, isActive])
+  @@index([destination])
+  @@map("regulatory_subscriptions")
+}
+
+// ============================================================================
+// FEATURE 04: STABLECOIN CORRIDORS & REMITTANCE TOOLS
+// ============================================================================
+
+model RemittanceCorridor {
+  id                  String   @id @default(cuid())
+  sourceCountry       String?  @db.Char(2)
+  sourceCurrency      String
+  destinationCountry  String?  @db.Char(2)
+  destinationCurrency String
+  popularRoute        Boolean  @default(false)
+  estimatedVolume     Decimal? @db.Decimal(20, 2)
+
+  rates     RemittanceProviderRate[]
+  createdAt DateTime                 @default(now())
+  updatedAt DateTime                 @updatedAt
+
+  @@index([sourceCurrency, destinationCurrency])
+  @@map("corridors")
+}
+
+model RemittanceProviderRate {
+  id             String   @id @default(cuid())
+  corridorId     String
+  providerName   String
+  rateType       String
+  buyRate        Decimal? @db.Decimal(20, 8)
+  sellRate       Decimal? @db.Decimal(20, 8)
+  feePercentage  Decimal? @db.Decimal(10, 4)
+  feeFixed       Decimal? @db.Decimal(20, 8)
+  processingTime String?
+  limitsMin      Decimal? @db.Decimal(20, 8)
+  limitsMax      Decimal? @db.Decimal(20, 8)
+  updatedAt      DateTime @default(now())
+
+  corridor RemittanceCorridor @relation(fields: [corridorId], references: [id], onDelete: Cascade)
+
+  @@index([providerName, updatedAt])
+  @@index([corridorId, updatedAt])
+  @@map("provider_rates")
+}
+
+model RemittanceProviderReview {
+  id                    String    @id @default(cuid())
+  providerName          String
+  userId                String?
+  rating                Int
+  reviewText            String?
+  transactionSuccessful Boolean?
+  completedAt           DateTime?
+  createdAt             DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([providerName, createdAt])
+  @@map("provider_reviews")
+}
+
+// ============================================================================
+// FEATURE 08: FIAT-TO-STABLECOIN ON-RAMP AGGREGATOR
+// ============================================================================
+
+model OnRampProvider {
+  id         String   @id @default(cuid())
+  name       String
+  slug       String   @unique
+  type       String
+  countries  String // JSON array
+  assets     String // JSON array
+  isActive   Boolean  @default(true)
+  trustScore Int? // 0-100
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  quotes OnRampQuote[]
+
+  @@index([isActive])
+  @@map("onramp_providers")
+}
+
+model OnRampQuote {
+  id            String   @id @default(cuid())
+  providerId    String
+  fiatCurrency  String
+  fiatAmount    Decimal  @db.Decimal(20, 8)
+  asset         String
+  assetAmount   Decimal  @db.Decimal(20, 8)
+  feeAmount     Decimal? @db.Decimal(20, 8)
+  feePercent    Decimal? @db.Decimal(10, 4)
+  settlementEta String?
+  paymentMethod String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  provider OnRampProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([fiatCurrency, asset, createdAt])
+  @@map("onramp_quotes")
+}
+
+// ============================================================================
+// FEATURE 09: LOCALIZED TAX & COMPLIANCE CALCULATOR
+// ============================================================================
+
+model TaxRule {
+  id            String   @id @default(cuid())
+  countryCode   String   @db.Char(2)
+  taxYear       Int
+  taxRate       Decimal  @db.Decimal(5, 4)
+  incomeTaxRate Decimal? @db.Decimal(5, 4)
+  threshold     Decimal? @db.Decimal(20, 2)
+  costBasis     String   @default("FIFO")
+  rules         Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([countryCode, taxYear])
+  @@index([countryCode, taxYear])
+  @@map("tax_rules")
+}
+
+model TaxTransaction {
+  id          String   @id @default(cuid())
+  userId      String?
+  countryCode String   @db.Char(2)
+  taxYear     Int
+  txType      String // BUY, SELL, TRANSFER, STAKING_REWARD, MINING, AIRDROP, FEE
+  asset       String
+  quantity    Decimal  @db.Decimal(20, 8)
+  priceUsd    Decimal? @db.Decimal(20, 8)
+  feeUsd      Decimal? @db.Decimal(20, 8)
+  timestamp   DateTime
+  source      String? // binance, luno, csv, manual
+  raw         Json?
+  createdAt   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, countryCode, taxYear])
+  @@index([countryCode, taxYear])
+  @@map("tax_transactions")
+}
+
+model TaxReport {
+  id          String   @id @default(cuid())
+  userId      String?
+  countryCode String   @db.Char(2)
+  taxYear     Int
+  costBasis   String   @default("FIFO")
+  totalGains  Decimal  @db.Decimal(20, 2)
+  totalIncome Decimal  @db.Decimal(20, 2)
+  taxDue      Decimal  @db.Decimal(20, 2)
+  currency    String   @default("USD")
+  reportJson  Json
+  createdAt   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, countryCode, taxYear])
+  @@map("tax_reports")
+}
+
+// ============================================================================
+// Feature 07: On-Chain Reputation & Merchant Scoring System
+// ============================================================================
+
+model MerchantReputation {
+  id                     String    @id @default(cuid())
+  walletAddress          String    @unique
+  userId                 String?
+  totalTransactions      Int       @default(0)
+  successfulTransactions Int       @default(0)
+  volumeUsd              Decimal   @default(0) @db.Decimal(20, 2)
+  disputeCount           Int       @default(0)
+  settlementScore        Int       @default(100) // 0-100 percentage
+  zkVerified             Boolean   @default(false)
+  firstTxAt              DateTime  @default(now())
+  lastTxAt               DateTime?
+
+  // On-chain token ID (from ReputationSBT contract)
+  tokenId String?
+
+  user   User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  badges MerchantBadge[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([walletAddress])
+  @@index([userId])
+  @@index([volumeUsd])
+  @@map("merchant_reputations")
+}
+
+model MerchantBadge {
+  id           String   @id @default(cuid())
+  reputationId String
+  badgeType    String // VERIFIED_MERCHANT, ECO_EARLY_ADOPTER, FAST_SETTLER, HIGH_VOLUME_TRADER, DISPUTE_FREE
+  awardedAt    DateTime @default(now())
+  txHash       String? // On-chain transaction hash
+
+  reputation MerchantReputation @relation(fields: [reputationId], references: [id], onDelete: Cascade)
+
+  @@unique([reputationId, badgeType])
+  @@index([reputationId])
+  @@index([badgeType])
+  @@map("merchant_badges")
+}
+
+// =============================================
+// Bloomberg of Crypto — Data Models
+// =============================================
+
+model PriceTick {
+  id        String   @id @default(cuid())
+  symbol    String // e.g. BTC/USDT
+  exchange  String // e.g. binance_africa, luno, quidax
+  open      Decimal  @db.Decimal(20, 8)
+  high      Decimal  @db.Decimal(20, 8)
+  low       Decimal  @db.Decimal(20, 8)
+  close     Decimal  @db.Decimal(20, 8)
+  volume    Decimal  @db.Decimal(20, 8)
+  interval  String   @default("1m") // 1m, 5m, 15m, 1h, 4h, 1d
+  timestamp DateTime
+
+  createdAt DateTime @default(now())
+
+  @@unique([symbol, exchange, interval, timestamp])
+  @@index([symbol, exchange])
+  @@index([timestamp])
+  @@index([interval])
+  @@map("price_ticks")
+}
+
+model FiatStablecoinPair {
+  id             String   @id @default(cuid())
+  fiatCurrency   String // NGN, KES, ZAR, GHS, UGX
+  stablecoin     String // USDT, USDC, BUSD, DAI
+  exchange       String // binance_p2p, luno, quidax
+  buyPrice       Decimal  @db.Decimal(20, 4) // local buy price
+  sellPrice      Decimal  @db.Decimal(20, 4) // local sell price
+  midPrice       Decimal  @db.Decimal(20, 4)
+  globalMidPrice Decimal  @db.Decimal(20, 4) // global reference
+  premiumPct     Decimal  @db.Decimal(8, 4) // (local-mid)/mid * 100
+  spreadPct      Decimal  @db.Decimal(8, 4) // (sell-buy)/mid * 100
+  volume24h      Decimal? @db.Decimal(20, 2)
+  sampleSize     Int? // number of P2P ads sampled
+  snapshot       DateTime // when this snapshot was captured
+
+  createdAt DateTime @default(now())
+
+  @@unique([fiatCurrency, stablecoin, exchange, snapshot])
+  @@index([fiatCurrency, stablecoin])
+  @@index([snapshot])
+  @@index([premiumPct])
+  @@map("fiat_stablecoin_pairs")
+}
+
+// =============================================
+// Bitwire-Style Press Release Distribution
+// =============================================
+
+model PressRelease {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  slug        String    @unique
+  summary     String    @db.Text
+  body        String    @db.Text // Markdown or HTML
+  status      String    @default("draft") // draft, pending_review, approved, published, rejected
+  packageId   String?
+  category    String    @default("general") // general, defi, nft, exchange, memecoin, regulation
+  region      String? // africa, nigeria, kenya, south_africa, global
+  tags        String? // JSON array of tags
+  boostLevel  String    @default("standard") // standard, featured, premium
+  publishedAt DateTime?
+  expiresAt   DateTime?
+
+  // Payment
+  paymentStatus String   @default("unpaid") // unpaid, pending, paid, refunded
+  paymentRef    String? // payment reference / tx hash
+  amountPaid    Decimal? @db.Decimal(10, 2)
+
+  user    User                   @relation(fields: [userId], references: [id])
+  package DistributionPackage?   @relation(fields: [packageId], references: [id])
+  assets  ReleaseAsset[]
+  logs    PressDistributionLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([category, region])
+  @@map("press_releases")
+}
+
+model DistributionPackage {
+  id          String  @id @default(cuid())
+  name        String // Starter, Professional, Enterprise
+  slug        String  @unique
+  description String?
+  price       Decimal @db.Decimal(10, 2) // 199, 499, 999
+  currency    String  @default("USD")
+  siteCount   Int // number of sites included: 50, 200, 500+
+  features    String // JSON: { analytics: true, seo: true, social: true, ... }
+  turnaround  String  @default("24h") // 24h, 12h, 6h
+  isActive    Boolean @default(true)
+
+  releases PressRelease[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("distribution_packages")
+}
+
+model ReleaseAsset {
+  id        String  @id @default(cuid())
+  releaseId String
+  type      String // logo, image, attachment, banner
+  url       String
+  filename  String
+  mimeType  String?
+  sizeBytes Int?
+
+  release PressRelease @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([releaseId])
+  @@map("release_assets")
+}
+
+model PressDistributionLog {
+  id          String    @id @default(cuid())
+  releaseId   String
+  siteName    String // site that published
+  siteUrl     String
+  backlinkUrl String? // URL of published article
+  status      String    @default("pending") // pending, submitted, published, failed, removed
+  submittedAt DateTime?
+  publishedAt DateTime?
+  failReason  String?
+
+  release PressRelease @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([releaseId])
+  @@index([status])
+  @@map("press_distribution_logs")
+}
+
+// =============================================
+// Influencer Partner System
+// =============================================
+
+model InfluencerPartnerProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  displayName     String
+  bio             String?   @db.Text
+  website         String?
+  country         String? // primary operating country
+  niche           String? // crypto, defi, nft, memecoin, finance, tech
+  status          String    @default("pending") // pending, under_review, approved, rejected, suspended
+  overallScore    Decimal?  @db.Decimal(5, 2) // 0-100, must be >= 60 to qualify
+  qualifiedAt     DateTime?
+  rejectedAt      DateTime?
+  rejectionReason String?
+  tier            String    @default("standard") // standard, silver, gold, platinum (based on performance)
+
+  user           User                             @relation(fields: [userId], references: [id])
+  socialHandles  InfluencerSocialHandle[]
+  verifications  InfluencerVerification[]
+  earnings       InfluencerEarning[]
+  collaborations InfluencerPartnerCollaboration[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([overallScore])
+  @@index([tier])
+  @@map("influencer_partner_profiles")
+}
+
+model InfluencerSocialHandle {
+  id             String    @id @default(cuid())
+  profileId      String
+  platform       String // twitter, youtube, tiktok, instagram, telegram, facebook
+  handle         String // @username or channel URL
+  profileUrl     String
+  followers      Int       @default(0) // must be > 20,000
+  avgViews       Int       @default(0) // must be > 100,000 for video platforms
+  watchHours     Int       @default(0) // must be > 5,000 for YouTube
+  engagementRate Decimal   @default(0) @db.Decimal(5, 2) // percentage
+  isOrganic      Boolean   @default(true) // false = suspected bot/fake followers
+  verified       Boolean   @default(false) // verified by our system
+  lastChecked    DateTime?
+
+  profile InfluencerPartnerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([profileId, platform])
+  @@index([platform])
+  @@index([followers])
+  @@map("influencer_social_handles")
+}
+
+model InfluencerVerification {
+  id        String   @id @default(cuid())
+  profileId String
+  category  String // followers, engagement, views, watch_hours, organic, overall
+  score     Decimal  @db.Decimal(5, 2) // 0-100
+  weight    Decimal  @db.Decimal(3, 2) // weight in overall score (e.g. 0.25)
+  details   String?  @db.Text // JSON: detailed breakdown
+  passed    Boolean  @default(false)
+  checkedAt DateTime @default(now())
+
+  profile InfluencerPartnerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([category])
+  @@map("influencer_verifications")
+}
+
+model InfluencerEarning {
+  id        String    @id @default(cuid())
+  profileId String
+  releaseId String? // associated press release if applicable
+  type      String // distribution, referral, bonus, campaign
+  amount    Decimal   @db.Decimal(10, 2)
+  currency  String    @default("USD")
+  status    String    @default("pending") // pending, approved, paid, cancelled
+  paidAt    DateTime?
+  reference String? // payment reference
+
+  profile InfluencerPartnerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([profileId])
+  @@index([status])
+  @@map("influencer_earnings")
+}
+
+model InfluencerPartnerCollaboration {
+  id           String    @id @default(cuid())
+  profileId    String
+  title        String
+  description  String?   @db.Text
+  type         String // sponsored_post, review, ama, thread, video
+  status       String    @default("proposed") // proposed, accepted, in_progress, completed, cancelled
+  budget       Decimal?  @db.Decimal(10, 2)
+  deliverables String? // JSON: expected deliverables
+  deadline     DateTime?
+  completedAt  DateTime?
+  proofUrl     String? // URL to published content
+
+  profile InfluencerPartnerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([profileId])
+  @@index([status])
+  @@map("influencer_partner_collaborations")
+}
+
+// =============================================
+// Bounty & OG Champs System
+// =============================================
+
+model Bounty {
+  id           String    @id @default(cuid())
+  title        String
+  slug         String    @unique
+  description  String    @db.Text
+  category     String // social_share, content_creation, bug_bounty, community, translation, referral, ambassador, dev
+  reward       Decimal   @db.Decimal(10, 2)
+  rewardType   String    @default("token") // token, usd, nft, badge
+  tokenSymbol  String? // JY, USDT, etc.
+  maxClaims    Int       @default(100) // total slots available
+  claimCount   Int       @default(0)
+  status       String    @default("active") // active, paused, completed, expired
+  difficulty   String    @default("easy") // easy, medium, hard, expert
+  xpReward     Int       @default(0) // experience points
+  requirements String?   @db.Text // JSON: specific requirements
+  startDate    DateTime  @default(now())
+  endDate      DateTime?
+  isRecurring  Boolean   @default(false)
+
+  claims      BountyClaim[]
+  submissions BountySubmission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([status])
+  @@index([endDate])
+  @@map("bounties")
+}
+
+model BountyClaim {
+  id        String   @id @default(cuid())
+  bountyId  String
+  userId    String
+  status    String   @default("claimed") // claimed, submitted, approved, rejected, expired
+  claimedAt DateTime @default(now())
+
+  bounty Bounty @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([bountyId, userId])
+  @@index([userId])
+  @@index([status])
+  @@map("bounty_claims")
+}
+
+model BountySubmission {
+  id           String    @id @default(cuid())
+  bountyId     String
+  userId       String
+  proofUrl     String? // link to proof (tweet, article, PR, etc.)
+  proofText    String?   @db.Text // description of work done
+  attachments  String? // JSON: array of attachment URLs
+  status       String    @default("pending") // pending, reviewing, approved, rejected
+  reviewedBy   String?
+  reviewNotes  String?
+  rewardTxHash String? // on-chain reward transaction
+  submittedAt  DateTime  @default(now())
+  reviewedAt   DateTime?
+
+  bounty Bounty @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([bountyId])
+  @@index([userId])
+  @@index([status])
+  @@map("bounty_submissions")
 }

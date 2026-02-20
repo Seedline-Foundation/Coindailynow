@@ -4,9 +4,28 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 const withPWA = require('next-pwa')({
   dest: 'public',
-  register: true,
-  skipWaiting: true,
+  // Service worker can cause stale chunk caching during local dev, leading to
+  // runtime errors like "Cannot read properties of undefined (reading 'call')".
+  // Disable PWA in non-production.
+  disable: process.env.NODE_ENV !== 'production',
+  register: process.env.NODE_ENV === 'production',
+  skipWaiting: process.env.NODE_ENV === 'production',
   runtimeCaching: [
+    // Images: CacheFirst — 30-day max age, 60 entry limit
+    {
+      urlPattern: ({ request }) => request.destination === 'image',
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'images',
+        expiration: {
+          maxEntries: 60,
+          maxAgeSeconds: 30 * 24 * 60 * 60,
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+      },
+    },
     {
       urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
       handler: 'CacheFirst',
@@ -19,14 +38,15 @@ const withPWA = require('next-pwa')({
       }
     },
     {
-      urlPattern: /^https:\/\/api\.coindaily\.africa\/.*/i,
+      // API Responses (/api/v1/*): NetworkFirst — 3-second timeout, 5-minute cache fallback, 50 entry limit
+      urlPattern: /^https?:\/\/(api\.coindaily\.africa|localhost:4000)\/api\/v1\/.*/i,
       handler: 'NetworkFirst',
       options: {
         cacheName: 'api-cache',
-        networkTimeoutSeconds: 10,
+        networkTimeoutSeconds: 3,
         expiration: {
-          maxEntries: 16,
-          maxAgeSeconds: 24 * 60 * 60 // 24 hours
+          maxEntries: 50,
+          maxAgeSeconds: 5 * 60 // 5 minutes
         }
       }
     }
@@ -122,6 +142,24 @@ const nextConfig = {
 
   // Performance and Security headers
   async headers() {
+    // In development, do not set aggressive caching headers on Next.js chunks.
+    // Otherwise the browser may reuse stale /_next/static/* files and crash at runtime
+    // (e.g., "Cannot read properties of undefined (reading 'call')").
+    if (process.env.NODE_ENV !== 'production') {
+      return [
+        {
+          // Security headers for ALL routes
+          source: '/(.*)',
+          headers: [
+            { key: 'X-Frame-Options', value: 'DENY' },
+            { key: 'X-Content-Type-Options', value: 'nosniff' },
+            { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
+            { key: 'X-DNS-Prefetch-Control', value: 'on' },
+          ]
+        },
+      ];
+    }
+
     return [
       {
         // Security headers for ALL routes (no Cache-Control here — only on static)

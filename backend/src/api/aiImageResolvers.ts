@@ -4,6 +4,7 @@
  */
 
 import prisma from '../lib/prisma';
+import { PrismaClient } from '@prisma/client';
 import { aiImageService, ImageGenerationResult } from '../services/aiImageService';
 import { PubSub } from 'graphql-subscriptions';
 const pubsub = new PubSub();

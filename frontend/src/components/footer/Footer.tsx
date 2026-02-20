@@ -21,6 +21,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   MoonIcon, 
   SunIcon, 
@@ -66,79 +67,68 @@ interface SocialPlatform {
   followers?: string;
 }
 
-interface LanguageOption {
-  code: string;
-  name: string;
-  flag: string;
-}
-
 const Footer: React.FC = () => {
   const { theme, setTheme } = useTheme();
+  const { t, currentLanguage, setLanguage, supportedLanguages } = useLanguage();
   const [mounted, setMounted] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // FR-096 to FR-102: Complete navigation links organized by sections
+  // FR-096 to FR-102: Navigation links — only existing pages (no 404s)
   const footerSections: FooterSection[] = [
     {
-      title: 'Services',
+      title: t('news'),
       links: [
-        { label: 'List Memecoins', href: '/services/list-memecoins' },
-        { label: 'Advertise', href: '/services/advertise' },
-        { label: 'Research', href: '/services/research' },
-        { label: 'Analytics', href: '/services/analytics' },
-        { label: 'API Access', href: '/services/api' },
-      ]
-    },
-    {
-      title: 'Products',
-      links: [
-        { label: 'Academy', href: '/academy' },
-        { label: 'Shop', href: '/shop' },
-        { label: 'Newsletter', href: '/newsletter' },
-        { label: 'Video Content', href: '/videos' },
-        { label: 'Membership', href: '/membership' },
-        { label: 'Glossary', href: '/glossary' },
-      ]
-    },
-    {
-      title: 'Market Insights',
-      links: [
+        { label: t('latestNews'), href: '/news' },
+        { label: t('newsAggregator'), href: '/news-aggregator' },
+        { label: t('aiSummarizer'), href: '/ai-summarizer' },
         { label: 'Price Analysis', href: '/insights/prices' },
-        { label: 'Market Trends', href: '/insights/trends' },
-        { label: 'Technical Analysis', href: '/insights/technical' },
-        { label: 'African Markets', href: '/insights/africa' },
       ]
     },
     {
-      title: 'News & Reports',
+      title: t('toolsData'),
       links: [
-        { label: 'Breaking News', href: '/news/breaking' },
-        { label: 'Daily Reports', href: '/news/daily' },
-        { label: 'Press Releases', href: '/news/press' },
-        { label: 'Editorials', href: '/news/editorials' },
+        { label: t('exchangeRates'), href: '/tools/exchange-rates' },
+        { label: t('p2pPremium'), href: '/tools/p2p-premium' },
+        { label: t('taxCalc'), href: '/tools/tax-calculator' },
+        { label: t('remittance'), href: '/tools/remittance-calculator' },
+        { label: t('onramp'), href: '/tools/onramp-aggregator' },
+        { label: t('automations'), href: '/automations' },
       ]
     },
     {
-      title: 'Tools & Resources',
+      title: t('safetyRegulation'),
       links: [
-        { label: 'Portfolio Tracker', href: '/tools/portfolio' },
-        { label: 'Price Calculator', href: '/tools/calculator' },
-        { label: 'Market Calendar', href: '/tools/calendar' },
-        { label: 'Trading Tools', href: '/tools/trading' },
+        { label: t('scamWatch'), href: '/scam-watch' },
+        { label: t('regulation'), href: '/regulation' },
+        { label: t('regulatoryBot'), href: '/regulatory-bot' },
       ]
     },
     {
-      title: 'Learn',
+      title: t('community'),
       links: [
-        { label: 'Beginner Guide', href: '/learn/beginner' },
-        { label: 'Advanced Trading', href: '/learn/advanced' },
-        { label: 'DeFi Education', href: '/learn/defi' },
-        { label: 'Security Best Practices', href: '/learn/security' },
+        { label: t('events'), href: '/events' },
+        { label: t('authors'), href: '/authors' },
+        { label: t('expertProgram'), href: '/expert-program' },
+        { label: t('paymentDir'), href: '/payment-directory' },
       ]
-    }
+    },
+    {
+      title: t('learn'),
+      links: [
+        { label: t('cryptoBasics'), href: '/crypto-basics' },
+      ]
+    },
+    {
+      title: t('company'),
+      links: [
+        { label: t('about'), href: '/about' },
+        { label: t('privacy'), href: '/privacy' },
+        { label: t('terms'), href: '/terms' },
+        { label: t('disclaimer'), href: '/disclaimer' },
+      ]
+    },
   ];
 
   // FR-104: Social media links (6 platforms)
@@ -179,15 +169,6 @@ const Footer: React.FC = () => {
       icon: <FaInstagram className="h-5 w-5" />,
       followers: '56K'
     }
-  ];
-
-  // FR-109: Language selector (5 African languages)
-  const languages: LanguageOption[] = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'sw', name: 'Kiswahili', flag: '🇰🇪' },
-    { code: 'am', name: 'አማርኛ', flag: '🇪🇹' },
-    { code: 'zu', name: 'isiZulu', flag: '🇿🇦' }
   ];
 
   // FR-118: Regional focus (6 African countries)
@@ -322,14 +303,14 @@ const Footer: React.FC = () => {
             {/* FR-105: Newsletter subscription widget */}
             <div className="space-y-6">
               <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-white">Stay Updated</h4>
+                <h4 className="text-lg font-semibold text-white">{t('stayUpdated')}</h4>
                 <form onSubmit={handleNewsletterSubmission} className="space-y-3">
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     <input
                       type="email"
                       value={newsletterEmail}
                       onChange={(e) => setNewsletterEmail(e.target.value)}
-                      placeholder="Enter your email"
+                      placeholder={t('enterYourEmail')}
                       className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
@@ -338,28 +319,28 @@ const Footer: React.FC = () => {
                       disabled={newsletterStatus === 'loading'}
                       className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg font-medium transition-colors"
                     >
-                      {newsletterStatus === 'loading' ? 'Subscribing...' : 'Subscribe'}
+                      {newsletterStatus === 'loading' ? t('subscribing') : t('subscribe')}
                     </button>
                   </div>
                   {newsletterStatus === 'success' && (
-                    <p className="text-green-400 text-sm">✅ Successfully subscribed!</p>
+                    <p className="text-green-400 text-sm">{t('successfullySubscribed')}</p>
                   )}
                   {newsletterStatus === 'error' && (
-                    <p className="text-red-400 text-sm">❌ Failed to subscribe. Please try again.</p>
+                    <p className="text-red-400 text-sm">{t('failedToSubscribe')}</p>
                   )}
                 </form>
               </div>
 
               {/* FR-111: Footer search functionality */}
               <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-white">Search</h4>
+                <h4 className="text-lg font-semibold text-white">{t('searchTitle')}</h4>
                 <form onSubmit={handleSearch} className="flex space-x-2">
                   <div className="relative flex-1">
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search articles, coins, news..."
+                      placeholder={t('searchFooterPlaceholder')}
                       className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <MagnifyingGlassIcon className="h-5 w-5 absolute right-3 top-2.5 text-gray-400" />
@@ -371,7 +352,7 @@ const Footer: React.FC = () => {
             {/* FR-107: Contact information */}
             <div className="space-y-6">
               <div className="space-y-3">
-                <h4 className="text-lg font-semibold text-white">Contact Us</h4>
+                <h4 className="text-lg font-semibold text-white">{t('contactUs')}</h4>
                 <div className="space-y-2 text-sm text-gray-300">
                   <div className="flex items-center space-x-2">
                     <EnvelopeIcon className="h-4 w-4" />
@@ -392,7 +373,7 @@ const Footer: React.FC = () => {
 
           {/* ROW 2: Navigation Links (Complete navigation links as requested) */}
           <div className="space-y-6">
-            <h4 className="text-xl font-bold text-white text-center">Quick Navigation</h4>
+            <h4 className="text-xl font-bold text-white text-center">{t('quickNavigation')}</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
               {footerSections.map((section) => (
                 <div key={section.title}>
@@ -420,7 +401,7 @@ const Footer: React.FC = () => {
             
             {/* FR-104: Social media links (6 platforms) */}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-3">Follow Us</h4>
+              <h4 className="text-lg font-semibold text-white mb-3">{t('followUs')}</h4>
               <div className="grid grid-cols-3 gap-3">
                 {socialPlatforms.map((platform) => (
                   <a
@@ -447,16 +428,16 @@ const Footer: React.FC = () => {
             <div>
               <h4 className="text-lg font-semibold text-white mb-3">
                 <LanguageIcon className="h-5 w-5 inline mr-2" />
-                Language
+                {t('language')}
               </h4>
               <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
+                value={currentLanguage}
+                onChange={(e) => setLanguage(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {languages.map((lang) => (
+                {supportedLanguages.map((lang) => (
                   <option key={lang.code} value={lang.code}>
-                    {lang.flag} {lang.name}
+                    {lang.flag} {lang.nativeName}
                   </option>
                 ))}
               </select>
@@ -464,7 +445,7 @@ const Footer: React.FC = () => {
 
             {/* FR-116: Trust indicators (security badges) */}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-3">Trust & Security</h4>
+              <h4 className="text-lg font-semibold text-white mb-3">{t('trustSecurity')}</h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2 text-sm text-gray-300">
                   <ShieldCheckIcon className="h-5 w-5 text-green-400" />
@@ -483,7 +464,7 @@ const Footer: React.FC = () => {
 
             {/* FR-118: Regional focus (6 African countries) */}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-3">🌍 Regional Focus</h4>
+              <h4 className="text-lg font-semibold text-white mb-3">🌍 {t('regionalFocus')}</h4>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 {regionalFocus.map((region) => (
                   <div key={region.country} className="text-gray-300">
@@ -495,7 +476,7 @@ const Footer: React.FC = () => {
               
               {/* FR-119: Cryptocurrency focus indicators */}
               <div className="mt-4">
-                <h5 className="text-lg font-semibold text-white mb-2">₿ Crypto Focus</h5>
+                <h5 className="text-lg font-semibold text-white mb-2">₿ {t('cryptoFocus')}</h5>
                 <div className="flex flex-wrap gap-2 text-xs">
                   <span className="bg-orange-600 px-2 py-1 rounded">Bitcoin</span>
                   <span className="bg-blue-600 px-2 py-1 rounded">Ethereum</span>
@@ -517,11 +498,10 @@ const Footer: React.FC = () => {
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-400">
               <p>&copy; 2025 CoinDaily Africa. All rights reserved.</p>
               <div className="flex items-center space-x-4">
-                <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-                <Link href="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
-                <Link href="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
-                <Link href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</Link>
+                <Link href="/about" className="hover:text-white transition-colors">{t('about')}</Link>
+                <Link href="/privacy" className="hover:text-white transition-colors">{t('privacy')}</Link>
+                <Link href="/terms" className="hover:text-white transition-colors">{t('terms')}</Link>
+                <Link href="/disclaimer" className="hover:text-white transition-colors">{t('disclaimer')}</Link>
               </div>
             </div>
 

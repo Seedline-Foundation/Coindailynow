@@ -85,6 +85,18 @@ interface Vulnerability {
   status: 'open' | 'in-progress' | 'resolved';
 }
 
+interface TrafficStats {
+  day: string;
+  total: number;
+  ivt: number;
+  ivtPct: number;
+  categories: Record<string, number>;
+}
+
+function getApiBase() {
+  return process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+}
+
 export default function SecurityPage() {
   const { user } = useSuperAdmin();
   const [loading, setLoading] = useState(true);
@@ -99,6 +111,7 @@ export default function SecurityPage() {
   const [blacklistedIPs, setBlacklistedIPs] = useState<BlacklistedIP[]>([]);
   const [securityAlerts, setSecurityAlerts] = useState<SecurityAlert[]>([]);
   const [vulnerabilities, setVulnerabilities] = useState<Vulnerability[]>([]);
+  const [trafficStats, setTrafficStats] = useState<TrafficStats | null>(null);
 
   useEffect(() => {
     loadSecurityData();
@@ -107,9 +120,10 @@ export default function SecurityPage() {
   const loadSecurityData = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('accessToken') || '';
       const response = await fetch(`/api/super-admin/security?timeRange=${timeRange}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -121,6 +135,21 @@ export default function SecurityPage() {
       setBlacklistedIPs(data.blacklistedIPs);
       setSecurityAlerts(data.securityAlerts);
       setVulnerabilities(data.vulnerabilities);
+
+      // Traffic Cop (Feature 06) passive monitoring stats
+      try {
+        const trafficRes = await fetch(`${getApiBase()}/api/v1/traffic/stats`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (trafficRes.ok) {
+          const trafficJson = await trafficRes.json();
+          setTrafficStats(trafficJson);
+        } else {
+          setTrafficStats(null);
+        }
+      } catch {
+        setTrafficStats(null);
+      }
     } catch (error) {
       console.error('Error loading security data:', error);
     } finally {
@@ -358,6 +387,41 @@ export default function SecurityPage() {
               <p className="text-3xl font-bold text-white">{metrics.vulnerabilities}</p>
             </div>
           </div>
+
+          {/* Traffic Cop */}
+          {trafficStats && (
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-6 h-6 text-blue-500" />
+                  <h2 className="text-xl font-semibold text-white">Traffic Cop (IVT)</h2>
+                </div>
+                <span className={`text-sm ${trafficStats.ivtPct >= 5 ? 'text-yellow-500' : 'text-green-500'}`}>
+                  {trafficStats.ivtPct.toFixed(2)}%
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300 mb-4">
+                <span>Total: <span className="text-white font-semibold">{trafficStats.total.toLocaleString()}</span></span>
+                <span>Flagged: <span className="text-white font-semibold">{trafficStats.ivt.toLocaleString()}</span></span>
+                <span className="text-gray-400">Day: {trafficStats.day}</span>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(trafficStats.categories)
+                  .sort((a, b) => (Number(b[1]) || 0) - (Number(a[1]) || 0))
+                  .slice(0, 8)
+                  .map(([cat, count]) => (
+                    <span key={cat} className="text-xs bg-gray-700 text-gray-200 px-2 py-1 rounded">
+                      {cat}: {Number(count) || 0}
+                    </span>
+                  ))}
+                {Object.keys(trafficStats.categories).length === 0 && (
+                  <span className="text-xs text-gray-400">No categories recorded yet.</span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Security Alerts */}
           <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">

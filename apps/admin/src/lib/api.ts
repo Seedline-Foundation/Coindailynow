@@ -12,7 +12,7 @@ interface FetchOptions {
 }
 
 async function apiRequest<T = any>(endpoint: string, options: FetchOptions = {}): Promise<T> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_access_token') : null;
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ async function apiRequest<T = any>(endpoint: string, options: FetchOptions = {})
 
 // GraphQL helper
 async function graphqlRequest<T = any>(query: string, variables?: Record<string, any>): Promise<T> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_access_token') : null;
   
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;

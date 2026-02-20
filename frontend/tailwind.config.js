@@ -8,6 +8,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Semantic tokens (shadcn-style) backed by our existing CSS variables.
+        // Using rgb(var(--...)/<alpha-value>) preserves Tailwind opacity modifiers.
+        background: 'rgb(var(--color-neutral-50) / <alpha-value>)',
+        foreground: 'rgb(var(--color-neutral-900) / <alpha-value>)',
+        card: 'rgb(var(--color-surface) / <alpha-value>)',
+        'card-foreground': 'rgb(var(--color-neutral-900) / <alpha-value>)',
+        muted: 'rgb(var(--color-neutral-100) / <alpha-value>)',
+        'muted-foreground': 'rgb(var(--color-neutral-500) / <alpha-value>)',
+        border: 'rgb(var(--color-neutral-200) / <alpha-value>)',
+        input: 'rgb(var(--color-neutral-200) / <alpha-value>)',
+        ring: 'rgb(var(--color-primary-500) / <alpha-value>)',
+
         // African-inspired primary colors (sunset and earth tones)
         primary: {
           50: '#fff7ed',   // Light orange (sunrise)
@@ -91,9 +103,8 @@ module.exports = {
         },
         
         // Background and surface colors
-        background: '#fafaf9',
-        surface: '#ffffff',
-        'surface-variant': '#f5f5f4',
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        'surface-variant': 'rgb(var(--color-neutral-100) / <alpha-value>)',
       },
       
       fontFamily: {

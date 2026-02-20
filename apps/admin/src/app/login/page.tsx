@@ -25,7 +25,7 @@ import {
  * - IP logging
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export default function StaffLoginPage() {
   const router = useRouter();

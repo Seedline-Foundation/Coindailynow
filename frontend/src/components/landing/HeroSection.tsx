@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ChevronRightIcon, PlayIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NewsItem {
   id: string;
@@ -31,6 +32,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   breakingNews = [],
   className = '',
 }) => {
+  const { t } = useLanguage();
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
@@ -59,7 +61,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="bg-red-600 text-white px-4 py-2 rounded-lg mb-4">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center justify-center w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                <span className="font-semibold uppercase text-sm tracking-wide">Breaking News</span>
+                <span className="font-semibold uppercase text-sm tracking-wide">{t('breakingNews')}</span>
               </div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-4">
@@ -85,7 +87,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="space-y-4">
               <Badge variant="secondary" className="inline-flex items-center gap-1">
                 <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                Latest News
+                {t('latestNews')}
               </Badge>
               
               {selectedNews && (
@@ -110,14 +112,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
                     <Link href={`/news/${selectedNews.slug}`}>
                       <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                        Read Full Article
+                        {t('readFullArticle')}
                         <ChevronRightIcon className="w-4 h-4 ml-2" />
                       </Button>
                     </Link>
                     
                     <Button variant="outline" size="lg" className="border-gray-300">
                       <PlayIcon className="w-4 h-4 mr-2" />
-                      Listen to Article
+                      {t('listenToArticle')}
                     </Button>
                   </div>
                 </div>
@@ -142,7 +144,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             
             {/* News Preview Cards */}
             <div className="grid gap-4">
-              <h3 className="text-lg font-semibold text-gray-900">Today's Top Stories</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('todaysTopStories')}</h3>
               
               <div className="space-y-3">
                 {featuredNews.slice(0, 4).map((news) => (
@@ -192,7 +194,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               </div>
               
               <Button variant="outline" className="w-full mt-4">
-                View All News
+                {t('viewAllNews')}
                 <ChevronRightIcon className="w-4 h-4 ml-2" />
               </Button>
             </div>

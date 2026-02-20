@@ -36,7 +36,7 @@ async function getArticle(slug: string): Promise<Article | null> {
   const backendUrl =
     process.env.NEXT_PUBLIC_API_URL ||
     process.env.BACKEND_URL ||
-    'http://localhost:3001';
+    'http://localhost:4000';
 
   const response = await fetch(`${backendUrl}/graphql`, {
     method: 'POST',

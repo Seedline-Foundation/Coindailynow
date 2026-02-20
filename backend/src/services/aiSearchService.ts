@@ -259,7 +259,7 @@ export class AISearchService {
       );
 
       // Parse expansions and ensure they are valid
-      const content = completion.content;
+      const content = completion;
       const jsonMatch = content?.match(/\[[\s\S]*\]/);
       const expansions = jsonMatch ? JSON.parse(jsonMatch[0]) as string[] : [];
       

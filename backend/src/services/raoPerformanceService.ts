@@ -346,7 +346,7 @@ Format as JSON array.`;
       maxTokens: 2000
     });
 
-    const messageContent = completion.content;
+    const messageContent = completion;
     if (!messageContent) {
       return [];
     }
@@ -730,7 +730,7 @@ Provide response as JSON with these exact fields: semanticRelevance, topicCovera
       maxTokens: 1500
     });
 
-    const messageContent = completion.content;
+    const messageContent = completion;
     if (!messageContent) {
       throw new Error('No response from AI');
     }

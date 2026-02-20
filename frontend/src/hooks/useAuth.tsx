@@ -21,6 +21,22 @@ import {
   DeviceInfo
 } from '../types/auth';
 
+// ========== Helpers ==========
+
+const DEFAULT_EXPIRES_IN = 86400; // 24 hours in seconds
+const FETCH_TIMEOUT_MS = 15000; // 15 second timeout for all auth fetches
+
+/** Fetch with AbortController timeout */
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = FETCH_TIMEOUT_MS): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // ========== Authentication Context ==========
 
 interface AuthContextType extends UseAuthReturn {
@@ -45,29 +61,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
     error: null
   });
 
-  // Device fingerprinting for African mobile devices
+  // Device fingerprinting for African mobile devices (SSR-safe)
   const getDeviceInfo = useCallback((): DeviceInfo => {
-    const userAgent = navigator.userAgent;
-    const platform = navigator.platform;
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-    
-    // Generate device fingerprint
-    const fingerprint = btoa(
-      `${userAgent}-${platform}-${screen.width}x${screen.height}-${Intl.DateTimeFormat().resolvedOptions().timeZone}`
-    ).replace(/[^a-zA-Z0-9]/g, '').substring(0, 32);
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return { fingerprint: 'ssr-default', userAgent: '', platform: '', isMobile: false };
+    }
+    try {
+      const userAgent = navigator.userAgent || '';
+      const platform = navigator.platform || '';
+      const screenW = typeof screen !== 'undefined' ? screen.width : 0;
+      const screenH = typeof screen !== 'undefined' ? screen.height : 0;
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      
+      const fingerprint = btoa(
+        `${userAgent}-${platform}-${screenW}x${screenH}-${Intl.DateTimeFormat().resolvedOptions().timeZone}`
+      ).replace(/[^a-zA-Z0-9]/g, '').substring(0, 32);
 
-    return {
-      fingerprint,
-      userAgent,
-      platform,
-      isMobile
-    };
+      return { fingerprint, userAgent, platform, isMobile };
+    } catch {
+      return { fingerprint: 'fallback', userAgent: '', platform: '', isMobile: false };
+    }
   }, []);
 
   // Initialize authentication state
   useEffect(() => {
     const initAuth = async () => {
       try {
+        if (typeof window === 'undefined') return;
+
         const storedTokens = localStorage.getItem('coindaily_tokens');
         const storedUser = localStorage.getItem('coindaily_user');
         
@@ -75,19 +96,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
           const tokens: AuthTokens = JSON.parse(storedTokens);
           const user: User = JSON.parse(storedUser);
           
-          // Check if token is expired
-          const tokenExpiry = new Date(Date.now() + tokens.expiresIn * 1000);
-          if (tokenExpiry > new Date()) {
-            setAuthState(prev => ({
-              ...prev,
+          // Check if token is expired using stored expiresAt timestamp
+          const expiresAt = localStorage.getItem('coindaily_token_expires_at');
+          const expiryTime = expiresAt ? parseInt(expiresAt, 10) : 0;
+          const isExpired = !expiryTime || Date.now() > expiryTime;
+
+          if (!isExpired) {
+            setAuthState({
               user,
               tokens,
               isAuthenticated: true,
-              isLoading: false
-            }));
+              isLoading: false,
+              error: null
+            });
           } else {
-            // Try to refresh token
-            await refreshTokenInternal();
+            // Token expired — try to refresh, but with timeout
+            try {
+              await refreshTokenInternal();
+            } catch {
+              clearAuthData();
+            }
           }
         } else {
           setAuthState(prev => ({
@@ -108,6 +136,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const clearAuthData = useCallback(() => {
     localStorage.removeItem('coindaily_tokens');
     localStorage.removeItem('coindaily_user');
+    localStorage.removeItem('coindaily_token_expires_at');
     setAuthState({
       user: null,
       tokens: null,
@@ -121,6 +150,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const storeAuthData = useCallback((user: User, tokens: AuthTokens) => {
     localStorage.setItem('coindaily_tokens', JSON.stringify(tokens));
     localStorage.setItem('coindaily_user', JSON.stringify(user));
+    // Store absolute expiry timestamp (expiresIn from token or default 24h)
+    const expiresIn = tokens.expiresIn || DEFAULT_EXPIRES_IN;
+    localStorage.setItem('coindaily_token_expires_at', String(Date.now() + expiresIn * 1000));
     setAuthState({
       user,
       tokens,
@@ -130,82 +162,127 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
   }, []);
 
-  // Login function
+  // Helper: set authToken cookie for Next.js middleware
+  const setAuthCookie = useCallback((token: string | null) => {
+    if (token) {
+      document.cookie = `authToken=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+    } else {
+      document.cookie = 'authToken=; path=/; max-age=0';
+    }
+  }, []);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+
+  // Login function — calls backend GraphQL directly
   const login = useCallback(async (data: LoginFormData): Promise<void> => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
       const deviceInfo = getDeviceInfo();
-      
-      const response = await fetch('/api/auth/login', {
+
+      const response = await fetchWithTimeout(`${API_URL}/graphql`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
-          ...data,
-          deviceFingerprint: deviceInfo.fingerprint,
-          userAgent: deviceInfo.userAgent
+          query: `mutation Login($input: LoginInput!) {
+            login(input: $input) {
+              success
+              user { id email username firstName lastName avatarUrl role }
+              tokens { accessToken refreshToken }
+              error { code message }
+            }
+          }`,
+          variables: {
+            input: {
+              email: data.email,
+              password: data.password,
+              deviceFingerprint: deviceInfo.fingerprint,
+              userAgent: deviceInfo.userAgent
+            }
+          }
         })
       });
 
-      const result: LoginResponse = await response.json();
+      const json = await response.json();
 
-      if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Login failed');
+      if (json.errors) {
+        throw new Error(json.errors[0]?.message || 'Login failed');
       }
 
-      if (result.data?.mfaRequired) {
-        // Handle MFA requirement
-        setAuthState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: null
-        }));
-        // MFA will be handled by MFA modal
-        return;
+      const result = json.data?.login;
+      if (!result?.success) {
+        throw new Error(result?.error?.message || 'Invalid credentials');
       }
 
-      if (result.data?.user && result.data?.tokens) {
-        storeAuthData(result.data.user, result.data.tokens);
+      if (result.user && result.tokens) {
+        setAuthCookie(result.tokens.accessToken);
+        storeAuthData(result.user, result.tokens);
+      } else {
+        throw new Error('Login succeeded but no user data returned');
       }
     } catch (error) {
+      const message = error instanceof Error 
+        ? (error.name === 'AbortError' ? 'Login request timed out. Please try again.' : error.message)
+        : 'Login failed';
       setAuthState(prev => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Login failed'
+        error: message
       }));
       throw error;
     }
-  }, [getDeviceInfo, storeAuthData]);
+  }, [getDeviceInfo, storeAuthData, setAuthCookie, API_URL]);
 
-  // Register function
+  // Register function — calls backend GraphQL directly
   const register = useCallback(async (data: RegisterFormData): Promise<void> => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
       const deviceInfo = getDeviceInfo();
-      
-      const response = await fetch('/api/auth/register', {
+
+      const response = await fetchWithTimeout(`${API_URL}/graphql`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
-          ...data,
-          deviceFingerprint: deviceInfo.fingerprint,
-          userAgent: deviceInfo.userAgent
+          query: `mutation Register($input: RegisterInput!) {
+            register(input: $input) {
+              success
+              user { id email username firstName lastName avatarUrl role }
+              tokens { accessToken refreshToken }
+              error { code message }
+            }
+          }`,
+          variables: {
+            input: {
+              email: data.email,
+              username: data.username,
+              password: data.password,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              deviceFingerprint: deviceInfo.fingerprint,
+              userAgent: deviceInfo.userAgent
+            }
+          }
         })
       });
 
-      const result: RegisterResponse = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Registration failed');
+      const json = await response.json();
+      if (json.errors) {
+        throw new Error(json.errors[0]?.message || 'Registration failed');
       }
 
-      if (result.data?.user && result.data?.tokens) {
-        storeAuthData(result.data.user, result.data.tokens);
+      const result = json.data?.register;
+      if (!result?.success) {
+        throw new Error(result?.error?.message || 'Registration failed');
+      }
+
+      if (result.user && result.tokens) {
+        setAuthCookie(result.tokens.accessToken);
+        storeAuthData(result.user, result.tokens);
+      } else {
+        throw new Error('Registration succeeded but no user data returned');
       }
     } catch (error) {
       setAuthState(prev => ({
@@ -215,7 +292,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }));
       throw error;
     }
-  }, [getDeviceInfo, storeAuthData]);
+  }, [getDeviceInfo, storeAuthData, setAuthCookie, API_URL]);
 
   // Logout function
   const logout = useCallback(async (): Promise<void> => {
@@ -223,56 +300,70 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       if (authState.tokens?.refreshToken) {
-        await fetch('/api/auth/logout', {
+        await fetchWithTimeout(`${API_URL}/graphql`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authState.tokens.accessToken}`
           },
+          credentials: 'include',
           body: JSON.stringify({
-            refreshToken: authState.tokens.refreshToken
+            query: `mutation Logout($refreshToken: String!) { logout(refreshToken: $refreshToken) { success } }`,
+            variables: { refreshToken: authState.tokens.refreshToken }
           })
-        });
+        }).catch(() => {});
       }
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
+      setAuthCookie(null);
       clearAuthData();
     }
-  }, [authState.tokens, clearAuthData]);
+  }, [authState.tokens, clearAuthData, setAuthCookie, API_URL]);
 
-  // Refresh token function
+  // Refresh token function — calls backend GraphQL
   const refreshTokenInternal = useCallback(async (): Promise<void> => {
     const storedTokens = localStorage.getItem('coindaily_tokens');
     if (!storedTokens) return;
 
     try {
       const tokens: AuthTokens = JSON.parse(storedTokens);
-      
-      const response = await fetch('/api/auth/refresh', {
+
+      const response = await fetchWithTimeout(`${API_URL}/graphql`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
-          refreshToken: tokens.refreshToken
+          query: `mutation RefreshToken($refreshToken: String!) {
+            refreshToken(refreshToken: $refreshToken) {
+              success
+              tokens { accessToken refreshToken }
+              error { code message }
+            }
+          }`,
+          variables: { refreshToken: tokens.refreshToken }
         })
       });
 
-      const result: AuthResponse<{ user: User; tokens: AuthTokens }> = await response.json();
+      const json = await response.json();
+      const result = json.data?.refreshToken;
 
-      if (!response.ok || !result.success) {
+      if (!result?.success || !result?.tokens) {
         throw new Error('Token refresh failed');
       }
 
-      if (result.data?.user && result.data?.tokens) {
-        storeAuthData(result.data.user, result.data.tokens);
+      const storedUser = localStorage.getItem('coindaily_user');
+      const user: User = storedUser ? JSON.parse(storedUser) : null;
+      if (user) {
+        setAuthCookie(result.tokens.accessToken);
+        storeAuthData(user, result.tokens);
       }
     } catch (error) {
       console.error('Token refresh error:', error);
+      setAuthCookie(null);
       clearAuthData();
     }
-  }, [storeAuthData, clearAuthData]);
+  }, [storeAuthData, clearAuthData, setAuthCookie, API_URL]);
 
   const refreshToken = useCallback(refreshTokenInternal, [refreshTokenInternal]);
 

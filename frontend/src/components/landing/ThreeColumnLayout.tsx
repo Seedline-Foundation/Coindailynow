@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AdBanner from './AdBanner';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ColumnLayoutProps {
   leftColumn?: React.ReactNode;
@@ -175,6 +176,13 @@ interface RightSidebarProps {
 }
 
 export const RightSidebar: React.FC<RightSidebarProps> = ({ className = '' }) => {
+  const { currentLanguage } = useLanguage();
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const marketData = [
     { symbol: 'BTC', price: 43250, change: 2.5 },
     { symbol: 'ETH', price: 2650, change: -1.2 },
@@ -200,6 +208,13 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ className = '' }) =>
       type: 'Workshop',
     },
   ];
+
+  const formatEventDate = (isoDate: string) => {
+    if (!hasMounted) return '';
+    // Use the current UI language if available; avoid relying on server default locale.
+    const locale = currentLanguage || 'en';
+    return new Intl.DateTimeFormat(locale).format(new Date(isoDate));
+  };
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -243,7 +258,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ className = '' }) =>
           {upcomingEvents.map((event, index) => (
             <div key={index} className="border-l-2 border-blue-200 pl-3">
               <div className="text-xs text-gray-500 mb-1">
-                {new Date(event.date).toLocaleDateString()}
+                <span suppressHydrationWarning>{formatEventDate(event.date)}</span>
               </div>
               <div className="text-sm font-medium text-gray-900 mb-1">
                 {event.title}

@@ -138,7 +138,7 @@ Return as JSON array with structure:
       maxTokens: 4000,
     });
 
-    const content = completion.content;
+    const content = completion;
     if (!content) {
       throw new Error('No content returned from AI');
     }
@@ -286,7 +286,7 @@ Return as JSON:
       maxTokens: 2000,
     });
 
-    const contentStr = completion.content;
+    const contentStr = completion;
     if (!contentStr) {
       throw new Error('No content returned from AI');
     }
@@ -507,7 +507,7 @@ Return as JSON:
     maxTokens: 2000,
   });
 
-  const contentStr = completion.content;
+  const contentStr = completion;
   if (!contentStr) {
     throw new Error('No content returned from AI');
   }
@@ -616,7 +616,7 @@ Return as JSON:
       maxTokens: 3000,
     });
 
-    const contentStr = completion.content;
+    const contentStr = completion;
     if (!contentStr) {
       throw new Error('No content returned from AI');
     }
@@ -810,7 +810,7 @@ Return top 15-20 trends as JSON:
       maxTokens: 4000,
     });
 
-    const contentStr = completion.content;
+    const contentStr = completion;
     if (!contentStr) {
       throw new Error('No content returned from AI');
     }

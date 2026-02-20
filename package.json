@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "dev:news": "cd frontend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
     "dev:admin": "cd apps/admin && npm run dev",
     "dev:ai": "cd apps/ai && npm run dev",
     "dev:press": "cd apps/press && npm run dev",

@@ -224,12 +224,6 @@ const DynamicMarquee: React.FC<DynamicMarqueeProps> = ({
 
   // Render individual marquee item
   const renderMarqueeItem = (item: MarqueeItem, marqueeId: string, styles: MarqueeStyle) => {
-    const itemStyle = {
-      marginRight: styles.itemSpacing,
-      color: item.textColor || styles.textColor,
-      backgroundColor: item.bgColor || 'transparent',
-    };
-
     const handleClick = () => {
       trackClick(marqueeId, item.id, item.linkUrl);
     };
@@ -237,71 +231,44 @@ const DynamicMarquee: React.FC<DynamicMarqueeProps> = ({
     return (
       <div
         key={item.id}
-        className="flex items-center gap-3 hover:bg-white/10 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer flex-shrink-0 group"
-        style={itemStyle}
+        className="flex items-center gap-2 hover:bg-white/10 px-3 py-1 rounded transition-all duration-200 cursor-pointer flex-shrink-0 whitespace-nowrap"
+        style={{ color: item.textColor || styles.textColor, marginRight: styles.itemSpacing }}
         onClick={handleClick}
       >
-        {/* Icon */}
-        {styles.showIcons && (item.icon || item.isHot || item.type === 'token') && (
-          <div className="flex items-center" style={{ color: item.iconColor || styles.iconColor }}>
-            {item.icon ? (
-              <span style={{ fontSize: styles.iconSize }}>{item.icon}</span>
-            ) : item.isHot ? (
-              <FireIcon style={{ width: styles.iconSize, height: styles.iconSize }} />
-            ) : item.type === 'token' && item.changePercent24h !== undefined ? (
-              item.changePercent24h >= 0 ? (
-                <ArrowTrendingUpIcon style={{ width: styles.iconSize, height: styles.iconSize }} />
-              ) : (
-                <ArrowTrendingDownIcon style={{ width: styles.iconSize, height: styles.iconSize }} />
-              )
-            ) : null}
-          </div>
+        {/* Coin icon */}
+        {styles.showIcons && item.icon && (item.icon.startsWith('http') || item.icon.startsWith('/')) && (
+          <img src={item.icon} alt={item.title} width={18} height={18} className="rounded-full flex-shrink-0" />
         )}
 
-        {/* Content */}
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-sm">{item.title}</span>
-            {item.subtitle && (
-              <span className="text-xs opacity-75 hidden sm:inline">{item.subtitle}</span>
-            )}
-          </div>
+        {/* Symbol */}
+        <span className="font-bold text-white text-[13px]">
+          {item.symbol || item.title}
+        </span>
 
-          {/* Token-specific data */}
-          {item.type === 'token' && (
-            <div className="flex items-center gap-3 text-sm">
-              {item.price && (
-                <span className="font-mono">{formatPrice(item.price)}</span>
-              )}
-              
-              {item.changePercent24h !== undefined && (
-                <div className={`flex items-center gap-1 ${
-                  item.changePercent24h >= 0 ? 'text-green-400' : 'text-red-400'
-                }`}>
-                  <span className="font-mono text-xs">
-                    {item.changePercent24h >= 0 ? '+' : ''}
-                    {item.changePercent24h.toFixed(2)}%
-                  </span>
-                </div>
-              )}
+        {/* Price */}
+        {item.type === 'token' && item.price != null && (
+          <span className="font-mono text-gray-200 text-[13px]">
+            {formatPrice(item.price)}
+          </span>
+        )}
 
-              {/* Volume/Market Cap for desktop */}
-              <div className="hidden lg:flex flex-col text-xs opacity-75">
-                {item.marketCap && (
-                  <span>MC: {formatLargeNumber(item.marketCap)}</span>
-                )}
-                {item.volume24h && (
-                  <span>Vol: {formatLargeNumber(item.volume24h)}</span>
-                )}
-              </div>
-            </div>
-          )}
+        {/* Change % */}
+        {item.type === 'token' && item.changePercent24h != null && (
+          <span className={`font-mono text-xs font-semibold ${
+            item.changePercent24h >= 0 ? 'text-green-400' : 'text-red-400'
+          }`}>
+            {item.changePercent24h >= 0 ? '▲' : '▼'}
+            {Math.abs(item.changePercent24h).toFixed(2)}%
+          </span>
+        )}
 
-          {/* News/Custom content */}
-          {(item.type === 'news' || item.type === 'custom') && item.description && (
-            <p className="text-xs opacity-75 line-clamp-1">{item.description}</p>
-          )}
-        </div>
+        {/* Hot badge */}
+        {item.isHot && (
+          <FireIcon className="w-3.5 h-3.5 text-orange-400" />
+        )}
+
+        {/* Separator dot */}
+        <span className="text-gray-600 ml-1">•</span>
       </div>
     );
   };
@@ -311,90 +278,50 @@ const DynamicMarquee: React.FC<DynamicMarqueeProps> = ({
     if (!marquee.items || marquee.items.length === 0) return null;
 
     const styles = marquee.styles;
-    
-    // Create duplicated items for seamless scrolling
+    const bg = styles.backgroundColor || '#111827';
+
+    // Create 3x duplicated items for seamless looping
     const duplicatedItems = Array(3).fill(marquee.items).flat();
 
-    const containerStyle = {
-      backgroundColor: styles.backgroundColor,
-      height: styles.height,
-      borderRadius: styles.borderRadius,
-      borderWidth: styles.borderWidth,
-      borderColor: styles.borderColor,
-      borderStyle: styles.borderWidth !== '0px' ? 'solid' : 'none',
-      boxShadow: styles.shadowColor !== 'transparent' ? `0 0 ${styles.shadowBlur} ${styles.shadowColor}` : 'none',
-      paddingTop: styles.paddingVertical,
-      paddingBottom: styles.paddingVertical,
-      paddingLeft: styles.paddingHorizontal,
-      paddingRight: styles.paddingHorizontal,
-      background: styles.gradient || styles.backgroundColor,
-    };
-
-    const scrollingStyle = {
-      animationDuration: `${styles.speed}s`,
-      animationDirection: styles.direction === 'right' ? 'reverse' : 'normal',
-      animationPlayState: isPaused ? 'paused' : 'running',
-    };
-
     return (
-      <div key={marquee.id} className={`relative overflow-hidden ${className}`} style={containerStyle}>
-        {/* Title/Header */}
-        {marquee.title && (
-          <div className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-current via-current to-transparent z-10 flex items-center px-4 min-w-[140px]">
-            <div className="flex items-center gap-2">
-              {styles.showIcons && (
-                <FireIcon 
-                  className="animate-pulse" 
-                  style={{ 
-                    width: styles.iconSize, 
-                    height: styles.iconSize, 
-                    color: styles.iconColor 
-                  }} 
-                />
-              )}
-              <span 
-                className="font-semibold text-sm tracking-wide uppercase"
-                style={{ 
-                  color: styles.textColor,
-                  fontSize: styles.fontSize,
-                  fontWeight: styles.fontWeight 
-                }}
-              >
-                {marquee.title}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Scrolling Content */}
+      <div
+        key={marquee.id}
+        className={`relative overflow-hidden ${className}`}
+        style={{ backgroundColor: bg, height: '40px' }}
+      >
+        {/* Left: "Trending" label pinned over the scroll */}
         <div
-          className="flex items-center animate-marquee"
-          style={scrollingStyle}
+          className="absolute left-0 top-0 bottom-0 z-20 flex items-center pl-3 pr-6"
+          style={{ background: `linear-gradient(to right, ${bg} 60%, transparent)` }}
+        >
+          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400">
+            <FireIcon className="w-3.5 h-3.5" />
+            Live
+          </span>
+        </div>
+
+        {/* Scrolling track */}
+        <div
+          className="animate-marquee items-center h-full"
+          style={{
+            animationDuration: `${styles.speed || 50}s`,
+            animationPlayState: isPaused ? 'paused' : 'running',
+          }}
           onMouseEnter={() => styles.pauseOnHover && setIsPaused(true)}
           onMouseLeave={() => styles.pauseOnHover && setIsPaused(false)}
         >
-          {/* Spacer for title */}
-          {marquee.title && <div className="min-w-[140px]"></div>}
-          
-          {duplicatedItems.map((item, index) => 
+          {/* Spacer so items start after the "Live" label */}
+          <div className="w-[80px] flex-shrink-0" />
+          {duplicatedItems.map((item, index) =>
             renderMarqueeItem({ ...item, id: `${item.id}-${index}` }, marquee.id, styles)
           )}
         </div>
 
-        {/* Gradient Fade */}
-        <div className="absolute right-0 top-0 bottom-0 bg-gradient-to-l from-current via-current to-transparent z-10 w-20 opacity-20"></div>
-
-        {/* Pause Indicator */}
-        {isPaused && (
-          <div className="absolute top-1 right-4 text-xs opacity-50 z-20">
-            Paused
-          </div>
-        )}
-
-        {/* Custom CSS */}
-        {styles.customCSS && (
-          <style dangerouslySetInnerHTML={{ __html: styles.customCSS }} />
-        )}
+        {/* Right fade */}
+        <div
+          className="absolute right-0 top-0 bottom-0 z-10 w-12 pointer-events-none"
+          style={{ background: `linear-gradient(to left, ${bg}, transparent)` }}
+        />
       </div>
     );
   };

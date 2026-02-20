@@ -61,8 +61,8 @@ export function middleware(request: NextRequest) {
   const whitelistedIPs = getWhitelistedIPs();
   const ceoIPs = getCEOIPs();
   
-  // Check if IP is whitelisted (bypass if ADMIN_WHITELISTED_IPS is set to BYPASS_ALL)
-  const bypassWhitelist = process.env.ADMIN_WHITELISTED_IPS === 'BYPASS_ALL';
+  // Check if IP is whitelisted (BYPASS_ALL only works in development)
+  const bypassWhitelist = process.env.NODE_ENV === 'development' && process.env.ADMIN_WHITELISTED_IPS === 'BYPASS_ALL';
   if (!bypassWhitelist && !whitelistedIPs.has(clientIP)) {
     console.log(`[ADMIN BLOCKED] IP ${clientIP} not whitelisted. Path: ${pathname}`);
     
@@ -80,9 +80,8 @@ export function middleware(request: NextRequest) {
     }
   }
   
-  // Add security headers
+  // Add security headers (never expose client IP in response headers)
   const response = NextResponse.next();
-  response.headers.set('X-Admin-IP', clientIP);
   response.headers.set('X-Admin-Timestamp', new Date().toISOString());
   
   return response;

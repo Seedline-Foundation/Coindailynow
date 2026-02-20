@@ -196,6 +196,21 @@ export class PWAHelper {
       return null;
     }
 
+    const isLocalDev =
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    if (isLocalDev) {
+      console.log('[PWA] Skipping Service Worker registration in local development');
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+      } catch {
+        // no-op
+      }
+      return null;
+    }
+
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
       console.log('[PWA] Service Worker registered');

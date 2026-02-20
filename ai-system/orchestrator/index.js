@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AIAgentOrchestrator = void 0;
-const dependencies_1 = require("../../backend/src/ai/dependencies");
+const dependencies_1 = require("./dependencies");
 const events_1 = require("events");
 const types_1 = require("../types");
 class AIAgentOrchestrator extends events_1.EventEmitter {

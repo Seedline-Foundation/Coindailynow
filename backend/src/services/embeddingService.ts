@@ -194,7 +194,7 @@ Return a JSON object with an "entities" array containing objects with: type, nam
       maxTokens: 1000,
     });
 
-    const messageContent = response.content;
+    const messageContent = response;
     if (!messageContent) {
       return {
         entities: [],

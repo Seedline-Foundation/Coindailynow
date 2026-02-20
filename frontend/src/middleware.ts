@@ -46,7 +46,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip middleware for public/static/API routes
-  if (PUBLIC_ROUTES.some(route => pathname.startsWith(route) || pathname === route)) {
+  if (pathname === '/' || PUBLIC_ROUTES.some(route => route !== '/' && pathname.startsWith(route))) {
     return NextResponse.next();
   }
 
