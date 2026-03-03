@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoinDaily — Offline</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0e17; color: #e5e7eb; padding: 2rem; }
+    .container { text-align: center; max-width: 480px; }
+    .icon { font-size: 4rem; margin-bottom: 1.5rem; }
+    h1 { font-size: 1.75rem; color: #f59e0b; margin-bottom: 0.5rem; }
+    p { font-size: 1rem; color: #9ca3af; margin-bottom: 1.5rem; line-height: 1.6; }
+    .btn { display: inline-block; padding: 0.75rem 2rem; background: #f59e0b; color: #000; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .btn:hover { background: #d97706; }
+    .features { margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: left; }
+    .feature { background: #111827; border-radius: 0.75rem; padding: 1rem; }
+    .feature h3 { font-size: 0.875rem; color: #f59e0b; margin-bottom: 0.25rem; }
+    .feature p { font-size: 0.75rem; color: #6b7280; margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📡</div>
+    <h1>You're Offline</h1>
+    <p>CoinDaily needs an internet connection for live market data and news. Check your connection and try again.</p>
+    <button class="btn" onclick="window.location.reload()">Try Again</button>
+    <div class="features">
+      <div class="feature">
+        <h3>Cached Pages</h3>
+        <p>Previously viewed articles are still available offline.</p>
+      </div>
+      <div class="feature">
+        <h3>Market Tools</h3>
+        <p>Tax calculator works offline with local estimates.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

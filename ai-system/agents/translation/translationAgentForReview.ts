@@ -24,7 +24,9 @@ export class TranslationAgentForReview {
     'French': 'fra_Latn',
     'Portuguese': 'por_Latn',
     'Wolof': 'wol_Latn',
-    'Kinyarwanda': 'kin_Latn'
+    'Kinyarwanda': 'kin_Latn',
+    'Pidgin': 'pcm_Latn',
+    'Spanish': 'spa_Latn'
   };
 
   // Crypto terms that should NEVER be translated
@@ -180,7 +182,7 @@ export class TranslationAgentForReview {
 
     } catch (error) {
       this.logger.error('[TranslationAgent] NLLB API call failed:', error);
-      throw new Error(`NLLB translation failed: ${error.message}`);
+      throw new Error(`NLLB translation failed: ${(error as any)?.message || 'Unknown error'}`);
     }
   }
 

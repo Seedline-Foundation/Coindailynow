@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFIS — CoinDaily Financial Intelligence System</title>
+<style>
+/* ──── RESET & VARIABLES ──── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e17;--bg2:#111827;--bg3:#1f2937;--bg4:#374151;
+  --brand:#f59e0b;--brand2:#d97706;--green:#10b981;--red:#ef4444;
+  --blue:#3b82f6;--purple:#8b5cf6;--cyan:#06b6d4;
+  --text:#f9fafb;--text2:#9ca3af;--text3:#6b7280;
+  --border:#374151;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4);
+}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--brand);text-decoration:none}
+button{cursor:pointer;border:none;font-family:inherit}
+
+/* ──── LOGIN SCREEN ──── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0a0e17 0%,#1a1a2e 50%,#16213e 100%)}
+.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:48px;width:400px;max-width:90vw;box-shadow:var(--shadow)}
+.login-card h1{font-size:28px;margin-bottom:8px;color:var(--brand);text-align:center}
+.login-card p{color:var(--text2);text-align:center;margin-bottom:32px;font-size:14px}
+.login-card label{display:block;color:var(--text2);font-size:13px;margin-bottom:6px;margin-top:16px}
+.login-card input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;outline:none;transition:border-color .2s}
+.login-card input:focus{border-color:var(--brand)}
+.login-card button{width:100%;padding:14px;background:var(--brand);color:#000;font-size:16px;font-weight:700;border-radius:8px;margin-top:24px;transition:background .2s}
+.login-card button:hover{background:var(--brand2)}
+.login-error{color:var(--red);font-size:13px;margin-top:12px;text-align:center;display:none}
+
+/* ──── APP LAYOUT ──── */
+#app{display:none;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.topbar .logo{display:flex;align-items:center;gap:12px}
+.topbar .logo-icon{width:36px;height:36px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:18px}
+.topbar h1{font-size:20px;font-weight:700}
+.topbar h1 span{color:var(--brand)}
+.topbar-right{display:flex;align-items:center;gap:24px}
+.notif-badge{position:relative;cursor:pointer;font-size:22px}
+.notif-badge .count{position:absolute;top:-6px;right:-8px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--bg3);padding:8px 16px;border-radius:8px;font-size:14px;color:var(--text2)}
+.user-pill strong{color:var(--text)}
+.btn-logout{background:var(--bg3);color:var(--text2);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;transition:background .2s}
+.btn-logout:hover{background:var(--bg4);color:var(--text)}
+
+.main-layout{display:flex;min-height:calc(100vh - 69px)}
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);padding:16px 0;flex-shrink:0;overflow-y:auto}
+.sidebar-section{margin-bottom:8px}
+.sidebar-section-title{padding:8px 24px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 24px;color:var(--text2);font-size:14px;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(245,158,11,.08);color:var(--brand);border-left-color:var(--brand)}
+.nav-item .icon{width:20px;text-align:center;font-size:16px}
+
+.content{flex:1;padding:32px;overflow-y:auto}
+.page-title{font-size:24px;font-weight:700;margin-bottom:4px}
+.page-subtitle{color:var(--text2);font-size:14px;margin-bottom:24px}
+
+/* ──── STATS CARDS ──── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:32px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:transform .15s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-card .label{color:var(--text2);font-size:13px;margin-bottom:4px}
+.stat-card .value{font-size:28px;font-weight:800;color:var(--text)}
+.stat-card .sub{font-size:12px;color:var(--text3);margin-top:4px}
+.stat-card.green .value{color:var(--green)}
+.stat-card.amber .value{color:var(--brand)}
+.stat-card.red .value{color:var(--red)}
+.stat-card.blue .value{color:var(--blue)}
+.stat-card.purple .value{color:var(--purple)}
+.stat-card.cyan .value{color:var(--cyan)}
+
+/* ──── DATA TABLES ──── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px;overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.card-header h3{font-size:16px;font-weight:700}
+.card-body{padding:20px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 16px;font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;background:var(--bg);border-bottom:1px solid var(--border)}
+td{padding:12px 16px;font-size:14px;border-bottom:1px solid rgba(55,65,81,.5);color:var(--text2)}
+tr:hover td{background:rgba(245,158,11,.03);color:var(--text)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-amber{background:rgba(245,158,11,.15);color:var(--brand)}
+.badge-red{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-blue{background:rgba(59,130,246,.15);color:var(--blue)}
+.badge-purple{background:rgba(139,92,246,.15);color:var(--purple)}
+.badge-gray{background:rgba(107,114,128,.15);color:var(--text3)}
+
+/* ──── BUTTONS ──── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--brand);color:#000}
+.btn-primary:hover{background:var(--brand2)}
+.btn-secondary{background:var(--bg3);color:var(--text)}
+.btn-secondary:hover{background:var(--bg4)}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ──── FORMS ──── */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--brand)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ──── MODAL ──── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;display:none}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);width:520px;max-width:90vw;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.modal-header h3{font-size:18px;font-weight:700}
+.modal-close{background:none;color:var(--text3);font-size:24px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background .15s}
+.modal-close:hover{background:var(--bg3);color:var(--text)}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end}
+
+/* ──── NOTIFICATION PANEL ──── */
+.notif-panel{position:fixed;top:69px;right:0;width:400px;max-width:90vw;height:calc(100vh - 69px);background:var(--bg2);border-left:1px solid var(--border);z-index:200;transform:translateX(100%);transition:transform .25s;overflow-y:auto;box-shadow:var(--shadow)}
+.notif-panel.open{transform:translateX(0)}
+.notif-panel-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.notif-item{padding:14px 20px;border-bottom:1px solid rgba(55,65,81,.5);cursor:pointer;transition:background .15s}
+.notif-item:hover{background:var(--bg3)}
+.notif-item.unread{border-left:3px solid var(--brand)}
+.notif-item .title{font-size:14px;font-weight:600;margin-bottom:4px}
+.notif-item .time{font-size:11px;color:var(--text3)}
+.notif-item .msg{font-size:13px;color:var(--text2)}
+
+/* ──── TOAST ──── */
+.toast-container{position:fixed;top:80px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:14px 20px;border-radius:8px;font-size:14px;font-weight:500;min-width:280px;box-shadow:var(--shadow);animation:slideIn .3s ease;color:#fff}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+.toast.info{background:var(--blue)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ──── AI STATUS ──── */
+.aria-status{display:flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:8px;font-size:13px;color:var(--green)}
+.aria-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ──── LOADING ──── */
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text3)}
+.spinner{width:24px;height:24px;border:3px solid var(--bg4);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite;margin-right:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ──── RESPONSIVE ──── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .content{padding:16px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .topbar{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ──── LOGIN SCREEN ──── -->
+<div id="login-screen">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:var(--brand);border-radius:12px;font-size:28px;font-weight:900;color:#000">C</div>
+    </div>
+    <h1>CFIS</h1>
+    <p>CoinDaily Financial Intelligence System<br><span style="font-size:12px;color:var(--text3)">Super Admin Access Only</span></p>
+    <label>Email</label>
+    <input type="email" id="login-email" placeholder="admin@coindaily.online" value="admin@coindaily.online">
+    <label>Password</label>
+    <input type="password" id="login-password" placeholder="Enter password">
+    <button onclick="handleLogin()">Sign In to CFIS</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ──── MAIN APP ──── -->
+<div id="app">
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">C</div>
+      <h1>CFIS <span>Dashboard</span></h1>
+    </div>
+    <div class="topbar-right">
+      <div class="aria-status">
+        <div class="aria-dot"></div>
+        ARIA Active
+      </div>
+      <div class="notif-badge" onclick="toggleNotifPanel()">
+        🔔 <span class="count" id="notif-count">0</span>
+      </div>
+      <div class="user-pill">
+        <strong>Super Admin</strong>
+      </div>
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Overview</div>
+        <div class="nav-item active" data-page="overview"><span class="icon">📊</span> Dashboard</div>
+        <div class="nav-item" data-page="wallets"><span class="icon">💰</span> Wallets</div>
+        <div class="nav-item" data-page="transactions"><span class="icon">🔄</span> Transactions</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Operations</div>
+        <div class="nav-item" data-page="press"><span class="icon">📰</span> Press Escrow</div>
+        <div class="nav-item" data-page="payroll"><span class="icon">👥</span> Staff Payroll</div>
+        <div class="nav-item" data-page="partnerships"><span class="icon">🤝</span> Partnerships</div>
+        <div class="nav-item" data-page="airdrops"><span class="icon">🪂</span> Airdrops</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Admin</div>
+        <div class="nav-item" data-page="bonus"><span class="icon">🎁</span> Bonus Pay</div>
+        <div class="nav-item" data-page="notifications"><span class="icon">🔔</span> Notifications</div>
+        <div class="nav-item" data-page="audit"><span class="icon">📋</span> Audit Log</div>
+        <div class="nav-item" data-page="ledger"><span class="icon">📒</span> Ledger</div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content" id="content">
+      <!-- Pages loaded dynamically -->
+    </div>
+  </div>
+
+  <!-- Notification Panel -->
+  <div class="notif-panel" id="notif-panel">
+    <div class="notif-panel-header">
+      <h3>🔔 Notifications</h3>
+      <button class="btn btn-sm btn-secondary" onclick="markAllRead()">Mark All Read</button>
+    </div>
+    <div id="notif-list"></div>
+  </div>
+</div>
+
+<!-- Modal Template -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title"></h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ────────────────────────────────────────────────────────────────────
+// CFIS Dashboard — Client-side Application
+// ────────────────────────────────────────────────────────────────────
+
+const API = window.location.origin + '/api';
+let TOKEN = localStorage.getItem('cfis_token') || '';
+let currentPage = 'overview';
+
+// ──── API Helper ────
+async function api(path, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' }
+  };
+  if (TOKEN) opts.headers['Authorization'] = `Bearer ${TOKEN}`;
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || 'Request failed');
+  return data;
+}
+
+// ──── Auth ────
+async function handleLogin() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const errorEl = document.getElementById('login-error');
+  try {
+    const res = await api('/auth/login', 'POST', { email, password });
+    TOKEN = res.data.token;
+    localStorage.setItem('cfis_token', TOKEN);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadPage('overview');
+    loadNotificationCount();
+  } catch (e) {
+    errorEl.textContent = e.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+function logout() {
+  TOKEN = '';
+  localStorage.removeItem('cfis_token');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+// Auto-login if token exists
+if (TOKEN) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadPage('overview');
+  loadNotificationCount();
+}
+
+// ──── Navigation ────
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    loadPage(item.dataset.page);
+  });
+});
+
+async function loadPage(page) {
+  currentPage = page;
+  const content = document.getElementById('content');
+  content.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+  try {
+    switch(page) {
+      case 'overview': await renderOverview(content); break;
+      case 'wallets': await renderWallets(content); break;
+      case 'transactions': await renderTransactions(content); break;
+      case 'press': await renderPress(content); break;
+      case 'payroll': await renderPayroll(content); break;
+      case 'partnerships': await renderPartnerships(content); break;
+      case 'airdrops': await renderAirdrops(content); break;
+      case 'bonus': await renderBonus(content); break;
+      case 'notifications': await renderNotifications(content); break;
+      case 'audit': await renderAudit(content); break;
+      case 'ledger': await renderLedger(content); break;
+    }
+  } catch(e) {
+    content.innerHTML = `<div class="card"><div class="card-body" style="color:var(--red)">Error loading page: ${e.message}<br><br><button class="btn btn-primary" onclick="loadPage('${page}')">Retry</button></div></div>`;
+  }
+}
+
+// ──── OVERVIEW PAGE ────
+async function renderOverview(el) {
+  let stats;
+  try { stats = (await api('/dashboard/stats')).data; } catch(e) { stats = null; }
+  
+  el.innerHTML = `
+    <h2 class="page-title">Financial Overview</h2>
+    <p class="page-subtitle">All payments flow through CFIS. AI Agent ARIA verifies all outbound transactions.</p>
+    <div class="stats-grid">
+      <div class="stat-card amber">
+        <div class="label">Treasury Balance (JY)</div>
+        <div class="value">${stats ? formatNum(stats.treasuryBalance || 0) : '—'}</div>
+        <div class="sub">Main CFIS Treasury</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">Total Wallets</div>
+        <div class="value">${stats ? stats.totalWallets || 0 : '—'}</div>
+        <div class="sub">Active tracked wallets</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="label">Transactions Today</div>
+        <div class="value">${stats ? stats.transactionsToday || 0 : '—'}</div>
+        <div class="sub">Last 24 hours</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="label">Pending Transactions</div>
+        <div class="value">${stats ? stats.pendingTransactions || 0 : '—'}</div>
+        <div class="sub">Awaiting processing</div>
+      </div>
+      <div class="stat-card cyan">
+        <div class="label">Active Escrows</div>
+        <div class="value">${stats ? stats.activeEscrows || 0 : '—'}</div>
+        <div class="sub">Press escrow holds</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">AI Verifications</div>
+        <div class="value">${stats ? stats.aiVerificationsToday || 0 : '—'}</div>
+        <div class="sub">ARIA checks today</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="label">Payroll Processed</div>
+        <div class="value">${stats ? formatNum(stats.totalPayrollThisMonth || 0) : '—'} JY</div>
+        <div class="sub">This month</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">Unread Notifications</div>
+        <div class="value">${stats ? stats.unreadNotifications || 0 : '—'}</div>
+        <div class="sub">Requires attention</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>💡 CFIS Flow — How Money Moves</h3></div>
+      <div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+        <div style="padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid var(--green)">
+          <strong style="color:var(--green)">↓ Inbound</strong>
+          <p style="color:var(--text2);font-size:13px;margin-top:4px">
+            Ad revenue, subscriptions, token purchases → all deposit to CFIS Treasury. Super Admin notified.
+          </p>
+        </div>
+        <div style="padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid var(--brand)">
+          <strong style="color:var(--brand)">🤖 ARIA Verification</strong>
+          <p style="color:var(--text2);font-size:13px;margin-top:4px">
+            Every outbound payment is verified by AI Agent ARIA. Score ≥ 85% = auto-approved. Flagged items require review.
+          </p>
+        </div>
+        <div style="padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid var(--blue)">
+          <strong style="color:var(--blue)">↑ Outbound</strong>
+          <p style="color:var(--text2);font-size:13px;margin-top:4px">
+            User withdrawals, staff payroll, press releases, partnership payments, bonuses — all executed by CFIS.
+          </p>
+        </div>
+        <div style="padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid var(--purple)">
+          <strong style="color:var(--purple)">📊 Double-Entry Ledger</strong>
+          <p style="color:var(--text2);font-size:13px;margin-top:4px">
+            Every movement is recorded in the GAAP-compliant double-entry ledger. Full audit trail maintained.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>⚡ Quick Actions</h3></div>
+      <div class="card-body">
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="loadPage('bonus')">🎁 Send Bonus</button>
+          <button class="btn btn-secondary" onclick="loadPage('press')">📰 View Escrows</button>
+          <button class="btn btn-secondary" onclick="loadPage('payroll')">👥 Run Payroll</button>
+          <button class="btn btn-secondary" onclick="loadPage('wallets')">💰 Manage Wallets</button>
+          <button class="btn btn-secondary" onclick="loadPage('ledger')">📒 View Ledger</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ──── WALLETS PAGE ────
+async function renderWallets(el) {
+  let wallets = [];
+  try { wallets = (await api('/wallets')).data || []; } catch(e) {}
+  
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div><h2 class="page-title">Wallets</h2><p class="page-subtitle">All CFIS-managed wallets</p></div>
+      <button class="btn btn-primary" onclick="showCreateWalletModal()">+ Create Wallet</button>
+    </div>
+    <div class="card">
+      <div class="card-body" style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>ID</th><th>Type</th><th>Owner</th><th>Address</th>
+            <th>JY Balance</th><th>Points</th><th>USD</th><th>Verified</th><th>Actions</th>
+          </tr></thead>
+          <tbody>
+            ${wallets.length === 0 ? '<tr><td colspan="9" style="text-align:center">No wallets found</td></tr>' : ''}
+            ${wallets.map(w => `<tr>
+              <td title="${w.id}">${w.id?.substring(0,8)}…</td>
+              <td><span class="badge badge-${typeColor(w.owner_type)}">${w.owner_type}</span></td>
+              <td>${w.owner_id?.substring(0,12) || '—'}</td>
+              <td style="font-family:monospace;font-size:12px">${w.wallet_address ? w.wallet_address.substring(0,10)+'…' : '—'}</td>
+              <td style="font-weight:600">${formatNum(w.balance_jy || 0)}</td>
+              <td>${formatNum(w.balance_points || 0)}</td>
+              <td>$${formatNum(w.balance_usd || 0)}</td>
+              <td>${w.is_verified ? '<span class="badge badge-green">Yes</span>' : '<span class="badge badge-gray">No</span>'}</td>
+              <td>
+                <button class="btn btn-sm btn-secondary" onclick="viewWalletTx('${w.id}')">Txns</button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function showCreateWalletModal() {
+  openModal('Create Wallet', `
+    <div class="form-row">
+      <div class="form-group">
+        <label>Owner Type</label>
+        <select id="cw-type"><option>USER</option><option>STAFF</option><option>PRESS</option><option>PARTNER</option><option>TREASURY</option></select>
+      </div>
+      <div class="form-group">
+        <label>Owner ID</label>
+        <input id="cw-owner" placeholder="e.g. user-123">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Wallet Address (optional)</label>
+      <input id="cw-address" placeholder="0x...">
+    </div>
+  `, `<button class="btn btn-primary" onclick="createWallet()">Create</button>`);
+}
+
+async function createWallet() {
+  try {
+    await api('/wallets', 'POST', {
+      owner_type: document.getElementById('cw-type').value,
+      owner_id: document.getElementById('cw-owner').value,
+      wallet_address: document.getElementById('cw-address').value || undefined
+    });
+    closeModal();
+    toast('Wallet created', 'success');
+    loadPage('wallets');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function viewWalletTx(walletId) {
+  try {
+    const txns = (await api(`/wallets/${walletId}/transactions`)).data || [];
+    openModal('Wallet Transactions', `
+      <table>
+        <thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          ${txns.length === 0 ? '<tr><td colspan="4">No transactions</td></tr>' : ''}
+          ${txns.map(t => `<tr>
+            <td><span class="badge badge-blue">${t.tx_type}</span></td>
+            <td>${formatNum(t.amount)} ${t.currency}</td>
+            <td><span class="badge badge-${statusColor(t.status)}">${t.status}</span></td>
+            <td>${fmtDate(t.created_at)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    `);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ──── TRANSACTIONS PAGE ────
+async function renderTransactions(el) {
+  let txns = [];
+  try { const r = await api('/transactions'); txns = r.data || []; } catch(e) {}
+  
+  el.innerHTML = `
+    <h2 class="page-title">Transactions</h2>
+    <p class="page-subtitle">All financial movements through CFIS</p>
+    <div class="card">
+      <div class="card-header">
+        <h3>Recent Transactions</h3>
+        <button class="btn btn-sm btn-secondary" onclick="loadPage('transactions')">🔄 Refresh</button>
+      </div>
+      <div class="card-body" style="overflow-x:auto">
+        <table>
+          <thead><tr><th>ID</th><th>Type</th><th>Amount</th><th>From</th><th>To</th><th>Status</th><th>AI</th><th>Date</th></tr></thead>
+          <tbody>
+            ${txns.length === 0 ? '<tr><td colspan="8" style="text-align:center">No transactions yet</td></tr>' : ''}
+            ${txns.map(t => `<tr>
+              <td title="${t.id}">${t.id?.substring(0,8)}…</td>
+              <td><span class="badge badge-blue">${t.tx_type}</span></td>
+              <td style="font-weight:600">${formatNum(t.amount)} ${t.currency}</td>
+              <td>${t.from_wallet_id ? t.from_wallet_id.substring(0,8)+'…' : '—'}</td>
+              <td>${t.to_wallet_id ? t.to_wallet_id.substring(0,8)+'…' : '—'}</td>
+              <td><span class="badge badge-${statusColor(t.status)}">${t.status}</span></td>
+              <td>${t.ai_verification_id ? '✅' : '—'}</td>
+              <td>${fmtDate(t.created_at)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ──── PRESS ESCROW PAGE ────
+async function renderPress(el) {
+  let escrows = [];
+  try { escrows = (await api('/press/escrows')).data || []; } catch(e) {}
+  
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div><h2 class="page-title">Press Escrow</h2><p class="page-subtitle">Users order PR packages at press.coindaily.online → payments held in escrow here → AI verify → Release or Refund (minus gas fees)</p></div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="showCreateEscrowModal()">📝 Manual Entry</button>
+        <button class="btn btn-primary" onclick="processReleasable()">🔄 Process Releasable</button>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--muted)">
+        <span>🟢 <b>SENDPRESS</b> = User placed order at press.coindaily.online</span>
+        <span>🟡 <b>MANUAL</b> = Admin created via CFIS dashboard</span>
+        <span>⛽ Refunds deduct <b>${'${GAS_FEE}'}%</b> gas fee (sent to treasury)</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="overflow-x:auto">
+        <table>
+          <thead><tr><th>ID</th><th>Source</th><th>Amount</th><th>Site</th><th>Status</th><th>Funded</th><th>Releasable At</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${escrows.length === 0 ? '<tr><td colspan="8" style="text-align:center">No escrows — user orders from SENDPRESS will appear here automatically</td></tr>' : ''}
+            ${escrows.map(e => {
+              const isUserOrder = e.metadata?.source === 'SENDPRESS_USER_DASHBOARD' || e.press_order_id?.startsWith('dist-') || (e.metadata && e.metadata.prTitle);
+              const sourceLabel = isUserOrder ? '🟢 SENDPRESS' : '🟡 MANUAL';
+              return `<tr>
+              <td title="${e.id}">${e.id?.substring(0,8)}…</td>
+              <td><span style="font-size:12px;white-space:nowrap">${sourceLabel}</span></td>
+              <td style="font-weight:600">${formatNum(e.amount)} ${e.currency || 'JY'}</td>
+              <td><a href="${e.site_url}" target="_blank">${e.site_url || '—'}</a></td>
+              <td><span class="badge badge-${escrowStatusColor(e.status)}">${e.status}</span></td>
+              <td>${fmtDate(e.funded_at)}</td>
+              <td>${e.release_eligible_at ? fmtDate(e.release_eligible_at) : (e.release_after ? fmtDate(e.release_after) : '—')}</td>
+              <td>
+                ${e.status === 'FUNDED' || e.status === 'PENDING_RELEASE' ? `
+                  <button class="btn btn-sm btn-primary" onclick="releaseEscrow('${e.id}')">Release</button>
+                  <button class="btn btn-sm btn-danger" onclick="refundEscrow('${e.id}')">Refund</button>
+                ` : ''}
+              </td>
+            </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function showCreateEscrowModal() {
+  openModal('📝 Manual Press Escrow Entry', `
+    <div style="background:#2a2a0a;border:1px solid #444;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#cca">
+      ⚠️ <b>Manual entry only.</b> Normal flow: Users place PR orders at <b>press.coindaily.online</b> → escrow is created here automatically.<br>
+      Use this form only for manually processing escrows outside the SENDPRESS system.
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Publisher Wallet ID</label><input id="ce-pub" placeholder="Publisher wallet"></div>
+      <div class="form-group"><label>Recipient Wallet ID</label><input id="ce-rcv" placeholder="Recipient wallet"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Amount (JY)</label><input id="ce-amount" type="number" placeholder="1000"></div>
+      <div class="form-group"><label>Press Order ID</label><input id="ce-order" placeholder="MANUAL-001"></div>
+    </div>
+    <div class="form-group"><label>Site URL</label><input id="ce-url" placeholder="https://example.com/article"></div>
+  `, `<button class="btn btn-primary" onclick="createEscrow()">Fund Escrow (Manual)</button>`);
+}
+
+async function createEscrow() {
+  try {
+    await api('/press/escrows', 'POST', {
+      publisherWalletId: document.getElementById('ce-pub').value,
+      recipientWalletId: document.getElementById('ce-rcv').value,
+      amount: parseFloat(document.getElementById('ce-amount').value),
+      pressOrderId: document.getElementById('ce-order').value,
+      siteUrl: document.getElementById('ce-url').value
+    });
+    closeModal(); toast('Escrow created', 'success'); loadPage('press');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function releaseEscrow(id) {
+  try { await api(`/press/escrows/${id}/release`, 'POST'); toast('Escrow released', 'success'); loadPage('press'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function refundEscrow(id) {
+  const reason = prompt('Refund reason (fraud, no slot, PR not placed, etc.):', 'Admin-initiated refund');
+  if (!reason) return;
+  try { await api(`/press/escrows/${id}/refund`, 'POST', { reason }); toast('Escrow refunded (gas fees deducted)', 'success'); loadPage('press'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function processReleasable() {
+  try { const r = await api('/press/process-releasable', 'POST'); toast(`Released: ${r.data.released}, Failed: ${r.data.failed}`, 'info'); loadPage('press'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ──── PAYROLL PAGE ────
+async function renderPayroll(el) {
+  let schedules = [], history = [];
+  try { schedules = (await api('/payroll/schedules')).data || []; } catch(e) {}
+  try { history = (await api('/payroll/history')).data || []; } catch(e) {}
+  
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div><h2 class="page-title">Staff Payroll</h2><p class="page-subtitle">Automated monthly payments from CFIS treasury</p></div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="showAddScheduleModal()">+ Add Staff</button>
+        <button class="btn btn-secondary" onclick="runPayroll()">⚡ Run Payroll Now</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Active Schedules</h3></div>
+      <div class="card-body" style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Staff</th><th>Wallet</th><th>Monthly (JY)</th><th>Pay Day</th><th>Active</th><th>Last Paid</th></tr></thead>
+          <tbody>
+            ${schedules.length === 0 ? '<tr><td colspan="6" style="text-align:center">No schedules</td></tr>' : ''}
+            ${schedules.map(s => `<tr>
+              <td style="font-weight:600">${s.staff_name}</td>
+              <td>${s.staff_wallet_id?.substring(0,8)}…</td>
+              <td style="font-weight:600;color:var(--brand)">${formatNum(s.monthly_amount)}</td>
+              <td>Day ${s.pay_day_of_month}</td>
+              <td>${s.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Paused</span>'}</td>
+              <td>${s.last_paid_at ? fmtDate(s.last_paid_at) : 'Never'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Payment History</h3></div>
+      <div class="card-body" style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Staff</th><th>Wallet</th><th>Amount</th><th>Period</th><th>Status</th><th>Paid At</th></tr></thead>
+          <tbody>
+            ${history.length === 0 ? '<tr><td colspan="6" style="text-align:center">No payments yet</td></tr>' : ''}
+            ${history.map(h => `<tr>
+              <td>${h.staff_name || '—'}</td>
+              <td>${h.staff_wallet_id?.substring(0,8)}…</td>
+              <td style="font-weight:600">${formatNum(h.amount)} ${h.currency}</td>
+              <td>${h.pay_period}</td>
+              <td><span class="badge badge-${statusColor(h.status)}">${h.status}</span></td>
+              <td>${h.paid_at ? fmtDate(h.paid_at) : '—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function showAddScheduleModal() {
+  openModal('Add Staff to Payroll', `
+    <div class="form-group"><label>Staff Name</label><input id="ps-name" placeholder="John Doe"></div>
+    <div class="form-group"><label>Staff Wallet ID</label><input id="ps-wallet" placeholder="Wallet ID"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Monthly Amount (JY)</label><input id="ps-amount" type="number" placeholder="5000"></div>
+      <div class="form-group"><label>Pay Day of Month (1-28)</label><input id="ps-day" type="number" min="1" max="28" value="1"></div>
+    </div>
+  `, `<button class="btn btn-primary" onclick="addSchedule()">Add to Payroll</button>`);
+}
+
+async function addSchedule() {
+  try {
+    await api('/payroll/schedules', 'POST', {
+      staffName: document.getElementById('ps-name').value,
+      staffWalletId: document.getElementById('ps-wallet').value,
+      monthlyAmount: parseFloat(document.getElementById('ps-amount').value),
+      payDayOfMonth: parseInt(document.getElementById('ps-day').value)
+    });
+    closeModal(); toast('Staff added to payroll', 'success'); loadPage('payroll');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function runPayroll() {
+  try {
+    const r = await api('/payroll/process', 'POST');
+    toast(`Payroll complete. Processed: ${r.data.processed}, Failed: ${r.data.failed}`, 'info');
+    loadPage('payroll');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ──── PARTNERSHIPS PAGE ────
+async function renderPartnerships(el) {
+  let partnerships = [];
+  try { partnerships = (await api('/partnerships')).data || []; } catch(e) {}
+  
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div><h2 class="page-title">Partnerships</h2><p class="page-subtitle">Contract verification → AI doc check → payment</p></div>
+      <button class="btn btn-primary" onclick="showCreatePartnershipModal()">+ New Partnership</button>
+    </div>
+    <div class="card"><div class="card-body" style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Partner</th><th>Amount</th><th>Status</th><th>Doc Hash</th><th>Verified</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${partnerships.length === 0 ? '<tr><td colspan="6" style="text-align:center">No partnerships</td></tr>' : ''}
+          ${partnerships.map(p => `<tr>
+            <td style="font-weight:600">${p.partner_name}</td>
+            <td style="font-weight:600">${formatNum(p.contract_amount)} ${p.currency || 'JY'}</td>
+            <td><span class="badge badge-${statusColor(p.status)}">${p.status}</span></td>
+            <td style="font-family:monospace;font-size:11px">${p.contract_doc_hash ? p.contract_doc_hash.substring(0,16)+'…' : '—'}</td>
+            <td>${p.ai_verified ? '✅' : '❌'}</td>
+            <td>
+              ${p.status === 'PENDING_DOCS' ? `<button class="btn btn-sm btn-secondary" onclick="showSubmitDocsModal('${p.id}')">Submit Docs</button>` : ''}
+              ${p.status === 'DOCS_VERIFIED' ? `<button class="btn btn-sm btn-primary" onclick="processPartnerPay('${p.id}')">Process Payment</button>` : ''}
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div></div>
+  `;
+}
+
+function showCreatePartnershipModal() {
+  openModal('Create Partnership', `
+    <div class="form-row">
+      <div class="form-group"><label>Partner Name</label><input id="cp-name" placeholder="CoinMarketCap"></div>
+      <div class="form-group"><label>Partner Wallet ID</label><input id="cp-wallet" placeholder="Wallet ID"></div>
+    </div>
+    <div class="form-group"><label>Contract Amount (JY)</label><input id="cp-amount" type="number" placeholder="50000"></div>
+  `, `<button class="btn btn-primary" onclick="createPartnership()">Create</button>`);
+}
+
+async function createPartnership() {
+  try {
+    await api('/partnerships', 'POST', {
+      partnerName: document.getElementById('cp-name').value,
+      partnerWalletId: document.getElementById('cp-wallet').value,
+      contractAmount: parseFloat(document.getElementById('cp-amount').value)
+    });
+    closeModal(); toast('Partnership created', 'success'); loadPage('partnerships');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function showSubmitDocsModal(id) {
+  openModal('Submit Contract Documents', `
+    <div class="form-group"><label>Contract Document URL</label><input id="sd-url" placeholder="https://..."></div>
+    <div class="form-group"><label>Contract Content (text for hashing)</label><textarea id="sd-content" rows="4" placeholder="Full contract text..."></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Signed Date</label><input id="sd-date" type="date"></div>
+      <div class="form-group"><label>Contract Parties (comma-separated)</label><input id="sd-parties" placeholder="CoinDaily, Partner Co"></div>
+    </div>
+  `, `<button class="btn btn-primary" onclick="submitDocs('${id}')">Submit & Verify</button>`);
+}
+
+async function submitDocs(id) {
+  try {
+    await api(`/partnerships/${id}/submit-docs`, 'POST', {
+      contractDocUrl: document.getElementById('sd-url').value,
+      contractDocContent: document.getElementById('sd-content').value,
+      contractSignedDate: document.getElementById('sd-date').value,
+      contractParties: document.getElementById('sd-parties').value.split(',').map(s => s.trim())
+    });
+    closeModal(); toast('Documents submitted for AI verification', 'success'); loadPage('partnerships');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function processPartnerPay(id) {
+  try { await api(`/partnerships/${id}/process-payment`, 'POST'); toast('Partnership payment processed', 'success'); loadPage('partnerships'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ──── AIRDROPS PAGE ────
+async function renderAirdrops(el) {
+  let campaigns = [];
+  try { campaigns = (await api('/airdrops')).data || []; } catch(e) {}
+  
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div><h2 class="page-title">Airdrop Campaigns</h2><p class="page-subtitle">Monitor project funding wallets → record distributions</p></div>
+      <button class="btn btn-primary" onclick="showCreateCampaignModal()">+ New Campaign</button>
+    </div>
+    <div class="card"><div class="card-body" style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Project</th><th>Fund Amount</th><th>Distributed</th><th>Status</th><th>Funding Wallet</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${campaigns.length === 0 ? '<tr><td colspan="6" style="text-align:center">No campaigns</td></tr>' : ''}
+          ${campaigns.map(c => `<tr>
+            <td style="font-weight:600">${c.project_name}</td>
+            <td>${formatNum(c.total_fund_amount)}</td>
+            <td>${formatNum(c.distributed_amount || 0)}</td>
+            <td><span class="badge badge-${campaignStatusColor(c.status)}">${c.status}</span></td>
+            <td style="font-family:monospace;font-size:12px">${c.funding_wallet_address?.substring(0,12)}…</td>
+            <td>
+              ${c.status === 'CREATED' ? `<button class="btn btn-sm btn-secondary" onclick="verifyFunding('${c.id}')">Verify Funding</button>` : ''}
+              ${c.status === 'FUNDED' ? `<button class="btn btn-sm btn-primary" onclick="activateCampaign('${c.id}')">Activate</button>` : ''}
+              ${c.status === 'ACTIVE' ? `<button class="btn btn-sm btn-secondary" onclick="showDistributionModal('${c.id}')">Record Distribution</button>` : ''}
+              <button class="btn btn-sm btn-secondary" onclick="viewCampaignSummary('${c.id}')">Summary</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div></div>
+  `;
+}
+
+function showCreateCampaignModal() {
+  openModal('Create Airdrop Campaign', `
+    <div class="form-group"><label>Project Name</label><input id="ac-name" placeholder="PEPE Token"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Total Fund Amount</label><input id="ac-amount" type="number" placeholder="100000"></div>
+      <div class="form-group"><label>Token Address</label><input id="ac-token" placeholder="0x..."></div>
+    </div>
+    <div class="form-group"><label>Funding Wallet</label><input id="ac-funding" placeholder="0x..."></div>
+  `, `<button class="btn btn-primary" onclick="createCampaign()">Create Campaign</button>`);
+}
+
+async function createCampaign() {
+  try {
+    await api('/airdrops', 'POST', {
+      projectName: document.getElementById('ac-name').value,
+      totalFundAmount: parseFloat(document.getElementById('ac-amount').value),
+      tokenAddress: document.getElementById('ac-token').value,
+      fundingWalletAddress: document.getElementById('ac-funding').value
+    });
+    closeModal(); toast('Campaign created', 'success'); loadPage('airdrops');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function verifyFunding(id) {
+  try { await api(`/airdrops/${id}/verify-funding`, 'POST'); toast('Funding verification initiated', 'info'); loadPage('airdrops'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function activateCampaign(id) {
+  try { await api(`/airdrops/${id}/activate`, 'POST'); toast('Campaign activated', 'success'); loadPage('airdrops'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+function showDistributionModal(id) {
+  openModal('Record Distribution', `
+    <div class="form-group"><label>Recipient Address</label><input id="rd-addr" placeholder="0x..."></div>
+    <div class="form-row">
+      <div class="form-group"><label>Amount</label><input id="rd-amount" type="number" placeholder="1000"></div>
+      <div class="form-group"><label>Tx Hash</label><input id="rd-hash" placeholder="0x..."></div>
+    </div>
+  `, `<button class="btn btn-primary" onclick="recordDistribution('${id}')">Record</button>`);
+}
+
+async function recordDistribution(id) {
+  try {
+    await api(`/airdrops/${id}/record-distribution`, 'POST', {
+      recipientAddress: document.getElementById('rd-addr').value,
+      amount: parseFloat(document.getElementById('rd-amount').value),
+      txHash: document.getElementById('rd-hash').value
+    });
+    closeModal(); toast('Distribution recorded', 'success'); loadPage('airdrops');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function viewCampaignSummary(id) {
+  try {
+    const s = (await api(`/airdrops/${id}/summary`)).data;
+    openModal('Campaign Summary', `
+      <div style="display:grid;gap:12px">
+        <div style="padding:12px;background:var(--bg);border-radius:8px"><strong>Project:</strong> ${s.project_name || '—'}</div>
+        <div style="padding:12px;background:var(--bg);border-radius:8px"><strong>Total Fund:</strong> ${formatNum(s.total_fund_amount || 0)}</div>
+        <div style="padding:12px;background:var(--bg);border-radius:8px"><strong>Distributed:</strong> ${formatNum(s.distributed_amount || 0)}</div>
+        <div style="padding:12px;background:var(--bg);border-radius:8px"><strong>Recipients:</strong> ${s.distribution_count || 0}</div>
+        <div style="padding:12px;background:var(--bg);border-radius:8px"><strong>Status:</strong> ${s.status}</div>
+      </div>
+    `);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ──── BONUS PAGE ────
+async function renderBonus(el) {
+  el.innerHTML = `
+    <h2 class="page-title">Bonus Payments</h2>
+    <p class="page-subtitle">Ad-hoc payments from CFIS treasury. AI ARIA verifies before execution.</p>
+    <div class="card">
+      <div class="card-header"><h3>🎁 Send Bonus Payment</h3></div>
+      <div class="card-body">
+        <div class="form-group"><label>Recipient Wallet ID</label><input id="bp-wallet" placeholder="Enter wallet ID"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Amount (JY)</label><input id="bp-amount" type="number" placeholder="1000"></div>
+          <div class="form-group"><label>Reason</label><input id="bp-reason" placeholder="Performance bonus Q4"></div>
+        </div>
+        <div style="margin-top:16px;padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid var(--brand)">
+          <strong style="color:var(--brand)">🤖 ARIA Note:</strong>
+          <p style="font-size:13px;color:var(--text2);margin-top:4px">This payment will be verified by AI Agent ARIA before execution. ARIA checks wallet existence, amount reasonableness, and requestor authorization.</p>
+        </div>
+        <button class="btn btn-primary" style="margin-top:20px" onclick="sendBonus()">Send Bonus via CFIS</button>
+      </div>
+    </div>
+  `;
+}
+
+async function sendBonus() {
+  try {
+    const r = await api('/payments/bonus', 'POST', {
+      recipientWalletId: document.getElementById('bp-wallet').value,
+      amount: parseFloat(document.getElementById('bp-amount').value),
+      reason: document.getElementById('bp-reason').value
+    });
+    toast('Bonus payment processed by CFIS', 'success');
+    loadPage('transactions');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ──── NOTIFICATIONS PAGE ────
+async function renderNotifications(el) {
+  let notifs = [];
+  try { notifs = (await api('/notifications')).data || []; } catch(e) {}
+  
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div><h2 class="page-title">Notifications</h2><p class="page-subtitle">CFIS system alerts and updates</p></div>
+      <button class="btn btn-secondary" onclick="markAllReadAndRefresh()">Mark All Read</button>
+    </div>
+    <div class="card"><div class="card-body">
+      ${notifs.length === 0 ? '<p style="color:var(--text3);text-align:center;padding:40px">No notifications</p>' : ''}
+      ${notifs.map(n => `
+        <div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="markOneRead('${n.id}')">
+          <div class="title">${n.title} <span class="badge badge-${priorityColor(n.priority)}" style="margin-left:8px">${n.priority}</span></div>
+          <div class="msg">${n.message}</div>
+          <div class="time">${fmtDate(n.created_at)} · ${n.category}</div>
+        </div>
+      `).join('')}
+    </div></div>
+  `;
+}
+
+async function markOneRead(id) {
+  try { await api(`/notifications/${id}/read`, 'PUT'); loadPage('notifications'); loadNotificationCount(); }
+  catch(e) {}
+}
+async function markAllReadAndRefresh() {
+  try { await api('/notifications/read-all', 'PUT'); loadPage('notifications'); loadNotificationCount(); toast('All marked read', 'info'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ──── AUDIT PAGE ────
+async function renderAudit(el) {
+  let entries = [];
+  try { entries = (await api('/notifications/audit')).data || []; } catch(e) {}
+  
+  el.innerHTML = `
+    <h2 class="page-title">Audit Log</h2>
+    <p class="page-subtitle">Immutable record of all CFIS actions</p>
+    <div class="card"><div class="card-body" style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Action</th><th>Entity</th><th>Actor</th><th>Details</th><th>Time</th></tr></thead>
+        <tbody>
+          ${entries.length === 0 ? '<tr><td colspan="5" style="text-align:center">No audit entries</td></tr>' : ''}
+          ${entries.map(a => `<tr>
+            <td><span class="badge badge-blue">${a.action}</span></td>
+            <td>${a.entity_type} ${a.entity_id?.substring(0,8)}…</td>
+            <td>${a.actor}</td>
+            <td style="font-size:12px;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis">${JSON.stringify(a.new_values || {}).substring(0,60)}</td>
+            <td>${fmtDate(a.created_at)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div></div>
+  `;
+}
+
+// ──── LEDGER PAGE ────
+async function renderLedger(el) {
+  let pnl, bs;
+  try { pnl = (await api('/dashboard/profit-loss')).data; } catch(e) { pnl = null; }
+  try { bs = (await api('/dashboard/balance-sheet')).data; } catch(e) { bs = null; }
+  
+  el.innerHTML = `
+    <h2 class="page-title">Financial Ledger</h2>
+    <p class="page-subtitle">GAAP-compliant double-entry bookkeeping</p>
+    <div class="stats-grid">
+      <div class="stat-card green"><div class="label">Total Revenue</div><div class="value">${pnl ? formatNum(pnl.total_revenue || 0) : '—'}</div></div>
+      <div class="stat-card red"><div class="label">Total Expenses</div><div class="value">${pnl ? formatNum(pnl.total_expenses || 0) : '—'}</div></div>
+      <div class="stat-card amber"><div class="label">Net Income</div><div class="value">${pnl ? formatNum(pnl.net_income || 0) : '—'}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Profit & Loss</h3></div>
+      <div class="card-body">
+        ${pnl && pnl.revenue ? `
+          <h4 style="color:var(--green);margin-bottom:12px">Revenue</h4>
+          <table><thead><tr><th>Account</th><th>Amount</th></tr></thead><tbody>
+            ${(pnl.revenue || []).map(r => `<tr><td>${r.account_name || r.account_code}</td><td>${formatNum(r.total)}</td></tr>`).join('')}
+          </tbody></table>
+          <h4 style="color:var(--red);margin:20px 0 12px">Expenses</h4>
+          <table><thead><tr><th>Account</th><th>Amount</th></tr></thead><tbody>
+            ${(pnl.expenses || []).map(r => `<tr><td>${r.account_name || r.account_code}</td><td>${formatNum(r.total)}</td></tr>`).join('')}
+          </tbody></table>
+        ` : '<p style="color:var(--text3)">No ledger data available</p>'}
+      </div>
+    </div>
+  `;
+}
+
+// ──── NOTIFICATION PANEL ────
+async function loadNotificationCount() {
+  try {
+    const r = await api('/notifications/unread');
+    const count = r.data?.length || 0;
+    document.getElementById('notif-count').textContent = count;
+  } catch(e) {}
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) loadNotifPanel();
+}
+
+async function loadNotifPanel() {
+  try {
+    const r = await api('/notifications/unread');
+    const notifs = r.data || [];
+    document.getElementById('notif-list').innerHTML = notifs.length === 0
+      ? '<p style="padding:40px;text-align:center;color:var(--text3)">No unread notifications</p>'
+      : notifs.map(n => `
+        <div class="notif-item unread" onclick="markOneRead('${n.id}')">
+          <div class="title">${n.title}</div>
+          <div class="msg">${n.message}</div>
+          <div class="time">${fmtDate(n.created_at)}</div>
+        </div>
+      `).join('');
+  } catch(e) {}
+}
+
+async function markAllRead() {
+  try { await api('/notifications/read-all', 'PUT'); loadNotificationCount(); loadNotifPanel(); toast('All read', 'info'); }
+  catch(e) {}
+}
+
+// ──── UTILITY ────
+function formatNum(n) { return Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 }); }
+function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+function typeColor(t) { return { USER: 'blue', STAFF: 'purple', PRESS: 'amber', PARTNER: 'green', TREASURY: 'amber', ESCROW: 'red' }[t] || 'gray'; }
+function statusColor(s) { return { COMPLETED: 'green', APPROVED: 'green', PAID: 'green', PENDING: 'amber', PENDING_DOCS: 'amber', PROCESSING: 'blue', FAILED: 'red', REJECTED: 'red', DOCS_VERIFIED: 'green' }[s] || 'gray'; }
+function escrowStatusColor(s) { return { FUNDED: 'blue', PENDING_RELEASE: 'amber', RELEASED: 'green', REFUNDED: 'red' }[s] || 'gray'; }
+function campaignStatusColor(s) { return { CREATED: 'gray', FUNDED: 'blue', ACTIVE: 'green', COMPLETED: 'purple', CANCELLED: 'red' }[s] || 'gray'; }
+function priorityColor(p) { return { HIGH: 'red', URGENT: 'red', MEDIUM: 'amber', LOW: 'gray' }[p] || 'gray'; }
+
+// ──── MODAL ────
+function openModal(title, body, footer = '') {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-footer').innerHTML = footer;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
+document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target.id === 'modal-overlay') closeModal(); });
+
+// ──── TOAST ────
+function toast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+// Auto-refresh notification count every 30 seconds
+setInterval(loadNotificationCount, 30000);
+</script>
+</body>
+</html>

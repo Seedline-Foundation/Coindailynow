@@ -179,6 +179,8 @@ export default function SuperAdminHeader({ sidebarOpen, setSidebarOpen }: SuperA
             )}
           </div>
 
+          {/* Portal quick-links moved to profile dropdown */}
+
           {/* Settings */}
           <button className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700">
             <Settings className="w-5 h-5" />
@@ -208,6 +210,42 @@ export default function SuperAdminHeader({ sidebarOpen, setSidebarOpen }: SuperA
                     {user?.email}
                   </p>
                 </div>
+
+                {/* Portal links */}
+                <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+                  <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                    Portals
+                  </p>
+                  <a
+                    href="https://jet.coindaily.online/super-admin/login"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+                    Staff / Super Admin
+                    <span className="ml-auto text-[10px] text-gray-400">jet.coindaily.online</span>
+                  </a>
+                  <a
+                    href="https://coindaily.online/user"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0" />
+                    User Dashboard
+                    <span className="ml-auto text-[10px] text-gray-400">coindaily.online</span>
+                  </a>
+                  <a
+                    href="/ceo/login"
+                    className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                    CEO Dashboard
+                    <span className="ml-auto text-[10px] text-gray-400">secured</span>
+                  </a>
+                </div>
+
                 <div className="p-2">
                   <button
                     onClick={logout}

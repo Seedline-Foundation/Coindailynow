@@ -1,4 +1,4 @@
-export type TaxCountryCode = 'NG' | 'GH' | 'KE';
+export type TaxCountryCode = 'NG' | 'GH' | 'KE' | 'ZA' | 'EG' | 'UG' | 'TZ' | 'MA' | 'SN' | 'CI';
 export type CostBasisMethod = 'FIFO' | 'LIFO' | 'HIFO';
 
 export type TaxTxType =
@@ -73,11 +73,24 @@ function parseTs(ts: string): number {
 }
 
 export function getDefaultRules(countryCode: TaxCountryCode, taxYear: number): TaxRules {
-  // Blueprint Feature 09 launch defaults
+  // Blueprint Feature 09 — all 10 African countries
   const base = countryCode.toUpperCase() as TaxCountryCode;
-  if (base === 'NG') return { countryCode: 'NG', taxYear, capitalGainsRate: 0.10, incomeRate: 0.10, costBasisDefault: 'FIFO' };
-  if (base === 'GH') return { countryCode: 'GH', taxYear, capitalGainsRate: 0.15, incomeRate: 0.15, costBasisDefault: 'FIFO' };
-  return { countryCode: 'KE', taxYear, capitalGainsRate: 0.03, incomeRate: 0.03, costBasisDefault: 'FIFO' };
+
+  const ruleMap: Record<TaxCountryCode, { cg: number; inc: number }> = {
+    NG: { cg: 0.10,  inc: 0.10  }, // Nigeria — 10% CGT
+    GH: { cg: 0.25,  inc: 0.25  }, // Ghana — 25% CGT (corrected from 15%)
+    KE: { cg: 0.15,  inc: 0.03  }, // Kenya — 15% CGT + 3% Digital Asset Tax
+    ZA: { cg: 0.18,  inc: 0.45  }, // South Africa — effective 18% inclusion CGT, up to 45% income
+    EG: { cg: 0.00,  inc: 0.00  }, // Egypt — no official crypto tax framework yet
+    UG: { cg: 0.00,  inc: 0.30  }, // Uganda — no specific CGT, general income rate ~30%
+    TZ: { cg: 0.00,  inc: 0.00  }, // Tanzania — crypto officially banned, no tax
+    MA: { cg: 0.00,  inc: 0.00  }, // Morocco — banned 2017, regulation pending
+    SN: { cg: 0.10,  inc: 0.25  }, // Senegal — WAEMU framework, general income rates apply
+    CI: { cg: 0.10,  inc: 0.25  }, // Côte d'Ivoire — WAEMU framework
+  };
+
+  const rates = ruleMap[base] || ruleMap.NG;
+  return { countryCode: base, taxYear, capitalGainsRate: rates.cg, incomeRate: rates.inc, costBasisDefault: 'FIFO' };
 }
 
 function pickLots(lots: Lot[], method: CostBasisMethod): Lot[] {

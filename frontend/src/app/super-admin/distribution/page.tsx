@@ -27,7 +27,9 @@ import {
   Instagram,
   Youtube,
   Search,
-  Filter
+  Filter,
+  X,
+  ChevronDown
 } from 'lucide-react';
 
 interface Campaign {
@@ -75,7 +77,7 @@ export default function DistributionPage() {
   const { user } = useSuperAdmin();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'campaigns' | 'social' | 'email' | 'push' | 'rss'>('campaigns');
+  const [activeTab, setActiveTab] = useState<'campaigns' | 'social' | 'email' | 'push' | 'rss' | 'settings'>('campaigns');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   
@@ -83,9 +85,56 @@ export default function DistributionPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [socialPosts, setSocialPosts] = useState<SocialPost[]>([]);
 
-  useEffect(() => {
-    loadDistributionData();
-  }, []);
+  // New Campaign modal
+  const [showNewCampaign, setShowNewCampaign] = useState(false);
+  const [campaignForm, setCampaignForm] = useState({
+    title: '',
+    type: 'email' as Campaign['type'],
+    channels: [] as string[],
+    scheduledFor: '',
+    recipients: '',
+    content: '',
+  });
+  const [savingCampaign, setSavingCampaign] = useState(false);
+
+  const CHANNEL_OPTIONS: Record<Campaign['type'], string[]> = {
+    email: ['email-list', 'mailgun', 'sendgrid'],
+    push: ['web-push', 'fcm-android', 'apns-ios'],
+    social: ['twitter', 'facebook', 'linkedin', 'instagram'],
+    rss: ['rss-feed', 'atom-feed'],
+  };
+
+  const toggleChannel = (ch: string) => {
+    setCampaignForm(f => ({
+      ...f,
+      channels: f.channels.includes(ch) ? f.channels.filter(c => c !== ch) : [...f.channels, ch],
+    }));
+  };
+
+  const handleCreateCampaign = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingCampaign(true);
+    try {
+      const newCampaign: Campaign = {
+        id: `camp_${Date.now()}`,
+        title: campaignForm.title,
+        type: campaignForm.type,
+        status: campaignForm.scheduledFor ? 'scheduled' : 'draft',
+        channels: campaignForm.channels.length ? campaignForm.channels : [campaignForm.type],
+        scheduledFor: campaignForm.scheduledFor || new Date().toISOString(),
+        recipients: parseInt(campaignForm.recipients) || 0,
+        opened: 0,
+        clicked: 0,
+        conversions: 0,
+        createdBy: 'Super Admin',
+      };
+      setCampaigns(prev => [newCampaign, ...prev]);
+      setShowNewCampaign(false);
+      setCampaignForm({ title: '', type: 'email', channels: [], scheduledFor: '', recipients: '', content: '' });
+    } finally {
+      setSavingCampaign(false);
+    }
+  };
 
   const loadDistributionData = async () => {
     try {
@@ -190,6 +239,7 @@ export default function DistributionPage() {
               Refresh
             </button>
             <button
+              onClick={() => setShowNewCampaign(true)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -291,18 +341,18 @@ export default function DistributionPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-gray-700">
-        {(['campaigns', 'social', 'email', 'push', 'rss'] as const).map((tab) => (
+      <div className="flex gap-2 mb-6 border-b border-gray-700 overflow-x-auto">
+        {(['campaigns', 'social', 'email', 'push', 'rss', 'settings'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-6 py-3 font-medium transition-colors capitalize ${
+            className={`px-6 py-3 font-medium transition-colors capitalize whitespace-nowrap ${
               activeTab === tab
                 ? 'text-blue-500 border-b-2 border-blue-500'
                 : 'text-gray-400 hover:text-gray-300'
             }`}
           >
-            {tab}
+            {tab === 'settings' ? '⚙ Channel Settings' : tab}
           </button>
         ))}
       </div>
@@ -496,6 +546,352 @@ export default function DistributionPage() {
             >
               Go to Campaigns
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Channel Settings Tab ── */}
+      {activeTab === 'settings' && (
+        <div className="space-y-6 max-w-3xl">
+          {/* Social — Twitter/X */}
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Twitter className="w-5 h-5 text-sky-400" />
+              <h3 className="text-white font-semibold text-lg">Twitter / X</h3>
+              <span className="ml-auto px-2 py-0.5 text-xs rounded-full bg-green-900 text-green-300">Connected</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">API Key</label>
+                <input type="password" defaultValue="••••••••••••••••" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">API Secret</label>
+                <input type="password" defaultValue="••••••••••••••••" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Access Token</label>
+                <input type="password" defaultValue="••••••••••••••••" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Access Token Secret</label>
+                <input type="password" defaultValue="••••••••••••••••" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Facebook */}
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Facebook className="w-5 h-5 text-blue-500" />
+              <h3 className="text-white font-semibold text-lg">Facebook / Meta</h3>
+              <span className="ml-auto px-2 py-0.5 text-xs rounded-full bg-green-900 text-green-300">Connected</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Page Access Token</label>
+                <input type="password" defaultValue="••••••••••••••••" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Page ID</label>
+                <input type="text" defaultValue="coindailyafrica" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm text-gray-400 mb-1">App Secret</label>
+                <input type="password" defaultValue="••••••••••••••••" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* LinkedIn */}
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Linkedin className="w-5 h-5 text-blue-600" />
+              <h3 className="text-white font-semibold text-lg">LinkedIn</h3>
+              <span className="ml-auto px-2 py-0.5 text-xs rounded-full bg-yellow-900 text-yellow-300">Needs Setup</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Client ID</label>
+                <input type="text" placeholder="LinkedIn Client ID" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500 placeholder-gray-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Client Secret</label>
+                <input type="password" placeholder="LinkedIn Client Secret" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500 placeholder-gray-500" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm text-gray-400 mb-1">Organization URN</label>
+                <input type="text" placeholder="urn:li:organization:..." className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500 placeholder-gray-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Email SMTP */}
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Mail className="w-5 h-5 text-green-400" />
+              <h3 className="text-white font-semibold text-lg">Email (SMTP)</h3>
+              <span className="ml-auto px-2 py-0.5 text-xs rounded-full bg-green-900 text-green-300">Active</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">SMTP Host</label>
+                <input type="text" defaultValue="smtp.mailgun.org" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Port</label>
+                <input type="number" defaultValue="587" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Username / API Key</label>
+                <input type="text" defaultValue="postmaster@mg.coindaily.africa" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Password</label>
+                <input type="password" defaultValue="••••••••••••" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">From Name</label>
+                <input type="text" defaultValue="CoinDaily Africa" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">From Address</label>
+                <input type="email" defaultValue="news@coindaily.africa" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Push Notifications (VAPID / Web Push) */}
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Bell className="w-5 h-5 text-purple-400" />
+              <h3 className="text-white font-semibold text-lg">Push Notifications (Web Push / VAPID)</h3>
+              <span className="ml-auto px-2 py-0.5 text-xs rounded-full bg-green-900 text-green-300">Active</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">VAPID Public Key</label>
+                <input type="text" defaultValue="BLc9CKqJ3Xu5..." className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm font-mono focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">VAPID Private Key</label>
+                <input type="password" defaultValue="••••••••••••••••" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">FCM Server Key (Android)</label>
+                <input type="password" defaultValue="••••••••••••••••" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">APNS Key ID (iOS)</label>
+                <input type="text" placeholder="Apple Push Key ID" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500 placeholder-gray-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* RSS Feed */}
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Rss className="w-5 h-5 text-orange-400" />
+              <h3 className="text-white font-semibold text-lg">RSS / Atom Feed</h3>
+              <span className="ml-auto px-2 py-0.5 text-xs rounded-full bg-green-900 text-green-300">Active</span>
+            </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Main Feed URL</label>
+                  <input type="url" defaultValue="https://coindaily.africa/feed.xml" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Items per Feed</label>
+                  <input type="number" defaultValue="20" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Ad Material in RSS</label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" defaultChecked className="rounded bg-gray-700 border-gray-600 text-blue-600" />
+                  <span className="text-sm text-gray-300">Include sponsored content slots in RSS feed</span>
+                </label>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Ad Injection Frequency</label>
+                <select className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500">
+                  <option value="5">Every 5th item</option>
+                  <option value="10">Every 10th item</option>
+                  <option value="none">No ads</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Save button */}
+          <div className="flex justify-end gap-3">
+            <button className="px-6 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">
+              Reset to Defaults
+            </button>
+            <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium">
+              Save Channel Settings
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── New Campaign Modal ── */}
+      {showNewCampaign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            {/* Modal header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-700">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Send className="w-5 h-5 text-blue-400" />
+                Create New Campaign
+              </h2>
+              <button
+                onClick={() => setShowNewCampaign(false)}
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCampaign} className="p-6 space-y-5">
+              {/* Campaign Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Campaign Title <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={campaignForm.title}
+                  onChange={e => setCampaignForm(f => ({ ...f, title: e.target.value }))}
+                  className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                  placeholder="e.g. BTC Halving Breaking News Alert"
+                />
+              </div>
+
+              {/* Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Campaign Type</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {(['email', 'push', 'social', 'rss'] as Campaign['type'][]).map(t => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setCampaignForm(f => ({ ...f, type: t, channels: [] }))}
+                      className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl border text-xs font-medium transition-colors ${
+                        campaignForm.type === t
+                          ? 'bg-blue-600 border-blue-500 text-white'
+                          : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-400'
+                      }`}
+                    >
+                      {t === 'email' && <Mail className="w-5 h-5" />}
+                      {t === 'push' && <Bell className="w-5 h-5" />}
+                      {t === 'social' && <Share2 className="w-5 h-5" />}
+                      {t === 'rss' && <Rss className="w-5 h-5" />}
+                      <span className="capitalize">{t}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Channels for selected type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Channels / Destinations
+                  <span className="text-gray-500 font-normal ml-1">(select all that apply)</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {CHANNEL_OPTIONS[campaignForm.type].map(ch => (
+                    <button
+                      key={ch}
+                      type="button"
+                      onClick={() => toggleChannel(ch)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                        campaignForm.channels.includes(ch)
+                          ? 'bg-blue-600 border-blue-500 text-white'
+                          : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-400'
+                      }`}
+                    >
+                      {campaignForm.channels.includes(ch) && <CheckCircle className="w-3.5 h-3.5" />}
+                      {ch.replace(/-/g, ' ')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Content / Message */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Message / Content <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={campaignForm.content}
+                  onChange={e => setCampaignForm(f => ({ ...f, content: e.target.value }))}
+                  className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+                  placeholder="Write your campaign message or subject line here…"
+                />
+                <p className="text-xs text-gray-500 mt-1">{campaignForm.content.length} / 2000 characters</p>
+              </div>
+
+              {/* Estimated Recipients + Schedule */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Estimated Recipients</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={campaignForm.recipients}
+                    onChange={e => setCampaignForm(f => ({ ...f, recipients: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                    placeholder="e.g. 12000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Schedule (optional)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={campaignForm.scheduledFor}
+                    onChange={e => setCampaignForm(f => ({ ...f, scheduledFor: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500 [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+
+              {/* Status preview */}
+              <div className="bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-sm">
+                <span className="text-gray-400">Will be saved as: </span>
+                <span className={`font-semibold ${campaignForm.scheduledFor ? 'text-blue-400' : 'text-gray-200'}`}>
+                  {campaignForm.scheduledFor ? `Scheduled for ${new Date(campaignForm.scheduledFor).toLocaleString()}` : 'Draft'}
+                </span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowNewCampaign(false)}
+                  className="flex-1 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingCampaign}
+                  className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2 font-medium"
+                >
+                  {savingCampaign ? (
+                    <><RefreshCw className="w-4 h-4 animate-spin" /> Saving…</>
+                  ) : (
+                    <><Send className="w-4 h-4" /> {campaignForm.scheduledFor ? 'Schedule Campaign' : 'Save as Draft'}</>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

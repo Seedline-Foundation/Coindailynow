@@ -3,8 +3,13 @@
 
 /// <reference types="node" />
 // Audit logging (stubbed for standalone usage)
-const createAuditLog = async (action: string, data: any) => { /* stub */ };
-const AuditActions = { IMO_IMAGE_GENERATED: 'imo_image_generated' };
+const createAuditLog = async (data: any) => { /* stub */ };
+const AuditActions = {
+  IMO_IMAGE_GENERATED: 'imo_image_generated',
+  SETTINGS_UPDATE: 'settings_update',
+  ARTICLE_CREATE: 'article_create',
+  ARTICLE_DELETE: 'article_delete'
+};
 import { imoService } from './imo-service';
 
 export interface EnhancedImageRequest {
@@ -38,17 +43,20 @@ export interface EnhancedImageResult {
  * Uses Imo for intelligent prompt engineering before image generation
  */
 export class ImoImageGenerationAgent {
-  private apiKey: string;
-  private baseUrl: string = 'https://api.openai.com/v1';
+  private sdxlEndpoint: string;
   private isInitialized: boolean = false;
 
   constructor() {
-    this.apiKey = process.env.OPENAI_API_KEY || '';
+    this.sdxlEndpoint = process.env.SDXL_API_ENDPOINT || 'http://localhost:7860';
   }
 
   async initialize(): Promise<void> {
-    if (!this.apiKey) {
-      throw new Error('OpenAI API key not configured');
+    // Verify SDXL is reachable
+    try {
+      const res = await fetch(`${this.sdxlEndpoint}/sdapi/v1/sd-models`);
+      if (!res.ok) console.warn('[ImoImageAgent] SDXL not reachable yet');
+    } catch (e) {
+      console.warn('[ImoImageAgent] SDXL not available, will retry on first call');
     }
 
     // Initialize Imo service
@@ -59,8 +67,8 @@ export class ImoImageGenerationAgent {
     await createAuditLog({
       action: AuditActions.SETTINGS_UPDATE,
       resource: 'imo_image_agent',
-      resourceId: 'imo-dalle',
-      details: { initialized: true, imoEnhanced: true }
+      resourceId: 'imo-sdxl',
+      details: { initialized: true, imoEnhanced: true, provider: 'sdxl-self-hosted' }
     });
   }
 
@@ -106,42 +114,44 @@ export class ImoImageGenerationAgent {
       
       const negativePrompt = imoResult.negativePrompt;
 
-      // STEP 2: Generate image with optimized prompt
-      const size = this.getSize(request.aspectRatio || '16:9');
-      const quality = request.quality || 'standard';
+      // STEP 2: Generate image with self-hosted SDXL
+      const width = request.aspectRatio === '9:16' ? 768 : 1024;
+      const height = request.aspectRatio === '1:1' ? 1024 : (request.aspectRatio === '9:16' ? 1344 : 768);
 
-      const response = await fetch(`${this.baseUrl}/images/generations`, {
+      const response = await fetch(`${this.sdxlEndpoint}/sdapi/v1/txt2img`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'dall-e-3',
           prompt: prompt,
-          size,
-          quality,
-          n: 1,
-          response_format: 'url'
+          negative_prompt: negativePrompt || 'blurry, low quality, distorted, watermark, text overlay, signature, username, low resolution, bad anatomy, poorly drawn',
+          width,
+          height,
+          steps: 30,
+          cfg_scale: 7.5,
+          sampler_name: 'DPM++ 2M Karras',
+          n_iter: 1,
+          batch_size: 1
         })
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(`Image generation failed: ${JSON.stringify(error)}`);
+        const error = await response.text().catch(() => 'Unknown error');
+        throw new Error(`SDXL image generation failed: ${error}`);
       }
 
-      const data = await response.json();
-      const imageData = data.data[0];
+      const data: any = await response.json();
+      // SDXL returns base64 images
+      const imageBase64 = data.images?.[0];
+      const imageUrl = imageBase64 ? `data:image/png;base64,${imageBase64}` : '';
 
       const result: EnhancedImageResult = {
-        imageUrl: imageData.url,
+        imageUrl,
         prompt,
         negativePrompt,
         metadata: {
           type: request.type,
-          size,
-          quality,
+          size: `${width}x${height}`,
+          quality: request.quality || 'standard',
           processingTime: Date.now() - startTime,
           promptQuality: imoResult.quality.expectedQuality,
           imoEnhanced: true

@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { ApolloServer } from '@apollo/server';
@@ -24,6 +25,8 @@ import {
 import { performanceMiddleware } from './middleware/performance';
 import { errorHandler } from './middleware/errorHandler';
 import { csrfProtection } from './middleware/csrf';
+import { promptInjectionGuard } from './middleware/promptInjectionGuard';
+import { metricsMiddleware, metricsRouter } from './middleware/metrics';
 import { logger } from './utils/logger';
 import { WebSocketManager } from './services/websocket/WebSocketManager';
 import { DatabaseOptimizer } from './services/databaseOptimizer';
@@ -32,6 +35,9 @@ import { optimizedResolvers } from './api/resolvers/optimizedResolvers';
 import superAdminRouter from './api/routes/super-admin';
 import contentAutomationRouter from './routes/content-automation.routes';
 import userDashboardRouter from './routes/user-dashboard.routes';
+import tokenomicsRouter from './routes/tokenomics.routes';
+import { createSecurityMonitoringRoutes } from './routes/securityMonitoring';
+import { getSecurityMonitoringAgent } from './agents/SecurityMonitoringAgent';
 import v1MarketRouter from './api/routes/v1Market.routes';
 import marketCompatRouter from './api/routes/marketCompat.routes';
 import v1RegulationsRouter from './api/routes/v1Regulations.routes';
@@ -40,12 +46,30 @@ import v1RemittanceRouter from './api/routes/v1Remittance.routes';
 import v1OnrampRouter from './api/routes/v1Onramp.routes';
 import v1TrafficRouter from './api/routes/v1Traffic.routes';
 import v1ReputationRouter from './api/routes/v1Reputation.routes';
+import v1PushRouter from './api/routes/v1Push.routes';
 import v1BountyRouter from './api/routes/v1Bounty.routes';
 import v1PressReleaseRouter from './api/routes/v1PressRelease.routes';
 import v1InfluencerRouter from './api/routes/v1Influencer.routes';
+import newsAggregationRouter from './routes/news-aggregation.routes';
+import dataAnalysisAdminRouter from './routes/data-analysis-admin.routes';
+import adsRotationRouter from './routes/ads-rotation.routes';
+import rssFeedRouter from './routes/rss-feed.routes';
+import indexNowRouter from './routes/indexnow.routes';
+import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
+import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
+import { startPipelineScheduler as startAnalysisScheduler } from './services/dataAnalysisPipeline';
 import { MarketDataAggregator } from './services/marketDataAggregator';
 import { ReputationService } from './services/reputation/ReputationService';
 import { AuthType, ExchangeRegion, ExchangeType, HealthStatus, ComplianceLevel } from './types/market-data';
+
+// Prevent ioredis unhandled errors from crashing the process
+process.on('unhandledRejection', (reason: any) => {
+  if (reason?.message?.includes('ECONNREFUSED') || reason?.name === 'AggregateError' || reason?.code === 'ECONNREFUSED') {
+    console.warn('[Redis] Connection failed (non-fatal):', reason?.message || reason);
+    return;
+  }
+  console.error('Unhandled Rejection:', reason);
+});
 
 const PORT = process.env.PORT || 4000;
 const GRAPHQL_PATH = '/graphql';
@@ -240,6 +264,10 @@ export async function setupApp() {
     allowedHeaders: ['Content-Type', 'Authorization', 'x-request-id', 'X-Requested-With'],
   }));
 
+  // Prometheus metrics
+  app.use(metricsMiddleware);
+  app.use(metricsRouter());
+
   // Performance monitoring and caching middleware
   app.use(performanceMiddleware);
   app.use(responseTimeMiddleware);
@@ -252,8 +280,21 @@ export async function setupApp() {
   }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+  // Static assets for uploaded ad creatives
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
   // Rate limiting
   app.use(rateLimitMiddleware);
+
+  // AI Prompt Injection Guard — scans POST/PUT/PATCH bodies for LLM attacks
+  app.use(promptInjectionGuard({
+    enabled: true,
+    strictMode: true,
+    maxInputLength: 50_000,
+    enableDeepAnalysis: false,
+    logToDatabase: true,
+    excludedPaths: ['/health', '/metrics', '/api/auth/login', '/api/auth/register'],
+  }));
 
   // CSRF protection for state-changing requests
   // GraphQL has its own auth via Authorization header + CORS
@@ -263,6 +304,11 @@ export async function setupApp() {
       '/api/auth/register',
       '/api/auth/refresh',
       '/api/v1/traffic',
+      '/api/super-admin',
+      '/api/content-automation',
+      '/api/user',
+      '/api/news',
+      '/api/admin',
       '/health',
       '/metrics',
       '/graphql'
@@ -297,6 +343,7 @@ export async function setupApp() {
   app.use('/api/v1/onramp', v1OnrampRouter);
   app.use('/api/v1/traffic', v1TrafficRouter);
   app.use('/api/v1/reputation', v1ReputationRouter);
+  app.use('/api/v1/push', v1PushRouter);
   app.use('/api/v1/bounty', v1BountyRouter);
   app.use('/api/v1/press', v1PressReleaseRouter);
   app.use('/api/v1/influencer', v1InfluencerRouter);
@@ -309,6 +356,32 @@ export async function setupApp() {
 
   // User Dashboard Routes (bookmarks, reading history, notifications, profile)
   app.use('/api/user', userDashboardRouter);
+
+  // Tokenomics Config (public GET for dashboards, protected PUT for admin)
+  app.use('/api/tokenomics', tokenomicsRouter);
+
+  // Security Monitoring Routes (DeepSeek R1-powered, super admin only)
+  app.use('/api/security-monitoring', createSecurityMonitoringRoutes(prisma));
+
+  // News Aggregation Routes (RSS feeds + API data from 29 countries)
+  app.use('/api/news', newsAggregationRouter);
+
+  // Data Analysis Admin Routes (Data Source Center, Analysis Pipeline, Benchmarks)
+  app.use('/api/admin', dataAnalysisAdminRouter);
+
+  // Ads Management & Rotation Agent Routes (DeepSeek R1-powered ad engine)
+  app.use('/api/ads', adsRotationRouter);
+  startMLRetrainingLoop();
+
+  // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
+  app.use('/', rssFeedRouter);
+
+  // IndexNow & Instant Indexing Routes (Bing, Google, Yandex notification)
+  app.use('/', indexNowRouter);
+
+  // Start Security Monitoring Agent in background
+  const securityAgent = getSecurityMonitoringAgent(prisma);
+  securityAgent.start().catch((err: Error) => console.error('[SecurityMonitor] Failed to start:', err.message));
 
   // GraphQL Server setup with depth limiting to prevent DoS
   // Merge all resolvers: optimized (performance) + base (auth, CMS, etc.)
@@ -383,6 +456,28 @@ async function startServer() {
   httpServer.listen(PORT, () => {
     logger.info(`🚀 Server ready at http://localhost:${PORT}`);
     logger.info(`🚀 GraphQL endpoint at http://localhost:${PORT}${GRAPHQL_PATH}`);
+    
+    // Start News Aggregation Scheduler (RSS + API feeds from 29 countries)
+    if (process.env.ENABLE_NEWS_SCHEDULER !== 'false') {
+      logger.info('📰 Starting News Aggregation Scheduler...');
+      
+      // Register a handler to process news items (connect to AI pipeline here)
+      registerNewsHandler(async (items) => {
+        logger.info(`[News] Processing ${items.length} news items`);
+        // TODO: Connect to AI content pipeline service
+        // await aiContentPipeline.processNewsItems(items);
+      });
+      
+      startNewsScheduler();
+      logger.info('📰 News Aggregation Scheduler started');
+    }
+
+    // Start Data Analysis Pipeline Scheduler (Tuesday 10pm → Wednesday morning reports)
+    if (process.env.ENABLE_ANALYSIS_SCHEDULER !== 'false') {
+      logger.info('🔬 Starting Data Analysis Pipeline Scheduler...');
+      startAnalysisScheduler();
+      logger.info('🔬 Data Analysis Pipeline Scheduler started (runs Tuesday 10pm)');
+    }
   });
 }
 

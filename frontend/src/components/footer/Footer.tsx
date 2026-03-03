@@ -94,7 +94,6 @@ const Footer: React.FC = () => {
         { label: t('taxCalc'), href: '/tools/tax-calculator' },
         { label: t('remittance'), href: '/tools/remittance-calculator' },
         { label: t('onramp'), href: '/tools/onramp-aggregator' },
-        { label: t('automations'), href: '/automations' },
       ]
     },
     {
@@ -121,12 +120,35 @@ const Footer: React.FC = () => {
       ]
     },
     {
+      title: t('paidServices'),
+      links: [
+        { label: t('membership'), href: '/membership' },
+        { label: t('advertise'), href: '/paid-services/advertise' },
+        { label: t('apiPricing'), href: '/paid-services/api' },
+        { label: t('marketplace'), href: '/paid-services/marketplace' },
+        { label: t('sponsoredContent'), href: '/paid-services/sponsored-content' },
+        { label: t('affiliate'), href: '/paid-services/affiliate' },
+        { label: 'News Subscription', href: '/paid-services/news-subscription' },
+        { label: 'Data Insight', href: '/paid-services/data-insight' },
+      ]
+    },
+    {
       title: t('company'),
       links: [
         { label: t('about'), href: '/about' },
+        { label: 'Jobs', href: '/jobs' },
         { label: t('privacy'), href: '/privacy' },
         { label: t('terms'), href: '/terms' },
         { label: t('disclaimer'), href: '/disclaimer' },
+      ]
+    },
+    {
+      title: 'Resources',
+      links: [
+        { label: 'Press Release', href: 'https://press.coindaily.online/', external: true },
+        { label: 'Swap Token', href: 'https://imaswap.online', external: true },
+        { label: 'Stake Your Token', href: 'https://stake.imaswap.online', external: true },
+        { label: 'Joy Token', href: 'https://token.coindaily.online', external: true },
       ]
     },
   ];
@@ -374,7 +396,7 @@ const Footer: React.FC = () => {
           {/* ROW 2: Navigation Links (Complete navigation links as requested) */}
           <div className="space-y-6">
             <h4 className="text-xl font-bold text-white text-center">{t('quickNavigation')}</h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-8">
               {footerSections.map((section) => (
                 <div key={section.title}>
                   <h5 className="text-lg font-semibold text-white mb-3">{section.title}</h5>

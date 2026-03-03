@@ -36,8 +36,10 @@ export default function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
+    // Validate password strength (must match backend regex)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      setError('Password must be at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)');
       return;
     }
 
@@ -183,8 +185,11 @@ export default function RegisterPage() {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Create a password (min. 8 characters)"
+                placeholder="Create a password"
               />
+              <p className="mt-1 text-xs text-gray-500">
+                Min 8 chars, with uppercase, lowercase, number, and special character (@$!%*?&)
+              </p>
             </div>
 
             <div>

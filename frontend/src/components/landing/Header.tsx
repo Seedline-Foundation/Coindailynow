@@ -91,6 +91,24 @@ const NAV_MENUS = [
       { tKey: 'cryptoBasics', href: '/crypto-basics', icon: AcademicCapIcon },
     ],
   },
+  {
+    key: 'services',
+    tKey: 'paidServices',
+    href: '/paid-services',
+    icon: BanknotesIcon,
+    children: [
+      { tKey: 'allServices', href: '/paid-services', icon: BanknotesIcon },
+      { tKey: 'membership', href: '/membership', icon: SparklesIcon },
+      { tKey: 'advertise', href: '/paid-services/advertise', icon: BoltIcon },
+      { tKey: 'apiPricing', href: '/paid-services/api', icon: CpuChipIcon },
+      { tKey: 'marketplace', href: '/paid-services/marketplace', icon: CreditCardIcon },
+      { tKey: 'sponsoredContent', href: '/paid-services/sponsored-content', icon: NewspaperIcon },
+      { tKey: 'affiliate', href: '/paid-services/affiliate', icon: UserGroupIcon },
+      { tKey: 'dataInsight', href: '/paid-services/data-insight', icon: CpuChipIcon },
+      { tKey: 'newsSubscription', href: '/paid-services/news-subscription', icon: RssIcon },
+      { tKey: 'pressRelease', href: 'https://press.coindaily.online', icon: NewspaperIcon, external: true },
+    ],
+  },
 ];
 
 // ====== Language Selector Component ======
@@ -228,6 +246,7 @@ function NavDropdown({ menu }: { menu: typeof NAV_MENUS[0] }) {
         <div className="absolute left-0 top-full mt-0.5 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-[60] py-2" role="menu">
           {menu.children.map((child) => {
             const ChildIcon = child.icon;
+            const isExternal = (child as any).external;
             return (
               <Link
                 key={child.href}
@@ -235,9 +254,11 @@ function NavDropdown({ menu }: { menu: typeof NAV_MENUS[0] }) {
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                 role="menuitem"
+                {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
               >
                 <ChildIcon className="w-4 h-4 text-gray-400" />
                 <span>{t(child.tKey)}</span>
+                {isExternal && <span className="ml-auto text-xs text-gray-400">↗</span>}
               </Link>
             );
           })}
@@ -514,15 +535,18 @@ const Header: React.FC<HeaderProps> = ({ className = '', showDateTime = true }) 
                         <div className="ml-4 mt-1 space-y-0.5 border-l-2 border-gray-100 pl-4">
                           {menu.children.map((child) => {
                             const ChildIcon = child.icon;
+                            const isExternal = (child as any).external;
                             return (
                               <Link
                                 key={child.href}
                                 href={child.href}
                                 onClick={() => setIsMenuOpen(false)}
                                 className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
+                                {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
                               >
                                 <ChildIcon className="w-4 h-4" />
                                 <span>{t(child.tKey)}</span>
+                                {isExternal && <span className="ml-auto text-xs text-gray-400">↗</span>}
                               </Link>
                             );
                           })}

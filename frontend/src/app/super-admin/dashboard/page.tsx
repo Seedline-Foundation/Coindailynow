@@ -24,7 +24,18 @@ import {
   Database,
   ArrowUp,
   ArrowDown,
-  RefreshCw
+  RefreshCw,
+  Target,
+  BarChart3,
+  Gauge,
+  Newspaper,
+  Wifi,
+  Brain,
+  Timer,
+  Mail,
+  Coins,
+  Bell,
+  Key,
 } from 'lucide-react';
 
 interface StatCardProps {
@@ -351,6 +362,9 @@ function DashboardContent() {
         </div>
       </div>
 
+      {/* ── CoinDaily Top 10 KPI Tracker ── */}
+      <KpiTracker kpis={platformStats.kpis} />
+
       {/* System Metrics Dashboard - Embedded directly, no Grafana login needed! */}
       <SystemMetricsDashboard />
     </div>
@@ -359,6 +373,232 @@ function DashboardContent() {
 
 // Import the System Metrics Dashboard
 import SystemMetricsDashboard from '@/components/super-admin/SystemMetricsDashboard';
+
+/* ────────────────────────────────────────────────────────────────────────── *
+ *  KPI Tracker Component — CoinDaily Top-10 North Star Metrics              *
+ * ────────────────────────────────────────────────────────────────────────── */
+
+interface KpiDef {
+  label: string;
+  value: string;
+  target: string;
+  pct: number;           // 0-100 progress toward target
+  change?: string;       // e.g. "+14.2%"
+  positive: boolean;     // is the trend in the right direction?
+  icon: React.ElementType;
+  color: string;         // tailwind ring/accent color
+  detail?: string;       // extra sub-text
+}
+
+function KpiTracker({ kpis }: { kpis: NonNullable<ReturnType<typeof import('@/contexts/SuperAdminContext').useSuperAdmin>['platformStats']>['kpis'] }) {
+  const items: KpiDef[] = [
+    {
+      label: 'Monthly Active Users',
+      value: `${(kpis.mau.current / 1000).toFixed(1)}K`,
+      target: `${(kpis.mau.target / 1000).toFixed(0)}K`,
+      pct: Math.round((kpis.mau.current / kpis.mau.target) * 100),
+      change: `${kpis.mau.change > 0 ? '+' : ''}${kpis.mau.change}%`,
+      positive: kpis.mau.change > 0,
+      icon: Users,
+      color: 'blue',
+    },
+    {
+      label: 'API Revenue (MRR)',
+      value: `$${kpis.apiMrr.current.toLocaleString()}`,
+      target: `$${(kpis.apiMrr.target / 1000).toFixed(0)}K`,
+      pct: Math.round((kpis.apiMrr.current / kpis.apiMrr.target) * 100),
+      change: `${kpis.apiMrr.change > 0 ? '+' : ''}${kpis.apiMrr.change}%`,
+      positive: kpis.apiMrr.change > 0,
+      icon: Key,
+      color: 'emerald',
+    },
+    {
+      label: 'Content Velocity',
+      value: `${kpis.contentVelocity.current}/day`,
+      target: `${kpis.contentVelocity.target}/day`,
+      pct: Math.round((kpis.contentVelocity.current / kpis.contentVelocity.target) * 100),
+      change: `${kpis.contentVelocity.change > 0 ? '+' : ''}${kpis.contentVelocity.change}%`,
+      positive: kpis.contentVelocity.change > 0,
+      icon: Newspaper,
+      color: 'purple',
+    },
+    {
+      label: 'Subscription Conversion',
+      value: `${kpis.subscriptionConversion.current}%`,
+      target: `${kpis.subscriptionConversion.target}%`,
+      pct: Math.round((kpis.subscriptionConversion.current / kpis.subscriptionConversion.target) * 100),
+      change: `${kpis.subscriptionConversion.change > 0 ? '+' : ''}${kpis.subscriptionConversion.change}pp`,
+      positive: kpis.subscriptionConversion.change > 0,
+      icon: TrendingUp,
+      color: 'orange',
+      detail: 'Free → Premium',
+    },
+    {
+      label: 'African Exchange Coverage',
+      value: `${kpis.exchangeCoverage.current}%`,
+      target: '100%',
+      pct: kpis.exchangeCoverage.current,
+      positive: kpis.exchangeCoverage.current >= 80,
+      icon: Globe,
+      color: 'yellow',
+      detail: `${kpis.exchangeCoverage.exchanges}/${kpis.exchangeCoverage.total} feeds <5 min`,
+    },
+    {
+      label: 'AI Quality Score',
+      value: `${kpis.aiQualityScore.current}%`,
+      target: `≥${kpis.aiQualityScore.target}%`,
+      pct: Math.min(Math.round((kpis.aiQualityScore.current / kpis.aiQualityScore.target) * 100), 100),
+      change: `${kpis.aiQualityScore.change > 0 ? '+' : ''}${kpis.aiQualityScore.change}%`,
+      positive: kpis.aiQualityScore.current >= kpis.aiQualityScore.target,
+      icon: Brain,
+      color: 'cyan',
+      detail: 'Gemini review pass rate',
+    },
+    {
+      label: 'Page Load Time',
+      value: `${kpis.pageLoadTime.current}s`,
+      target: `<${kpis.pageLoadTime.target}s`,
+      pct: Math.min(Math.round(((kpis.pageLoadTime.target - Math.max(kpis.pageLoadTime.current - kpis.pageLoadTime.target, 0)) / kpis.pageLoadTime.target) * 100), 100),
+      change: `${kpis.pageLoadTime.change}s`,
+      positive: kpis.pageLoadTime.change <= 0,
+      icon: Gauge,
+      color: 'indigo',
+      detail: 'P75 global / Africa mobile',
+    },
+    {
+      label: 'Newsletter / Push Subs',
+      value: `${(kpis.subscriberGrowth.current / 1000).toFixed(1)}K`,
+      target: `${(kpis.subscriberGrowth.target / 1000).toFixed(0)}K`,
+      pct: Math.round((kpis.subscriberGrowth.current / kpis.subscriberGrowth.target) * 100),
+      change: `${kpis.subscriberGrowth.change > 0 ? '+' : ''}${kpis.subscriberGrowth.change}%`,
+      positive: kpis.subscriberGrowth.change > 0,
+      icon: Mail,
+      color: 'pink',
+    },
+    {
+      label: 'Stablecoin Premium Accuracy',
+      value: `${kpis.stablecoinAccuracy.current}%`,
+      target: `<${kpis.stablecoinAccuracy.target}%`,
+      pct: Math.min(Math.round(((kpis.stablecoinAccuracy.target - kpis.stablecoinAccuracy.current) / kpis.stablecoinAccuracy.target) * 100 + 50), 100),
+      positive: kpis.stablecoinAccuracy.current <= kpis.stablecoinAccuracy.target,
+      icon: Coins,
+      color: 'green',
+      detail: 'USDT/NGN delta vs Quidax',
+    },
+    {
+      label: 'Alert Response Time',
+      value: `${kpis.alertResponseTime.current} min`,
+      target: `<${kpis.alertResponseTime.target} min`,
+      pct: Math.min(Math.round(((kpis.alertResponseTime.target - kpis.alertResponseTime.current) / kpis.alertResponseTime.target) * 100 + 60), 100),
+      change: `${kpis.alertResponseTime.change}%`,
+      positive: kpis.alertResponseTime.change < 0,
+      icon: Bell,
+      color: 'red',
+      detail: 'Whale/volatility → published',
+    },
+  ];
+
+  const tailwindColors: Record<string, { ring: string; bg: string; text: string; bar: string }> = {
+    blue:    { ring: 'ring-blue-500/30',    bg: 'bg-blue-500',    text: 'text-blue-400',    bar: 'bg-blue-500' },
+    emerald: { ring: 'ring-emerald-500/30', bg: 'bg-emerald-500', text: 'text-emerald-400', bar: 'bg-emerald-500' },
+    purple:  { ring: 'ring-purple-500/30',  bg: 'bg-purple-500',  text: 'text-purple-400',  bar: 'bg-purple-500' },
+    orange:  { ring: 'ring-orange-500/30',  bg: 'bg-orange-500',  text: 'text-orange-400',  bar: 'bg-orange-500' },
+    yellow:  { ring: 'ring-yellow-500/30',  bg: 'bg-yellow-500',  text: 'text-yellow-400',  bar: 'bg-yellow-500' },
+    cyan:    { ring: 'ring-cyan-500/30',    bg: 'bg-cyan-500',    text: 'text-cyan-400',    bar: 'bg-cyan-500' },
+    indigo:  { ring: 'ring-indigo-500/30',  bg: 'bg-indigo-500',  text: 'text-indigo-400',  bar: 'bg-indigo-500' },
+    pink:    { ring: 'ring-pink-500/30',    bg: 'bg-pink-500',    text: 'text-pink-400',    bar: 'bg-pink-500' },
+    green:   { ring: 'ring-green-500/30',   bg: 'bg-green-500',   text: 'text-green-400',   bar: 'bg-green-500' },
+    red:     { ring: 'ring-red-500/30',     bg: 'bg-red-500',     text: 'text-red-400',     bar: 'bg-red-500' },
+  };
+
+  // Overall score: how many KPIs are on-target?
+  const onTarget = items.filter(k => k.pct >= 100 || k.positive).length;
+
+  return (
+    <div className="space-y-4">
+      {/* KPI Section Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-600/30">
+            <Target className="h-6 w-6 text-yellow-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">North Star KPIs</h2>
+            <p className="text-sm text-gray-400">Top 10 metrics that prove we&apos;re on the right track</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-700 border border-gray-600">
+            <BarChart3 className="h-4 w-4 text-yellow-400" />
+            <span className="text-sm font-semibold text-white">{onTarget}/10</span>
+            <span className="text-xs text-gray-400">on target</span>
+          </div>
+        </div>
+      </div>
+
+      {/* KPI Grid — 5 columns × 2 rows */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        {items.map((kpi) => {
+          const c = tailwindColors[kpi.color] || tailwindColors.blue;
+          const capped = Math.min(kpi.pct, 100);
+          const hitTarget = kpi.pct >= 100 || kpi.positive;
+          return (
+            <div
+              key={kpi.label}
+              className={`relative bg-gray-800 border rounded-xl p-4 ring-1 transition-colors hover:bg-gray-750
+                ${hitTarget ? `border-gray-600 ${c.ring}` : 'border-gray-700 ring-transparent'}`}
+            >
+              {/* Icon + trend */}
+              <div className="flex items-center justify-between mb-2">
+                <div className={`p-2 rounded-lg ${c.bg}/20`}>
+                  <kpi.icon className={`h-4 w-4 ${c.text}`} />
+                </div>
+                {kpi.change && (
+                  <span className={`text-xs font-medium flex items-center gap-0.5 ${
+                    kpi.positive ? 'text-emerald-400' : 'text-red-400'
+                  }`}>
+                    {kpi.positive ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                    {kpi.change}
+                  </span>
+                )}
+              </div>
+
+              {/* Value */}
+              <div className="text-lg font-bold text-white leading-tight">{kpi.value}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{kpi.label}</div>
+
+              {/* Progress bar toward target */}
+              <div className="mt-3 mb-1">
+                <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                  <div
+                    className={`h-1.5 rounded-full transition-all duration-500 ${c.bar}`}
+                    style={{ width: `${capped}%` }}
+                  />
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-[10px]">
+                <span className="text-gray-500">Target: {kpi.target}</span>
+                <span className={`font-semibold ${hitTarget ? c.text : 'text-gray-400'}`}>{capped}%</span>
+              </div>
+
+              {/* Extra detail */}
+              {kpi.detail && (
+                <div className="text-[10px] text-gray-500 mt-1 truncate" title={kpi.detail}>{kpi.detail}</div>
+              )}
+
+              {/* On-target checkmark */}
+              {hitTarget && (
+                <div className="absolute top-2.5 right-2.5">
+                  <CheckCircle className={`h-3.5 w-3.5 ${c.text}`} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function SuperAdminDashboard() {
   return (

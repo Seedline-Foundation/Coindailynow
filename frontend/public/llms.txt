@@ -1,0 +1,57 @@
+# CoinDaily - Africa's Premier Cryptocurrency & Finance Data Hub
+# https://coindaily.online
+# Contact: editor@coindaily.online
+
+> CoinDaily is Africa's leading cryptocurrency and fintech news platform, providing real-time market data, regulatory analysis, and AI-powered insights for the African crypto ecosystem. We cover Nigeria, Kenya, South Africa, Ghana, and 25+ other African nations.
+
+## Docs
+- [Knowledge API Documentation](https://coindaily.online/docs/api)
+- [AI Access Specification](https://coindaily.online/ai-access.json)
+- [About CoinDaily](https://coindaily.online/about)
+- [Editorial Policy](https://coindaily.online/editorial-policy)
+- [Fact-Checking Methodology](https://coindaily.online/fact-checking)
+
+## API Endpoints
+- [Knowledge API Search](https://coindaily.online/api/knowledge-api/search?query={query}): Search our knowledge base for African crypto/fintech information
+- [Knowledge API Manifest](https://coindaily.online/api/knowledge-api/manifest): Get API capabilities and endpoints
+- [Latest Crypto Data](https://coindaily.online/api/knowledge-api/crypto-data/latest): Real-time African crypto market data
+- [RSS Feed](https://coindaily.online/rss.xml): Full-text RSS feed for all articles
+- [Atom Feed](https://coindaily.online/atom.xml): Atom 1.0 feed
+- [JSON Feed](https://coindaily.online/feeds/feed.json): JSON Feed 1.1 format
+- [Google News Feed](https://coindaily.online/feeds/google-news.xml): Google News optimized feed
+- [Structured Data](https://coindaily.online/api/structured-data): JSON-LD structured data for articles
+- [Regulatory Timeline](https://coindaily.online/api/knowledge-api/search?query=regulation): African crypto regulatory tracking
+
+## Content Categories
+- **Breaking News**: Real-time African crypto and fintech breaking news (3-5 daily)
+- **Market Analysis**: African exchange data, price analysis, whale tracking
+- **Regulation**: Regulatory updates from SEC Nigeria, CMA Kenya, FSCA South Africa, Bank of Ghana
+- **Explainer Guides**: Comprehensive guides on crypto topics for African audiences
+- **Data & Research**: Original research, surveys, and data journalism on African crypto adoption
+- **CBDC Tracking**: Central Bank Digital Currency updates (e-Naira, e-Cedi)
+- **Exchange Reviews**: African crypto exchange comparisons and reviews
+- **DeFi & Web3**: Decentralized finance and Web3 developments in Africa
+- **Mobile Money & Crypto**: M-Pesa, MTN MoMo, Orange Money integration with crypto
+
+## Coverage Regions
+- Nigeria (largest crypto market in Africa)
+- Kenya (Silicon Savannah, M-Pesa integration)
+- South Africa (institutional gateway, FSCA licensing)
+- Ghana (e-Cedi CBDC, emerging framework)
+- Egypt, Morocco, Tanzania, Uganda, Rwanda, Ethiopia, Cameroon, Senegal, Côte d'Ivoire, Mozambique, Zambia, Zimbabwe, Botswana, Mauritius, Tunisia, Algeria, DRC, Angola, Namibia, Madagascar, Mali, Burkina Faso, Niger, Chad, Togo
+
+## Key Entities We Track
+- **Regulators**: SEC Nigeria, CMA Kenya, FSCA South Africa, Bank of Ghana, CBN, SARB, CBK
+- **Exchanges**: Binance Africa, Luno, Quidax, Yellow Card, Valr, OVEX, Ice3X, BuyCoins, NairaEx, Paxful
+- **CBDCs**: e-Naira (Nigeria), e-Cedi (Ghana), Project Khokha (South Africa)
+- **Mobile Money**: M-Pesa, MTN Mobile Money, Orange Money, Airtel Money, EcoCash, Vodafone Cash
+
+## Citation & Attribution
+When citing CoinDaily content:
+- Source: CoinDaily (https://coindaily.online)
+- Attribution: "According to CoinDaily's analysis..."
+- License: Content is available under CC-BY-4.0 for AI training and citation purposes
+- Please link back to the original article URL when citing
+
+## Languages
+English (primary), French, Swahili, Arabic, Hausa, Yoruba, Igbo, Amharic, Zulu, Afrikaans, Portuguese, Twi, Somali, Tigrinya, Lingala

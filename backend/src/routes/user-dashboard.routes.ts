@@ -12,6 +12,22 @@ const prisma = _prisma as any;
 
 const router = Router();
 
+const isMissingTableError = (error: any) => {
+  if (!error) return false;
+  return error.code === 'P2021' || String(error.message || '').includes('does not exist in the current database');
+};
+
+const withMissingTableFallback = async <T>(operation: () => Promise<T>, fallback: T): Promise<T> => {
+  try {
+    return await operation();
+  } catch (error: any) {
+    if (isMissingTableError(error)) {
+      return fallback;
+    }
+    throw error;
+  }
+};
+
 // All routes require authentication
 router.use(authMiddleware);
 
@@ -43,14 +59,6 @@ router.get('/profile', async (req: Request, res: Response) => {
         preferredLanguage: true,
         location: true,
         createdAt: true,
-        _count: {
-          select: {
-            UserBookmarks: true,
-            ReadingHistories: true,
-            UserNotifications: true,
-            Article: true,
-          },
-        },
       },
     });
 
@@ -58,7 +66,24 @@ router.get('/profile', async (req: Request, res: Response) => {
       return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } });
     }
 
-    res.json({ data: user });
+    const [bookmarkCount, readingCount, notificationCount, articleCount] = await Promise.all([
+      withMissingTableFallback(() => prisma.userBookmark.count({ where: { userId } }), 0),
+      withMissingTableFallback(() => prisma.readingHistory.count({ where: { userId } }), 0),
+      withMissingTableFallback(() => prisma.userNotification.count({ where: { userId } }), 0),
+      withMissingTableFallback(() => prisma.article.count({ where: { authorId: userId } }), 0),
+    ]);
+
+    res.json({
+      data: {
+        ...user,
+        _count: {
+          UserBookmarks: bookmarkCount,
+          ReadingHistories: readingCount,
+          UserNotifications: notificationCount,
+          Article: articleCount,
+        },
+      },
+    });
   } catch (error: any) {
     console.error('Error fetching profile:', error);
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
@@ -150,6 +175,14 @@ router.get('/bookmarks', async (req: Request, res: Response) => {
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (error: any) {
+    if (isMissingTableError(error)) {
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
+      return res.json({
+        data: [],
+        pagination: { page, limit, total: 0, totalPages: 0 },
+      });
+    }
     console.error('Error fetching bookmarks:', error);
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
   }
@@ -182,6 +215,14 @@ router.post('/bookmarks', async (req: Request, res: Response) => {
 
     res.status(201).json({ data: bookmark });
   } catch (error: any) {
+    if (isMissingTableError(error)) {
+      return res.status(503).json({
+        error: {
+          code: 'FEATURE_UNAVAILABLE',
+          message: 'Bookmarks are temporarily unavailable until database migration is completed.',
+        },
+      });
+    }
     console.error('Error creating bookmark:', error);
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
   }
@@ -202,6 +243,9 @@ router.delete('/bookmarks/:articleId', async (req: Request, res: Response) => {
 
     res.json({ data: { success: true } });
   } catch (error: any) {
+    if (isMissingTableError(error)) {
+      return res.json({ data: { success: true } });
+    }
     console.error('Error deleting bookmark:', error);
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
   }
@@ -222,6 +266,9 @@ router.get('/bookmarks/check/:articleId', async (req: Request, res: Response) =>
 
     res.json({ data: { bookmarked: !!bookmark } });
   } catch (error: any) {
+    if (isMissingTableError(error)) {
+      return res.json({ data: { bookmarked: false } });
+    }
     console.error('Error checking bookmark:', error);
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
   }
@@ -462,27 +509,35 @@ router.get('/stats', async (req: Request, res: Response) => {
     const userId = req.user!.id;
 
     const [bookmarkCount, historyCount, unreadNotifications, recentHistory] = await Promise.all([
-      prisma.userBookmark.count({ where: { userId } }),
-      prisma.readingHistory.count({ where: { userId } }),
-      prisma.userNotification.count({ where: { userId, read: false } }),
-      prisma.readingHistory.findMany({
-        where: { userId },
-        orderBy: { readAt: 'desc' },
-        take: 5,
-        include: {
-          article: {
-            select: { id: true, title: true, slug: true, featuredImageUrl: true },
-          },
-        },
-      }),
+      withMissingTableFallback(() => prisma.userBookmark.count({ where: { userId } }), 0),
+      withMissingTableFallback(() => prisma.readingHistory.count({ where: { userId } }), 0),
+      withMissingTableFallback(() => prisma.userNotification.count({ where: { userId, read: false } }), 0),
+      withMissingTableFallback(
+        () =>
+          prisma.readingHistory.findMany({
+            where: { userId },
+            orderBy: { readAt: 'desc' },
+            take: 5,
+            include: {
+              article: {
+                select: { id: true, title: true, slug: true, featuredImageUrl: true },
+              },
+            },
+          }),
+        []
+      ),
     ]);
 
     // Calculate total reading time
-    const readingStats = await prisma.readingHistory.aggregate({
-      where: { userId },
-      _sum: { readDurationSec: true },
-      _count: { _all: true },
-    });
+    const readingStats = await withMissingTableFallback(
+      () =>
+        prisma.readingHistory.aggregate({
+          where: { userId },
+          _sum: { readDurationSec: true },
+          _count: { _all: true },
+        }),
+      { _sum: { readDurationSec: 0 }, _count: { _all: 0 } }
+    );
 
     res.json({
       data: {

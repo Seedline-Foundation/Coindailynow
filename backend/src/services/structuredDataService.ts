@@ -568,6 +568,124 @@ export class StructuredDataService {
   // UTILITY METHODS
   // ============================================================================
 
+  /**
+   * Generate BreadcrumbList schema for navigation context (rich results)
+   */
+  generateBreadcrumbSchema(breadcrumbs: Array<{ name: string; url: string }>): object {
+    const siteUrl = process.env.FRONTEND_URL || 'https://coindaily.online';
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbs.map((crumb, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: crumb.name,
+        item: crumb.url.startsWith('http') ? crumb.url : `${siteUrl}${crumb.url}`,
+      })),
+    };
+  }
+
+  /**
+   * Generate Speakable schema for voice assistants (Google Assistant, Alexa)
+   */
+  generateSpeakableSchema(articleUrl: string, speakableSections: string[] = ['.article-summary', '.key-facts', 'h1']): object {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      url: articleUrl,
+      speakable: {
+        '@type': 'SpeakableSpecification',
+        cssSelector: speakableSections,
+      },
+    };
+  }
+
+  /**
+   * Generate ClaimReview / FactCheck schema for news credibility
+   */
+  generateFactCheckSchema(params: {
+    claimText: string;
+    claimAuthor?: string;
+    reviewUrl: string;
+    rating: 'True' | 'Mostly True' | 'Half True' | 'Mostly False' | 'False' | 'Unverifiable';
+    reviewBody: string;
+    datePublished: string;
+    reviewerName?: string;
+  }): object {
+    const ratingValue: Record<string, number> = {
+      'True': 5, 'Mostly True': 4, 'Half True': 3, 'Mostly False': 2, 'False': 1, 'Unverifiable': 0,
+    };
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'ClaimReview',
+      url: params.reviewUrl,
+      claimReviewed: params.claimText,
+      itemReviewed: {
+        '@type': 'Claim',
+        author: params.claimAuthor ? {
+          '@type': 'Person',
+          name: params.claimAuthor,
+        } : undefined,
+        datePublished: params.datePublished,
+      },
+      author: {
+        '@type': 'Organization',
+        name: params.reviewerName || 'CoinDaily Fact Check',
+        url: process.env.FRONTEND_URL || 'https://coindaily.online',
+      },
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: ratingValue[params.rating] ?? 3,
+        bestRating: 5,
+        worstRating: 1,
+        alternateName: params.rating,
+      },
+      reviewBody: params.reviewBody,
+      datePublished: params.datePublished,
+    };
+  }
+
+  /**
+   * Generate complete structured data bundle for an article page
+   * Includes: NewsArticle + BreadcrumbList + Speakable + FAQPage
+   */
+  async generateFullArticleSchemaBundle(articleId: string): Promise<object[]> {
+    const schemas: object[] = [];
+    const siteUrl = process.env.FRONTEND_URL || 'https://coindaily.online';
+
+    // 1. NewsArticle
+    const newsArticle = await this.generateNewsArticleSchema(articleId);
+    if (newsArticle) schemas.push(newsArticle);
+
+    // 2. Get article details for breadcrumb
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+      include: { Category: true },
+    });
+
+    if (article) {
+      // 3. BreadcrumbList
+      const breadcrumbs = [
+        { name: 'Home', url: '/' },
+        ...(article.Category ? [{ name: article.Category.name, url: `/category/${article.Category.slug}` }] : []),
+        { name: article.title, url: `/news/${article.slug}` },
+      ];
+      schemas.push(this.generateBreadcrumbSchema(breadcrumbs));
+
+      // 4. Speakable
+      schemas.push(this.generateSpeakableSchema(
+        `${siteUrl}/news/${article.slug}`,
+        ['.article-summary', '.key-facts', 'h1', '.faq-section']
+      ));
+    }
+
+    // 5. FAQ/RAO
+    const rao = await this.generateRAOSchema(articleId);
+    if (rao) schemas.push(rao);
+
+    return schemas;
+  }
+
   private stripHtml(html: string): string {
     return html.replace(/<[^>]*>/g, '').trim();
   }

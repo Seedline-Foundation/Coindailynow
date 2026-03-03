@@ -1,0 +1,54 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+rule_files:
+  - 'alert-rules.yml'
+
+scrape_configs:
+  # ── Backend API ─────────────────────────────────────────
+  - job_name: 'coindaily-backend'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['host.docker.internal:4000']
+        labels:
+          service: 'backend'
+          env: 'production'
+
+  # ── Frontend (Next.js) ──────────────────────────────────
+  - job_name: 'coindaily-frontend'
+    metrics_path: '/api/metrics'
+    static_configs:
+      - targets: ['host.docker.internal:3000']
+        labels:
+          service: 'frontend'
+          env: 'production'
+
+  # ── Finance System ─────────────────────────────────────
+  - job_name: 'coindaily-finance'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['host.docker.internal:3005']
+        labels:
+          service: 'finance'
+          env: 'production'
+
+  # ── Node Exporter (host metrics) ─────────────────────────
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # ── Redis ───────────────────────────────────────────────
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['host.docker.internal:9121']
+        labels:
+          service: 'redis'
+
+  # ── PostgreSQL ──────────────────────────────────────────
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['host.docker.internal:9187']
+        labels:
+          service: 'postgres'

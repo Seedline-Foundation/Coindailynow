@@ -99,21 +99,63 @@ router.post('/collect', async (req: Request, res: Response) => {
     categories,
   };
 
-  // One Redis round-trip via MULTI/EXEC.
-  const multi = redis.multi();
-  multi.hincrby(statsKey, 'total', 1);
-  if (isIvt) multi.hincrby(statsKey, 'ivt', 1);
-  for (const c of categories) {
-    multi.hincrby(statsKey, `cat:${c}`, 1);
+  // One Redis round-trip via MULTI/EXEC when available.
+  if (typeof redis.multi === 'function') {
+    const multi = redis.multi();
+    multi.hincrby(statsKey, 'total', 1);
+    if (isIvt) multi.hincrby(statsKey, 'ivt', 1);
+    for (const c of categories) {
+      multi.hincrby(statsKey, `cat:${c}`, 1);
+    }
+    multi.expire(statsKey, 60 * 60 * 24 * 35);
+    multi.lpush(eventsKey, JSON.stringify(event));
+    multi.ltrim(eventsKey, 0, 4999);
+    multi.expire(eventsKey, 60 * 60 * 24 * 7);
+    await multi.exec();
   }
-  multi.expire(statsKey, 60 * 60 * 24 * 35);
-  multi.lpush(eventsKey, JSON.stringify(event));
-  multi.ltrim(eventsKey, 0, 4999);
-  multi.expire(eventsKey, 60 * 60 * 24 * 7);
-  await multi.exec();
 
   return res.json({ ok: true, ivtScore, categories });
 });
+
+/* ── Known data-center / bot IP ranges (sample set) ───────────────── */
+const DC_IP_PREFIXES = [
+  '35.', '34.', '104.196.', '104.197.', // GCP
+  '52.', '54.', '18.', '3.',            // AWS
+  '13.', '20.', '40.', '51.',           // Azure
+  '159.203.', '167.71.', '188.166.',     // DigitalOcean
+  '141.101.', '172.64.',                 // Cloudflare Workers
+];
+
+function isDcIp(ip: string): boolean {
+  return DC_IP_PREFIXES.some(p => ip.startsWith(p));
+}
+
+/* ── ML-inspired anomaly scoring (extends rule-based) ─────────────── */
+function mlScore(payload: any, ip: string): { mlBoost: number; mlCategories: string[] } {
+  const cats: string[] = [];
+  let boost = 0;
+
+  // Data-center IP detection
+  if (isDcIp(ip)) { boost += 20; cats.push('datacenter_ip'); }
+
+  // Session anomaly: no referrer + direct landing on deep page
+  const ref = payload?.page?.referrer || '';
+  const path = payload?.page?.path || '/';
+  if (!ref && path.split('/').length > 3) { boost += 8; cats.push('suspicious_entry'); }
+
+  // Cookie/localStorage absent on non-first visit
+  if (payload?.fingerprint?.returningVisitor && !payload?.fingerprint?.hasCookies) {
+    boost += 12; cats.push('cookie_mismatch');
+  }
+
+  // Canvas fingerprint is identical across many sessions (placeholder — real check is server-side dedup)
+  // Rapid successive requests from same fingerprint
+  if (payload?.meta?.requestsInWindow && Number(payload.meta.requestsInWindow) > 30) {
+    boost += 25; cats.push('rate_anomaly');
+  }
+
+  return { mlBoost: boost, mlCategories: cats };
+}
 
 /**
  * GET /api/v1/traffic/stats?day=YYYY-MM-DD
@@ -127,7 +169,7 @@ router.get('/stats', authMiddleware, requireRole(['admin']), async (req: Request
 
   const day = String(req.query.day || todayKey()).slice(0, 10);
   const statsKey = `traffic:stats:${day}`;
-  const raw = await redis.hgetall(statsKey);
+  const raw = typeof redis.hgetall === 'function' ? await redis.hgetall(statsKey) : {};
   const total = Number(raw.total || 0);
   const ivt = Number(raw.ivt || 0);
   const ivtPct = total > 0 ? (ivt / total) * 100 : 0;
@@ -145,6 +187,76 @@ router.get('/stats', authMiddleware, requireRole(['admin']), async (req: Request
     ivtPct,
     categories,
   });
+});
+
+/**
+ * GET /api/v1/traffic/stats/range?from=YYYY-MM-DD&to=YYYY-MM-DD
+ * Admin-only: multi-day traffic stats for charting.
+ */
+router.get('/stats/range', authMiddleware, requireRole(['admin']), async (req: Request, res: Response) => {
+  const redis = getRedis(req);
+  if (!redis) return res.status(503).json({ error: { code: 'SERVICE_UNAVAILABLE', message: 'Redis unavailable' } });
+
+  const from = String(req.query.from || todayKey(new Date(Date.now() - 7 * 86400000)));
+  const to = String(req.query.to || todayKey());
+
+  const days: { day: string; total: number; ivt: number; ivtPct: number }[] = [];
+  const d = new Date(from);
+  const end = new Date(to);
+  while (d <= end) {
+    const day = todayKey(d);
+    const raw = await redis.hgetall(`traffic:stats:${day}`);
+    const total = Number(raw?.total || 0);
+    const ivt = Number(raw?.ivt || 0);
+    days.push({ day, total, ivt, ivtPct: total > 0 ? (ivt / total) * 100 : 0 });
+    d.setDate(d.getDate() + 1);
+  }
+
+  return res.json({ data: days });
+});
+
+/**
+ * GET /api/v1/traffic/events?day=YYYY-MM-DD&limit=100
+ * Admin-only: recent IVT events (for investigation).
+ */
+router.get('/events', authMiddleware, requireRole(['admin']), async (req: Request, res: Response) => {
+  const redis = getRedis(req);
+  if (!redis) return res.status(503).json({ error: { code: 'SERVICE_UNAVAILABLE', message: 'Redis unavailable' } });
+
+  const day = String(req.query.day || todayKey());
+  const limit = Math.min(Number(req.query.limit || 100), 500);
+  const raw = await redis.lrange(`traffic:events:${day}`, 0, limit - 1);
+  const events = raw.map((r: string) => { try { return JSON.parse(r); } catch { return null; } }).filter(Boolean);
+
+  return res.json({ data: events });
+});
+
+/**
+ * GET /api/v1/traffic/alerts
+ * Admin-only: check for IVT spike alerts.
+ */
+router.get('/alerts', authMiddleware, requireRole(['admin']), async (req: Request, res: Response) => {
+  const redis = getRedis(req);
+  if (!redis) return res.status(503).json({ error: { code: 'SERVICE_UNAVAILABLE', message: 'Redis unavailable' } });
+
+  const alerts: any[] = [];
+  const day = todayKey();
+  const raw = await redis.hgetall(`traffic:stats:${day}`);
+  const total = Number(raw?.total || 0);
+  const ivt = Number(raw?.ivt || 0);
+  const ivtPct = total > 0 ? (ivt / total) * 100 : 0;
+
+  if (ivtPct > 15) alerts.push({ level: 'critical', message: `IVT rate is ${ivtPct.toFixed(1)}% today (threshold: 15%)`, day });
+  else if (ivtPct > 8) alerts.push({ level: 'warning', message: `IVT rate is ${ivtPct.toFixed(1)}% today (threshold: 8%)`, day });
+
+  if (Number(raw?.['cat:headless'] || 0) > 50) {
+    alerts.push({ level: 'warning', message: `${raw['cat:headless']} headless browser detections today`, day });
+  }
+  if (Number(raw?.['cat:datacenter_ip'] || 0) > 100) {
+    alerts.push({ level: 'critical', message: `${raw['cat:datacenter_ip']} data-center IP visits detected`, day });
+  }
+
+  return res.json({ data: alerts });
 });
 
 export default router;

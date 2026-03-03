@@ -445,6 +445,27 @@ ${marketContext.marketData.slice(0, 5).map((data: MarketData) =>
 
 Generate high-quality, accurate, and culturally appropriate content that serves African cryptocurrency communities.
 
+=== MANDATORY: RANKBRAIN-FRIENDLY CONTENT FRAMEWORK (6 STEPS) ===
+Every article you produce MUST follow this exact 6-step structure for maximum search engine ranking:
+
+STEP 1 - HOOK (first 100 words): Start with problem agitation. Identify the reader's pain point, fear, or curiosity about the topic. Use a compelling opening that creates urgency and makes the reader want to continue. Include the primary keyword naturally in the first sentence.
+
+STEP 2 - TABLE OF CONTENTS: After the hook, include a structured table of contents with jump links (using markdown anchors like [Section Name](#section-name)). This increases dwell time and helps Google understand article structure. List all H2 sections.
+
+STEP 3 - H2/H3 HIERARCHY WITH KEYWORD VARIATIONS: Structure the body using clear H2 and H3 headings. Each H2 must contain a keyword variation (e.g., if keyword is "crypto regulation Nigeria", use variations like "Nigerian crypto laws", "SEC Nigeria crypto rules", "cryptocurrency policy in Nigeria"). Use at least 4-6 H2 sections with 2-3 H3 sub-sections each.
+
+STEP 4 - MULTIMEDIA PLACEHOLDERS EVERY 300 WORDS: Insert multimedia markers every ~300 words. Use format: [IMAGE: description of relevant image/chart/infographic] or [VIDEO: description of embedded video] or [CHART: description of data visualization]. These will be replaced with actual media in post-production.
+
+STEP 5 - FAQ SECTION: End with a "Frequently Asked Questions" section containing 3-5 questions that target Google's "People Also Ask" boxes. Format as:
+## Frequently Asked Questions
+### [Question targeting "People Also Ask"]
+[Concise, direct answer in 2-3 sentences]
+
+STEP 6 - STRONG CTA: Close with a compelling call-to-action. Direct readers to related content, newsletter subscription, or community engagement. Use format:
+**What to read next:** [Related topic suggestion]
+**Stay informed:** Subscribe to CoinDaily's daily African crypto briefing for real-time updates.
+=== END FRAMEWORK ===
+
 CRITICAL: Respond only with valid JSON in this exact format:`;
 
     const jsonStructure = {
@@ -526,7 +547,15 @@ ARTICLE REQUIREMENTS:
 - Multiple sections with clear structure
 - Include data, statistics, and expert quotes where relevant
 - Call-to-action or conclusion
-- SEO-optimized structure`,
+- SEO-optimized structure
+
+MANDATORY RANKBRAIN 6-STEP FRAMEWORK:
+1. HOOK: Open with problem agitation in first 100 words (include primary keyword)
+2. TABLE OF CONTENTS: Include TOC with anchor links to all H2 sections after the hook
+3. H2/H3 HIERARCHY: Use keyword variations in each H2 heading (at least 4-6 H2s)
+4. MULTIMEDIA: Insert [IMAGE: desc] or [CHART: desc] placeholders every ~300 words
+5. FAQ SECTION: End with 3-5 "People Also Ask" questions with concise 2-3 sentence answers
+6. CTA: Close with call-to-action to CoinDaily related content and newsletter subscription`,
       
       summary: `
 SUMMARY REQUIREMENTS:

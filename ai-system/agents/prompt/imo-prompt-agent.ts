@@ -3,8 +3,13 @@
 // Specialized in prompt chaining, negative prompting, RAG integration, and multi-step workflows
 
 // Audit logging (stubbed for standalone usage)
-const createAuditLog = async (action: string, data: any) => { /* stub */ };
-const AuditActions = { IMO_PROMPT_GENERATED: 'imo_prompt_generated' };
+const createAuditLog = async (data: any) => { /* stub */ };
+const AuditActions = {
+  IMO_PROMPT_GENERATED: 'imo_prompt_generated',
+  SETTINGS_UPDATE: 'settings_update',
+  ARTICLE_CREATE: 'article_create',
+  ARTICLE_DELETE: 'article_delete'
+};
 
 /**
  * Prompt generation strategies
@@ -554,13 +559,30 @@ TONE: ${tone}
 ${africanFocus ? 'FOCUS: African cryptocurrency market, regulations, adoption, and impact' : ''}
 ${keywords.length > 0 ? `TARGET KEYWORDS: ${keywords.join(', ')}` : ''}
 
+=== MANDATORY: RANKBRAIN-FRIENDLY CONTENT FRAMEWORK (6 STEPS) ===
+
+STEP 1 - HOOK (first 100 words): Start with problem agitation. What is the reader's pain point or burning question about "${topic}"? Create urgency and curiosity. Include the primary keyword naturally in the opening.
+
+STEP 2 - TABLE OF CONTENTS: Include a structured table of contents with anchor links to each major section. This increases dwell time and improves Google's understanding of your content.
+
+STEP 3 - H2/H3 HIERARCHY WITH KEYWORD VARIATIONS: Structure using clear H2 and H3 headings. Each H2 heading should include a keyword variation. Use at least 4-6 H2 sections with sub-sections.
+
+STEP 4 - MULTIMEDIA PLACEHOLDERS EVERY 300 WORDS: Insert [IMAGE: description], [VIDEO: description], or [CHART: description] markers every ~300 words for media to be added in post-production.
+
+STEP 5 - FAQ SECTION: Include 3-5 FAQs targeting "People Also Ask" with concise answers.
+
+STEP 6 - STRONG CTA: End with a call-to-action directing readers to related CoinDaily content and newsletter subscription.
+
+=== END FRAMEWORK ===
+
 Write a comprehensive, engaging article that:
-1. Captures reader attention with a strong lead
-2. Provides accurate, well-researched information
-3. Includes relevant examples and data
-4. Addresses African market context and implications
-5. Concludes with actionable insights or future outlook
-${keywords.length > 0 ? `6. Naturally incorporates target keywords: ${keywords.join(', ')}` : ''}
+1. Opens with a compelling hook (problem agitation) with primary keyword
+2. Includes table of contents with jump links
+3. Provides accurate, well-researched information in H2/H3 hierarchy
+4. Includes multimedia placeholders every 300 words
+5. Addresses African market context and implications
+6. Ends with FAQ section and strong CTA
+${keywords.length > 0 ? `7. Naturally incorporates target keywords: ${keywords.join(', ')}` : ''}
 
 ${request.context.customInstructions || ''}`;
   }
@@ -625,13 +647,31 @@ REQUIREMENTS:
 - Add internal linking suggestions
 - Focus on African cryptocurrency market context
 
+=== MANDATORY: RANKBRAIN-FRIENDLY CONTENT FRAMEWORK (6 STEPS) ===
+Every article MUST follow this 6-step structure:
+
+STEP 1 - HOOK (first 100 words): Problem agitation. Open with the reader's pain point, fear, or burning curiosity. Create urgency. Include primary keyword "${targetKeywords[0] || topic}" naturally in the first sentence.
+
+STEP 2 - TABLE OF CONTENTS: After the hook, include a table of contents with anchor links to all H2 sections. Format: [Section Name](#section-name). This boosts dwell time and helps search engines understand structure.
+
+STEP 3 - H2/H3 HIERARCHY WITH KEYWORD VARIATIONS: Use at least 5-7 H2 sections with 2-3 H3 sub-sections. Each H2 must contain a keyword variation of "${targetKeywords[0] || topic}" (e.g., synonyms, long-tail versions, question forms).
+
+STEP 4 - MULTIMEDIA EVERY 300 WORDS: Insert [IMAGE: description], [VIDEO: description], or [CHART: description] placeholders every ~300 words for post-production media insertion.
+
+STEP 5 - FAQ SECTION (3-5 questions): Target Google "People Also Ask" boxes. Write common questions African users would search. Include direct, concise answers (2-3 sentences each).
+
+STEP 6 - STRONG CTA: End with call-to-action directing to related CoinDaily content, newsletter signup, or community. Format: "What to read next: [topic]" and "Stay informed: Subscribe to CoinDaily's African crypto briefing."
+=== END FRAMEWORK ===
+
 Structure:
-1. Attention-grabbing introduction with primary keyword
-2. Problem/context explanation
-3. Detailed solution/information sections
-4. African market implications
-5. Actionable conclusion
-6. FAQ section (3-5 questions)`;
+1. Attention-grabbing introduction with primary keyword (HOOK)
+2. Table of contents with jump links
+3. Problem/context explanation
+4. Detailed solution/information sections (H2/H3 with keyword variations)
+5. African market implications
+6. Actionable conclusion
+7. FAQ section (3-5 questions targeting People Also Ask)
+8. CTA to related content and newsletter`;
   }
 
   private buildGenericPrompt(request: ImoPromptRequest): string {
@@ -689,7 +729,7 @@ Translate:`;
 
     return `You are an SEO strategist researching: ${topic}
 
-TASK: Create a comprehensive content outline
+TASK: Create a comprehensive content outline using the RankBrain 6-Step Framework
 
 1. KEYWORD RESEARCH:
    - Primary keyword: ${targetKeywords[0] || topic}
@@ -700,11 +740,16 @@ TASK: Create a comprehensive content outline
    - What are top-ranking articles covering?
    - What gaps can we fill?
 
-3. CONTENT STRUCTURE:
+3. RANKBRAIN 6-STEP CONTENT STRUCTURE:
+   STEP 1 (HOOK): Draft problem agitation angle for first 100 words
+   STEP 2 (TOC): List all planned H2 sections for table of contents
+   STEP 3 (H2/H3 HIERARCHY):
    - Suggested H1 (with primary keyword)
-   - 5-7 H2 sections (with keyword variations)
+   - 5-7 H2 sections (each with a keyword variation)
    - 2-3 H3 sub-sections per H2
-   - FAQ section (5 questions)
+   STEP 4 (MULTIMEDIA): Plan [IMAGE/VIDEO/CHART] placements every ~300 words
+   STEP 5 (FAQ): Draft 5 "People Also Ask" questions with brief answers
+   STEP 6 (CTA): Plan closing CTA and related content links
 
 4. AFRICAN MARKET ANGLE:
    - Local exchanges to mention (Luno, Quidax, Binance Africa)
@@ -715,18 +760,23 @@ Return detailed outline with estimated word count per section.`;
   }
 
   private buildWritingPrompt(request: ImoPromptRequest): string {
-    return `Using the outline from step 1, write the complete article.
+    return `Using the outline from step 1, write the complete article following the RankBrain 6-Step Framework.
 
 REQUIREMENTS:
-- Follow the structure exactly
-- Incorporate all suggested keywords naturally
+- STEP 1: Open with problem agitation hook (first 100 words, include primary keyword)
+- STEP 2: Include table of contents with anchor links after the hook
+- STEP 3: Follow the H2/H3 structure exactly with keyword variations in each heading
+- STEP 4: Insert [IMAGE: desc], [VIDEO: desc], or [CHART: desc] every ~300 words
+- STEP 5: End with FAQ section (3-5 "People Also Ask" questions with concise answers)
+- STEP 6: Close with strong CTA to related CoinDaily content and newsletter
+
+ADDITIONAL:
 - Write for ${request.context.targetAudience || 'general'} audience
 - Maintain ${request.context.tone || 'professional'} tone
 - Include African market context in each major section
-- Write compelling introduction and conclusion
-- Add transition sentences between sections
+- Write compelling transitions between sections
 - Include specific examples and data points
-- End with clear call-to-action or key takeaways
+- Incorporate suggested keywords naturally
 
 Write the article:`;
   }
@@ -746,7 +796,15 @@ YOUR TASK:
 5. Plan African market integration points
 6. Suggest internal/external linking opportunities
 
-Provide detailed strategy and outline.`;
+REQUIRED: Plan the RankBrain-Friendly 6-Step Framework:
+- STEP 1 HOOK: Draft the opening problem agitation angle (what makes readers care?)
+- STEP 2 TOC: List all H2 section titles for the table of contents
+- STEP 3 H2/H3 HIERARCHY: Map keyword variations to each H2/H3 heading
+- STEP 4 MULTIMEDIA: Plan where to place [IMAGE], [VIDEO], [CHART] markers (every ~300 words)
+- STEP 5 FAQ: Draft 3-5 "People Also Ask" questions with brief answers
+- STEP 6 CTA: Plan the closing call-to-action and related content links
+
+Provide detailed strategy and outline following this framework.`;
   }
 
   private buildExecutionPrompt(request: ImoPromptRequest): string {
@@ -754,17 +812,22 @@ Provide detailed strategy and outline.`;
 
 Using the strategy and outline from Step 1, write the complete article.
 
-EXECUTION CHECKLIST:
-✓ Use outline structure from Step 1
-✓ Incorporate researched keywords naturally
+EXECUTION CHECKLIST (RankBrain 6-Step Framework):
+✓ STEP 1: Hook with problem agitation in first 100 words (include primary keyword)
+✓ STEP 2: Table of contents with anchor links to all H2 sections
+✓ STEP 3: H2/H3 heading hierarchy with keyword variations from Step 1 outline
+✓ STEP 4: Insert [IMAGE: desc], [VIDEO: desc], or [CHART: desc] every ~300 words
+✓ STEP 5: FAQ section with 3-5 "People Also Ask" questions and concise answers
+✓ STEP 6: Strong CTA directing to related content and newsletter subscription
+
+ADDITIONAL REQUIREMENTS:
 ✓ Target ${request.context.wordCount || 1000} words
 ✓ Write for ${request.context.targetAudience || 'general'} readers
-✓ Include African cryptocurrency market context
-✓ Add meta title and description
-✓ Include FAQ section
-✓ Ensure readability and flow
+✓ Include African cryptocurrency market context in each major section
+✓ Add meta title (60 chars) and meta description (160 chars)
+✓ Ensure readability and flow between sections
 
-Write the polished, SEO-optimized article:`;
+Write the polished, SEO-optimized article following all 6 framework steps:`;
   }
 
   private buildVisualAnalysisPrompt(request: ImoPromptRequest): string {

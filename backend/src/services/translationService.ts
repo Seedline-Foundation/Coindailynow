@@ -7,25 +7,27 @@
 import { PrismaClient, ArticleTranslation } from '@prisma/client';
 import { Logger } from 'winston';
 
-// Supported African languages with regional context
-export type SupportedLanguage = 
-  | 'en'  // English (Primary)
-  | 'sw'  // Swahili (East Africa)
-  | 'fr'  // French (West/Central Africa)  
-  | 'ar'  // Arabic (North Africa)
-  | 'pt'  // Portuguese (Lusophone Africa)
-  | 'es'  // Spanish
-  | 'am'  // Amharic (Ethiopia)
-  | 'ha'  // Hausa (Nigeria/West Africa)
-  | 'ig'  // Igbo (Nigeria)
-  | 'yo'  // Yoruba (Nigeria)
-  | 'zu'  // Zulu (South Africa)
-  | 'af'  // Afrikaans (South Africa)
-  | 'so'  // Somali (Horn of Africa)
-  | 'om'  // Oromo (Ethiopia)
-  | 'ti'  // Tigrinya (Ethiopia/Eritrea)
-  | 'xh'  // Xhosa (South Africa)
-  | 'sn'; // Shona (Zimbabwe)
+// 18 supported languages — aligned with shared/languages.ts canonical config
+// 1 source (English) + 17 NLLB translation targets
+export type SupportedLanguage =
+  | 'en'   // English (source)
+  | 'ha'   // Hausa (West Africa)
+  | 'yo'   // Yoruba (West Africa)
+  | 'ig'   // Igbo (West Africa)
+  | 'pcm'  // Pidgin / Naijá (West Africa)
+  | 'wol'  // Wolof (West Africa)
+  | 'sw'   // Swahili (East Africa)
+  | 'kin'  // Kinyarwanda (East Africa)
+  | 'am'   // Amharic (Horn of Africa)
+  | 'so'   // Somali (Horn of Africa)
+  | 'om'   // Oromo (Horn of Africa)
+  | 'zu'   // Zulu (Southern Africa)
+  | 'af'   // Afrikaans (Southern Africa)
+  | 'sn'   // Shona (Southern Africa)
+  | 'ar'   // Arabic (North Africa)
+  | 'fr'   // French (European / W. Africa)
+  | 'pt'   // Portuguese (European / Lusophone Africa)
+  | 'es';  // Spanish (European)
 
 export interface LanguageInfo {
   code: SupportedLanguage;
@@ -117,8 +119,9 @@ export class TranslationService {
       ['af', { code: 'af', name: 'Afrikaans', region: 'Southern Africa', countries: ['South Africa'], direction: 'ltr' }],
       ['so', { code: 'so', name: 'Soomali', region: 'Horn of Africa', countries: ['Somalia', 'Ethiopia'], direction: 'ltr' }],
       ['om', { code: 'om', name: 'Afaan Oromoo', region: 'Horn of Africa', countries: ['Ethiopia'], direction: 'ltr' }],
-      ['ti', { code: 'ti', name: 'ትግርኛ', region: 'Horn of Africa', countries: ['Ethiopia', 'Eritrea'], direction: 'ltr' }],
-      ['xh', { code: 'xh', name: 'isiXhosa', region: 'Southern Africa', countries: ['South Africa'], direction: 'ltr' }],
+      ['pcm', { code: 'pcm', name: 'Naijá', region: 'West Africa', countries: ['Nigeria'], direction: 'ltr' }],
+      ['wol', { code: 'wol', name: 'Wolof', region: 'West Africa', countries: ['Senegal', 'Gambia'], direction: 'ltr' }],
+      ['kin', { code: 'kin', name: 'Ikinyarwanda', region: 'East Africa', countries: ['Rwanda'], direction: 'ltr' }],
       ['sn', { code: 'sn', name: 'chiShona', region: 'Southern Africa', countries: ['Zimbabwe'], direction: 'ltr' }]
     ]);
 

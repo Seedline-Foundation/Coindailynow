@@ -32,6 +32,9 @@ interface User {
   firstName?: string;
   lastName?: string;
   role: string;
+  roles?: string[];
+  department?: string;
+  delegatedPermissions?: string[];
   subscriptionTier: string;
   status: string;
   emailVerified: boolean;
@@ -41,10 +44,26 @@ interface User {
 }
 
 export default function UserManagementPage() {
+  const DEPARTMENTS = [
+    'finance',
+    'News',
+    'Compliance/Expansion/Govt',
+    'Partnership',
+    'Adverts',
+    'Events',
+    'Market And Data',
+    'People Happiness',
+    'Users Management/HR',
+    'Marketing/branding',
+    'Innovation(coding/infra)',
+    'Content management',
+  ];
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState('all');
+  const [filterDepartment, setFilterDepartment] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,7 +73,7 @@ export default function UserManagementPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, filterRole, filterStatus, searchQuery]);
+  }, [currentPage, filterRole, filterDepartment, filterStatus, searchQuery]);
 
   const fetchUsers = async () => {
     try {
@@ -66,6 +85,7 @@ export default function UserManagementPage() {
         limit: usersPerPage.toString(),
         ...(searchQuery && { search: searchQuery }),
         ...(filterRole !== 'all' && { role: filterRole }),
+        ...(filterDepartment !== 'all' && { department: filterDepartment }),
         ...(filterStatus !== 'all' && { status: filterStatus }),
       });
 
@@ -153,7 +173,7 @@ export default function UserManagementPage() {
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <UserPlus className="h-4 w-4" />
-            <span>Add User</span>
+            <span>Create Staff</span>
           </button>
         </div>
       </div>
@@ -200,7 +220,7 @@ export default function UserManagementPage() {
 
       {/* Filters and Search */}
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="md:col-span-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -237,6 +257,18 @@ export default function UserManagementPage() {
               <option value="ACTIVE">Active</option>
               <option value="SUSPENDED">Suspended</option>
               <option value="BANNED">Banned</option>
+            </select>
+          </div>
+          <div>
+            <select
+              value={filterDepartment}
+              onChange={(e) => setFilterDepartment(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              <option value="all">All Departments</option>
+              {DEPARTMENTS.map((department) => (
+                <option key={department} value={department}>{department}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -299,6 +331,9 @@ export default function UserManagementPage() {
                       Role
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Department
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Subscription
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
@@ -340,7 +375,17 @@ export default function UserManagementPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm text-gray-300">{user.role}</span>
+                        <div className="space-y-1">
+                          <span className="text-sm text-gray-300">{user.role}</span>
+                          {Array.isArray(user.roles) && user.roles.length > 1 && (
+                            <p className="text-xs text-gray-500">
+                              +{user.roles.length - 1} more role(s)
+                            </p>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-300">{user.department || 'Unassigned'}</span>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getTierBadge(user.subscriptionTier)}`}>
@@ -422,6 +467,31 @@ export default function UserManagementPage() {
 
 // Add User Modal Component
 function AddUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const DEPARTMENTS = [
+    'finance',
+    'News',
+    'Compliance/Expansion/Govt',
+    'Partnership',
+    'Adverts',
+    'Events',
+    'Market And Data',
+    'People Happiness',
+    'Users Management/HR',
+    'Marketing/branding',
+    'Innovation(coding/infra)',
+    'Content management',
+  ];
+
+  const AVAILABLE_ROLES = [
+    'USER',
+    'ADMIN',
+    'CONTENT_ADMIN',
+    'MARKETING_ADMIN',
+    'TECH_ADMIN',
+    'SUPER_ADMIN',
+  ];
+
+  const [allPermissions, setAllPermissions] = useState<Array<{ key: string; displayName: string; category: string }>>([]);
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -429,10 +499,33 @@ function AddUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: 
     lastName: '',
     password: '',
     role: 'USER',
+    roles: ['USER'] as string[],
+    department: '',
+    permissions: [] as string[],
     subscriptionTier: 'FREE',
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadPermissions = async () => {
+      try {
+        const token = localStorage.getItem('super_admin_token');
+        const response = await fetch('/api/super-admin/permissions', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAllPermissions(data.permissions || []);
+        }
+      } catch (err) {
+        console.error('Failed to load permissions for staff creation', err);
+      }
+    };
+    loadPermissions();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -468,8 +561,8 @@ function AddUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: 
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-700">
-          <h2 className="text-2xl font-bold text-white">Add New User</h2>
-          <p className="text-gray-400 mt-1">Create a new user account</p>
+          <h2 className="text-2xl font-bold text-white">Create Staff</h2>
+          <p className="text-gray-400 mt-1">Create a new staff account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -545,18 +638,75 @@ function AddUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: 
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                Role
+                Primary Role
               </label>
               <select
                 value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                onChange={(e) => {
+                  const primary = e.target.value;
+                  const nextRoles = formData.roles.includes(primary)
+                    ? formData.roles
+                    : [primary, ...formData.roles].slice(0, 5);
+                  setFormData({ ...formData, role: primary, roles: nextRoles });
+                }}
                 className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="USER">User</option>
-                <option value="CONTENT_ADMIN">Content Admin</option>
-                <option value="MARKETING_ADMIN">Marketing Admin</option>
-                <option value="TECH_ADMIN">Tech Admin</option>
+                {AVAILABLE_ROLES.map((role) => (
+                  <option key={role} value={role}>{role}</option>
+                ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Department
+              </label>
+              <select
+                value={formData.department}
+                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select Department</option>
+                {DEPARTMENTS.map((department) => (
+                  <option key={department} value={department}>{department}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Additional Roles (2-5 allowed)
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {AVAILABLE_ROLES.map((roleOption) => {
+                  const checked = formData.roles.includes(roleOption);
+                  return (
+                    <label key={roleOption} className="flex items-center space-x-2 text-sm text-gray-300">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          let nextRoles = formData.roles;
+                          if (e.target.checked) {
+                            nextRoles = [...new Set([...formData.roles, roleOption])].slice(0, 5);
+                          } else {
+                            nextRoles = formData.roles.filter(r => r !== roleOption);
+                          }
+
+                          const nextPrimary = nextRoles.includes(formData.role) ? formData.role : (nextRoles[0] || 'USER');
+                          setFormData({
+                            ...formData,
+                            roles: nextRoles.length > 0 ? nextRoles : ['USER'],
+                            role: nextPrimary,
+                          });
+                        }}
+                        className="rounded border-gray-600 text-blue-600 focus:ring-blue-400"
+                      />
+                      <span>{roleOption}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
 
             <div>
@@ -573,6 +723,40 @@ function AddUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: 
                 <option value="PREMIUM">Premium</option>
                 <option value="ENTERPRISE">Enterprise</option>
               </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Delegated Permissions ({formData.permissions.length} selected)
+            </label>
+            <div className="max-h-56 overflow-y-auto border border-gray-700 rounded-lg p-3 bg-gray-900/50">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {allPermissions.map((permission) => {
+                  const checked = formData.permissions.includes(permission.key);
+                  return (
+                    <label key={permission.key} className="flex items-start space-x-2 text-sm text-gray-300">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          setFormData(prev => ({
+                            ...prev,
+                            permissions: e.target.checked
+                              ? [...prev.permissions, permission.key]
+                              : prev.permissions.filter(p => p !== permission.key)
+                          }));
+                        }}
+                        className="mt-1 rounded border-gray-600 text-blue-600 focus:ring-blue-400"
+                      />
+                      <span>
+                        <span className="block">{permission.key}</span>
+                        <span className="text-xs text-gray-500">{permission.displayName} • {permission.category}</span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

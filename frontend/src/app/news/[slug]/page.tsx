@@ -5,6 +5,15 @@
 
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import Link from 'next/link';
+
+// Canonical language list
+const LANG_NAMES: Record<string, string> = {
+  en: 'English', ha: 'Hausa', yo: 'Yoruba', ig: 'Igbo', pcm: 'Pidgin',
+  wol: 'Wolof', sw: 'Swahili', kin: 'Kinyarwanda', am: 'Amharic',
+  so: 'Somali', om: 'Oromo', zu: 'Zulu', af: 'Afrikaans', sn: 'Shona',
+  ar: 'Arabic', fr: 'French', pt: 'Portuguese', es: 'Spanish',
+};
 
 interface NewsPageProps {
   params: {
@@ -30,6 +39,10 @@ interface Article {
     name?: string | null;
     slug?: string | null;
   } | null;
+  translations?: {
+    languageCode: string;
+    translationStatus: string;
+  }[];
 }
 
 async function getArticle(slug: string): Promise<Article | null> {
@@ -61,6 +74,10 @@ async function getArticle(slug: string): Promise<Article | null> {
             category {
               name
               slug
+            }
+            translations {
+              languageCode
+              translationStatus
             }
           }
         }
@@ -109,9 +126,32 @@ export default async function NewsPage({ params }: NewsPageProps) {
     notFound();
   }
 
+  const availableTranslations = (article.translations || [])
+    .filter(t => t.translationStatus === 'COMPLETED')
+    .map(t => t.languageCode);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <article className="max-w-4xl mx-auto px-4 py-12">
+        {/* Language Switcher */}
+        {availableTranslations.length > 0 && (
+          <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-200 flex-wrap">
+            <span className="text-sm font-medium text-gray-500 mr-1">Read in:</span>
+            <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-600 text-white">
+              English
+            </span>
+            {availableTranslations.map((code: string) => (
+              <Link
+                key={code}
+                href={`/${code}/news/${params.slug}`}
+                className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
+              >
+                {LANG_NAMES[code] || code}
+              </Link>
+            ))}
+          </div>
+        )}
+
         <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-4">
           <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-blue-700">
             {article.category?.name || 'News'}
@@ -144,6 +184,24 @@ export default async function NewsPage({ params }: NewsPageProps) {
             }}
           />
         </div>
+
+        {/* Bottom Language Switcher */}
+        {availableTranslations.length > 0 && (
+          <div className="mt-12 pt-6 border-t border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Also available in:</h3>
+            <div className="flex flex-wrap gap-2">
+              {availableTranslations.map((code: string) => (
+                <Link
+                  key={code}
+                  href={`/${code}/news/${params.slug}`}
+                  className="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
+                >
+                  {LANG_NAMES[code] || code}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </article>
     </div>
   );

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { optionalApiKey, requireApiKey } from '../../middleware/apiKeyAuth';
 import { ExchangeRateService } from '../../services/exchangeRateService';
+import prisma from '../../lib/prisma';
 
 const router = Router();
 
@@ -177,7 +178,6 @@ router.get('/market/sentiment', requireApiKey(), async (req: Request, res: Respo
  * Query params: exchange, interval (1m,5m,15m,1h,4h,1d), from, to, limit
  */
 router.get('/ticks/:symbol', async (req: Request, res: Response) => {
-  const prisma = getPrisma(req);
   const { symbol } = req.params;
   const exchange = req.query.exchange as string | undefined;
   const interval = (req.query.interval as string) || '1m';
@@ -221,7 +221,6 @@ router.get('/ticks/:symbol', async (req: Request, res: Response) => {
  * Query params: fiat (NGN,KES,ZAR,GHS), stablecoin (USDT,USDC), exchange
  */
 router.get('/fiat-stablecoin', async (req: Request, res: Response) => {
-  const prisma = getPrisma(req);
   const fiat = req.query.fiat as string | undefined;
   const stablecoin = req.query.stablecoin as string | undefined;
   const exchange = req.query.exchange as string | undefined;
@@ -265,7 +264,6 @@ router.get('/fiat-stablecoin', async (req: Request, res: Response) => {
  * Query params: fiat, stablecoin, exchange, from, to, limit
  */
 router.get('/fiat-stablecoin/history', async (req: Request, res: Response) => {
-  const prisma = getPrisma(req);
   const fiat = (req.query.fiat as string || 'NGN').toUpperCase();
   const stablecoin = (req.query.stablecoin as string || 'USDT').toUpperCase();
   const exchange = req.query.exchange as string | undefined;

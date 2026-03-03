@@ -48,6 +48,8 @@ const LANGUAGE_INFO: Record<string, { name: string; region: string; flag: string
   ti: { name: 'Tigrinya', region: 'Ethiopia/Eritrea', flag: '🇪🇷' },
   xh: { name: 'Xhosa', region: 'South Africa', flag: '🇿🇦' },
   sn: { name: 'Shona', region: 'Zimbabwe', flag: '🇿🇼' },
+  pcm: { name: 'Pidgin', region: 'West Africa', flag: '🇳🇬' },
+  es: { name: 'Spanish', region: 'Global', flag: '🇪🇸' },
 };
 
 export const TranslationSwitcher: React.FC<TranslationSwitcherProps> = ({

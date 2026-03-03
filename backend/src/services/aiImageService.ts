@@ -67,41 +67,30 @@ export interface ChartGenerationOptions {
 }
 
 export class AIImageService {
-  private dalleApiKey: string;
-  private dalleBaseUrl: string = 'https://api.openai.com/v1';
+  private sdxlEndpoint: string;
   private isInitialized: boolean = false;
 
   constructor() {
-    this.dalleApiKey = process.env.OPENAI_API_KEY || '';
+    this.sdxlEndpoint = process.env.SDXL_API_ENDPOINT || 'http://localhost:7860';
   }
 
   /**
    * Initialize the service
    */
   async initialize(): Promise<void> {
-    if (!this.dalleApiKey) {
-      throw new Error('OpenAI API key not configured for image generation');
-    }
-
     try {
-      // Test API connection
-      const response = await fetch(`${this.dalleBaseUrl}/models`, {
-        headers: {
-          'Authorization': `Bearer ${this.dalleApiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // Test SDXL connection
+      const response = await fetch(`${this.sdxlEndpoint}/sdapi/v1/sd-models`);
 
       if (!response.ok) {
-        throw new Error(`OpenAI API connection failed: ${response.statusText}`);
+        console.warn('[AIImageService] SDXL not reachable, will retry on first call');
       }
 
       this.isInitialized = true;
-      console.log('[AIImageService] Initialized successfully');
+      console.log('[AIImageService] Initialized with self-hosted SDXL');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown initialization error';
-      console.error('[AIImageService] Initialization failed:', errorMessage);
-      throw error;
+      console.warn('[AIImageService] SDXL not available yet, will retry:', error instanceof Error ? error.message : '');
+      this.isInitialized = true; // Allow lazy initialization
     }
   }
 
@@ -133,34 +122,36 @@ export class AIImageService {
       // Determine optimal size based on image type
       const size = options.size || this.getOptimalSize(options.type);
       const quality = options.quality || 'standard';
+      const [width, height] = size.split('x').map(Number);
 
-      // Call DALL-E 3 API
-      const dalleResponse = await fetch(`${this.dalleBaseUrl}/images/generations`, {
+      // Call self-hosted SDXL API
+      const sdxlResponse = await fetch(`${this.sdxlEndpoint}/sdapi/v1/txt2img`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.dalleApiKey}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'dall-e-3',
           prompt: enhancedPrompt,
-          size,
-          quality,
-          n: 1,
-          response_format: 'url',
+          negative_prompt: 'blurry, low quality, distorted, watermark, text overlay, signature, username, low resolution, bad anatomy, poorly drawn, deformed',
+          width: width || 1024,
+          height: height || 1024,
+          steps: quality === 'hd' ? 40 : 30,
+          cfg_scale: 7.5,
+          sampler_name: 'DPM++ 2M Karras',
+          n_iter: 1,
+          batch_size: 1,
         }),
       });
 
-      if (!dalleResponse.ok) {
-        const errorData = await dalleResponse.json().catch(() => ({}));
-        throw new Error(`DALL-E API error: ${dalleResponse.statusText} - ${JSON.stringify(errorData)}`);
+      if (!sdxlResponse.ok) {
+        const errorData = await sdxlResponse.text().catch(() => 'Unknown error');
+        throw new Error(`SDXL API error: ${sdxlResponse.statusText} - ${errorData}`);
       }
 
-      const dalleData = await dalleResponse.json();
-      const generatedImage = dalleData.data[0];
+      const sdxlData = await sdxlResponse.json();
+      const imageBase64 = sdxlData.images?.[0];
+      const imageDataUrl = imageBase64 ? `data:image/png;base64,${imageBase64}` : '';
 
-      // Download and optimize the image
-      const optimizedImage = await this.optimizeImage(generatedImage.url);
+      // Optimize the generated image
+      const optimizedImage = await this.optimizeImage(imageDataUrl);
 
       // Generate SEO-optimized alt text
       const altText = await this.generateAltText(articleId, options);
@@ -174,8 +165,8 @@ export class AIImageService {
           thumbnailUrl: optimizedImage.thumbnailUrl,
           altText,
           generationPrompt: enhancedPrompt,
-          revisedPrompt: generatedImage.revised_prompt,
-          dalleModel: 'dall-e-3',
+          revisedPrompt: enhancedPrompt,
+          dalleModel: 'sdxl-self-hosted',
           width: optimizedImage.width,
           height: optimizedImage.height,
           format: optimizedImage.format,
@@ -193,7 +184,7 @@ export class AIImageService {
           metadata: JSON.stringify({
             generationTime: Date.now() - startTime,
             style: options.style || 'professional',
-            dalleRevision: generatedImage.revised_prompt,
+            model: 'sdxl-self-hosted',
           }),
         },
       });
@@ -664,7 +655,7 @@ export class AIImageService {
       status: this.isInitialized ? 'healthy' : 'unhealthy',
       timestamp: new Date().toISOString(),
       features: {
-        dalleGeneration: !!this.dalleApiKey,
+        sdxlGeneration: this.isInitialized,
         imageOptimization: true,
         chartGeneration: true,
         caching: true,

@@ -3,8 +3,14 @@
 
 /// <reference types="node" />
 // Audit logging (stubbed for standalone usage)
-const createAuditLog = async (action: string, data: any) => { /* stub */ };
-const AuditActions = { IMO_TRANSLATION: 'imo_translation' };
+const createAuditLog = async (data: any) => { /* stub */ };
+const AuditActions = {
+  IMO_TRANSLATION: 'imo_translation',
+  SETTINGS_UPDATE: 'settings_update',
+  ARTICLE_CREATE: 'article_create',
+  ARTICLE_DELETE: 'article_delete',
+  ARTICLE_UPDATE: 'article_update'
+};
 import { imoService } from './imo-service';
 
 // Supported African languages
@@ -71,16 +77,16 @@ export interface EnhancedTranslationResult {
  * 2. Translate with preserved context
  */
 export class ImoTranslationAgent {
-  private llmApiKey: string;
-  private nllbApiKey: string;
-  private llmBaseUrl: string = 'https://api.openai.com/v1';
-  private nllbBaseUrl: string = 'https://api-inference.huggingface.co/models/facebook/nllb-200-distilled-600M';
+  private ollamaUrl: string;
+  private ollamaModel: string;
+  private nllbUrl: string;
   private isInitialized: boolean = false;
   private cache: Map<string, EnhancedTranslationResult> = new Map();
 
   constructor() {
-    this.llmApiKey = process.env.OPENAI_API_KEY || '';
-    this.nllbApiKey = process.env.HUGGINGFACE_API_KEY || '';
+    this.ollamaUrl = process.env.LLAMA_API_ENDPOINT || 'http://localhost:11434';
+    this.ollamaModel = process.env.LLAMA_MODEL || 'llama3.1:8b';
+    this.nllbUrl = process.env.NLLB_API_ENDPOINT || 'http://localhost:8080';
   }
 
   async initialize(): Promise<void> {
@@ -95,7 +101,7 @@ export class ImoTranslationAgent {
         initialized: true,
         supportedLanguages: Object.keys(SUPPORTED_LANGUAGES).length,
         imoEnhanced: true,
-        methods: { llm: !!this.llmApiKey, nllb: !!this.nllbApiKey }
+        methods: { llm: 'ollama-llama', nllb: 'self-hosted-nllb-200' }
       }
     });
   }
@@ -119,7 +125,7 @@ export class ImoTranslationAgent {
 
     try {
       // Use LLM for high-quality translations if available
-      if (request.useLLM && this.llmApiKey) {
+      if (request.useLLM) {
         return await this.translateWithLLM(request, startTime);
       }
 
@@ -241,10 +247,9 @@ ${request.text}`;
       throw new Error(`Unsupported language pair: ${request.sourceLanguage} -> ${request.targetLanguage}`);
     }
 
-    const response = await fetch(this.nllbBaseUrl, {
+    const response = await fetch(`${this.nllbUrl}/translate`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.nllbApiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -260,7 +265,7 @@ ${request.text}`;
       throw new Error(`NLLB translation failed: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     const translatedText = data[0]?.translation_text || data.translation_text || '';
 
     const result: EnhancedTranslationResult = {
@@ -319,14 +324,13 @@ ${request.text}`;
     temperature: number, 
     maxTokens: number
   ): Promise<string> {
-    const response = await fetch(`${this.llmBaseUrl}/chat/completions`, {
+    const response = await fetch(`${this.ollamaUrl}/api/chat`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.llmApiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-4-turbo-preview',
+        model: this.ollamaModel,
         messages: [
           {
             role: 'system',
@@ -334,17 +338,21 @@ ${request.text}`;
           },
           { role: 'user', content: prompt }
         ],
-        max_tokens: maxTokens,
-        temperature
+        stream: false,
+        options: {
+          temperature,
+          num_predict: maxTokens,
+          top_p: 0.9
+        }
       })
     });
 
     if (!response.ok) {
-      throw new Error(`LLM call failed: ${response.statusText}`);
+      throw new Error(`Ollama LLM call failed: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    return data.choices[0]?.message?.content || '';
+    const data: any = await response.json();
+    return data.message?.content || '';
   }
 
   /**

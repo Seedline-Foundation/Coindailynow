@@ -9552,3 +9552,238 @@ model BountySubmission {
   @@index([status])
   @@map("bounty_submissions")
 }
+// ============================================
+// DATASOURCE CENTER - Raw News Data Storage
+// ============================================
+
+model NewsDataItem {
+  id              String   @id @default(cuid())
+  externalId      String?  // Original ID from source if available
+  title           String
+  description     String   @db.Text
+  content         String?  @db.Text // Full content if available
+  link            String?
+  pubDate         DateTime
+  source          String   // Source name
+  sourceUrl       String   // Feed/API URL
+  sourceType      String   // 'rss' | 'api'
+  region          String   // ISO country code or 'GLOBAL'
+  category        String   // Crypto, Finance, Tech, Policy, etc.
+  dataType        String?  // For API data: exchange_rate, interest_rate, inflation, etc.
+  
+  // Numeric data for financial APIs
+  value           Float?
+  unit            String?
+  previousValue   Float?
+  changePercent   Float?
+  
+  // Processing metadata
+  status          String   @default("pending") // pending, queued, processed, archived, discarded
+  priority        Int      @default(50) // 0-100 priority score
+  processedAt     DateTime?
+  processedBy     String?  // AI pipeline or human reviewer
+  articleId       String?  // Link to resulting article if published
+  
+  // Quality & relevance scoring
+  relevanceScore  Float?   // AI-calculated relevance 0-100
+  qualityScore    Float?   // AI-calculated quality 0-100
+  
+  // Metadata
+  metadata        String?  @db.Text // JSON: Additional data from source
+  tags            String?  // JSON array of auto-generated tags
+  entities        String?  // JSON: Extracted entities (people, orgs, etc.)
+  sentiment       String?  // positive, negative, neutral
+  
+  // Timestamps
+  fetchedAt       DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([sourceUrl, title, pubDate])
+  @@index([status])
+  @@index([region])
+  @@index([category])
+  @@index([pubDate])
+  @@index([fetchedAt])
+  @@index([priority])
+  @@index([relevanceScore])
+  @@map("news_data_items")
+}
+
+// Weekly AI Analysis Reports
+model AIAnalysisReport {
+  id              String   @id @default(cuid())
+  
+  // Report metadata
+  title           String
+  reportType      String   // market_trends, regional_analysis, topic_deep_dive, sentiment_report
+  weekNumber      Int      // ISO week number
+  year            Int
+  generatedAt     DateTime @default(now())
+  publishDate     DateTime // Scheduled publish date (Wednesday)
+  
+  // Report content
+  executiveSummary String  @db.Text
+  mainAnalysis    String   @db.Text // Full analysis content
+  keyFindings     String   @db.Text // JSON array of key findings
+  dataInsights    String   @db.Text // JSON: Charts and data visualizations config
+  recommendations String?  @db.Text // JSON array of recommendations
+  
+  // Regions/categories covered
+  regions         String   // JSON array of regions analyzed
+  categories      String   // JSON array of categories analyzed
+  
+  // Data sources used
+  sourceCount     Int      @default(0) // Number of data items analyzed
+  sourceIds       String?  @db.Text // JSON array of NewsDataItem IDs used
+  dateRangeStart  DateTime
+  dateRangeEnd    DateTime
+  
+  // AI metadata
+  aiModel         String   @default("deepseek-r1:8b")
+  tokensUsed      Int?
+  processingTime  Int?     // milliseconds
+  confidence      Float?   // AI confidence score 0-100
+  
+  // Review workflow
+  status          String   @default("draft") // draft, pending_review, approved, published, rejected
+  reviewedBy      String?
+  reviewNotes     String?  @db.Text
+  reviewedAt      DateTime?
+  publishedAt     DateTime?
+  
+  // Performance after publishing
+  viewCount       Int      @default(0)
+  shareCount      Int      @default(0)
+  engagementScore Float?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  benchmarks      AIAnalysisBenchmark[]
+  
+  @@unique([reportType, weekNumber, year])
+  @@index([status])
+  @@index([publishDate])
+  @@index([weekNumber, year])
+  @@map("ai_analysis_reports")
+}
+
+// Data Analysis Benchmarks
+model AIAnalysisBenchmark {
+  id              String   @id @default(cuid())
+  reportId        String?
+  
+  // Benchmark metadata
+  name            String   // e.g., "Weekly Market Volume", "Sentiment Trend"
+  category        String   // market, sentiment, regional, engagement
+  period          String   // daily, weekly, monthly
+  
+  // Metric values
+  currentValue    Float
+  previousValue   Float?
+  targetValue     Float?
+  baseline        Float?   // Historical baseline for comparison
+  
+  // Trend analysis
+  changePercent   Float?
+  trend           String?  // up, down, stable
+  trendStrength   Float?   // 0-100 strength of trend
+  
+  // Thresholds
+  warningThreshold Float?
+  criticalThreshold Float?
+  status          String   @default("normal") // normal, warning, critical
+  
+  // Context
+  region          String?
+  dataSourceType  String?  // rss, api, combined
+  measurementUnit String?
+  
+  // Timestamps
+  measuredAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
+  
+  report          AIAnalysisReport? @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  
+  @@index([category])
+  @@index([period])
+  @@index([measuredAt])
+  @@index([status])
+  @@map("ai_analysis_benchmarks")
+}
+
+// Data Analysis Pipeline Jobs
+model DataAnalysisJob {
+  id              String   @id @default(cuid())
+  
+  // Job configuration
+  jobType         String   // weekly_analysis, trend_detection, anomaly_scan, custom
+  name            String
+  description     String?
+  
+  // Schedule (cron format or one-time)
+  schedule        String?  // Cron expression: "0 22 * * 2" (Tuesday 10pm)
+  isRecurring     Boolean  @default(true)
+  nextRunAt       DateTime?
+  
+  // Filters
+  regionFilter    String?  // JSON array of regions to analyze
+  categoryFilter  String?  // JSON array of categories
+  dateRangeDays   Int      @default(7) // Number of days to analyze
+  
+  // Execution tracking
+  lastRunAt       DateTime?
+  lastRunStatus   String?  // success, failed, partial
+  lastRunDuration Int?     // milliseconds
+  lastError       String?  @db.Text
+  runCount        Int      @default(0)
+  
+  // Output
+  lastReportId    String?  // ID of last generated report
+  
+  // Configuration
+  enabled         Boolean  @default(true)
+  priority        Int      @default(50)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String?
+  
+  @@index([enabled])
+  @@index([nextRunAt])
+  @@index([jobType])
+  @@map("data_analysis_jobs")
+}
+
+// Aggregate statistics for the datasource center
+model DatasourceStat {
+  id              String   @id @default(cuid())
+  
+  // Stat identification
+  statType        String   // total_items, items_by_region, items_by_category, items_by_source
+  dimension       String?  // The dimension value (region code, category name, etc.)
+  
+  // Values
+  count           Int      @default(0)
+  processedCount  Int      @default(0)
+  pendingCount    Int      @default(0)
+  avgRelevance    Float?
+  avgQuality      Float?
+  
+  // Time period
+  period          String   // hourly, daily, weekly
+  periodStart     DateTime
+  periodEnd       DateTime
+  
+  // Metadata
+  metadata        String?  @db.Text // JSON
+  
+  createdAt       DateTime @default(now())
+  
+  @@unique([statType, dimension, period, periodStart])
+  @@index([statType])
+  @@index([period])
+  @@index([periodStart])
+  @@map("datasource_stats")
+}

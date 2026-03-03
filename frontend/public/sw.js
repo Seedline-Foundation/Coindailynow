@@ -72,30 +72,112 @@ define(['./workbox-b4554625'], (function (workbox) { 'use strict';
   importScripts();
   self.skipWaiting();
   workbox.clientsClaim();
+
+  /* ── Precache critical assets ───────────────────────────────────── */
+  workbox.precacheAndRoute([
+    { url: '/', revision: '1' },
+    { url: '/offline.html', revision: '1' },
+    { url: '/manifest.json', revision: '1' },
+  ]);
+
+  /* ── Start URL — NetworkFirst ───────────────────────────────────── */
   workbox.registerRoute("/", new workbox.NetworkFirst({
     "cacheName": "start-url",
     plugins: [{
-      cacheWillUpdate: async ({
-        request,
-        response,
-        event,
-        state
-      }) => {
+      cacheWillUpdate: async ({ response }) => {
         if (response && response.type === 'opaqueredirect') {
-          return new Response(response.body, {
-            status: 200,
-            statusText: 'OK',
-            headers: response.headers
-          });
+          return new Response(response.body, { status: 200, statusText: 'OK', headers: response.headers });
         }
         return response;
       }
     }]
   }), 'GET');
-  workbox.registerRoute(/.*/i, new workbox.NetworkOnly({
-    "cacheName": "dev",
-    plugins: []
-  }), 'GET');
+
+  /* ── Static assets — CacheFirst (JS, CSS, fonts, images) ────────── */
+  workbox.registerRoute(
+    /\/_next\/static\/.*/i,
+    new workbox.CacheFirst({
+      cacheName: 'static-assets',
+      plugins: [
+        new workbox.ExpirationPlugin({ maxEntries: 200, maxAgeSeconds: 30 * 24 * 3600 }),
+      ],
+    }),
+    'GET'
+  );
+
+  workbox.registerRoute(
+    /\.(?:png|jpg|jpeg|svg|gif|webp|avif|ico|woff2?)$/i,
+    new workbox.CacheFirst({
+      cacheName: 'images-fonts',
+      plugins: [
+        new workbox.ExpirationPlugin({ maxEntries: 100, maxAgeSeconds: 30 * 24 * 3600 }),
+      ],
+    }),
+    'GET'
+  );
+
+  /* ── API data — StaleWhileRevalidate (market data, articles) ────── */
+  workbox.registerRoute(
+    /\/api\/(market-data|v1\/prices|v1\/regulations|v1\/tax|v1\/reputation)/i,
+    new workbox.StaleWhileRevalidate({
+      cacheName: 'api-data',
+      plugins: [
+        new workbox.ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 300 }),
+      ],
+    }),
+    'GET'
+  );
+
+  /* ── Article / news pages — NetworkFirst with offline fallback ───── */
+  workbox.registerRoute(
+    /\/(news|articles|tools)\/.*/i,
+    new workbox.NetworkFirst({
+      cacheName: 'pages',
+      plugins: [
+        new workbox.ExpirationPlugin({ maxEntries: 60, maxAgeSeconds: 24 * 3600 }),
+      ],
+    }),
+    'GET'
+  );
+
+  /* ── Catch-all — NetworkOnly with offline fallback ──────────────── */
+  workbox.registerRoute(
+    /.*/i,
+    new workbox.NetworkOnly({ cacheName: 'fallback' }),
+    'GET'
+  );
+
+  /* ── Offline fallback for navigations ───────────────────────────── */
+  self.addEventListener('fetch', (event) => {
+    if (event.request.mode === 'navigate') {
+      event.respondWith(
+        fetch(event.request).catch(() => caches.match('/offline.html'))
+      );
+    }
+  });
+
+  /* ── Push notification handling ─────────────────────────────────── */
+  self.addEventListener('push', (event) => {
+    let data = { title: 'CoinDaily', body: 'New update available', icon: '/icons/icon-192x192.png', badge: '/icons/icon-72x72.png' };
+    try { if (event.data) data = { ...data, ...event.data.json() }; } catch { /* use defaults */ }
+
+    event.waitUntil(
+      self.registration.showNotification(data.title, {
+        body: data.body,
+        icon: data.icon,
+        badge: data.badge,
+        tag: data.tag || 'coindaily-notification',
+        data: data.url ? { url: data.url } : undefined,
+        actions: [{ action: 'open', title: 'View' }],
+      })
+    );
+  });
+
+  self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const url = event.notification.data?.url || '/';
+    event.waitUntil(clients.openWindow(url));
+  });
 
 }));
 //# sourceMappingURL=sw.js.map

@@ -124,7 +124,9 @@ class PerformanceMonitor {
 
       // Store in Redis for persistence
       const key = `${this.REDIS_KEY_PREFIX}${Date.now()}`;
-      await redis.setex(key, 86400, JSON.stringify(metric)); // 24 hours TTL
+      if (typeof (redis as any)?.setex === 'function') {
+        await (redis as any).setex(key, 86400, JSON.stringify(metric)); // 24 hours TTL
+      }
 
       // Update real-time stats
       await this.updateRealTimeStats(metric);
@@ -141,7 +143,11 @@ class PerformanceMonitor {
     const minuteKey = `${this.REDIS_KEY_PREFIX}stats:${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}`;
 
     try {
-      const multi = redis.multi();
+      if (typeof (redis as any)?.multi !== 'function') {
+        return;
+      }
+
+      const multi = (redis as any).multi();
       
       // Increment counters
       multi.hincrby(minuteKey, 'total_requests', 1);
@@ -197,7 +203,11 @@ class PerformanceMonitor {
       const responseTimes: number[] = [];
 
       for (const key of keys) {
-        const stats = await redis.hgetall(key);
+        if (typeof (redis as any)?.hgetall !== 'function') {
+          continue;
+        }
+
+        const stats = await (redis as any).hgetall(key);
         if (Object.keys(stats).length > 0) {
           const requests = parseInt(stats.total_requests || '0');
           const responseTime = parseInt(stats.total_response_time || '0');

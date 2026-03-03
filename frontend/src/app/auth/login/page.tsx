@@ -1,6 +1,6 @@
 /**
  * Login Page
- * User authentication page
+ * User authentication page — fully standalone (no AuthProvider dependency)
  */
 
 'use client';
@@ -8,25 +8,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Show loading skeleton while auth provider initializes
-  if (authLoading && !isSubmitting) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-orange-50">
-        <div className="animate-pulse text-gray-500">Loading...</div>
-      </div>
-    );
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,8 +23,25 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login({ email, password, rememberMe });
-      router.push('/');
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, rememberMe }),
+      });
+      const data = await res.json();
+
+      if (data.success && data.token) {
+        // Store token under all keys used across the app
+        localStorage.setItem('auth_token', data.token);
+        localStorage.setItem('accessToken', data.token);
+        if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Redirect to user dashboard
+        window.location.href = '/user';
+        return;
+      }
+
+      setError(data.error || data.message || 'Invalid email or password.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {
@@ -127,6 +133,15 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
+          </div>
+
+          {/* Demo credentials */}
+          <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+            <p className="text-xs font-semibold text-orange-800 mb-2">Demo Credentials</p>
+            <div className="space-y-1 text-xs text-orange-700">
+              <p>User &nbsp;&nbsp;&nbsp;— <span className="font-mono">user@coindaily.africa</span> / <span className="font-mono">User@2024</span></p>
+              <p>Editor — <span className="font-mono">editor@coindaily.africa</span> / <span className="font-mono">Editor@2024</span></p>
+            </div>
           </div>
         </div>
       </div>

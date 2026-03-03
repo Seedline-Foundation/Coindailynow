@@ -24,11 +24,15 @@ export interface Source {
   domain: string;
 }
 
+export type QueueStatus = 'pending_approval' | 'approved' | 'edit_requested' | 'published';
+
 export interface ValidationResult {
   passed: boolean;
-  score: number; // 0-100
-  issues: string[];
-  suggestions: string[];
+  score?: number; // 0-100
+  reason?: string;
+  issues?: string[];
+  suggestions?: string[];
+  details?: Record<string, any>;
   metadata?: Record<string, any>;
 }
 
@@ -42,6 +46,8 @@ export interface ArticleOutcome {
   seo_score: number;
   facts_preserved: boolean;
   message_consistent: boolean;
+  featured_image?: string;
+  featured_image_alt?: string;
 }
 
 export interface ImageOutcome {
@@ -64,19 +70,20 @@ export interface TranslationOutcome {
 export interface AdminQueueItem {
   id: string;
   article_id: string;
-  status: 'pending_approval' | 'approved' | 'edit_requested' | 'published';
+  status: QueueStatus;
   articles: ArticleBundle;
   submitted_at: Date;
   reviewed_at?: Date;
   admin_notes?: string;
   edit_requests?: EditRequest[];
+  research_data?: ResearchOutcome;
 }
 
 export interface ArticleBundle {
   english: ArticleOutcome;
   translations: TranslationOutcome[];
   image: ImageOutcome;
-  research: ResearchOutcome;
+  research?: ResearchOutcome;
 }
 
 export interface EditRequest {

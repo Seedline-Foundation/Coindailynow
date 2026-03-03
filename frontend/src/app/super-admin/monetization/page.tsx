@@ -66,11 +66,41 @@ interface MonetizationData {
     totalSpent: number;
     subscriptionTier: string;
   }>;
+  disbursements?: {
+    pending: number;
+    approved: number;
+    rejected: number;
+    queue: Array<{
+      id: string;
+      userId: string;
+      user: string;
+      amount: number;
+      currency: string;
+      destinationAddress: string;
+      requestedAt: string;
+      walletId: string;
+      walletStatus?: string;
+      walletLocked: boolean;
+      walletAddress?: string;
+    }>;
+  };
+  auditTrail?: Array<{
+    id: string;
+    action: string;
+    actor: string;
+    success: boolean;
+    severity: string;
+    category: string;
+    details?: string | null;
+    timestamp: string;
+  }>;
 }
 
 export default function MonetizationPage() {
   const [data, setData] = useState<MonetizationData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [auditFilter, setAuditFilter] = useState<'all' | 'withdrawals' | 'wallet' | 'failed'>('all');
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
 
   useEffect(() => {
@@ -92,6 +122,94 @@ export default function MonetizationPage() {
       console.error('Error fetching monetization data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const formatAddress = (value: string) => {
+    if (!value || value.length <= 14) return value;
+    return `${value.slice(0, 8)}...${value.slice(-6)}`;
+  };
+
+  const formatAction = (action: string) => action.replace(/_/g, ' ').toLowerCase();
+
+  const getFilteredAuditTrail = () => {
+    const events = data?.auditTrail || [];
+    switch (auditFilter) {
+      case 'withdrawals':
+        return events.filter(event =>
+          event.action === 'WITHDRAWAL_APPROVED' || event.action === 'WITHDRAWAL_REJECTED'
+        );
+      case 'wallet':
+        return events.filter(event =>
+          event.action === 'WALLET_LOCKED' || event.action === 'WALLET_UNLOCKED'
+        );
+      case 'failed':
+        return events.filter(event => !event.success);
+      default:
+        return events;
+    }
+  };
+
+  const runDisbursementAction = async (
+    requestId: string,
+    action: 'approve' | 'reject',
+    reason?: string
+  ) => {
+    try {
+      setActionLoading(`${action}:${requestId}`);
+      const token = localStorage.getItem('super_admin_token');
+      const response = await fetch(`/api/super-admin/monetization/disbursements/${requestId}/${action}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(action === 'reject' ? { reason } : {}),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err?.error || 'Action failed');
+      }
+
+      await fetchMonetizationData();
+    } catch (error) {
+      console.error(`Failed to ${action} disbursement:`, error);
+      alert(`Failed to ${action} disbursement`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const toggleWalletLock = async (walletId: string, walletLocked: boolean) => {
+    try {
+      setActionLoading(`wallet:${walletId}`);
+      const token = localStorage.getItem('super_admin_token');
+      const endpoint = walletLocked ? 'unlock' : 'lock';
+      const reason = walletLocked
+        ? 'Wallet unlocked by super-admin before disbursement review'
+        : 'Wallet locked by super-admin during disbursement review';
+
+      const response = await fetch(`/api/super-admin/monetization/wallets/${walletId}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reason }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err?.error || 'Wallet action failed');
+      }
+
+      await fetchMonetizationData();
+    } catch (error) {
+      console.error('Failed wallet action:', error);
+      alert('Failed to update wallet state');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -220,6 +338,171 @@ export default function MonetizationPage() {
               </div>
               <p className="text-3xl font-bold text-white">{data?.subscriptions.active.toLocaleString()}</p>
               <p className="text-sm text-gray-400 mt-1">Active Subscriptions</p>
+            </div>
+          </div>
+
+          {/* Pre-Disbursement Controls */}
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white flex items-center space-x-2">
+                <AlertCircle className="h-5 w-5 text-yellow-400" />
+                <span>Pre-Disbursement Queue</span>
+              </h2>
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <div className="px-3 py-2 rounded-lg bg-yellow-900/20 border border-yellow-700 text-yellow-300">
+                  Pending: {data?.disbursements?.pending || 0}
+                </div>
+                <div className="px-3 py-2 rounded-lg bg-green-900/20 border border-green-700 text-green-300">
+                  Approved: {data?.disbursements?.approved || 0}
+                </div>
+                <div className="px-3 py-2 rounded-lg bg-red-900/20 border border-red-700 text-red-300">
+                  Rejected: {data?.disbursements?.rejected || 0}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {(data?.disbursements?.queue || []).length === 0 ? (
+                <div className="text-center py-8 bg-gray-750 rounded-lg border border-gray-700">
+                  <p className="text-gray-400">No pending disbursement requests</p>
+                </div>
+              ) : (
+                data?.disbursements?.queue.map((request) => (
+                  <div key={request.id} className="bg-gray-750 border border-gray-700 rounded-lg p-4">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                      <div>
+                        <p className="text-white font-semibold">{request.user}</p>
+                        <p className="text-sm text-gray-400">
+                          {request.amount.toLocaleString()} {request.currency} • {new Date(request.requestedAt).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Destination: {formatAddress(request.destinationAddress)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Wallet: {formatAddress(request.walletAddress || request.walletId)} ({request.walletStatus || 'UNKNOWN'})
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => runDisbursementAction(request.id, 'approve')}
+                          disabled={actionLoading === `approve:${request.id}`}
+                          className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-60"
+                        >
+                          {actionLoading === `approve:${request.id}` ? 'Approving...' : 'Approve'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            const reason = window.prompt('Enter rejection reason');
+                            if (reason && reason.trim().length > 0) {
+                              runDisbursementAction(request.id, 'reject', reason.trim());
+                            }
+                          }}
+                          disabled={actionLoading === `reject:${request.id}`}
+                          className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-60"
+                        >
+                          {actionLoading === `reject:${request.id}` ? 'Rejecting...' : 'Reject'}
+                        </button>
+                        <button
+                          onClick={() => toggleWalletLock(request.walletId, request.walletLocked)}
+                          disabled={actionLoading === `wallet:${request.walletId}`}
+                          className="px-3 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 disabled:opacity-60"
+                        >
+                          {actionLoading === `wallet:${request.walletId}`
+                            ? 'Updating...'
+                            : request.walletLocked
+                              ? 'Unlock Wallet'
+                              : 'Lock Wallet'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Finance Audit Trail */}
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+              <h2 className="text-xl font-bold text-white flex items-center space-x-2">
+                <Clock className="h-5 w-5 text-blue-400" />
+                <span>Finance Audit Trail</span>
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setAuditFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    auditFilter === 'all'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setAuditFilter('withdrawals')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    auditFilter === 'withdrawals'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Withdrawals
+                </button>
+                <button
+                  onClick={() => setAuditFilter('wallet')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    auditFilter === 'wallet'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Wallet actions
+                </button>
+                <button
+                  onClick={() => setAuditFilter('failed')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    auditFilter === 'failed'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Failed only
+                </button>
+              </div>
+            </div>
+            <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+              {getFilteredAuditTrail().length === 0 ? (
+                <div className="text-center py-8 bg-gray-750 rounded-lg border border-gray-700">
+                  <p className="text-gray-400">No recent finance audit activity</p>
+                </div>
+              ) : (
+                getFilteredAuditTrail().map((event) => (
+                  <div key={event.id} className="bg-gray-750 border border-gray-700 rounded-lg p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-white font-semibold capitalize">{formatAction(event.action)}</p>
+                        <p className="text-sm text-gray-400">By {event.actor}</p>
+                        <p className="text-xs text-gray-500 mt-1">{new Date(event.timestamp).toLocaleString()}</p>
+                        {event.details && (
+                          <p className="text-xs text-gray-500 mt-1 truncate">{event.details}</p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          event.success
+                            ? 'bg-green-900/20 border border-green-700 text-green-300'
+                            : 'bg-red-900/20 border border-red-700 text-red-300'
+                        }`}>
+                          {event.success ? 'Success' : 'Failed'}
+                        </span>
+                        <p className="text-xs text-gray-500 mt-2 uppercase">{event.severity}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 

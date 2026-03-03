@@ -68,6 +68,7 @@ export const SUPPORTED_LANGUAGES: LanguageConfig[] = [
   { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇦🇴', dir: 'ltr', region: 'Southern Africa' },
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸', dir: 'ltr', region: 'Global' },
   { code: 'ig', name: 'Igbo', nativeName: 'Igbo', flag: '🇳🇬', dir: 'ltr', region: 'West Africa' },
+  { code: 'pcm', name: 'Pidgin', nativeName: 'Naijá', flag: '🇳🇬', dir: 'ltr', region: 'West Africa' },
 ];
 
 // Browser language to our supported code mapping
@@ -83,6 +84,7 @@ const BROWSER_LANG_MAP: Record<string, string> = {
   'pt': 'pt', 'pt-BR': 'pt', 'pt-PT': 'pt', 'pt-AO': 'pt', 'pt-MZ': 'pt',
   'es': 'es', 'es-ES': 'es', 'es-MX': 'es', 'es-AR': 'es', 'es-CO': 'es', 'es-CL': 'es', 'es-PE': 'es', 'es-VE': 'es', 'es-GQ': 'es',
   'ig': 'ig', 'ig-NG': 'ig',
+  'pcm': 'pcm',
 };
 
 // Basic UI translations for key elements
@@ -127,6 +129,10 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'Disclaimer',
     toolsData: 'Tools & Data',
     safetyRegulation: 'Safety & Regulation',
+    paidServices: 'Paid Services', allServices: 'All Services', membership: 'Membership Plans',
+    advertise: 'Advertise With Us', apiPricing: 'API & Data', marketplace: 'Marketplace',
+    sponsoredContent: 'Sponsored Content', affiliate: 'Affiliate Program',
+    dataInsight: 'Data Insight', newsSubscription: 'News Subscription',
   },
   fr: {
     home: 'Accueil', news: 'Actualités', tools: 'Outils', community: 'Communauté', learn: 'Apprendre',
@@ -167,6 +173,9 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'Avertissement',
     toolsData: 'Outils & données',
     safetyRegulation: 'Sécurité & réglementation',
+    paidServices: 'Services Payants', allServices: 'Tous les services', membership: 'Abonnements',
+    advertise: 'Publicité', apiPricing: 'API & Données', marketplace: 'Boutique',
+    sponsoredContent: 'Contenu Sponsorisé', affiliate: 'Programme Affilié',
   },
   sw: {
     home: 'Nyumbani', news: 'Habari', tools: 'Zana', community: 'Jamii', learn: 'Jifunze',
@@ -207,6 +216,9 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'Kanusho',
     toolsData: 'Zana & data',
     safetyRegulation: 'Usalama & kanuni',
+    paidServices: 'Huduma za Kulipa', allServices: 'Huduma Zote', membership: 'Mipango ya Uanachama',
+    advertise: 'Tangaza Nasi', apiPricing: 'API & Data', marketplace: 'Soko',
+    sponsoredContent: 'Maudhui Yanayofadhiliwa', affiliate: 'Mpango wa Ushirika',
   },
   ha: {
     home: 'Gida', news: 'Labarai', tools: 'Kayan Aiki', community: 'Al\'umma', learn: 'Koyo',
@@ -247,6 +259,9 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'Gargaɗi',
     toolsData: 'Kayan aiki & bayanai',
     safetyRegulation: 'Tsaro & doka',
+    paidServices: 'Sabis na Biyan Kuɗi', allServices: 'Duk Sabis', membership: 'Tsarin Biyan Kuɗi',
+    advertise: 'Tallata Tare da Mu', apiPricing: 'API & Bayanai', marketplace: 'Kasuwa',
+    sponsoredContent: 'Abun Ciki Mai Tallafi', affiliate: 'Shirin Haɗin Gwiwa',
   },
   am: {
     home: 'መነሻ', news: 'ዜና', tools: 'መሳሪያዎች', community: 'ማህበረሰብ', learn: 'ተማር',
@@ -287,6 +302,9 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'ማስታወቂያ',
     toolsData: 'መሳሪያዎች & ውሂብ',
     safetyRegulation: 'ደህንነት & ደንብ',
+    paidServices: 'የሚከፈልባቸው አገልግሎቶች', allServices: 'ሁሉም አገልግሎቶች', membership: 'የአባልነት እቅዶች',
+    advertise: 'ከእኛ ጋር ያስተዋውቁ', apiPricing: 'API & ዳታ', marketplace: 'ገበያ',
+    sponsoredContent: 'የተደገፈ ይዘት', affiliate: 'የአጋር ፕሮግራም',
   },
   zu: {
     home: 'Ikhaya', news: 'Izindaba', tools: 'Amathuluzi', community: 'Umphakathi', learn: 'Funda',
@@ -327,6 +345,9 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'Isixwayiso',
     toolsData: 'Amathuluzi & idatha',
     safetyRegulation: 'Ukuphepha & umthetho',
+    paidServices: 'Izinsizakalo Ezikhokhwayo', allServices: 'Zonke Izinsizakalo', membership: 'Izinhlelo Zobulungu',
+    advertise: 'Khangisa Nathi', apiPricing: 'API & Idatha', marketplace: 'Imakethe',
+    sponsoredContent: 'Okuqukethwe Okuxhaswayo', affiliate: 'Uhlelo Lokuhlanganyela',
   },
   yo: {
     home: 'Ile', news: 'Iroyin', tools: 'Awọn irinṣẹ', community: 'Agbegbe', learn: 'Kọ ẹkọ',
@@ -367,6 +388,9 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'Ìkìlọ̀',
     toolsData: 'Àwọn irinṣẹ́ & data',
     safetyRegulation: 'Ààbò & òfin',
+    paidServices: 'Iṣẹ́ Tí A Ń Sanwó Fún', allServices: 'Gbogbo Iṣẹ́', membership: 'Ètò Ọmọ Ẹgbẹ́',
+    advertise: 'Polówó Pẹ̀lú Wa', apiPricing: 'API & Dátà', marketplace: 'Ọjà',
+    sponsoredContent: 'Àkóónú Tí A Ṣètìlẹ́yìn', affiliate: 'Ètò Alájọṣepọ̀',
   },
   ar: {
     home: 'الرئيسية', news: 'أخبار', tools: 'أدوات', community: 'مجتمع', learn: 'تعلم',
@@ -407,6 +431,9 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'إخلاء مسؤولية',
     toolsData: 'أدوات وبيانات',
     safetyRegulation: 'السلامة والتنظيم',
+    paidServices: 'خدمات مدفوعة', allServices: 'جميع الخدمات', membership: 'خطط العضوية',
+    advertise: 'أعلن معنا', apiPricing: 'API والبيانات', marketplace: 'السوق',
+    sponsoredContent: 'محتوى مدعوم', affiliate: 'برنامج الشركاء',
   },
   pt: {
     home: 'Início', news: 'Notícias', tools: 'Ferramentas', community: 'Comunidade', learn: 'Aprender',
@@ -447,6 +474,9 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'Aviso legal',
     toolsData: 'Ferramentas e dados',
     safetyRegulation: 'Segurança e regulamentação',
+    paidServices: 'Serviços Pagos', allServices: 'Todos os Serviços', membership: 'Planos de Adesão',
+    advertise: 'Anuncie Connosco', apiPricing: 'API & Dados', marketplace: 'Loja',
+    sponsoredContent: 'Conteúdo Patrocinado', affiliate: 'Programa de Afiliados',
   },
   es: {
     home: 'Inicio', news: 'Noticias', tools: 'Herramientas', community: 'Comunidad', learn: 'Aprender',
@@ -487,6 +517,9 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'Aviso',
     toolsData: 'Herramientas y datos',
     safetyRegulation: 'Seguridad y regulación',
+    paidServices: 'Servicios de Pago', allServices: 'Todos los Servicios', membership: 'Planes de Membresía',
+    advertise: 'Anúnciate con Nosotros', apiPricing: 'API & Datos', marketplace: 'Tienda',
+    sponsoredContent: 'Contenido Patrocinado', affiliate: 'Programa de Afiliados',
   },
   ig: {
     home: 'Ụlọ', news: 'Akụkọ', tools: 'Ngwaọrụ', community: 'Obodo', learn: 'Mụta',
@@ -527,6 +560,52 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     disclaimer: 'Nkwupụta',
     toolsData: 'Ngwaọrụ & data',
     safetyRegulation: 'Nchekwa & iwu',
+    paidServices: 'Ọrụ A Na-Akwụ Ụgwọ', allServices: 'Ọrụ Niile', membership: 'Atụmatụ Ndị Otu',
+    advertise: 'Kwụpụta Ozi', apiPricing: 'API & Data', marketplace: 'Ahịa',
+    sponsoredContent: 'Ọdịnaya Nkwado', affiliate: 'Mmemme Ndị Mmekọ',
+  },
+  pcm: {
+    home: 'Home', news: 'News', tools: 'Tools', community: 'Community', learn: 'Learn',
+    search: 'Search crypto news, tokens, analysis...', login: 'Enter', register: 'Register',
+    searchTitle: 'Search',
+    language: 'Language', breakingNews: 'Breaking News', latestNews: 'Latest News',
+    scamWatch: 'Scam Alert', regulation: 'Regulation', events: 'Events', authors: 'Writers',
+    taxCalc: 'Tax Calculator', p2pPremium: 'P2P Premium', exchangeRates: 'Exchange Rate',
+    remittance: 'Send Money', onramp: 'On/Off-Ramp', aiSummarizer: 'AI Summary', newsAggregator: 'News Gather',
+    cryptoBasics: 'Crypto Basics', expertProgram: 'Expert Program', paymentDir: 'Payment Directory',
+    regulatoryBot: 'Regulatory Bot', automations: 'Automations',
+
+    todaysTopStories: 'Today Top Stories',
+    readFullArticle: 'Read di full article',
+    listenToArticle: 'Listen to di article',
+    viewAllNews: 'See all news',
+    latestAfricanCryptoNews: 'Latest African Crypto News',
+    loadMoreArticles: 'Load more articles',
+    by: 'By',
+    image: 'Picture',
+    quickNavigation: 'Quick Navigation',
+    followUs: 'Follow us',
+    trustSecurity: 'Trust & Security',
+    regionalFocus: 'Regional Focus',
+    cryptoFocus: 'Crypto Focus',
+    contactUs: 'Contact us',
+    stayUpdated: 'Stay Updated',
+    enterYourEmail: 'Put your email',
+    subscribe: 'Subscribe',
+    subscribing: 'Subscribing...',
+    successfullySubscribed: '✅ You don subscribe!',
+    failedToSubscribe: '❌ E no work. Try again.',
+    searchFooterPlaceholder: 'Search articles, coins, news...',
+    company: 'Company',
+    about: 'About',
+    privacy: 'Privacy',
+    terms: 'Terms',
+    disclaimer: 'Disclaimer',
+    toolsData: 'Tools & Data',
+    safetyRegulation: 'Safety & Regulation',
+    paidServices: 'Paid Services', allServices: 'All Services', membership: 'Membership Plans',
+    advertise: 'Advertise With Us', apiPricing: 'API & Data', marketplace: 'Marketplace',
+    sponsoredContent: 'Sponsored Content', affiliate: 'Affiliate Program',
   },
 };
 
@@ -538,6 +617,12 @@ interface LanguageContextType {
   isRTL: boolean;
   supportedLanguages: LanguageConfig[];
   detectedBrowserLang: string;
+  /** Translate arbitrary content text via the NLLB backend */
+  translateContent: (text: string, targetLang?: string) => Promise<string>;
+  /** True while a content translation request is in-flight */
+  isTranslating: boolean;
+  /** Translate the entire visible page DOM into the current language */
+  translateFullPage: () => Promise<void>;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -566,6 +651,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState('en');
   const [detectedBrowserLang, setDetectedBrowserLang] = useState('en');
   const [mounted, setMounted] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  // Translation cache to avoid redundant API calls
+  const translationCache = React.useRef<Map<string, string>>(new Map());
 
   // On mount: detect browser language, check localStorage override
   useEffect(() => {
@@ -617,6 +706,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   }, [currentLanguage, mounted]);
 
+  // Auto-translate page content when language changes (non-English)
+  useEffect(() => {
+    if (!mounted || currentLanguage === 'en') return;
+    // Small delay to let DOM settle after React renders
+    const timer = setTimeout(() => {
+      translateFullPage();
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLanguage, mounted]);
+
   const setLanguage = useCallback((code: string) => {
     const config = SUPPORTED_LANGUAGES.find(l => l.code === code);
     if (config) {
@@ -634,6 +734,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       setLangCookie(code);
       document.documentElement.lang = code;
       document.documentElement.dir = config.dir;
+
+      // Clear translation cache on language change so new translations come through
+      translationCache.current.clear();
     }
   }, []);
 
@@ -642,6 +745,88 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       || UI_TRANSLATIONS['en']?.[key] 
       || key;
   }, [currentLanguage]);
+
+  /**
+   * Translate arbitrary text content via the backend NLLB translation API.
+   * Uses a local cache to avoid redundant calls.
+   */
+  const translateContent = useCallback(async (text: string, targetLang?: string): Promise<string> => {
+    const lang = targetLang || currentLanguage;
+    if (lang === 'en' || !text.trim()) return text;
+
+    const cacheKey = `${lang}:${text.substring(0, 100)}`;
+    const cached = translationCache.current.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, targetLanguage: lang }),
+        credentials: 'include',
+      });
+      if (!res.ok) return text;
+      const data = await res.json();
+      const translated = data.translatedText || data.data?.translatedText || text;
+      translationCache.current.set(cacheKey, translated);
+      return translated;
+    } catch {
+      return text; // graceful fallback
+    }
+  }, [currentLanguage]);
+
+  /**
+   * Translate the full visible page by walking the DOM and translating
+   * all text nodes within [data-translatable] elements and common content areas.
+   * Falls back gracefully if any translation fails.
+   */
+  const translateFullPage = useCallback(async () => {
+    if (currentLanguage === 'en') return;
+    setIsTranslating(true);
+
+    try {
+      // Collect all translatable text nodes from article content, headings, paragraphs
+      const selectors = [
+        '[data-translatable]',
+        'article p', 'article h1', 'article h2', 'article h3',
+        'main p', 'main h1', 'main h2', 'main h3',
+        '.article-content p', '.article-content h1', '.article-content h2',
+      ];
+      const elements = document.querySelectorAll(selectors.join(', '));
+
+      // Batch translate: collect texts, send in chunks
+      const nodes: { el: Element; originalText: string }[] = [];
+      elements.forEach(el => {
+        const text = el.textContent?.trim();
+        if (text && text.length > 2) {
+          // Store original text for potential revert
+          if (!el.getAttribute('data-original-text')) {
+            el.setAttribute('data-original-text', text);
+          }
+          nodes.push({ el, originalText: text });
+        }
+      });
+
+      // Process in batches of 10 for performance
+      const BATCH_SIZE = 10;
+      for (let i = 0; i < nodes.length; i += BATCH_SIZE) {
+        const batch = nodes.slice(i, i + BATCH_SIZE);
+        const translations = await Promise.allSettled(
+          batch.map(({ originalText }) => translateContent(originalText))
+        );
+
+        translations.forEach((result, idx) => {
+          if (result.status === 'fulfilled' && result.value) {
+            batch[idx].el.textContent = result.value;
+          }
+        });
+      }
+    } catch (err) {
+      console.error('[LanguageProvider] Full page translation failed:', err);
+    } finally {
+      setIsTranslating(false);
+    }
+  }, [currentLanguage, translateContent]);
 
   const languageConfig = SUPPORTED_LANGUAGES.find(l => l.code === currentLanguage) || SUPPORTED_LANGUAGES[0];
   const isRTL = languageConfig.dir === 'rtl';
@@ -654,6 +839,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     isRTL,
     supportedLanguages: SUPPORTED_LANGUAGES,
     detectedBrowserLang,
+    translateContent,
+    isTranslating,
+    translateFullPage,
   };
 
   return (
@@ -675,6 +863,9 @@ export function useLanguage(): LanguageContextType {
       isRTL: false,
       supportedLanguages: SUPPORTED_LANGUAGES,
       detectedBrowserLang: 'en',
+      translateContent: async (text: string) => text,
+      isTranslating: false,
+      translateFullPage: async () => {},
     };
   }
   return context;

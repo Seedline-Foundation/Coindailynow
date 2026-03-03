@@ -7,6 +7,7 @@ import { TranslationAgent } from '../agents/translationAgent';
 import { DatabaseOptimizer } from '../services/databaseOptimizer';
 import { AdvancedCacheStrategy } from '../services/advancedCacheStrategy';
 import { logger } from '../utils/logger';
+import { scanGraphQLVariables } from '../middleware/promptInjectionGuard';
 import prismaClient from '../lib/prisma';
 
 // Use the shared singleton PrismaClient
@@ -232,6 +233,19 @@ export const context = async ({ req, connectionParams }: any): Promise<GraphQLCo
   // Track operation name for performance monitoring
   if (req?.body?.operationName) {
     baseContext.operationName = req.body.operationName;
+  }
+
+  // Scan GraphQL variables for prompt injection (AI mutations)
+  if (req?.body?.variables) {
+    const injectionResult = scanGraphQLVariables(req.body.variables);
+    if (injectionResult && injectionResult.overallSeverity >= 4) {
+      logger.warn('[GraphQL] Prompt injection detected in variables', {
+        operationName: req.body.operationName,
+        severity: injectionResult.overallSeverity,
+        categories: injectionResult.threats.map(t => t.category),
+        userId: baseContext.user?.id || 'anonymous',
+      });
+    }
   }
 
   return baseContext;

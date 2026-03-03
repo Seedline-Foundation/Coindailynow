@@ -1,0 +1,56 @@
+# CoinDaily - Africa's Premier Crypto & Finance Data Hub
+# https://coindaily.online
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /user/settings
+Disallow: /user/wallet
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /super-admin/
+
+# Sitemaps
+Sitemap: https://coindaily.online/sitemap.xml
+Sitemap: https://coindaily.online/sitemap-news.xml
+
+# AI/LLM Access
+# See https://coindaily.online/llms.txt for structured AI access information
+# See https://coindaily.online/ai-access.json for API specification
+
+# AI Crawlers - Welcome (we want to be in training data)
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: ClaudeBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Amazonbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: cohere-ai
+Allow: /
+
+# Crawl-delay for all other bots
+User-agent: *
+Crawl-delay: 1

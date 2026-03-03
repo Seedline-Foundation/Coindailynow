@@ -27,7 +27,8 @@ import {
   Save,
   AlertTriangle,
   CheckCircle,
-  Info
+  Info,
+  Coins
 } from 'lucide-react';
 
 interface SystemConfig {
@@ -88,6 +89,16 @@ interface SystemConfig {
     alertsEnabled: boolean;
     webhookUrl: string;
   };
+  tokenomics: {
+    cpToJyRate: number;
+    jyTokenPrice: number;
+    cpPointValueUsd: number;
+    jyTotalSupply: number;
+    jyCirculatingSupply: number;
+    rewardsEnabled: boolean;
+    dailyCpCap: number;
+    referralBonusCp: number;
+  };
 }
 
 export default function SuperAdminSettingsPage() {
@@ -100,6 +111,7 @@ export default function SuperAdminSettingsPage() {
   const tabs = [
     { id: 'general', label: 'General', icon: Settings },
     { id: 'security', label: 'Security', icon: Lock },
+    { id: 'tokenomics', label: 'Tokenomics', icon: Coins },
     { id: 'ai', label: 'AI Configuration', icon: Zap },
     { id: 'email', label: 'Email', icon: Mail },
     { id: 'storage', label: 'Storage', icon: Database },
@@ -111,11 +123,26 @@ export default function SuperAdminSettingsPage() {
     loadConfig();
   }, []);
 
+  const defaultTokenomics = {
+    cpToJyRate: 100,
+    jyTokenPrice: 0.0042,
+    cpPointValueUsd: 0.0042 / 100,
+    jyTotalSupply: 1000000000,
+    jyCirculatingSupply: 100000000,
+    rewardsEnabled: true,
+    dailyCpCap: 500,
+    referralBonusCp: 50,
+  };
+
   const loadConfig = async () => {
     try {
       const response = await fetch('/api/super-admin/config');
       const data = await response.json();
-      setConfig(data);
+      // Ensure tokenomics section always has defaults
+      setConfig({
+        ...data,
+        tokenomics: { ...defaultTokenomics, ...(data.tokenomics || {}) },
+      });
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to load configuration' });
     } finally {
@@ -128,11 +155,21 @@ export default function SuperAdminSettingsPage() {
 
     setSaving(true);
     try {
+      // Save main config
       const response = await fetch('/api/super-admin/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config)
       });
+
+      // Also push tokenomics to the public endpoint so user dashboards pick it up
+      if (config.tokenomics) {
+        await fetch('/api/tokenomics/config', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config.tokenomics),
+        }).catch(() => { /* best-effort */ });
+      }
 
       if (response.ok) {
         setMessage({ type: 'success', text: 'Configuration saved successfully' });
@@ -529,6 +566,180 @@ export default function SuperAdminSettingsPage() {
                     Enable Auto Moderation
                   </span>
                 </label>
+              </div>
+            </div>
+          )}
+
+          {/* Tokenomics Settings */}
+          {activeTab === 'tokenomics' && (
+            <div className="space-y-6">
+              {/* Info banner */}
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <Coins className="w-5 h-5 text-amber-600 mt-0.5" />
+                  <div>
+                    <h4 className="text-amber-800 dark:text-amber-300 font-medium text-sm">CP &amp; JY Token Economics</h4>
+                    <p className="text-amber-700 dark:text-amber-400 text-xs mt-1">
+                      Changes here apply to all user dashboards in real-time. The CP-to-JY conversion rate determines how many CoinPoints equal 1 JY token.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Conversion Rates */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Conversion Rates</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      CP to JY Rate
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        min={1}
+                        value={config.tokenomics?.cpToJyRate ?? 100}
+                        onChange={(e) => {
+                          const rate = parseInt(e.target.value) || 100;
+                          updateConfig('tokenomics', 'cpToJyRate', rate);
+                          updateConfig('tokenomics', 'cpPointValueUsd',
+                            (config.tokenomics?.jyTokenPrice ?? 0.0042) / rate);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                      <span className="text-sm text-gray-500 whitespace-nowrap">CP = 1 JY</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Current: {config.tokenomics?.cpToJyRate ?? 100} CP = 1 JY token
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      JY Token Price (USD)
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-gray-500">$</span>
+                      <input
+                        type="number"
+                        step="0.0001"
+                        min={0}
+                        value={config.tokenomics?.jyTokenPrice ?? 0.0042}
+                        onChange={(e) => {
+                          const price = parseFloat(e.target.value) || 0.0042;
+                          updateConfig('tokenomics', 'jyTokenPrice', price);
+                          updateConfig('tokenomics', 'cpPointValueUsd',
+                            price / (config.tokenomics?.cpToJyRate ?? 100));
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      1 CP = ${((config.tokenomics?.jyTokenPrice ?? 0.0042) / (config.tokenomics?.cpToJyRate ?? 100)).toFixed(6)} USD
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Supply Info */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">JY Token Supply</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Total Supply
+                    </label>
+                    <input
+                      type="number"
+                      value={config.tokenomics?.jyTotalSupply ?? 1000000000}
+                      onChange={(e) => updateConfig('tokenomics', 'jyTotalSupply', parseInt(e.target.value) || 0)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Circulating Supply
+                    </label>
+                    <input
+                      type="number"
+                      value={config.tokenomics?.jyCirculatingSupply ?? 100000000}
+                      onChange={(e) => updateConfig('tokenomics', 'jyCirculatingSupply', parseInt(e.target.value) || 0)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Rewards Config */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Rewards Configuration</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Daily CP Cap (per user)
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={config.tokenomics?.dailyCpCap ?? 500}
+                      onChange={(e) => updateConfig('tokenomics', 'dailyCpCap', parseInt(e.target.value) || 0)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Max CP a user can earn per day</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Referral Bonus (CP)
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={config.tokenomics?.referralBonusCp ?? 50}
+                      onChange={(e) => updateConfig('tokenomics', 'referralBonusCp', parseInt(e.target.value) || 0)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">CP awarded for each successful referral</p>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={config.tokenomics?.rewardsEnabled ?? true}
+                      onChange={(e) => updateConfig('tokenomics', 'rewardsEnabled', e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Enable CP Rewards System
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Live Preview */}
+              <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Live Preview</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Rate</p>
+                    <p className="text-lg font-bold text-orange-600">{config.tokenomics?.cpToJyRate ?? 100} CP = 1 JY</p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">JY Price</p>
+                    <p className="text-lg font-bold text-green-600">${(config.tokenomics?.jyTokenPrice ?? 0.0042).toFixed(4)}</p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">1 CP Value</p>
+                    <p className="text-lg font-bold text-blue-600">
+                      ${((config.tokenomics?.jyTokenPrice ?? 0.0042) / (config.tokenomics?.cpToJyRate ?? 100)).toFixed(6)}
+                    </p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">1000 CP =</p>
+                    <p className="text-lg font-bold text-purple-600">
+                      {(1000 / (config.tokenomics?.cpToJyRate ?? 100)).toFixed(2)} JY
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

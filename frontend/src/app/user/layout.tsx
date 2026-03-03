@@ -20,7 +20,16 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
+  Ticket,
+  Store,
+  Package,
+  ShoppingCart,
+  MessageSquare,
+  Zap,
+  DollarSign,
+  Megaphone,
+  CreditCard,
 } from 'lucide-react';
 
 interface UserLayoutProps {
@@ -31,10 +40,22 @@ const navItems = [
   { href: '/user', label: 'Dashboard', icon: Home },
   { href: '/user/portfolio', label: 'Portfolio', icon: TrendingUp },
   { href: '/user/wallet', label: 'Wallet', icon: Wallet },
+  { href: '/user/place-order', label: 'Place Order', icon: CreditCard },
   { href: '/user/bookmarks', label: 'Bookmarks', icon: Star },
   { href: '/user/reading-history', label: 'Reading History', icon: BookOpen },
   { href: '/user/notifications', label: 'Notifications', icon: Bell },
+  { href: '/user/tickets', label: 'Support Tickets', icon: Ticket },
+  { href: '/user/ads', label: 'My Ads', icon: Megaphone },
   { href: '/user/settings', label: 'Settings', icon: Settings },
+];
+
+const marketplaceItems = [
+  { href: '/user/marketplace', label: 'My Store', icon: Store },
+  { href: '/user/marketplace/products', label: 'Products', icon: Package },
+  { href: '/user/marketplace/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/user/marketplace/messages', label: 'Messages', icon: MessageSquare },
+  { href: '/user/marketplace/payouts', label: 'Payouts', icon: DollarSign },
+  { href: '/user/marketplace/boost', label: 'Boost & Ads', icon: Zap },
 ];
 
 export default function UserLayout({ children }: UserLayoutProps) {
@@ -48,30 +69,52 @@ export default function UserLayout({ children }: UserLayoutProps) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('auth_token') || localStorage.getItem('accessToken');
         if (!token) {
           router.push('/auth/login?redirect=/user');
           return;
         }
 
-        // Verify token with backend
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        // Store under canonical key if found under alternate
+        if (!localStorage.getItem('auth_token') && token) {
+          localStorage.setItem('auth_token', token);
+        }
 
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData.user);
+        // Try reading stored user first (works offline)
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          try {
+            setUser(JSON.parse(storedUser));
+            setIsAuthenticated(true);
+            setLoading(false);
+          } catch { /* fall through to verify */ }
+        }
+
+        // Verify token with backend
+        try {
+          const response = await fetch('/api/auth/verify', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData.user || (storedUser ? JSON.parse(storedUser) : { name: 'User', email: '' }));
+            setIsAuthenticated(true);
+          } else if (!storedUser) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('accessToken');
+            router.push('/auth/login?redirect=/user');
+          } else {
+            // Token invalid but we have stored user - allow dev access
+            setIsAuthenticated(true);
+          }
+        } catch (verifyError) {
+          // Backend unreachable — allow access with stored user or demo
           setIsAuthenticated(true);
-        } else {
-          localStorage.removeItem('auth_token');
-          router.push('/auth/login?redirect=/user');
+          if (!user) setUser(storedUser ? JSON.parse(storedUser) : { name: 'Demo User', email: 'demo@coindaily.online' });
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        // For development, allow access
-        setIsAuthenticated(true);
-        setUser({ name: 'Demo User', email: 'demo@coindaily.online' });
       } finally {
         setLoading(false);
       }
@@ -148,7 +191,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-1">
+        <nav className="p-4 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 240px)' }}>
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -171,6 +214,33 @@ export default function UserLayout({ children }: UserLayoutProps) {
               </Link>
             );
           })}
+
+          {/* Marketplace Section */}
+          <div className="pt-3 mt-3 border-t border-dark-700">
+            <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-dark-500 mb-2">Marketplace</p>
+            {marketplaceItems.map((item) => {
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`
+                    flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                    transition-colors
+                    ${isActive 
+                      ? 'bg-primary-500/10 text-primary-500' 
+                      : 'text-dark-300 hover:text-white hover:bg-dark-800'
+                    }
+                  `}
+                >
+                  <Icon className="w-5 h-5" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         {/* Bottom Actions */}

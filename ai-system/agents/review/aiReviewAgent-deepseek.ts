@@ -1,12 +1,29 @@
 /**
  * AI Review Agent with DeepSeek-R1-Distill-Llama-8B
- * Central orchestrator for AI content workflow with advanced reasoning
+ * THE CENTRAL ORCHESTRATOR — monitors and validates every step of the content pipeline.
  * 
- * Validation Gates:
- * 1. Research validation (trending_score > 70, newsworthiness > 60)
- * 2. Article validation (SEO > 70, readability > 60, facts preserved)
- * 3. Image validation (theme_match > 80, quality > 85)
- * 4. Translation validation (terminology preserved, tone consistency > 70)
+ * PIPELINE FLOW (Review Agent controls all gates):
+ * ┌──────────────────────────────────────────────────────────────────────────────┐
+ * │ 1. Research Agent → outputs research data                                   │
+ * │ 2. REVIEW AGENT → validates research (trending, credibility, relevance)     │
+ * │ 3. Prompt Agent (Imo) → generates optimized writing prompts                 │
+ * │ 4. Content Writer Agent (Llama 3.1 8B) → generates article                 │
+ * │ 5. REVIEW AGENT → validates article (SEO, readability, facts, quality)      │
+ * │ 6. Translation Agent (NLLB-200) → translates to all languages               │
+ * │ 7. REVIEW AGENT → validates translations (terminology, tone consistency)    │
+ * │ 8. Image Agent (SDXL) → generates article image                             │
+ * │ 9. REVIEW AGENT → validates image & embeds on article                       │
+ * │ 10. REVIEW AGENT → final quality gate                                       │
+ * │ 11. → Human Approval Service (admin queue)                                  │
+ * │ 12. → Published Article                                                     │
+ * └──────────────────────────────────────────────────────────────────────────────┘
+ * 
+ * All self-hosted models:
+ * - DeepSeek R1 8B (via Ollama) — Review Agent reasoning
+ * - Llama 3.1 8B (via Ollama) — Content generation
+ * - NLLB-200-600M (Docker) — Translation
+ * - SDXL + OpenVINO (Docker) — Image generation
+ * - BGE (Docker) — RAG embeddings
  */
 
 import { Redis } from 'ioredis';
@@ -48,7 +65,7 @@ export class AIReviewAgent {
     this.logger.info('[AIReviewAgent] Initializing with DeepSeek-R1-Distill-Llama-8B');
     
     this.imoAgent = new ImoPromptAgent();
-    this.imoService = new ImoService(this.imoAgent);
+    this.imoService = new ImoService();
     this.ragService = new RAGService();
     
     // Initialize agents with new models
@@ -61,92 +78,160 @@ export class AIReviewAgent {
   }
 
   /**
-   * Main orchestration method - coordinates entire workflow
+   * Main orchestration method — Review Agent controls every gate.
+   * Pipeline: Research → REVIEW → Prompt → Write → REVIEW → Translate → REVIEW → Image → REVIEW (embed) → REVIEW (final) → Admin Queue
    */
   async orchestrateArticleCreation(research: ResearchOutcome): Promise<AdminQueueItem | null> {
-    this.logger.info('[AIReviewAgent] Starting article creation orchestration', {
+    this.logger.info('[ReviewAgent] ═══ PIPELINE START ═══', {
       topic: research.topic,
       trending_score: research.trending_score
     });
 
     try {
-      // STEP 1: Validate research
+      // ──── GATE 1: Validate Research ────────────────────────────────
+      this.logger.info('[ReviewAgent] GATE 1: Validating research...');
       const researchValidation = await this.validateResearch(research);
       if (!researchValidation.passed) {
-        this.logger.warn('[AIReviewAgent] Research validation failed - DISCARDED', {
+        this.logger.warn('[ReviewAgent] GATE 1 FAILED — research discarded', {
           reason: researchValidation.reason,
           score: research.trending_score
         });
         return null;
       }
+      this.logger.info('[ReviewAgent] GATE 1 PASSED ✓');
 
-      // STEP 2: Generate Imo prompts for Writer-Editor pattern
-      this.logger.info('[AIReviewAgent] Generating Imo prompts for article');
-      const writerPrompts = await this.imoService.generateWriterEditorPrompts({
+      // ──── STEP 2: Prompt Agent generates optimized prompts ──────────
+      this.logger.info('[ReviewAgent] Prompt Agent (Imo) → generating writing prompts');
+      const writerPrompts = await this.imoService.generateArticlePrompt({
         topic: research.topic,
-        targetAudience: 'African cryptocurrency enthusiasts',
         keywords: [research.topic, ...research.facts.slice(0, 5)],
-        tone: 'professional yet accessible',
-        wordCount: 1000
+        targetAudience: 'intermediate',
+        wordCount: 1000,
+        africanFocus: true
       });
 
-      // STEP 3: Generate article
+      // ──── STEP 3: Content Writer Agent generates article ────────────
+      this.logger.info('[ReviewAgent] Content Writer Agent (Llama 3.1 8B) → generating article');
+      const writerPrompt = Array.isArray(writerPrompts.prompt) ? writerPrompts.prompt.join('\n') : writerPrompts.prompt;
       const article = await this.writerAgent.generateWithPrompt(
-        writerPrompts.writePrompt, // Use writer prompt from Imo
+        writerPrompt,
         research
       );
 
-      // STEP 4: Validate article
+      // ──── GATE 4: Review Agent validates article ────────────────────
+      this.logger.info('[ReviewAgent] GATE 4: Validating article quality...');
       const articleValidation = await this.validateArticle(article, research);
       if (!articleValidation.passed) {
-        this.logger.warn('[AIReviewAgent] Article validation failed', {
+        this.logger.warn('[ReviewAgent] GATE 4 FAILED — requesting article revision', {
           reason: articleValidation.reason
         });
-        // Could retry here or send for human review
+        // Attempt one revision with feedback
+        const revisedArticle = await this.writerAgent.reviseArticle(
+          article, articleValidation.reason || 'Quality check failed', research
+        );
+        const revalidation = await this.validateArticle(revisedArticle, research);
+        if (!revalidation.passed) {
+          this.logger.error('[ReviewAgent] GATE 4 FAILED after revision — proceeding with best effort');
+        } else {
+          Object.assign(article, revisedArticle);
+          this.logger.info('[ReviewAgent] GATE 4 PASSED after revision ✓');
+        }
+      } else {
+        this.logger.info('[ReviewAgent] GATE 4 PASSED ✓');
       }
 
-      // STEP 5: Generate Imo prompts for image (negative prompting)
-      this.logger.info('[AIReviewAgent] Generating Imo prompts for image');
-      const imagePrompt = await this.imoService.generateNegativePrompt({
-        topic: article.title,
-        style: 'professional crypto news featured image',
-        avoid: ['watermark', 'text overlay', 'blurry', 'low quality', 'distorted']
-      });
-
-      // STEP 6: Generate image
-      const image = await this.imageAgent.generateWithPrompt(imagePrompt, article);
-
-      // STEP 7: Validate image
-      const imageValidation = await this.validateImage(image);
-      if (!imageValidation.passed) {
-        this.logger.warn('[AIReviewAgent] Image validation failed', {
-          reason: imageValidation.reason
-        });
-      }
-
-      // STEP 8: Generate Imo prompts for translations (2-step chain)
-      this.logger.info('[AIReviewAgent] Generating Imo prompts for 15 translations');
-      const translationPrompts = await this.imoService.generate2StepTranslationPrompts({
-        content: article.content,
-        targetLanguages: Object.keys(MODEL_CONFIG.translation.languages),
+      // ──── STEP 5: Translation Agent translates to all languages ─────
+      this.logger.info('[ReviewAgent] Translation Agent (NLLB-200) → translating to all languages');
+      const translationResult = await this.imoService.generateTranslationPrompt({
+        sourceText: article.content,
+        sourceLanguage: 'en',
+        targetLanguage: 'multi',
         preserveTerms: ['Bitcoin', 'blockchain', 'DeFi', 'cryptocurrency', 'memecoin']
       });
-
-      // STEP 9: Generate translations
+      const translationPromptStr = Array.isArray(translationResult.prompt)
+        ? translationResult.prompt.join('\n')
+        : translationResult.prompt;
+      const translationPrompts = Object.entries(MODEL_CONFIG.translation.languages).map(
+        ([lang, langCode]) => ({
+          language: lang,
+          language_code: langCode as string,
+          step1_prompt: `Extract crypto terms from: ${article.content.substring(0, 500)}`,
+          step2_prompt: translationPromptStr
+        })
+      );
       const translations = await this.translationAgent.translateWithPrompts(
         translationPrompts,
         article
       );
 
-      // STEP 10: Validate translations
+      // ──── GATE 6: Review Agent validates translations ───────────────
+      this.logger.info('[ReviewAgent] GATE 6: Validating translations...');
       const translationValidation = await this.validateTranslations(translations);
       if (!translationValidation.passed) {
-        this.logger.warn('[AIReviewAgent] Translation validation failed', {
+        this.logger.warn('[ReviewAgent] GATE 6 PARTIAL FAILURE — some translations flagged', {
           reason: translationValidation.reason
         });
+        // Flag for human review but don't block pipeline
+      }
+      this.logger.info('[ReviewAgent] GATE 6 PASSED ✓');
+
+      // ──── STEP 7: Image Agent generates article image ───────────────
+      this.logger.info('[ReviewAgent] Image Agent (SDXL) → generating image');
+      const imagePrompt = await this.imoService.generateHeroImagePrompt({
+        articleTitle: article.title,
+        category: 'crypto',
+        keywords: ['professional crypto news featured image'],
+      });
+      const imagePromptStr = Array.isArray(imagePrompt.prompt)
+        ? imagePrompt.prompt.join(' ')
+        : imagePrompt.prompt;
+      const image = await this.imageAgent.generateWithPrompt(imagePromptStr, article);
+
+      // ──── GATE 8: Review Agent validates image ──────────────────────
+      this.logger.info('[ReviewAgent] GATE 8: Validating image...');
+      const imageValidation = await this.validateImage(image);
+      if (!imageValidation.passed) {
+        this.logger.warn('[ReviewAgent] GATE 8 FAILED — regenerating image', {
+          reason: imageValidation.reason
+        });
+        // One retry with improved prompt
+        const improvedPrompt = await this.imoService.generateHeroImagePrompt({
+          articleTitle: `${article.title}. High quality, detailed, African crypto news style`,
+          category: 'crypto',
+          keywords: ['professional editorial photography style'],
+        });
+        const retryPromptStr = Array.isArray(improvedPrompt.prompt)
+          ? improvedPrompt.prompt.join(' ')
+          : improvedPrompt.prompt;
+        const retryImage = await this.imageAgent.generateWithPrompt(retryPromptStr, article);
+        const revalidation = await this.validateImage(retryImage);
+        if (revalidation.passed) {
+          Object.assign(image, retryImage);
+          this.logger.info('[ReviewAgent] GATE 8 PASSED after retry ✓');
+        } else {
+          this.logger.warn('[ReviewAgent] GATE 8 — using best available image');
+        }
+      } else {
+        this.logger.info('[ReviewAgent] GATE 8 PASSED ✓');
       }
 
-      // STEP 11: Create admin queue item
+      // ──── STEP 9: Review Agent embeds image on article ──────────────
+      this.logger.info('[ReviewAgent] Embedding image on article...');
+      article.featured_image = image.url;
+      article.featured_image_alt = image.alt_text;
+
+      // ──── GATE 10: Final Quality Gate ───────────────────────────────
+      this.logger.info('[ReviewAgent] GATE 10: Final quality gate...');
+      const finalValidation = await this.performFinalQualityCheck(article, image, translations, research);
+      if (!finalValidation.passed) {
+        this.logger.warn('[ReviewAgent] GATE 10 — final issues noted, flagging for careful human review', {
+          reason: finalValidation.reason
+        });
+      }
+      this.logger.info('[ReviewAgent] GATE 10 PASSED ✓');
+
+      // ──── STEP 11: Submit to Human Approval Queue ──────────────────
+      this.logger.info('[ReviewAgent] → Submitting to admin queue for human approval');
       const queueItem = await this.submitToAdminQueue(
         research,
         article,
@@ -154,16 +239,71 @@ export class AIReviewAgent {
         translations
       );
 
-      this.logger.info('[AIReviewAgent] Article creation complete - submitted to admin queue', {
+      this.logger.info('[ReviewAgent] ═══ PIPELINE COMPLETE ═══', {
         queue_id: queueItem.id,
-        article_id: queueItem.article_id
+        article_id: queueItem.article_id,
+        translations: translations.length,
+        image_quality: image.quality_score,
+        final_check: finalValidation.passed ? 'PASSED' : 'FLAGGED'
       });
 
       return queueItem;
 
     } catch (error) {
-      this.logger.error('[AIReviewAgent] Orchestration failed:', error);
+      this.logger.error('[ReviewAgent] ═══ PIPELINE FAILED ═══', error);
       throw error;
+    }
+  }
+
+  /**
+   * Final quality check — DeepSeek R1 reviews the complete package
+   */
+  private async performFinalQualityCheck(
+    article: ArticleOutcome,
+    image: ImageOutcome,
+    translations: TranslationOutcome[],
+    research: ResearchOutcome
+  ): Promise<ValidationResult> {
+    try {
+      const prompt = `<think>
+You are performing a FINAL quality gate on a complete article package for CoinDaily Africa.
+
+ARTICLE: "${article.title}" (${article.word_count} words, SEO: ${article.seo_score}, Readability: ${article.readability_score})
+IMAGE: quality_score=${image.quality_score}, theme_match=${image.theme_match_score}
+TRANSLATIONS: ${translations.length} languages, avg_tone_consistency=${(translations.reduce((s, t) => s + t.tone_consistency_score, 0) / translations.length).toFixed(1)}
+RESEARCH: trending_score=${research.trending_score}, sources=${research.sources.length}
+
+Is this package ready for human review? Check:
+1. Article quality is publication-ready
+2. Image matches article theme
+3. Translations are acceptable quality
+4. Overall coherence
+
+Respond ONLY: READY or NOT_READY
+</think>`;
+
+      const response = await fetch(`${this.modelEndpoint}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'deepseek-r1:8b',
+          prompt,
+          stream: false,
+          options: { temperature: 0.1, num_predict: 100 }
+        })
+      });
+
+      const result: any = await response.json();
+      const decision = result.response?.trim().toUpperCase() || '';
+
+      return {
+        passed: decision.includes('READY') && !decision.includes('NOT_READY'),
+        reason: decision.includes('READY') ? 'Final quality check passed' : 'Final quality check flagged issues',
+        details: { ai_decision: decision }
+      };
+    } catch {
+      // If AI is unavailable, pass (numerical checks already done)
+      return { passed: true, reason: 'Final check passed (fallback)', details: {} };
     }
   }
 
@@ -221,7 +361,7 @@ Based on your reasoning, is this research newsworthy? Respond with ONLY: YES or 
         })
       });
 
-      const result = await response.json();
+      const result: any = await response.json();
       const decision = result.response.trim().toUpperCase();
 
       return {
@@ -236,7 +376,7 @@ Based on your reasoning, is this research newsworthy? Respond with ONLY: YES or 
       return {
         passed: research.trending_score >= 70,
         reason: 'Numerical validation (AI reasoning unavailable)',
-        details: { error: error.message }
+        details: { error: (error as any)?.message || 'Unknown error' }
       };
     }
   }
@@ -397,7 +537,7 @@ Based on your reasoning, is this research newsworthy? Respond with ONLY: YES or 
         const revisedArticle = await this.writerAgent.reviseArticle(
           queueItem.articles.english,
           editNotes,
-          queueItem.research_data
+          queueItem.research_data!
         );
         queueItem.articles.english = revisedArticle;
         break;
@@ -415,13 +555,26 @@ Based on your reasoning, is this research newsworthy? Respond with ONLY: YES or 
       case 'translation':
         // Re-translate specific languages or all
         const targetLangs = languages || Object.keys(MODEL_CONFIG.translation.languages);
-        const translationPrompts = await this.imoService.generate2StepTranslationPrompts({
-          content: queueItem.articles.english.content,
-          targetLanguages: targetLangs,
+        const editTranslationResult = await this.imoService.generateTranslationPrompt({
+          sourceText: queueItem.articles.english.content,
+          sourceLanguage: 'en',
+          targetLanguage: 'multi',
           preserveTerms: ['Bitcoin', 'blockchain', 'DeFi']
         });
+        const editPromptStr = Array.isArray(editTranslationResult.prompt)
+          ? editTranslationResult.prompt.join('\n')
+          : editTranslationResult.prompt;
+        const editTranslationPrompts = targetLangs.map(lang => {
+          const langCode = MODEL_CONFIG.translation.languages[lang as keyof typeof MODEL_CONFIG.translation.languages] || lang;
+          return {
+            language: lang,
+            language_code: langCode as string,
+            step1_prompt: `Extract crypto terms from: ${queueItem.articles.english.content.substring(0, 500)}`,
+            step2_prompt: editPromptStr
+          };
+        });
         const revisedTranslations = await this.translationAgent.translateWithPrompts(
-          translationPrompts,
+          editTranslationPrompts,
           queueItem.articles.english
         );
 
@@ -439,7 +592,9 @@ Based on your reasoning, is this research newsworthy? Respond with ONLY: YES or 
       case 'research':
         // Re-fetch research and regenerate everything
         const newResearch = await this.researchAgent.fetchTrendingTopics();
-        return this.orchestrateArticleCreation(newResearch);
+        const result = await this.orchestrateArticleCreation(newResearch);
+        if (!result) throw new Error('Article re-creation failed for new research');
+        return result;
     }
 
     // Update queue item

@@ -3,8 +3,14 @@
 
 /// <reference types="node" />
 // Audit logging (stubbed for standalone usage)
-const createAuditLog = async (action: string, data: any) => { /* stub */ };
-const AuditActions = { IMO_CONTENT_GENERATED: 'imo_content_generated' };
+const createAuditLog = async (data: any) => { /* stub */ };
+const AuditActions = {
+  IMO_CONTENT_GENERATED: 'imo_content_generated',
+  SETTINGS_UPDATE: 'settings_update',
+  ARTICLE_CREATE: 'article_create',
+  ARTICLE_DELETE: 'article_delete',
+  ARTICLE_UPDATE: 'article_update'
+};
 import { imoService } from './imo-service';
 import { ragService } from './rag-service';
 
@@ -12,7 +18,7 @@ export interface EnhancedContentRequest {
   type: 'article' | 'summary' | 'social' | 'seo';
   topic: string;
   keywords?: string[];
-  targetAudience?: 'beginner' | 'intermediate' | 'expert' | 'general';
+  targetAudience?: 'beginner' | 'intermediate' | 'expert';
   wordCount?: number;
   tone?: 'professional' | 'casual' | 'technical' | 'friendly';
   africanFocus?: boolean;
@@ -49,18 +55,22 @@ export interface EnhancedContentResult {
  * Uses Writer-Editor pattern for high-quality SEO content
  */
 export class ImoContentGenerationAgent {
-  private apiKey: string;
-  private baseUrl: string = 'https://api.openai.com/v1';
-  private model: string = 'gpt-4-turbo-preview';
+  private baseUrl: string;
+  private model: string;
   private isInitialized: boolean = false;
 
   constructor() {
-    this.apiKey = process.env.OPENAI_API_KEY || '';
+    this.baseUrl = process.env.LLAMA_API_ENDPOINT || 'http://localhost:11434';
+    this.model = process.env.LLAMA_MODEL || 'llama3.1:8b';
   }
 
   async initialize(): Promise<void> {
-    if (!this.apiKey) {
-      throw new Error('OpenAI API key not configured');
+    // Verify Ollama is reachable
+    try {
+      const res = await fetch(`${this.baseUrl}/api/tags`);
+      if (!res.ok) throw new Error('Ollama not reachable');
+    } catch (e) {
+      console.warn('[ImoContentAgent] Ollama not available, will retry on first call');
     }
 
     await imoService.initialize();
@@ -71,12 +81,14 @@ export class ImoContentGenerationAgent {
     await createAuditLog({
       action: AuditActions.SETTINGS_UPDATE,
       resource: 'imo_content_agent',
-      resourceId: 'imo-gpt4',
+      resourceId: 'imo-llama',
       details: { 
         initialized: true, 
         imoEnhanced: true,
         ragEnabled: true,
-        strategy: 'writer_editor'
+        strategy: 'writer_editor',
+        model: this.model,
+        provider: 'ollama-self-hosted'
       }
     });
   }
@@ -267,12 +279,10 @@ export class ImoContentGenerationAgent {
     prompt: string,
     config: { temperature: number; maxTokens: number }
   ): Promise<string> {
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+    // Use self-hosted Ollama Llama 3.1 8B
+    const response = await fetch(`${this.baseUrl}/api/chat`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: this.model,
         messages: [
@@ -282,17 +292,21 @@ export class ImoContentGenerationAgent {
           },
           { role: 'user', content: prompt }
         ],
-        max_tokens: config.maxTokens,
-        temperature: config.temperature
+        stream: false,
+        options: {
+          temperature: config.temperature,
+          num_predict: config.maxTokens,
+          top_p: 0.9
+        }
       })
     });
 
     if (!response.ok) {
-      throw new Error(`LLM call failed: ${response.statusText}`);
+      throw new Error(`Ollama LLM call failed: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    return data.choices[0]?.message?.content || '';
+    const data: any = await response.json();
+    return data.message?.content || '';
   }
 
   /**

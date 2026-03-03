@@ -490,24 +490,28 @@ export default function AIManagementPage() {
                     <div>
                       <label className="block text-sm text-gray-400 mb-2">Content Generation Model</label>
                       <select className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
-                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                        <option value="gpt-4">GPT-4</option>
-                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        <option value="llama3-70b">Llama 3 70B (Self-hosted)</option>
+                        <option value="llama3-8b">Llama 3 8B (Self-hosted)</option>
+                        <option value="deepseek-v2">DeepSeek V2 (Self-hosted)</option>
+                        <option value="mistral-7b">Mistral 7B (Ollama)</option>
+                        <option value="mixtral-8x7b">Mixtral 8×7B (Ollama)</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm text-gray-400 mb-2">Quality Review Model</label>
                       <select className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
-                        <option value="gemini-pro">Google Gemini Pro</option>
-                        <option value="claude-3">Claude 3</option>
-                        <option value="gpt-4">GPT-4</option>
+                        <option value="deepseek-r1">DeepSeek-R1 (Self-hosted)</option>
+                        <option value="llama3-70b">Llama 3 70B (Self-hosted)</option>
+                        <option value="mistral-large">Mistral Large (Ollama)</option>
+                        <option value="qwen2-72b">Qwen2 72B (Self-hosted)</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm text-gray-400 mb-2">Translation Model</label>
                       <select className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
-                        <option value="nllb-200">Meta NLLB-200</option>
-                        <option value="gpt-4">GPT-4</option>
+                        <option value="nllb-200">Meta NLLB-200 (Self-hosted, 15 African languages)</option>
+                        <option value="seamless-m4t">SeamlessM4T (Self-hosted)</option>
+                        <option value="madlad-400">MADLAD-400 (Ollama)</option>
                       </select>
                     </div>
                   </div>

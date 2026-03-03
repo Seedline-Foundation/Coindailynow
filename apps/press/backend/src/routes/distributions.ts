@@ -232,6 +232,75 @@ router.post('/distributions', async (req, res) => {
             .update({ joy_balance: publisher.joy_balance - totalCost })
             .eq('id', publisherId);
         
+        // ─── Notify CFIS — Create escrow in financial system ─────────
+        // This makes the payment instantly visible to Super Admin in the
+        // CFIS dashboard. CFIS holds the funds in escrow and handles
+        // AI verification, release, or refund (with gas fee deduction).
+        try {
+            const cfisUrl = process.env.CFIS_URL || 'http://localhost:3005';
+            const hmacSecret = process.env.CFIS_HMAC_SECRET || process.env.PRESS_HMAC_SECRET || 'press-hmac-secret';
+            const timestamp = Date.now().toString();
+            
+            // Get PR title for context
+            const { data: prData } = await supabase
+                .from('press_releases')
+                .select('title')
+                .eq('id', prId)
+                .single();
+            
+            // Get publisher email for context
+            const { data: pubData } = await supabase
+                .from('press_publishers')
+                .select('contact_email, wallet_address')
+                .eq('id', publisherId)
+                .single();
+            
+            const orderPayload = {
+                orderId: distributionId,
+                publisherId,
+                publisherEmail: pubData?.contact_email || '',
+                publisherWallet: pubData?.wallet_address || '',
+                amount: totalCost,
+                prTitle: prData?.title || 'Untitled PR',
+                targetSites: sites.map((s: any) => s.domain || s.id),
+                siteUrl: sites[0]?.domain || '',
+                tier: sites[0]?.tier || 'standard'
+            };
+            
+            const crypto = require('crypto');
+            const signature = crypto.createHmac('sha256', hmacSecret)
+                .update(timestamp + '.' + JSON.stringify(orderPayload))
+                .digest('hex');
+            
+            const cfisResponse = await fetch(`${cfisUrl}/api/press-orders/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Press-Signature': signature,
+                    'X-Press-Timestamp': timestamp
+                },
+                body: JSON.stringify(orderPayload)
+            });
+            
+            if (cfisResponse.ok) {
+                const cfisResult = await cfisResponse.json();
+                console.log(`[SENDPRESS] CFIS escrow created: ${cfisResult.data?.escrowId}`);
+                
+                // Store CFIS escrow ID in the distribution record
+                await supabase
+                    .from('press_distributions')
+                    .update({ 
+                        metadata: { cfis_escrow_id: cfisResult.data?.escrowId },
+                    })
+                    .eq('id', distributionId);
+            } else {
+                console.warn('[SENDPRESS] CFIS escrow creation failed (non-blocking):', await cfisResponse.text());
+            }
+        } catch (cfisError) {
+            // Non-blocking — CFIS notification failure should not block the user's order
+            console.warn('[SENDPRESS] Failed to notify CFIS (non-blocking):', cfisError);
+        }
+        
         res.status(201).json({
             distributionId: distribution.id,
             status: 'pending',

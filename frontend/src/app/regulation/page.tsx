@@ -127,12 +127,12 @@ export default function RegulationTrackerPage() {
           >
             {compareMode ? 'Exit Compare' : '⚖️ Compare Countries'}
           </button>
-          <a
-            href={`${backendUrl}/api/v1/regulations/export.csv`}
-            className="px-6 py-3 rounded-xl bg-green-600 text-white font-medium text-center hover:bg-green-700"
+          <Link
+            href="/membership"
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold text-center hover:from-orange-600 hover:to-amber-600 shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
           >
-            📥 Download CSV
-          </a>
+            👑 Get Full Analysis — Pro
+          </Link>
         </div>
 
         {/* Compare Panel */}
@@ -261,6 +261,45 @@ export default function RegulationTrackerPage() {
             </div>
           </div>
         )}
+
+        {/* Premium Upsell Banner */}
+        <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 rounded-2xl shadow-xl p-8 mb-8 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10" />
+          <div className="relative z-10">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-4xl">👑</span>
+                  <h2 className="text-2xl md:text-3xl font-bold">Unlock Full Regulatory Intelligence</h2>
+                </div>
+                <p className="text-white/90 text-lg mb-4 max-w-2xl">
+                  Get deep-dive analysis, risk scores, licensing requirements, CBDC timelines, tax frameworks,
+                  regulatory body contacts, and our expert editorial views on every African country's crypto policy.
+                </p>
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {['Full Country Analysis', 'Risk Scores & Ratings', 'Regulatory Timeline', 'Tax Framework Details',
+                    'CBDC Progress Tracking', 'Expert Editorial Views', 'CSV & API Access', 'Real-time Alerts'].map(f => (
+                    <span key={f} className="px-3 py-1 bg-white/20 backdrop-blur rounded-full text-sm font-medium">✓ {f}</span>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-3">
+                <div className="text-center">
+                  <p className="text-sm text-white/70 line-through">$49/month</p>
+                  <p className="text-4xl font-bold">$29<span className="text-lg font-normal">/mo</span></p>
+                  <p className="text-xs text-white/80">Early adopter pricing</p>
+                </div>
+                <Link
+                  href="/membership"
+                  className="px-8 py-4 bg-white text-orange-600 font-bold rounded-xl hover:bg-orange-50 transition-colors shadow-lg text-lg"
+                >
+                  Start Free Trial →
+                </Link>
+                <p className="text-xs text-white/70">7-day free trial • Cancel anytime</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* JSON-LD Structured Data */}
         <script

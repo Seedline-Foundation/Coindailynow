@@ -1,8 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Settings, LogOut } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { Settings, LogOut, Newspaper, Bell, Camera, Upload, User, Coins } from 'lucide-react';
 import { fetchProfile, updateProfile } from '@/lib/userApi';
+import {
+  DASHBOARD_THEME_STORAGE_KEY,
+  DashboardThemeId,
+  dashboardThemes,
+  getStoredDashboardThemeId,
+} from '@/lib/dashboardThemes';
 
 interface UserProfile {
   id: string;
@@ -19,16 +25,31 @@ interface UserProfile {
 }
 
 const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'fr', label: 'French' },
-  { code: 'sw', label: 'Swahili' },
-  { code: 'ha', label: 'Hausa' },
-  { code: 'yo', label: 'Yoruba' },
-  { code: 'ig', label: 'Igbo' },
-  { code: 'am', label: 'Amharic' },
-  { code: 'zu', label: 'Zulu' },
-  { code: 'ar', label: 'Arabic' },
-  { code: 'pt', label: 'Portuguese' },
+  // Source
+  { code: 'en', label: 'English 🇬🇧' },
+  // West Africa
+  { code: 'ha', label: 'Hausa 🇳🇬' },
+  { code: 'yo', label: 'Yoruba 🇳🇬' },
+  { code: 'ig', label: 'Igbo 🇳🇬' },
+  { code: 'pcm', label: 'Pidgin (Naijá) 🇳🇬' },
+  { code: 'wol', label: 'Wolof 🇸🇳' },
+  // East Africa
+  { code: 'sw', label: 'Swahili 🇰🇪' },
+  { code: 'kin', label: 'Kinyarwanda 🇷🇼' },
+  // Horn of Africa
+  { code: 'am', label: 'Amharic 🇪🇹' },
+  { code: 'so', label: 'Somali 🇸🇴' },
+  { code: 'om', label: 'Oromo 🇪🇹' },
+  // Southern Africa
+  { code: 'zu', label: 'Zulu 🇿🇦' },
+  { code: 'af', label: 'Afrikaans 🇿🇦' },
+  { code: 'sn', label: 'Shona 🇿🇼' },
+  // North Africa
+  { code: 'ar', label: 'Arabic 🇪🇬' },
+  // European / International
+  { code: 'fr', label: 'French 🇫🇷' },
+  { code: 'pt', label: 'Portuguese 🇵🇹' },
+  { code: 'es', label: 'Spanish 🇪🇸' },
 ];
 
 const COUNTRIES = [
@@ -36,6 +57,37 @@ const COUNTRIES = [
   'Ethiopia', 'Egypt', 'Uganda', 'Cameroon', 'Rwanda',
   'Senegal', "C\u00f4te d'Ivoire", 'Zambia', 'Zimbabwe', 'Botswana',
 ];
+
+const NEWS_CATEGORIES = [
+  { id: 'bitcoin', label: 'Bitcoin & BTC News', emoji: '₿' },
+  { id: 'ethereum', label: 'Ethereum & Altcoins', emoji: 'Ξ' },
+  { id: 'defi', label: 'DeFi & Yield', emoji: '🏦' },
+  { id: 'nft', label: 'NFTs & Digital Art', emoji: '🖼️' },
+  { id: 'memecoin', label: 'Memecoins & Trending', emoji: '🐶' },
+  { id: 'regulation', label: 'Regulation & Policy', emoji: '⚖️' },
+  { id: 'africa', label: 'Africa Crypto & Adoption', emoji: '🌍' },
+  { id: 'mobile-money', label: 'Mobile Money & Payments', emoji: '📱' },
+  { id: 'mining', label: 'Mining & Staking', emoji: '⛏️' },
+  { id: 'security', label: 'Security & Scam Alerts', emoji: '🛡️' },
+  { id: 'education', label: 'Guides & Education', emoji: '📚' },
+  { id: 'market-analysis', label: 'Market Analysis', emoji: '📊' },
+  { id: 'exchanges', label: 'African Exchanges', emoji: '💹' },
+  { id: 'startups', label: 'Blockchain Startups', emoji: '🚀' },
+];
+
+const NEWS_PREFS_KEY = 'coindaily_news_prefs';
+
+function getStoredNewsPrefs(): string[] {
+  if (typeof window === 'undefined') return NEWS_CATEGORIES.map(c => c.id);
+  try {
+    const stored = localStorage.getItem(NEWS_PREFS_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch { /* ignore */ }
+  return NEWS_CATEGORIES.map(c => c.id);
+}
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -51,8 +103,20 @@ export default function SettingsPage() {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [preferredLanguage, setPreferredLanguage] = useState('');
   const [location, setLocation] = useState('');
+  const [dashboardTheme, setDashboardTheme] = useState<DashboardThemeId>('milk');
+  const [newsPrefs, setNewsPrefs] = useState<string[]>([]);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushSupported, setPushSupported] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // Check push notification support
+    if (typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator) {
+      setPushSupported(true);
+      setPushEnabled(Notification.permission === 'granted');
+    }
+
     async function load() {
       try {
         const res = await fetchProfile();
@@ -64,6 +128,8 @@ export default function SettingsPage() {
         setAvatarUrl(p.avatarUrl || '');
         setPreferredLanguage(p.preferredLanguage || 'en');
         setLocation(p.location || '');
+        setDashboardTheme(getStoredDashboardThemeId());
+        setNewsPrefs(getStoredNewsPrefs());
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -78,6 +144,10 @@ export default function SettingsPage() {
     setSaving(true);
     setSuccess(false);
     setError(null);
+    // Save theme & news prefs immediately (independent of backend)
+    localStorage.setItem(DASHBOARD_THEME_STORAGE_KEY, dashboardTheme);
+    localStorage.setItem(NEWS_PREFS_KEY, JSON.stringify(newsPrefs));
+
     try {
       const res = await updateProfile({
         firstName: firstName || null,
@@ -87,6 +157,7 @@ export default function SettingsPage() {
         preferredLanguage,
         location: location || null,
       });
+
       setProfile((prev) => prev ? { ...prev, ...res.data } : prev);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
@@ -186,17 +257,74 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label htmlFor="avatarUrl" className="block text-xs text-dark-400 mb-1">
-              Avatar URL
+            <label className="block text-xs text-dark-400 mb-2">
+              Profile Picture
             </label>
-            <input
-              id="avatarUrl"
-              type="url"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://example.com/avatar.png"
-              className="w-full px-3 py-2 bg-dark-800 border border-dark-600 rounded-lg text-sm text-white placeholder-dark-500 focus:outline-none focus:border-primary-500 transition-colors"
-            />
+            <div className="flex items-center gap-4">
+              {/* Avatar preview */}
+              <div className="relative group">
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-dark-800 border-2 border-dark-600 flex items-center justify-center">
+                  {(avatarPreview || avatarUrl) ? (
+                    <img
+                      src={avatarPreview || avatarUrl}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  ) : (
+                    <User className="w-8 h-8 text-dark-500" />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <Camera className="w-5 h-5 text-white" />
+                </button>
+              </div>
+              <div className="flex-1">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/gif,image/webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (file.size > 2 * 1024 * 1024) {
+                      alert('Image must be under 2MB');
+                      return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      const dataUrl = ev.target?.result as string;
+                      setAvatarPreview(dataUrl);
+                      setAvatarUrl(dataUrl);
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-dark-800 border border-dark-600 rounded-lg text-dark-300 hover:text-white hover:border-dark-500 transition-colors"
+                >
+                  <Upload className="w-3 h-3" />
+                  Upload Photo
+                </button>
+                <p className="text-[10px] text-dark-500 mt-1">PNG, JPG, GIF or WebP. Max 2MB.</p>
+                {/* Fallback URL field */}
+                <input
+                  id="avatarUrl"
+                  type="url"
+                  value={avatarUrl.startsWith('data:') ? '' : avatarUrl}
+                  onChange={(e) => { setAvatarUrl(e.target.value); setAvatarPreview(null); }}
+                  placeholder="Or paste an image URL"
+                  className="mt-2 w-full px-3 py-1.5 bg-dark-800 border border-dark-600 rounded-lg text-xs text-white placeholder-dark-500 focus:outline-none focus:border-primary-500 transition-colors"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -241,6 +369,226 @@ export default function SettingsPage() {
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* News Category Preferences */}
+          <div>
+            <label className="block text-xs text-dark-400 mb-1 flex items-center gap-1.5">
+              <Newspaper className="w-3.5 h-3.5" /> Free News Categories
+            </label>
+            <p className="text-[11px] text-dark-500 mb-3">Choose which types of news you want in your feed. Deselect categories you're not interested in.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {NEWS_CATEGORIES.map((cat) => {
+                const checked = newsPrefs.includes(cat.id);
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => {
+                      setNewsPrefs((prev) =>
+                        checked
+                          ? prev.filter((id) => id !== cat.id)
+                          : [...prev, cat.id]
+                      );
+                    }}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border text-sm text-left transition-colors ${
+                      checked
+                        ? 'border-primary-500/50 bg-primary-500/10 text-white'
+                        : 'border-dark-700 bg-dark-800 text-dark-400 hover:border-dark-600'
+                    }`}
+                  >
+                    <span className="text-base leading-none">{cat.emoji}</span>
+                    <span className="flex-1 truncate">{cat.label}</span>
+                    <span className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] ${
+                      checked ? 'bg-primary-500 border-primary-500 text-dark-950' : 'border-dark-600'
+                    }`}>
+                      {checked && '✓'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (newsPrefs.length === NEWS_CATEGORIES.length) {
+                  setNewsPrefs([]);
+                } else {
+                  setNewsPrefs(NEWS_CATEGORIES.map(c => c.id));
+                }
+              }}
+              className="mt-2 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+            >
+              {newsPrefs.length === NEWS_CATEGORIES.length ? 'Deselect All' : 'Select All'}
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-xs text-dark-400 mb-2">Dashboard Color Scheme</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {dashboardThemes.map((theme) => {
+                const selected = dashboardTheme === theme.id;
+                return (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    onClick={() => setDashboardTheme(theme.id)}
+                    className={`text-left p-3 rounded-xl border transition-colors ${
+                      selected
+                        ? 'border-primary-500 bg-primary-500/10'
+                        : 'border-dark-700 bg-dark-800 hover:border-dark-600'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.preview.bg }} />
+                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.preview.text }} />
+                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.preview.card }} />
+                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.preview.accent }} />
+                    </div>
+                    <p className="text-sm font-semibold text-white">{theme.name}</p>
+                    <p className="text-xs text-dark-400 mt-1">{theme.description}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Push Notifications ── */}
+        <div className="bg-dark-900 border border-dark-700 rounded-xl p-6 space-y-5">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Bell className="w-5 h-5 text-primary-500" />
+            Push Notifications
+          </h2>
+          <p className="text-xs text-dark-400">
+            Receive real-time alerts on your phone for breaking news, price movements, and account activity.
+          </p>
+
+          {pushSupported ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-dark-800 rounded-lg">
+                <div>
+                  <p className="text-sm text-white font-medium">Mobile Push Notifications</p>
+                  <p className="text-xs text-dark-400 mt-0.5">
+                    {pushEnabled
+                      ? 'You will receive push notifications on this device'
+                      : 'Enable to get alerts on your phone or browser'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!pushEnabled) {
+                      const permission = await Notification.requestPermission();
+                      if (permission === 'granted') {
+                        setPushEnabled(true);
+                        localStorage.setItem('coindaily_push_enabled', 'true');
+                        new Notification('CoinDaily', {
+                          body: 'Push notifications enabled! You\'ll receive alerts for breaking news and price movements.',
+                          icon: '/icons/icon-192.png',
+                        });
+                      }
+                    } else {
+                      setPushEnabled(false);
+                      localStorage.setItem('coindaily_push_enabled', 'false');
+                    }
+                  }}
+                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                    pushEnabled ? 'bg-primary-500' : 'bg-dark-600'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                    pushEnabled ? 'translate-x-6' : 'translate-x-0.5'
+                  }`} />
+                </button>
+              </div>
+
+              {pushEnabled && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {[
+                    { key: 'push_breaking_news', label: 'Breaking News', desc: 'Major crypto events', default: true },
+                    { key: 'push_price_alerts', label: 'Price Alerts', desc: 'Token price movements', default: true },
+                    { key: 'push_portfolio', label: 'Portfolio Updates', desc: 'Significant P&L changes', default: true },
+                    { key: 'push_earnings', label: 'CP Earnings', desc: 'When you earn CoinPoints', default: false },
+                    { key: 'push_social', label: 'Social Activity', desc: 'Replies, mentions, follows', default: false },
+                    { key: 'push_market', label: 'Market Analysis', desc: 'AI-powered insights', default: true },
+                  ].map((notif) => {
+                    const stored = localStorage.getItem(notif.key);
+                    const isOn = stored !== null ? stored === 'true' : notif.default;
+                    return (
+                      <button
+                        key={notif.key}
+                        type="button"
+                        onClick={() => {
+                          localStorage.setItem(notif.key, (!isOn).toString());
+                          setPushEnabled(p => p); // force re-render
+                        }}
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border text-sm text-left transition-colors ${
+                          isOn
+                            ? 'border-primary-500/50 bg-primary-500/10 text-white'
+                            : 'border-dark-700 bg-dark-800 text-dark-400 hover:border-dark-600'
+                        }`}
+                      >
+                        <span className="flex-1">
+                          <span className="block text-xs font-medium">{notif.label}</span>
+                          <span className="block text-[10px] text-dark-500">{notif.desc}</span>
+                        </span>
+                        <span className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] ${
+                          isOn ? 'bg-primary-500 border-primary-500 text-dark-950' : 'border-dark-600'
+                        }`}>
+                          {isOn && '✓'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-3 bg-dark-800 rounded-lg">
+              <p className="text-xs text-dark-400">
+                Push notifications are not supported on this browser. Try using Chrome, Firefox, or Edge on your phone or computer.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* ── How to Earn CP Points ── */}
+        <div className="bg-dark-900 border border-dark-700 rounded-xl p-6 space-y-5">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Coins className="w-5 h-5 text-primary-500" />
+            How to Earn CoinPoints (CP)
+          </h2>
+          <p className="text-xs text-dark-400">
+            Earn CP through daily activities. 100 CP = 1 JY Token. CP are automatically converted and reflected on your dashboard.
+          </p>
+          <div className="space-y-2">
+            {[
+              { action: 'Daily Login', cp: 5, desc: 'Visit the platform every day', emoji: '📅' },
+              { action: 'Read an Article', cp: 2, desc: 'Read any news article fully', emoji: '📖' },
+              { action: 'Bookmark Content', cp: 1, desc: 'Save articles to your bookmarks', emoji: '🔖' },
+              { action: 'Share an Article', cp: 3, desc: 'Share news to social media', emoji: '📤' },
+              { action: 'Comment on Article', cp: 2, desc: 'Leave a thoughtful comment', emoji: '💬' },
+              { action: 'Refer a Friend', cp: 50, desc: 'When your referral signs up & verifies', emoji: '🤝' },
+              { action: 'Complete Profile', cp: 20, desc: 'Fill out all profile fields (one-time)', emoji: '✅' },
+              { action: 'Streak Bonus (7 days)', cp: 25, desc: 'Login 7 consecutive days', emoji: '🔥' },
+              { action: 'First Article Read (Daily)', cp: 3, desc: 'Bonus for first read each day', emoji: '🌅' },
+              { action: 'Watch Market Video', cp: 2, desc: 'Watch analysis or tutorial videos', emoji: '🎬' },
+            ].map((item) => (
+              <div key={item.action} className="flex items-center gap-3 p-3 bg-dark-800 rounded-lg">
+                <span className="text-lg">{item.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white">{item.action}</p>
+                  <p className="text-[10px] text-dark-500">{item.desc}</p>
+                </div>
+                <span className="shrink-0 text-sm font-bold text-primary-400">+{item.cp} CP</span>
+              </div>
+            ))}
+          </div>
+          <div className="p-3 bg-primary-500/10 border border-primary-500/20 rounded-lg">
+            <p className="text-xs text-primary-400">
+              <strong>Daily Cap:</strong> You can earn up to 500 CP per day. Premium subscribers get 2x CP on all activities.
+            </p>
           </div>
         </div>
 

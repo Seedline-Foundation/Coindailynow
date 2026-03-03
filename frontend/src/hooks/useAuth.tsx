@@ -24,7 +24,7 @@ import {
 // ========== Helpers ==========
 
 const DEFAULT_EXPIRES_IN = 86400; // 24 hours in seconds
-const FETCH_TIMEOUT_MS = 15000; // 15 second timeout for all auth fetches
+const FETCH_TIMEOUT_MS = 45000; // 45 second timeout for auth fetches (bcrypt/db can be slow on dev machines)
 
 /** Fetch with AbortController timeout */
 async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = FETCH_TIMEOUT_MS): Promise<Response> {
@@ -484,7 +484,7 @@ export function useWalletConnection() {
         isConnecting: false,
         error: error instanceof Error ? error.message : 'Connection failed'
       }));
-      throw error;
+      return;
     }
   }, []);
 

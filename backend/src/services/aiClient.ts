@@ -10,6 +10,8 @@
  * - BGE Embeddings (port 8081) - RAG embeddings
  */
 
+import { sanitisePromptInput } from '../middleware/promptInjectionGuard';
+
 // Model configurations
 export const AI_MODELS = {
   LLAMA: 'llama3.1:8b',
@@ -83,10 +85,13 @@ async function ollamaComplete(
 ): Promise<AICompletionResponse> {
   const model = options.model || AI_MODELS.LLAMA;
   
+  // Sanitise prompt to prevent injection attacks
+  const safePrompt = sanitisePromptInput(prompt);
+
   // Build the full prompt with system message if provided
-  let fullPrompt = prompt;
+  let fullPrompt = safePrompt;
   if (options.systemPrompt) {
-    fullPrompt = `<|system|>\n${options.systemPrompt}\n<|end|>\n<|user|>\n${prompt}\n<|end|>\n<|assistant|>`;
+    fullPrompt = `<|system|>\n${options.systemPrompt}\n<|end|>\n<|user|>\n${safePrompt}\n<|end|>\n<|assistant|>`;
   }
 
   const response = await fetch(`${AI_ENDPOINTS.OLLAMA}/api/generate`, {
@@ -124,12 +129,18 @@ async function ollamaChatComplete(
 ): Promise<AICompletionResponse> {
   const model = options.model || AI_MODELS.LLAMA;
 
+  // Sanitise user messages to prevent prompt injection
+  const safeMessages = messages.map(m => ({
+    ...m,
+    content: m.role === 'user' ? sanitisePromptInput(m.content) : m.content,
+  }));
+
   const response = await fetch(`${AI_ENDPOINTS.OLLAMA}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model,
-      messages,
+      messages: safeMessages,
       stream: false,
       options: {
         temperature: options.temperature ?? 0.7,

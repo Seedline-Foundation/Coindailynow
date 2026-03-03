@@ -74,7 +74,9 @@ export const MODEL_CONFIG = {
       'French': 'fra_Latn',
       'Portuguese': 'por_Latn',
       'Wolof': 'wol_Latn',
-      'Kinyarwanda': 'kin_Latn'
+      'Kinyarwanda': 'kin_Latn',
+      'Pidgin': 'pcm_Latn',
+      'Spanish': 'spa_Latn'
     }
   },
 
@@ -193,27 +195,34 @@ export const PERFORMANCE_BENCHMARKS = {
 
 /**
  * Fallback configuration
- * If self-hosted models are down, fallback to cloud APIs
+ * All models are self-hosted — no cloud API dependencies
  */
 export const FALLBACK_CONFIG = {
-  enabled: process.env.ENABLE_FALLBACK === 'true',
+  // No cloud fallbacks — all models are self-hosted via Ollama + Docker
+  enabled: false,
   
   writer: {
-    provider: 'openai',
-    model: 'gpt-4-turbo-preview',
-    apiKey: process.env.OPENAI_API_KEY
+    provider: 'ollama',
+    model: 'llama3.1:8b',
+    apiEndpoint: process.env.LLAMA_API_ENDPOINT || 'http://localhost:11434'
+  },
+  
+  review: {
+    provider: 'ollama',
+    model: 'deepseek-r1:8b',
+    apiEndpoint: process.env.DEEPSEEK_API_ENDPOINT || 'http://localhost:11435'
   },
   
   image: {
-    provider: 'openai',
-    model: 'dall-e-3',
-    apiKey: process.env.OPENAI_API_KEY
+    provider: 'sdxl',
+    model: 'stable-diffusion-xl-base-1.0',
+    apiEndpoint: process.env.SDXL_API_ENDPOINT || 'http://localhost:7860'
   },
   
   translation: {
-    provider: 'huggingface',
-    model: 'facebook/nllb-200-3.3B',
-    apiKey: process.env.HUGGINGFACE_API_KEY
+    provider: 'nllb',
+    model: 'facebook/nllb-200-distilled-600M',
+    apiEndpoint: process.env.NLLB_API_ENDPOINT || 'http://localhost:8080'
   }
 };
 

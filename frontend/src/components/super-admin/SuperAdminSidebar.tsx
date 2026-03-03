@@ -16,7 +16,6 @@ import {
   TrendingUp,
   Brain,
   MessageSquare,
-  Handshake,
   Database,
   DollarSign,
   Search,
@@ -40,7 +39,13 @@ import {
   BookOpen,
   Headphones,
   Send,
-  ShoppingCart
+  ShoppingCart,
+  Tag,
+  Key,
+  Ticket,
+  LifeBuoy,
+  Award,
+  Megaphone,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -107,6 +112,7 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
         { id: 'articles', label: 'Articles', icon: FileText, href: '/super-admin/content' },
         { id: 'ai-content', label: 'AI Content', icon: Bot, href: '/super-admin/content/ai' },
         { id: 'content-automation', label: 'Content Automation', icon: Bot, href: '/super-admin/content-automation', badge: 'NEW', badgeColor: 'bg-green-500 text-white' },
+        { id: 'translations', label: 'Translations', icon: Globe, href: '/super-admin/translations', badge: 'NEW', badgeColor: 'bg-cyan-500 text-white' },
         { id: 'moderation', label: 'Moderation', icon: Shield, href: '/super-admin/content/moderation' },
         { id: 'categories', label: 'Categories', icon: BookOpen, href: '/super-admin/content/categories' },
       ]
@@ -120,6 +126,14 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       badgeColor: 'bg-yellow-500 text-white',
     },
     {
+      id: 'automations',
+      label: 'Automations',
+      icon: Bot,
+      href: '/super-admin/automations',
+      badge: 'NEW',
+      badgeColor: 'bg-orange-500 text-white',
+    },
+    {
       id: 'analytics',
       label: 'Analytics',
       icon: BarChart3,
@@ -128,12 +142,12 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       badgeColor: 'bg-yellow-500 text-white',
     },
     {
-      id: 'system-health',
-      label: 'System Health',
-      icon: Monitor,
-      href: '/super-admin/system',
+      id: 'crypto-policies',
+      label: 'Crypto Policies',
+      icon: Globe,
+      href: '/super-admin/crypto-policies',
       badge: 'NEW',
-      badgeColor: 'bg-yellow-500 text-white',
+      badgeColor: 'bg-purple-500 text-white',
     },
     {
       id: 'monetization',
@@ -142,6 +156,14 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       href: '/super-admin/monetization',
       badge: 'NEW',
       badgeColor: 'bg-yellow-500 text-white',
+    },
+    {
+      id: 'ads-management',
+      label: 'Ads Management',
+      icon: Megaphone,
+      href: '/super-admin/ads',
+      badge: 'AI',
+      badgeColor: 'bg-orange-500 text-white',
     },
     {
       id: 'community',
@@ -171,9 +193,37 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       id: 'ecommerce',
       label: 'E-commerce',
       icon: ShoppingCart,
-      href: '/super-admin/ecommerce',
       badge: 'NEW',
       badgeColor: 'bg-yellow-500 text-white',
+      children: [
+        { id: 'ecommerce-manage', label: 'Product Management', icon: ShoppingCart, href: '/super-admin/ecommerce' },
+        { id: 'ecommerce-marketplace', label: 'Marketplace', icon: Tag, href: '/super-admin/ecommerce/marketplace' },
+        { id: 'ecommerce-sellers', label: 'Seller Management', icon: Users, href: '/super-admin/ecommerce/sellers' },
+      ],
+    },
+    {
+      id: 'api-licensing',
+      label: 'API Licensing',
+      icon: Key,
+      href: '/super-admin/api-licensing',
+      badge: 'NEW',
+      badgeColor: 'bg-emerald-500 text-white',
+    },
+    {
+      id: 'affiliate',
+      label: 'Affiliate Mgmt',
+      icon: Users,
+      href: '/super-admin/affiliate',
+      badge: 'NEW',
+      badgeColor: 'bg-orange-500 text-white',
+    },
+    {
+      id: 'expert-program',
+      label: 'Expert Program',
+      icon: Award,
+      href: '/super-admin/expert-program',
+      badge: 'NEW',
+      badgeColor: 'bg-amber-500 text-white',
     },
     {
       id: 'compliance',
@@ -229,7 +279,7 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
     {
       id: 'partnerships',
       label: 'Partnerships',
-      icon: Handshake,
+      icon: Users,
       children: [
         { id: 'partners', label: 'Partners', icon: Building, href: '/super-admin/partnerships/partners' },
         { id: 'integrations', label: 'Integrations', icon: Zap, href: '/super-admin/partnerships/integrations' },
@@ -245,17 +295,6 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
         { id: 'backups', label: 'Backups', icon: Shield, href: '/super-admin/data/backups' },
         { id: 'migrations', label: 'Migrations', icon: Zap, href: '/super-admin/data/migrations' },
         { id: 'privacy', label: 'Privacy & GDPR', icon: Lock, href: '/super-admin/data/privacy' },
-      ]
-    },
-    {
-      id: 'seo-management-old',
-      label: 'SEO Management (Old)',
-      icon: Search,
-      children: [
-        { id: 'seo-analytics', label: 'SEO Analytics', icon: BarChart3, href: '/super-admin/seo/analytics' },
-        { id: 'keywords', label: 'Keywords', icon: Search, href: '/super-admin/seo/keywords' },
-        { id: 'meta-data', label: 'Meta Data', icon: FileText, href: '/super-admin/seo/meta' },
-        { id: 'sitemap', label: 'Sitemap', icon: Globe, href: '/super-admin/seo/sitemap' },
       ]
     },
     {
@@ -279,6 +318,14 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
         { id: 'api-config', label: 'API Configuration', icon: Zap, href: '/super-admin/settings/api' },
         { id: 'localization', label: 'Localization', icon: Globe, href: '/super-admin/settings/localization' },
       ]
+    },
+    {
+      id: 'help-center',
+      label: 'Help Center',
+      icon: LifeBuoy,
+      href: '/super-admin/help-center',
+      badge: 'NEW',
+      badgeColor: 'bg-amber-500 text-white',
     },
   ];
 
@@ -364,25 +411,13 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
           isOpen ? 'w-64' : 'w-16'
         } overflow-y-auto`}
       >
-        <div className="p-4">
+        <div className="p-4 pb-6">
           <nav className="space-y-2">
             {menuItems.map(item => renderMenuItem(item))}
           </nav>
         </div>
 
-        {/* Footer */}
-        {isOpen && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-700">
-            <div className="text-center">
-              <p className="text-xs text-gray-400">
-                Super Admin v1.0
-              </p>
-              <p className="text-xs text-gray-500">
-                CoinDaily Platform
-              </p>
-            </div>
-          </div>
-        )}
+        {/* Footer — portal links removed; accessible via the header profile menu */}
       </aside>
     </>
   );
