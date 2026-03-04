@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -46,6 +46,7 @@ import {
   LifeBuoy,
   Award,
   Megaphone,
+  ClipboardList,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -63,9 +64,40 @@ interface SuperAdminSidebarProps {
   onClose: () => void;
 }
 
+/* ─── Menus that ALL staff can always access (never grayed) ─── */
+const ALWAYS_ACCESSIBLE_MENUS = [
+  'overview',
+  'today-todo',
+  'help-center',
+];
+
+/* ─── Role detection ─── */
+function detectSidebarRole(): { isCeo: boolean; staffId: string; assignedMenus: string[] } {
+  if (typeof window === 'undefined') return { isCeo: true, staffId: 'ceo', assignedMenus: [] };
+  const token = localStorage.getItem('super_admin_token') || '';
+  const isCeo = token.includes('super_admin') || token.includes('ceo') || token.includes('super-admin');
+  const staffId = localStorage.getItem('staff_id') || (isCeo ? 'ceo' : 'staff-unknown');
+  // Staff menu assignments stored by CEO (JSON array of menu IDs)
+  const assignedRaw = localStorage.getItem('staff_assigned_menus');
+  const assignedMenus: string[] = assignedRaw ? JSON.parse(assignedRaw) : [];
+  return { isCeo, staffId, assignedMenus };
+}
+
 export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>(['overview']);
+  const [userRole, setUserRole] = useState<{ isCeo: boolean; staffId: string; assignedMenus: string[] }>({ isCeo: true, staffId: 'ceo', assignedMenus: [] });
+
+  useEffect(() => {
+    setUserRole(detectSidebarRole());
+  }, []);
+
+  const isMenuAccessible = (menuId: string): boolean => {
+    if (userRole.isCeo) return true; // CEO sees everything
+    if (ALWAYS_ACCESSIBLE_MENUS.includes(menuId)) return true;
+    if (userRole.assignedMenus.length === 0) return true; // No restriction set yet — show all
+    return userRole.assignedMenus.includes(menuId);
+  };
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
@@ -81,6 +113,14 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       label: 'Overview',
       icon: LayoutDashboard,
       href: '/super-admin/dashboard',
+    },
+    {
+      id: 'today-todo',
+      label: 'Today TO DO',
+      icon: ClipboardList,
+      href: '/super-admin/today-todo',
+      badge: 'DAILY',
+      badgeColor: 'bg-red-500 text-white',
     },
     {
       id: 'admin-management',
@@ -313,6 +353,8 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       label: 'Platform Settings',
       icon: Settings,
       children: [
+        { id: 'all-settings', label: 'All Settings', icon: Settings, href: '/super-admin/settings' },
+        { id: 'tokenomics', label: 'Tokenomics (CP/JY)', icon: Coins, href: '/super-admin/settings?tab=tokenomics' },
         { id: 'general', label: 'General Settings', icon: Settings, href: '/super-admin/settings/general' },
         { id: 'security', label: 'Security', icon: Lock, href: '/super-admin/settings/security' },
         { id: 'api-config', label: 'API Configuration', icon: Zap, href: '/super-admin/settings/api' },
@@ -333,18 +375,23 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
     const isActive = pathname === item.href;
     const isExpanded = expandedItems.includes(item.id);
     const hasChildren = item.children && item.children.length > 0;
+    const accessible = isMenuAccessible(item.id);
+    const grayedOut = !accessible;
 
     return (
-      <div key={item.id} className="mb-1">
+      <div key={item.id} className={`mb-1 ${grayedOut ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
         {hasChildren ? (
           <button
-            onClick={() => toggleExpanded(item.id)}
+            onClick={() => !grayedOut && toggleExpanded(item.id)}
             className={`w-full flex items-center justify-between px-3 py-2 text-left rounded-lg transition-colors ${
-              level === 0 
+              grayedOut
+                ? 'text-gray-500 cursor-not-allowed'
+                : level === 0 
                 ? 'text-gray-300 hover:text-white hover:bg-gray-700'
                 : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/50'
             }`}
             style={{ paddingLeft: `${12 + level * 16}px` }}
+            disabled={grayedOut}
           >
             <div className="flex items-center space-x-3">
               <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -352,41 +399,61 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
                 <span className="font-medium">{item.label}</span>
               )}
             </div>
-            {isOpen && (
+            {isOpen && !grayedOut && (
               isExpanded ? 
                 <ChevronDown className="w-4 h-4" /> : 
                 <ChevronRight className="w-4 h-4" />
             )}
+            {isOpen && grayedOut && (
+              <Lock className="w-3 h-3 text-gray-600" />
+            )}
           </button>
         ) : (
-          <Link
-            href={item.href || '#'}
-            className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-              isActive 
-                ? 'bg-blue-600 text-white' 
-                : level === 0
-                ? 'text-gray-300 hover:text-white hover:bg-gray-700'
-                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/50'
-            }`}
-            style={{ paddingLeft: `${12 + level * 16}px` }}
-          >
-            <div className="flex items-center space-x-3">
-              <item.icon className="w-5 h-5 flex-shrink-0" />
+          grayedOut ? (
+            <div
+              className="flex items-center justify-between px-3 py-2 rounded-lg text-gray-500 cursor-not-allowed"
+              style={{ paddingLeft: `${12 + level * 16}px` }}
+            >
+              <div className="flex items-center space-x-3">
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                {isOpen && (
+                  <span className="font-medium">{item.label}</span>
+                )}
+              </div>
               {isOpen && (
-                <span className="font-medium">{item.label}</span>
+                <Lock className="w-3 h-3 text-gray-600" />
               )}
             </div>
-            {isOpen && item.badge && (
-              <span className={`px-2 py-1 text-xs rounded-full ${
-                item.badgeColor || 'bg-blue-500 text-white'
-              }`}>
-                {item.badge}
-              </span>
-            )}
-          </Link>
+          ) : (
+            <Link
+              href={item.href || '#'}
+              className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                isActive 
+                  ? 'bg-blue-600 text-white' 
+                  : level === 0
+                  ? 'text-gray-300 hover:text-white hover:bg-gray-700'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/50'
+              }`}
+              style={{ paddingLeft: `${12 + level * 16}px` }}
+            >
+              <div className="flex items-center space-x-3">
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                {isOpen && (
+                  <span className="font-medium">{item.label}</span>
+                )}
+              </div>
+              {isOpen && item.badge && (
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  item.badgeColor || 'bg-blue-500 text-white'
+                }`}>
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          )
         )}
 
-        {hasChildren && isExpanded && (
+        {hasChildren && isExpanded && !grayedOut && (
           <div className="mt-1 space-y-1">
             {item.children?.map(child => renderMenuItem(child, level + 1))}
           </div>

@@ -178,6 +178,23 @@ export default function UserHomePage() {
       }
     }
     load();
+
+    // Poll tokenomics config every 60s so admin rate changes appear instantly
+    const pollInterval = setInterval(async () => {
+      try {
+        const tkConfig = await fetchTokenomicsConfig();
+        setTokenomics(prev => {
+          // Only update state if something actually changed
+          if (prev.cpToJyRate !== tkConfig.cpToJyRate || prev.jyTokenPrice !== tkConfig.jyTokenPrice) {
+            setEarnings(getEarningsData(tkConfig.cpToJyRate, tkConfig.jyTokenPrice));
+            return tkConfig;
+          }
+          return prev;
+        });
+      } catch { /* silent — keep showing last known values */ }
+    }, 60_000);
+
+    return () => clearInterval(pollInterval);
   }, []);
 
   if (loading) {

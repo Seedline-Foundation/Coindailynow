@@ -20,6 +20,22 @@ import { TransactionHistory } from './TransactionHistory';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';
 
+/** Small inline component that fetches the live CP-to-JY rate */
+function CpToJyWalletRate() {
+  const [rate, setRate] = React.useState(100);
+  React.useEffect(() => {
+    fetch('/api/tokenomics/config')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.cpToJyRate) setRate(d.cpToJyRate); })
+      .catch(() => {});
+  }, []);
+  return (
+    <p className="text-xs text-dark-500 mt-2">
+      {rate} CP = 1 JY Token &bull; Earn CP by reading articles, daily logins, referrals, and more
+    </p>
+  );
+}
+
 interface WalletDashboardProps {
   userId?: string;
 }
@@ -209,9 +225,7 @@ export const WalletDashboard: React.FC<WalletDashboardProps> = ({ userId }) => {
           <p className="text-sm text-dark-400">
             Your wallet is being set up. Start earning CP points through daily activities, and they will appear here automatically.
           </p>
-          <p className="text-xs text-dark-500 mt-2">
-            100 CP = 1 JY Token • Earn CP by reading articles, daily logins, referrals, and more
-          </p>
+          <CpToJyWalletRate />
         </div>
       </div>
     );

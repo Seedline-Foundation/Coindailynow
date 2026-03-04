@@ -77,6 +77,117 @@ const NEWS_CATEGORIES = [
 
 const NEWS_PREFS_KEY = 'coindaily_news_prefs';
 
+/** Small component that fetches the live CP-to-JY rate from admin config */
+function CpToJyRateText() {
+  const [rate, setRate] = useState(100);
+  useEffect(() => {
+    fetch('/api/tokenomics/config')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.cpToJyRate) setRate(d.cpToJyRate); })
+      .catch(() => {});
+  }, []);
+  return (
+    <p className="text-xs text-dark-400">
+      Earn CP through daily activities. <strong>{rate} CP = 1 JY Token</strong>. CP are automatically converted and reflected on your dashboard.
+    </p>
+  );
+}
+
+/** Fetch task reward values set by admin */
+function useTaskRewards() {
+  const [rewards, setRewards] = useState<Record<string, number>>({
+    daily_login: 5, read_article: 2, bookmark_content: 1, share_article: 3,
+    comment_article: 2, refer_friend: 50, complete_profile: 20, streak_7day: 25,
+    first_read_daily: 3, watch_video: 2, telegram_activity: 3, discord_activity: 3,
+    twitter_activity: 3, facebook_activity: 2, linkedin_activity: 2, youtube_activity: 2,
+    coinmarketcap_activity: 3, reddit_activity: 2,
+  });
+  const [dailyCap, setDailyCap] = useState(500);
+  useEffect(() => {
+    fetch('/api/tokenomics/config')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.taskRewards) setRewards(prev => ({ ...prev, ...d.taskRewards }));
+        if (d?.dailyCpCap) setDailyCap(d.dailyCpCap);
+      })
+      .catch(() => {});
+  }, []);
+  return { rewards, dailyCap };
+}
+
+/** Earn CP Section — dynamic task list with admin-set values + social media */
+function EarnCpSection() {
+  const { rewards, dailyCap } = useTaskRewards();
+  const coreTasks = [
+    { key: 'daily_login', action: 'Daily Login', desc: 'Visit the platform every day', emoji: '📅' },
+    { key: 'read_article', action: 'Read an Article', desc: 'Read any news article fully', emoji: '📖' },
+    { key: 'bookmark_content', action: 'Bookmark Content', desc: 'Save articles to your bookmarks', emoji: '🔖' },
+    { key: 'share_article', action: 'Share an Article', desc: 'Share news to social media', emoji: '📤' },
+    { key: 'comment_article', action: 'Comment on Article', desc: 'Leave a thoughtful comment', emoji: '💬' },
+    { key: 'refer_friend', action: 'Refer a Friend', desc: 'When your referral signs up & verifies', emoji: '🤝' },
+    { key: 'complete_profile', action: 'Complete Profile', desc: 'Fill out all profile fields (one-time)', emoji: '✅' },
+    { key: 'streak_7day', action: 'Streak Bonus (7 days)', desc: 'Login 7 consecutive days', emoji: '🔥' },
+    { key: 'first_read_daily', action: 'First Article Read (Daily)', desc: 'Bonus for first read each day', emoji: '🌅' },
+    { key: 'watch_video', action: 'Watch Market Video', desc: 'Watch analysis or tutorial videos', emoji: '🎬' },
+  ];
+  const socialTasks = [
+    { key: 'telegram_activity', action: 'Telegram', desc: 'Join & contribute to our Telegram group', emoji: '✈️' },
+    { key: 'discord_activity', action: 'Discord', desc: 'Join & discuss in our Discord server', emoji: '🎮' },
+    { key: 'twitter_activity', action: 'X (Twitter)', desc: 'Follow @CoinDailyNow & engage with posts', emoji: '🐦' },
+    { key: 'facebook_activity', action: 'Facebook', desc: 'Join our FB community & participate', emoji: '📘' },
+    { key: 'linkedin_activity', action: 'LinkedIn', desc: 'Follow & engage with our LinkedIn posts', emoji: '💼' },
+    { key: 'youtube_activity', action: 'YouTube', desc: 'Subscribe, like & comment on videos', emoji: '▶️' },
+    { key: 'coinmarketcap_activity', action: 'CoinMarketCap', desc: 'Follow us on CMC community', emoji: '📊' },
+    { key: 'reddit_activity', action: 'Reddit', desc: 'Join r/CoinDaily & participate in discussions', emoji: '🤖' },
+  ];
+  return (
+    <div className="bg-dark-900 border border-dark-700 rounded-xl p-6 space-y-5">
+      <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+        <Coins className="w-5 h-5 text-primary-500" />
+        How to Earn CoinPoints (CP)
+      </h2>
+      <CpToJyRateText />
+
+      {/* Core Platform Tasks */}
+      <div className="space-y-2">
+        <h3 className="text-xs font-semibold text-dark-400 uppercase tracking-wider">Platform Activities</h3>
+        {coreTasks.map((item) => (
+          <div key={item.key} className="flex items-center gap-3 p-3 bg-dark-800 rounded-lg">
+            <span className="text-lg">{item.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white">{item.action}</p>
+              <p className="text-[10px] text-dark-500">{item.desc}</p>
+            </div>
+            <span className="shrink-0 text-sm font-bold text-primary-400">+{rewards[item.key] || 0} CP</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Social Media Tasks */}
+      <div className="space-y-2">
+        <h3 className="text-xs font-semibold text-dark-400 uppercase tracking-wider mt-4">Social Media Engagement — Login &amp; Contribute</h3>
+        <p className="text-[10px] text-dark-500">Earn CP by logging into and contributing to discussions on our official social channels daily.</p>
+        {socialTasks.map((item) => (
+          <div key={item.key} className="flex items-center gap-3 p-3 bg-gradient-to-r from-dark-800 to-purple-900/20 border border-purple-800/30 rounded-lg">
+            <span className="text-lg">{item.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white">{item.action}</p>
+              <p className="text-[10px] text-dark-500">{item.desc}</p>
+            </div>
+            <span className="shrink-0 text-sm font-bold text-purple-400">+{rewards[item.key] || 0} CP</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="p-3 bg-primary-500/10 border border-primary-500/20 rounded-lg">
+        <p className="text-xs text-primary-400">
+          <strong>Daily Cap:</strong> You can earn up to {dailyCap} CP per day. Premium subscribers get 2x CP on all activities.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function getStoredNewsPrefs(): string[] {
   if (typeof window === 'undefined') return NEWS_CATEGORIES.map(c => c.id);
   try {
@@ -554,43 +665,7 @@ export default function SettingsPage() {
         </div>
 
         {/* ── How to Earn CP Points ── */}
-        <div className="bg-dark-900 border border-dark-700 rounded-xl p-6 space-y-5">
-          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <Coins className="w-5 h-5 text-primary-500" />
-            How to Earn CoinPoints (CP)
-          </h2>
-          <p className="text-xs text-dark-400">
-            Earn CP through daily activities. 100 CP = 1 JY Token. CP are automatically converted and reflected on your dashboard.
-          </p>
-          <div className="space-y-2">
-            {[
-              { action: 'Daily Login', cp: 5, desc: 'Visit the platform every day', emoji: '📅' },
-              { action: 'Read an Article', cp: 2, desc: 'Read any news article fully', emoji: '📖' },
-              { action: 'Bookmark Content', cp: 1, desc: 'Save articles to your bookmarks', emoji: '🔖' },
-              { action: 'Share an Article', cp: 3, desc: 'Share news to social media', emoji: '📤' },
-              { action: 'Comment on Article', cp: 2, desc: 'Leave a thoughtful comment', emoji: '💬' },
-              { action: 'Refer a Friend', cp: 50, desc: 'When your referral signs up & verifies', emoji: '🤝' },
-              { action: 'Complete Profile', cp: 20, desc: 'Fill out all profile fields (one-time)', emoji: '✅' },
-              { action: 'Streak Bonus (7 days)', cp: 25, desc: 'Login 7 consecutive days', emoji: '🔥' },
-              { action: 'First Article Read (Daily)', cp: 3, desc: 'Bonus for first read each day', emoji: '🌅' },
-              { action: 'Watch Market Video', cp: 2, desc: 'Watch analysis or tutorial videos', emoji: '🎬' },
-            ].map((item) => (
-              <div key={item.action} className="flex items-center gap-3 p-3 bg-dark-800 rounded-lg">
-                <span className="text-lg">{item.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white">{item.action}</p>
-                  <p className="text-[10px] text-dark-500">{item.desc}</p>
-                </div>
-                <span className="shrink-0 text-sm font-bold text-primary-400">+{item.cp} CP</span>
-              </div>
-            ))}
-          </div>
-          <div className="p-3 bg-primary-500/10 border border-primary-500/20 rounded-lg">
-            <p className="text-xs text-primary-400">
-              <strong>Daily Cap:</strong> You can earn up to 500 CP per day. Premium subscribers get 2x CP on all activities.
-            </p>
-          </div>
-        </div>
+        <EarnCpSection />
 
         {/* Submit */}
         <div className="flex items-center justify-between">
