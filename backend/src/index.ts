@@ -56,6 +56,7 @@ import adsRotationRouter from './routes/ads-rotation.routes';
 import rssFeedRouter from './routes/rss-feed.routes';
 import indexNowRouter from './routes/indexnow.routes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
+import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
 import { startPipelineScheduler as startAnalysisScheduler } from './services/dataAnalysisPipeline';
 import { MarketDataAggregator } from './services/marketDataAggregator';
@@ -368,6 +369,9 @@ export async function setupApp() {
 
   // Data Analysis Admin Routes (Data Source Center, Analysis Pipeline, Benchmarks)
   app.use('/api/admin', dataAnalysisAdminRouter);
+
+  // AI Agent Registry Routes (26 self-hosted agents: DeepSeek R1 + Llama 3.1)
+  integrateAIRegistryRoutes(app);
 
   // Ads Management & Rotation Agent Routes (DeepSeek R1-powered ad engine)
   app.use('/api/ads', adsRotationRouter);

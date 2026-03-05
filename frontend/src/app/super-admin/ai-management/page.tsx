@@ -45,6 +45,9 @@ import { aiWebSocketService } from '@/services/aiWebSocketService';
 // Import dashboard components
 import AIAgentsTab from '@/components/admin/ai/AIAgentsTab';
 import AITasksTab from '@/components/admin/ai/AITasksTab';
+import RunningTasksTab from '@/components/admin/ai/RunningTasksTab';
+import CompletedTasksTab from '@/components/admin/ai/CompletedTasksTab';
+import TaskHistoryTab from '@/components/admin/ai/TaskHistoryTab';
 import WorkflowsTab from '@/components/admin/ai/WorkflowsTab';
 import AnalyticsTab from '@/components/admin/ai/AnalyticsTab';
 import HumanApprovalTab from '@/components/admin/ai/HumanApprovalTab';
@@ -53,7 +56,7 @@ import HumanApprovalTab from '@/components/admin/ai/HumanApprovalTab';
 // Types
 // ============================================================================
 
-type TabType = 'agents' | 'tasks' | 'workflows' | 'analytics' | 'approval';
+type TabType = 'agents' | 'tasks' | 'running' | 'completed' | 'history' | 'workflows' | 'analytics' | 'approval';
 
 interface DashboardStats {
   totalAgents: number;
@@ -381,6 +384,25 @@ export default function AIManagementPage() {
             count={stats.tasksInQueue}
           />
           <TabButton
+            active={activeTab === 'running'}
+            onClick={() => setActiveTab('running')}
+            icon={<Loader2 className="h-4 w-4" />}
+            label="Running"
+            alert={true}
+          />
+          <TabButton
+            active={activeTab === 'completed'}
+            onClick={() => setActiveTab('completed')}
+            icon={<CheckCircle className="h-4 w-4" />}
+            label="Completed"
+          />
+          <TabButton
+            active={activeTab === 'history'}
+            onClick={() => setActiveTab('history')}
+            icon={<Clock className="h-4 w-4" />}
+            label="History"
+          />
+          <TabButton
             active={activeTab === 'workflows'}
             onClick={() => setActiveTab('workflows')}
             icon={<Activity className="h-4 w-4" />}
@@ -414,6 +436,9 @@ export default function AIManagementPage() {
           <>
             {activeTab === 'agents' && <AIAgentsTab />}
             {activeTab === 'tasks' && <AITasksTab />}
+            {activeTab === 'running' && <RunningTasksTab />}
+            {activeTab === 'completed' && <CompletedTasksTab />}
+            {activeTab === 'history' && <TaskHistoryTab />}
             {activeTab === 'workflows' && <WorkflowsTab />}
             {activeTab === 'analytics' && <AnalyticsTab />}
             {activeTab === 'approval' && <HumanApprovalTab />}

@@ -15,13 +15,23 @@ import axios, { AxiosInstance } from 'axios';
 // Type Definitions
 // ============================================================================
 
+export type AIAgentType = 
+  | 'content_generation' | 'image_generation' | 'translation' 
+  | 'market_analysis' | 'review' | 'moderation'
+  | 'analysis' | 'data' | 'research' | 'content' 
+  | 'engineering' | 'business' | 'finance' | 'legal';
+
+export type AIAgentCategory = 'analysis' | 'data' | 'research' | 'content' | 'engineering' | 'business' | 'finance' | 'legal';
+
 export interface AIAgent {
   id: string;
   name: string;
-  type: 'content_generation' | 'image_generation' | 'translation' | 'market_analysis' | 'review' | 'moderation';
+  type: AIAgentType;
+  category?: AIAgentCategory;
   status: 'active' | 'idle' | 'error' | 'disabled';
   description: string;
   capabilities: string[];
+  model?: string;
   configuration: {
     model?: string;
     temperature?: number;
@@ -42,6 +52,9 @@ export interface AIAgent {
     status: 'healthy' | 'degraded' | 'unhealthy';
     issues?: string[];
   };
+  currentTask?: AITask | null;
+  queuedTasks?: AITask[];
+  completedTasks?: AITask[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -711,6 +724,173 @@ class AIManagementService {
   async healthCheck(): Promise<{ status: string; uptime: number }> {
     const response = await this.api.get('/api/ai/analytics/health');
     return response.data;
+  }
+
+  // ============================================================================
+  // Agent Registry (New - All 26 Agents)
+  // ============================================================================
+
+  /**
+   * Get all agents from the registry, including new categories
+   */
+  async getAllRegistryAgents(filter?: { category?: string; status?: string }): Promise<AIAgent[]> {
+    try {
+      const response = await this.api.get('/api/ai/registry/agents', { params: filter });
+      return response.data.agents || [];
+    } catch {
+      // Fallback: return from standard agents endpoint
+      return this.getAgents(filter ? { type: filter.category, status: filter.status } : undefined);
+    }
+  }
+
+  /**
+   * Get agents grouped by category
+   */
+  async getAgentsByCategory(): Promise<Record<string, AIAgent[]>> {
+    try {
+      const response = await this.api.get('/api/ai/registry/agents/by-category');
+      return response.data.categories || {};
+    } catch {
+      const agents = await this.getAgents();
+      return agents.reduce((acc: Record<string, AIAgent[]>, agent) => {
+        const cat = agent.category || agent.type;
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(agent);
+        return acc;
+      }, {});
+    }
+  }
+
+  /**
+   * Get registry stats (total agents, active, by category)
+   */
+  async getRegistryStats(): Promise<{
+    totalAgents: number;
+    activeAgents: number;
+    runningTasks: number;
+    completedTasks: number;
+    queuedTasks: number;
+    categories: Record<string, number>;
+  }> {
+    try {
+      const response = await this.api.get('/api/ai/registry/stats');
+      return response.data;
+    } catch {
+      return {
+        totalAgents: 0, activeAgents: 0, runningTasks: 0,
+        completedTasks: 0, queuedTasks: 0, categories: {},
+      };
+    }
+  }
+
+  /**
+   * Get currently running tasks across all agents
+   */
+  async getRunningTasks(): Promise<AITask[]> {
+    try {
+      const response = await this.api.get('/api/ai/registry/tasks/running');
+      return response.data.tasks || [];
+    } catch {
+      const data = await this.getTasks({ status: 'processing', limit: 100 });
+      return data.tasks;
+    }
+  }
+
+  /**
+   * Get completed tasks (accessible by team)
+   */
+  async getCompletedTasksList(params?: {
+    agentId?: string;
+    limit?: number;
+    page?: number;
+  }): Promise<{ tasks: AITask[]; total: number; page: number; totalPages: number }> {
+    try {
+      const response = await this.api.get('/api/ai/registry/tasks/completed', { params });
+      return response.data;
+    } catch {
+      return this.getTasks({ status: 'completed', ...params });
+    }
+  }
+
+  /**
+   * Get full task history with timing
+   */
+  async getTaskHistory(params?: {
+    agentId?: string;
+    limit?: number;
+    page?: number;
+    dateRange?: { start: string; end: string };
+  }): Promise<{ tasks: AITask[]; total: number; page: number; totalPages: number }> {
+    try {
+      const response = await this.api.get('/api/ai/registry/tasks/history', { params });
+      return response.data;
+    } catch {
+      return this.getTasks({ ...params });
+    }
+  }
+
+  /**
+   * Get running tasks for a specific agent
+   */
+  async getAgentRunningTasks(agentId: string): Promise<AITask[]> {
+    try {
+      const response = await this.api.get(`/api/ai/registry/agents/${agentId}/tasks/running`);
+      return response.data.tasks || [];
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Get completed tasks for a specific agent
+   */
+  async getAgentCompletedTasks(agentId: string, limit: number = 50): Promise<AITask[]> {
+    try {
+      const response = await this.api.get(`/api/ai/registry/agents/${agentId}/tasks/completed`, {
+        params: { limit },
+      });
+      return response.data.tasks || [];
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Get task history for a specific agent
+   */
+  async getAgentTaskHistory(agentId: string, params?: {
+    limit?: number;
+    page?: number;
+  }): Promise<{ tasks: AITask[]; total: number }> {
+    try {
+      const response = await this.api.get(`/api/ai/registry/agents/${agentId}/tasks/history`, { params });
+      return response.data;
+    } catch {
+      return { tasks: [], total: 0 };
+    }
+  }
+
+  /**
+   * Submit task to specific agent
+   */
+  async submitAgentTask(agentId: string, input: any, priority?: string): Promise<AITask> {
+    const response = await this.api.post(`/api/ai/registry/agents/${agentId}/tasks`, {
+      input,
+      priority: priority || 'normal',
+    });
+    return response.data.task;
+  }
+
+  /**
+   * Run health check on all agents
+   */
+  async healthCheckAllAgents(): Promise<Record<string, { healthy: boolean; issues?: string[] }>> {
+    try {
+      const response = await this.api.get('/api/ai/registry/health');
+      return response.data;
+    } catch {
+      return {};
+    }
   }
 }
 
