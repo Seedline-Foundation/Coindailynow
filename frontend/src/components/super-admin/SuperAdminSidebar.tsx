@@ -155,6 +155,7 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
         { id: 'translations', label: 'Translations', icon: Globe, href: '/super-admin/translations', badge: 'NEW', badgeColor: 'bg-cyan-500 text-white' },
         { id: 'moderation', label: 'Moderation', icon: Shield, href: '/super-admin/content/moderation' },
         { id: 'categories', label: 'Categories', icon: BookOpen, href: '/super-admin/content/categories' },
+        { id: 'blog', label: 'Blog Management', icon: FileText, href: '/super-admin/blog', badge: 'NEW', badgeColor: 'bg-orange-500 text-white' },
       ]
     },
     {

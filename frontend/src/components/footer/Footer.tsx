@@ -137,6 +137,7 @@ const Footer: React.FC = () => {
       links: [
         { label: t('about'), href: '/about' },
         { label: 'Jobs', href: '/jobs' },
+        { label: 'Blog', href: '/blog' },
         { label: t('privacy'), href: '/privacy' },
         { label: t('terms'), href: '/terms' },
         { label: t('disclaimer'), href: '/disclaimer' },
@@ -145,6 +146,8 @@ const Footer: React.FC = () => {
     {
       title: 'Resources',
       links: [
+        { label: 'Platform Comparison', href: '/blog/comparison' },
+        { label: 'Crypto FAQ', href: '/blog/faq' },
         { label: 'Press Release', href: 'https://press.coindaily.online/', external: true },
         { label: 'Swap Token', href: 'https://imaswap.online', external: true },
         { label: 'Stake Your Token', href: 'https://stake.imaswap.online', external: true },

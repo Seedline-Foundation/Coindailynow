@@ -33,6 +33,12 @@
 - **DeFi & Web3**: Decentralized finance and Web3 developments in Africa
 - **Mobile Money & Crypto**: M-Pesa, MTN MoMo, Orange Money integration with crypto
 
+## Blog & Educational Content
+- [Blog Hub](https://coindaily.online/blog): 20+ pillar articles (4,700+ words each) on crypto for Africa
+- [Platform Comparison](https://coindaily.online/blog/comparison): Best crypto news platforms for Africa compared
+- [Crypto FAQ](https://coindaily.online/blog/faq): 15+ frequently asked questions about crypto in Africa
+- Topics: Bitcoin buying guides, exchange comparisons, regulations by country, crypto taxes, DeFi, NFTs, stablecoins, remittances, wallets, memecoins, Web3 jobs, blockchain agriculture, mobile money integration, scam protection, mining
+
 ## Coverage Regions
 - Nigeria (largest crypto market in Africa)
 - Kenya (Silicon Savannah, M-Pesa integration)

@@ -187,24 +187,39 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'WebSite',
-              name: 'CoinDaily Africa',
-              alternateName: 'CoinDaily',
-              url: 'https://coindaily.africa',
-              description: 'Africa\'s premier cryptocurrency news platform',
-              inLanguage: 'en-US',
+              name: 'CoinDaily',
+              alternateName: ['CoinDaily Africa', 'CoinDaily Online'],
+              url: 'https://coindaily.online',
+              description: 'Africa\'s premier cryptocurrency news platform with AI-powered content in 15+ African languages',
+              inLanguage: ['en', 'sw', 'ha', 'yo', 'am', 'zu', 'ig', 'af', 'so', 'rw', 'sn', 'lg', 'wo', 'om', 'ti'],
               isAccessibleForFree: true,
               publisher: {
                 '@type': 'Organization',
-                name: 'CoinDaily Africa',
-                url: 'https://coindaily.africa',
+                name: 'CoinDaily',
+                url: 'https://coindaily.online',
                 logo: {
                   '@type': 'ImageObject',
-                  url: 'https://coindaily.africa/logo.png'
+                  url: 'https://coindaily.online/images/logo.svg'
+                },
+                sameAs: [
+                  'https://twitter.com/coindailyafrica',
+                  'https://t.me/coindaily',
+                  'https://www.facebook.com/coindailyafrica',
+                  'https://www.linkedin.com/company/coindaily',
+                  'https://www.youtube.com/@coindaily'
+                ],
+                contactPoint: {
+                  '@type': 'ContactPoint',
+                  contactType: 'customer support',
+                  availableLanguage: ['English', 'Swahili', 'Hausa', 'Yoruba']
                 }
               },
               potentialAction: {
                 '@type': 'SearchAction',
-                target: 'https://coindaily.africa/search?q={search_term_string}',
+                target: {
+                  '@type': 'EntryPoint',
+                  urlTemplate: 'https://coindaily.online/search?q={search_term_string}'
+                },
                 'query-input': 'required name=search_term_string'
               }
             })

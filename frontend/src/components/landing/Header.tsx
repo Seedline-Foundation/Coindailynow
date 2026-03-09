@@ -28,6 +28,7 @@ import {
   RssIcon,
   CreditCardIcon,
   ChatBubbleLeftRightIcon,
+  BookOpenIcon,
 } from '@heroicons/react/24/outline';
 import { useLanguage, SUPPORTED_LANGUAGES } from '@/contexts/LanguageContext';
 import { FaXTwitter, FaTelegram, FaFacebookF, FaLinkedinIn, FaYoutube } from 'react-icons/fa6';
@@ -89,6 +90,7 @@ const NAV_MENUS = [
     icon: AcademicCapIcon,
     children: [
       { tKey: 'cryptoBasics', href: '/crypto-basics', icon: AcademicCapIcon },
+      { tKey: 'blog', href: '/blog', icon: BookOpenIcon },
     ],
   },
   {
