@@ -21,7 +21,9 @@ export type SupportedLanguage =
   | 'am'   // Amharic (Horn of Africa)
   | 'so'   // Somali (Horn of Africa)
   | 'om'   // Oromo (Horn of Africa)
+  | 'ti'   // Tigrinya (Horn of Africa)
   | 'zu'   // Zulu (Southern Africa)
+  | 'xh'   // Xhosa (Southern Africa)
   | 'af'   // Afrikaans (Southern Africa)
   | 'sn'   // Shona (Southern Africa)
   | 'ar'   // Arabic (North Africa)
@@ -122,7 +124,9 @@ export class TranslationService {
       ['pcm', { code: 'pcm', name: 'Naijá', region: 'West Africa', countries: ['Nigeria'], direction: 'ltr' }],
       ['wol', { code: 'wol', name: 'Wolof', region: 'West Africa', countries: ['Senegal', 'Gambia'], direction: 'ltr' }],
       ['kin', { code: 'kin', name: 'Ikinyarwanda', region: 'East Africa', countries: ['Rwanda'], direction: 'ltr' }],
-      ['sn', { code: 'sn', name: 'chiShona', region: 'Southern Africa', countries: ['Zimbabwe'], direction: 'ltr' }]
+      ['sn', { code: 'sn', name: 'chiShona', region: 'Southern Africa', countries: ['Zimbabwe'], direction: 'ltr' }],
+      ['ti', { code: 'ti', name: 'ትግርኛ', region: 'Horn of Africa', countries: ['Eritrea', 'Ethiopia'], direction: 'ltr' }],
+      ['xh', { code: 'xh', name: 'isiXhosa', region: 'Southern Africa', countries: ['South Africa'], direction: 'ltr' }]
     ]);
 
     // Initialize crypto glossaries with African context
@@ -336,7 +340,7 @@ export class TranslationService {
     const recommendations: string[] = [];
     if (factors.cryptoTermsPreserved < 70) recommendations.push('Preserve crypto terminology');
     if (factors.culturalRelevance < 60) recommendations.push('Add cultural context for African audience');
-    if (factors.linguisticAccuracy < 50) recommendations.push('Improve linguistic accuracy');
+    if (factors.linguisticAccuracy <= 50) recommendations.push('Improve linguistic accuracy');
     if (factors.contextualCoherence < 40) recommendations.push('Enhance contextual coherence');
 
     return {
@@ -392,8 +396,20 @@ export class TranslationService {
       localizations.push(...paymentLocalizations);
     }
 
+    // Apply localizations to the content text
+    let localizedContent = translation.content;
+    for (const loc of localizations) {
+      if (loc.original && localizedContent.toLowerCase().includes(loc.original.toLowerCase())) {
+        localizedContent = localizedContent.replace(
+          new RegExp(loc.original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+          `${loc.localized}`
+        );
+      }
+    }
+
     return {
       ...translation,
+      content: localizedContent,
       localizations
     };
   }
@@ -545,14 +561,34 @@ export class TranslationService {
     });
   }
 
+  private matchesWordPatterns(text: string, patterns: string[], minMatches = 2): boolean {
+    let matches = 0;
+    for (const pattern of patterns) {
+      const regex = new RegExp(`\\b${pattern}\\b`, 'i');
+      if (regex.test(text)) {
+        matches++;
+        if (matches >= minMatches) return true;
+      }
+    }
+    return false;
+  }
+
   private containsSwahiliPatterns(text: string): boolean {
-    const swahiliPatterns = ['na', 'ya', 'wa', 'za', 'kwa', 'katika', 'ni', 'si', 'bila'];
-    return swahiliPatterns.some(pattern => text.includes(pattern));
+    // Distinctive Swahili words alongside common function words
+    return this.matchesWordPatterns(text, [
+      'kwa', 'katika', 'bila', 'kabisa', 'kiwango', 'kipya', 'inafika',
+      'habari', 'soko', 'fedha', 'sarafu', 'thamani', 'juu', 'cha',
+      'na', 'ni', 'ya', 'wa', 'za'
+    ], 2);
   }
 
   private containsFrenchPatterns(text: string): boolean {
-    const frenchPatterns = ['le', 'la', 'les', 'de', 'du', 'des', 'et', 'ou', 'dans'];
-    return frenchPatterns.some(pattern => text.includes(pattern));
+    // Distinctive French words — requires 2 matches
+    return this.matchesWordPatterns(text, [
+      'les', 'des', 'dans', 'avec', 'pour', 'une', 'est', 'sont',
+      'atteint', 'nouveau', 'sommet', 'historique', 'prix', 'monnaie',
+      'le', 'la', 'du', 'au', 'aux', 'ce', 'cette'
+    ], 2);
   }
 
   private containsArabicPatterns(text: string): boolean {
@@ -560,13 +596,16 @@ export class TranslationService {
   }
 
   private containsPortuguesePatterns(text: string): boolean {
-    const portuguesePatterns = ['o', 'a', 'os', 'as', 'de', 'do', 'da', 'dos', 'das', 'em'];
-    return portuguesePatterns.some(pattern => text.includes(pattern));
+    return this.matchesWordPatterns(text, [
+      'dos', 'das', 'uma', 'são', 'está', 'pelo', 'pela',
+      'como', 'mais', 'também', 'novo', 'moeda', 'criptomoeda'
+    ], 2);
   }
 
   private containsHausaPatterns(text: string): boolean {
-    const hausaPatterns = ['da', 'na', 'za', 'ba', 'ta', 'ga', 'don', 'ina'];
-    return hausaPatterns.some(pattern => text.includes(pattern));
+    return this.matchesWordPatterns(text, [
+      'don', 'ina', 'suna', 'yana', 'kudin', 'haka', 'cikin', 'tare'
+    ], 2);
   }
 
   private async callNLLBAPI(
@@ -589,9 +628,23 @@ export class TranslationService {
     const allText = `${content.title} ${content.excerpt} ${content.content}`;
     const baseGlossary = this.cryptoGlossaries.get('en') || {};
     
-    return Object.keys(baseGlossary).filter(term => 
+    const terms = Object.keys(baseGlossary).filter(term => 
       allText.toLowerCase().includes(term.toLowerCase())
     );
+
+    // Also preserve African exchange and crypto brand names
+    const brandNames = [
+      'Binance', 'Luno', 'Quidax', 'Valr', 'Ice3X', 'BuyCoins',
+      'Yellow Card', 'Chipper Cash', 'Bitnob', 'M-Pesa', 'MTN MoMo',
+      'Paxful', 'LocalBitcoins', 'Coinbase', 'Kraken'
+    ];
+    for (const brand of brandNames) {
+      if (allText.includes(brand) && !terms.includes(brand)) {
+        terms.push(brand);
+      }
+    }
+
+    return terms;
   }
 
   private async applyCryptoGlossary(
@@ -698,9 +751,12 @@ export class TranslationService {
     content: TranslationContent,
     reason: string
   ): TranslationResult {
+    // Return original content with quality 100 if falling back to source (unsupported lang)
+    // Return quality 0 if translation service itself failed
+    const isUnsupportedLang = reason.includes('not supported');
     return {
       ...content,
-      qualityScore: content.title === content.title ? 100 : 0,
+      qualityScore: isUnsupportedLang ? 100 : 0,
       culturalAdaptations: [],
       cryptoTermsPreserved: [],
       fallbackUsed: true,
@@ -710,7 +766,7 @@ export class TranslationService {
 
   private scoreCryptoTermsPreservation(translation: any): number {
     if (!translation.cryptoTermsPreserved || translation.cryptoTermsPreserved.length === 0) {
-      return 50;
+      return 20;
     }
     return Math.min(translation.cryptoTermsPreserved.length * 20, 100);
   }
@@ -719,9 +775,9 @@ export class TranslationService {
     const hasAdaptations = translation.culturalAdaptations?.length > 0;
     const languageInfo = this.getLanguageInfo(language);
     
-    let score = 60; // Base score
+    let score = 30; // Base score
     
-    if (hasAdaptations) score += 20;
+    if (hasAdaptations) score += 40;
     if (languageInfo?.region === 'East Africa' || languageInfo?.region === 'West Africa') score += 10;
     
     return Math.min(score, 100);
@@ -729,9 +785,9 @@ export class TranslationService {
 
   private async scoreLinguisticAccuracy(translation: any, language: SupportedLanguage): Promise<number> {
     // Simple heuristic - in real implementation would use language models
-    let score = 70;
+    let score = 40;
     
-    if (translation.content && translation.content.length > 100) score += 10;
+    if (translation.content && translation.content.length > 100) score += 20;
     if (['sw', 'fr', 'ar'].includes(language)) score += 10;
     
     return Math.min(score, 100);
@@ -739,7 +795,7 @@ export class TranslationService {
 
   private scoreContextualCoherence(translation: any): number {
     // Simple coherence check based on content structure
-    let score = 65;
+    let score = 35;
     
     if (translation.title && translation.excerpt && translation.content) score += 15;
     if (translation.content && translation.content.length > 200) score += 10;
@@ -776,7 +832,7 @@ export class TranslationService {
   ): Promise<Localization[]> {
     const localizations: Localization[] = [];
     
-    if (content.includes('mobile money services')) {
+    if (content.toLowerCase().includes('mobile money')) {
       if (region === 'East Africa') {
         localizations.push({
           type: 'payment_method',

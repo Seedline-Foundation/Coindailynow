@@ -70,6 +70,21 @@ router.post('/api/indexnow/ping-sitemaps', async (req: Request, res: Response) =
 });
 
 /**
+ * POST /api/indexnow/websub - Publish topic updates to configured WebSub hubs
+ * Body: { topicUrl?: string }
+ */
+router.post('/api/indexnow/websub', async (req: Request, res: Response) => {
+  try {
+    const topicUrl = (req.body?.topicUrl as string) || `${process.env.SITE_URL || 'https://coindaily.online'}/rss.xml`;
+    const results = await indexNowService.publishWebSub(topicUrl);
+    res.json({ success: true, topicUrl, results });
+  } catch (error) {
+    console.error('[IndexNow] WebSub publish error:', error);
+    res.status(500).json({ error: 'Failed to publish WebSub topic update' });
+  }
+});
+
+/**
  * GET /api/indexnow/key - Get current IndexNow API key (admin only)
  */
 router.get('/api/indexnow/key', (req: Request, res: Response) => {

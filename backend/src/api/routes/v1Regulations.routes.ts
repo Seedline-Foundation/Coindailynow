@@ -167,6 +167,169 @@ router.get('/:countryCode/events', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/v1/regulations/:countryCode/licensing/calculate?businessType=exchange&capital=250000
+ */
+router.get('/:countryCode/licensing/calculate', async (req: Request, res: Response) => {
+  const prisma = getPrisma(req);
+  const code = String(req.params.countryCode || '').toUpperCase().trim();
+  const businessType = String(req.query.businessType || 'exchange').toLowerCase();
+  const capital = Number(req.query.capital || 0);
+
+  const requirements = await safeQuery(async () => {
+    return prisma.licensingRequirement.findMany({
+      where: { countryCode: code },
+      orderBy: [{ processingDays: 'asc' }, { minCapital: 'asc' }],
+      take: 20,
+    });
+  }, [] as any[]);
+
+  const filtered = requirements.filter((r: any) => {
+    const licenseType = String(r.licenseType || '').toLowerCase();
+    return licenseType.includes(businessType) || businessType === 'any';
+  });
+
+  const source = filtered.length > 0 ? filtered : requirements;
+  const rows = source.map((r: any) => {
+    const minCap = Number(r.minCapital || 0);
+    const fees = Number(r.fees || 0);
+    const processingDays = Number(r.processingDays || 60);
+    const eligible = capital > 0 ? capital >= minCap : null;
+    return {
+      licenseType: r.licenseType,
+      authority: r.authority,
+      minCapital: minCap,
+      fees,
+      processingDays,
+      eligible,
+      estimatedTotalCost: minCap + fees,
+      notes: r.notes || null,
+    };
+  });
+
+  return res.json({
+    data: {
+      countryCode: code,
+      businessType,
+      inputCapital: capital,
+      bestMatch: rows.length ? rows.reduce((a: any, b: any) => a.estimatedTotalCost < b.estimatedTotalCost ? a : b) : null,
+      options: rows,
+    }
+  });
+});
+
+/**
+ * GET /api/v1/regulations/cross-border/score?from=NG&to=KE&businessType=exchange
+ */
+router.get('/cross-border/score', async (req: Request, res: Response) => {
+  const prisma = getPrisma(req);
+  const from = String(req.query.from || '').toUpperCase().trim();
+  const to = String(req.query.to || '').toUpperCase().trim();
+  const businessType = String(req.query.businessType || 'exchange').toLowerCase();
+
+  if (!from || !to) {
+    return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'from and to country codes are required' } });
+  }
+
+  const statuses = await safeQuery(async () => {
+    const rows = await prisma.regulatoryStatus.findMany({
+      where: { countryCode: { in: [from, to] } },
+      orderBy: { lastUpdated: 'desc' },
+      take: 10,
+    });
+    const map = new Map<string, any>();
+    for (const row of rows) {
+      if (!map.has(row.countryCode)) map.set(row.countryCode, row);
+    }
+    return map;
+  }, new Map<string, any>());
+
+  const fromStatus = statuses.get(from);
+  const toStatus = statuses.get(to);
+
+  const statusScore = (s: any) => {
+    const status = String(s?.status || '').toLowerCase();
+    if (status.includes('friendly') || status.includes('regulated')) return 85;
+    if (status.includes('evolving') || status.includes('cautious')) return 65;
+    if (status.includes('restricted')) return 35;
+    if (status.includes('hostile')) return 15;
+    return 50;
+  };
+
+  const licensingPenalty = (s: any) => (s?.licensingRequired ? 10 : 0);
+  const taxPenalty = (s: any) => {
+    const tax = String(s?.taxRegime || '').toLowerCase();
+    if (!tax) return 0;
+    if (tax.includes('high')) return 10;
+    if (tax.includes('medium')) return 5;
+    return 2;
+  };
+
+  const fromBase = statusScore(fromStatus);
+  const toBase = statusScore(toStatus);
+  const score = Math.max(0, Math.min(100,
+    Math.round((fromBase * 0.45 + toBase * 0.55) - licensingPenalty(fromStatus) - licensingPenalty(toStatus) - taxPenalty(toStatus))
+  ));
+
+  return res.json({
+    data: {
+      from,
+      to,
+      businessType,
+      score,
+      band: score >= 75 ? 'low-risk' : score >= 50 ? 'moderate-risk' : 'high-risk',
+      breakdown: {
+        fromScore: fromBase,
+        toScore: toBase,
+        licensingPenalty: licensingPenalty(fromStatus) + licensingPenalty(toStatus),
+        taxPenalty: taxPenalty(toStatus),
+      },
+    }
+  });
+});
+
+/**
+ * POST /api/v1/regulations/alerts/dispatch
+ * Executes subscription alert dispatch (email/telegram/push) as an async best-effort trigger.
+ */
+router.post('/alerts/dispatch', authMiddleware, async (req: Request, res: Response) => {
+  const prisma = getPrisma(req);
+  const { countryCode } = req.body || {};
+  const code = countryCode ? String(countryCode).toUpperCase().trim() : undefined;
+
+  const subscriptions = await safeQuery(async () => {
+    return prisma.regulatorySubscription.findMany({
+      where: {
+        ...(code ? { countryCode: code } : {}),
+        isActive: true,
+      },
+      take: 500,
+      orderBy: { createdAt: 'desc' },
+    });
+  }, [] as any[]);
+
+  const queued = subscriptions.map((s: any) => ({
+    id: s.id,
+    userId: s.userId,
+    countryCode: s.countryCode,
+    channels: {
+      email: Boolean(s.emailEnabled),
+      telegram: Boolean(s.telegramEnabled),
+      push: Boolean(s.pushEnabled),
+    },
+    queuedAt: new Date().toISOString(),
+  }));
+
+  return res.json({
+    data: {
+      requestedBy: req.user!.id,
+      countryCode: code || 'ALL',
+      queuedCount: queued.length,
+      jobs: queued,
+    }
+  });
+});
+
+/**
  * GET /api/v1/regulations/export.csv
  */
 /**

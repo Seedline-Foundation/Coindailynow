@@ -230,8 +230,10 @@ export const legalResolvers = {
         console.error('Error fetching retention policies:', error);
         throw new Error('Failed to fetch retention policies');
       }
-    },
+    }
+  },
 
+  Mutation: {
     /**
      * Generate compliance report
      */
@@ -269,10 +271,8 @@ export const legalResolvers = {
         console.error('Error generating compliance report:', error);
         throw new Error('Failed to generate compliance report');
       }
-    }
-  },
+    },
 
-  Mutation: {
     /**
      * Record user consent
      */
@@ -331,9 +331,9 @@ export const legalResolvers = {
     },
 
     /**
-     * Withdraw consent
+     * Revoke consent
      */
-    withdrawConsent: async (
+    revokeConsent: async (
       parent: any,
       args: { userId: string; categories: string[] },
       context: Context,
@@ -507,9 +507,9 @@ export const legalResolvers = {
     },
 
     /**
-     * Execute data retention cleanup (Admin only)
+     * Run data retention cleanup (Admin only)
      */
-    executeDataRetentionCleanup: async (
+    runDataRetentionCleanup: async (
       parent: any,
       args: {},
       context: Context,

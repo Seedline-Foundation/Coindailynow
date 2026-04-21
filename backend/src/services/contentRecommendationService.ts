@@ -613,7 +613,7 @@ export class ContentRecommendationService {
   private async extractContentFeatures(articles: Article[]): Promise<ContentFeatures[]> {
     return Promise.all(articles.map(async (article: any) => {
       // Calculate popularity metrics
-      const engagements = article.userEngagements || [];
+      const engagements = article.UserEngagement || article.userEngagements || [];
       const views = engagements.filter((e: any) => e.actionType === 'VIEW').length;
       const likes = engagements.filter((e: any) => e.actionType === 'LIKE').length;
       const shares = engagements.filter((e: any) => e.actionType === 'SHARE').length;
@@ -631,7 +631,7 @@ export class ContentRecommendationService {
       const features: ContentFeatures = {
         articleId: article.id,
         categoryId: article.categoryId,
-        tags: article.tags?.map((tag: any) => tag.name) || [],
+        tags: this.parseTags(article.tags),
         wordCount: article.wordCount || 0,
         readingTime: article.readingTime || 0,
         africanRelevanceScore,
@@ -653,38 +653,47 @@ export class ContentRecommendationService {
   }
 
   /**
+   * Parse tags from JSON string or array
+   */
+  private parseTags(tags: any): string[] {
+    if (!tags) return [];
+    if (Array.isArray(tags)) return tags.map((t: any) => typeof t === 'string' ? t : t.name || '');
+    if (typeof tags === 'string') {
+      try { return JSON.parse(tags); } catch { return []; }
+    }
+    return [];
+  }
+
+  /**
    * Calculate African relevance score for content
    */
   private calculateAfricanRelevanceScore(article: any): number {
     const content = `${article.title} ${article.content || ''} ${article.excerpt || ''}`.toLowerCase();
-    let score = 0;
-    let totalPossible = 0;
+    let matchCount = 0;
 
     // Check for African country mentions
     this.africanCountries.forEach(country => {
-      totalPossible += 1;
       if (content.includes(country.toLowerCase())) {
-        score += 1;
+        matchCount += 1;
       }
     });
 
     // Check for African exchange mentions
     this.africanExchanges.forEach(exchange => {
-      totalPossible += 1;
       if (content.includes(exchange.toLowerCase().replace('_', ' '))) {
-        score += 1;
+        matchCount += 1;
       }
     });
 
     // Check for African crypto topics
     this.africanCryptoTopics.forEach(topic => {
-      totalPossible += 1;
       if (content.includes(topic)) {
-        score += 1;
+        matchCount += 1;
       }
     });
 
-    return totalPossible > 0 ? score / totalPossible : 0;
+    // Normalize: 1 match = 0.2, 3 matches = 0.6, 5+ matches = 1.0
+    return Math.min(1.0, matchCount * 0.2);
   }
 
   /**
@@ -1119,20 +1128,6 @@ Return JSON format:
   }
 
   /**
-   * Parse tags from JSON string or return empty array
-   */
-  private parseTags(tags: string | null): string[] {
-    if (!tags) return [];
-    
-    try {
-      const parsed = JSON.parse(tags);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-
-  /**
    * Update user behavior in real-time
    */
   async updateUserBehavior(userId: string, engagement: {
@@ -1222,7 +1217,7 @@ Return JSON format:
             trendingScore: africanScore * 0.6 + engagementScore * 0.4
           };
         })
-        .filter(item => item.africanScore > 0.3)
+        .filter(item => item.africanScore >= 0.3)
         .sort((a, b) => b.trendingScore - a.trendingScore)
         .slice(0, limit);
 

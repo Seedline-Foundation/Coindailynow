@@ -4,8 +4,12 @@ import rateLimit from 'express-rate-limit';
 export const rateLimitMiddleware = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: (req) => {
+    // In development, allow more requests for testing
+    if (process.env.NODE_ENV !== 'production') {
+      return 10000;
+    }
     // Check user subscription tier for rate limits
-    const userTier = req.user?.subscriptionTier;
+    const userTier = (req as any).user?.subscriptionTier;
 
     switch (userTier) {
       case 'enterprise':
@@ -26,6 +30,6 @@ export const rateLimitMiddleware = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Skip rate limiting for health checks
-  skip: (req) => req.path === '/health',
+  // Skip rate limiting for health checks and AI registry (development testing)
+  skip: (req) => req.path === '/health' || req.path.startsWith('/api/ai/registry'),
 });

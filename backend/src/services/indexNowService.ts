@@ -16,6 +16,10 @@ export class IndexNowService {
   private readonly siteUrl = process.env.SITE_URL || 'https://coindaily.online';
   private readonly indexNowKey = process.env.INDEXNOW_API_KEY || this.generateKey();
   private readonly googleApiKey = process.env.GOOGLE_INDEXING_API_KEY;
+  private readonly webSubHubs = (process.env.WEBSUB_HUB_URLS || 'https://pubsubhubbub.appspot.com')
+    .split(',')
+    .map((hub) => hub.trim())
+    .filter(Boolean);
 
   private generateKey(): string {
     return crypto.randomBytes(16).toString('hex');
@@ -139,11 +143,62 @@ export class IndexNowService {
   }
 
   /**
+   * Publish a topic update to configured WebSub hubs.
+   */
+  async publishWebSub(topicUrl: string): Promise<IndexingResult[]> {
+    const hubs = this.webSubHubs;
+    if (hubs.length === 0) {
+      return [
+        {
+          engine: 'WebSub',
+          success: false,
+          message: 'No WebSub hub configured',
+        },
+      ];
+    }
+
+    const results = await Promise.all(
+      hubs.map(async (hub): Promise<IndexingResult> => {
+        try {
+          const body = new URLSearchParams({
+            'hub.mode': 'publish',
+            'hub.url': topicUrl,
+          }).toString();
+
+          const response = await fetch(hub, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body,
+          });
+
+          return {
+            engine: `WebSub (${hub})`,
+            success: response.ok,
+            statusCode: response.status,
+            message: response.ok ? 'WebSub publish accepted' : `Status: ${response.status}`,
+          };
+        } catch (error) {
+          return {
+            engine: `WebSub (${hub})`,
+            success: false,
+            message: error instanceof Error ? error.message : 'Unknown error',
+          };
+        }
+      })
+    );
+
+    return results;
+  }
+
+  /**
    * Notify all search engines about a new/updated article
    * Call this after publishing or updating any article
    */
   async notifyAllEngines(articleSlug: string): Promise<IndexingResult[]> {
     const articleUrl = `${this.siteUrl}/news/${articleSlug}`;
+    const mainFeedUrl = `${this.siteUrl}/rss.xml`;
     const results: IndexingResult[] = [];
 
     // IndexNow (covers Bing, Yandex, Seznam, Naver)
@@ -154,6 +209,9 @@ export class IndexNowService {
 
     // Bing sitemap ping
     results.push(await this.pingBing());
+
+    // WebSub publish for feed subscribers/crawlers
+    results.push(...(await this.publishWebSub(mainFeedUrl)));
 
     // Log the indexing attempt
     try {
