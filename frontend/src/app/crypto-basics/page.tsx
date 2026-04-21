@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Header from '@/components/landing/Header';
 import Footer from '@/components/footer/Footer';
+import glossaryTerms from '@/data/glossaryTerms';
 
 const learningPaths = [
   {
@@ -97,23 +98,15 @@ const languages = [
   { code: 'ar', name: 'العربية', flag: '🇪🇬', progress: 45 },
 ];
 
-const glossaryTerms = [
-  { term: 'HODL', def: 'Hold On for Dear Life — holding crypto long-term instead of selling' },
-  { term: 'P2P', def: 'Peer-to-Peer — direct trading between users without intermediary' },
-  { term: 'DeFi', def: 'Decentralized Finance — financial services on blockchain without banks' },
-  { term: 'DYOR', def: 'Do Your Own Research — always verify before investing' },
-  { term: 'KYC', def: 'Know Your Customer — identity verification required by exchanges' },
-  { term: 'Gas Fee', def: 'Transaction fee paid to process blockchain operations' },
-  { term: 'Stablecoin', def: 'Crypto pegged to a stable asset like USD (e.g., USDT, USDC)' },
-  { term: 'Seed Phrase', def: '12-24 word backup code for your crypto wallet — NEVER share it' },
-  { term: 'Rug Pull', def: 'Scam where project creators disappear with investors\' money' },
-  { term: 'Whale', def: 'Person or entity holding very large amounts of cryptocurrency' },
-];
+const ALPHABET = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const TERMS_PER_PAGE = 50;
 
 export default function CryptoBasicsPage() {
   const [activeTab, setActiveTab] = useState<'paths' | 'countries' | 'glossary'>('paths');
   const [activePath, setActivePath] = useState('beginner');
   const [searchGlossary, setSearchGlossary] = useState('');
+  const [activeLetter, setActiveLetter] = useState<string | null>(null);
+  const [glossaryPage, setGlossaryPage] = useState(0);
   const [language, setLanguage] = useState('en');
 
   const colorMap: Record<string, string> = {
@@ -124,10 +117,39 @@ export default function CryptoBasicsPage() {
     red: 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700',
   };
 
-  const filteredTerms = glossaryTerms.filter(t =>
-    t.term.toLowerCase().includes(searchGlossary.toLowerCase()) ||
-    t.def.toLowerCase().includes(searchGlossary.toLowerCase())
-  );
+  const filteredTerms = useMemo(() => {
+    let result = glossaryTerms;
+    if (activeLetter) {
+      if (activeLetter === '#') {
+        result = result.filter(t => /^[^a-zA-Z]/.test(t.term));
+      } else {
+        result = result.filter(t => t.term.toUpperCase().startsWith(activeLetter));
+      }
+    }
+    if (searchGlossary) {
+      const q = searchGlossary.toLowerCase();
+      result = result.filter(t =>
+        t.term.toLowerCase().includes(q) ||
+        t.def.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [searchGlossary, activeLetter]);
+
+  const totalGlossaryPages = Math.ceil(filteredTerms.length / TERMS_PER_PAGE);
+  const pagedTerms = filteredTerms.slice(glossaryPage * TERMS_PER_PAGE, (glossaryPage + 1) * TERMS_PER_PAGE);
+
+  const letterCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const letter of ALPHABET) {
+      if (letter === '#') {
+        counts[letter] = glossaryTerms.filter(t => /^[^a-zA-Z]/.test(t.term)).length;
+      } else {
+        counts[letter] = glossaryTerms.filter(t => t.term.toUpperCase().startsWith(letter)).length;
+      }
+    }
+    return counts;
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -267,20 +289,75 @@ export default function CryptoBasicsPage() {
 
         {/* Glossary Tab */}
         {activeTab === 'glossary' && (
-          <div className="max-w-3xl mx-auto">
-            <div className="mb-6">
-              <input type="text" value={searchGlossary} onChange={e => setSearchGlossary(e.target.value)}
-                placeholder="Search crypto terms..."
+          <div className="max-w-4xl mx-auto">
+            {/* Stats */}
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="font-semibold text-orange-600">{glossaryTerms.length}</span> terms
+                {(searchGlossary || activeLetter) && (
+                  <> &middot; <span className="font-semibold">{filteredTerms.length}</span> matching</>
+                )}
+              </p>
+              {(searchGlossary || activeLetter) && (
+                <button onClick={() => { setSearchGlossary(''); setActiveLetter(null); setGlossaryPage(0); }}
+                  className="text-sm text-orange-600 hover:underline">Clear filters</button>
+              )}
+            </div>
+
+            {/* Search */}
+            <div className="mb-4">
+              <input type="text" value={searchGlossary}
+                onChange={e => { setSearchGlossary(e.target.value); setGlossaryPage(0); }}
+                placeholder="Search 1,600+ crypto & blockchain terms..."
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-              {filteredTerms.map((t, i) => (
-                <div key={t.term} className={`p-4 ${i > 0 ? 'border-t border-gray-200 dark:border-gray-700' : ''}`}>
-                  <h4 className="font-bold text-orange-600 text-lg">{t.term}</h4>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">{t.def}</p>
-                </div>
+
+            {/* Alphabet Nav */}
+            <div className="flex flex-wrap gap-1 mb-6 justify-center">
+              {ALPHABET.map(letter => (
+                <button key={letter}
+                  onClick={() => { setActiveLetter(activeLetter === letter ? null : letter); setGlossaryPage(0); }}
+                  disabled={letterCounts[letter] === 0}
+                  className={`w-9 h-9 rounded-lg text-sm font-bold transition-colors ${
+                    activeLetter === letter
+                      ? 'bg-orange-600 text-white'
+                      : letterCounts[letter] === 0
+                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-orange-900/20'
+                  }`}>
+                  {letter}
+                </button>
               ))}
             </div>
+
+            {/* Term List */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+              {pagedTerms.length > 0 ? (
+                pagedTerms.map((t, i) => (
+                  <div key={`${t.term}-${i}`} className={`p-4 ${i > 0 ? 'border-t border-gray-200 dark:border-gray-700' : ''}`}>
+                    <h4 className="font-bold text-orange-600 text-lg">{t.term}</h4>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mt-1 leading-relaxed">{t.def}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="p-8 text-center text-gray-500">No terms found matching your search.</div>
+              )}
+            </div>
+
+            {/* Pagination */}
+            {totalGlossaryPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <button disabled={glossaryPage === 0}
+                  onClick={() => setGlossaryPage(p => p - 1)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 disabled:opacity-40">← Prev</button>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  Page {glossaryPage + 1} of {totalGlossaryPages}
+                </span>
+                <button disabled={glossaryPage >= totalGlossaryPages - 1}
+                  onClick={() => setGlossaryPage(p => p + 1)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 disabled:opacity-40">Next →</button>
+              </div>
+            )}
 
             {/* Crypto Lingo Callout */}
             <div className="mt-8 p-6 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl text-white">
