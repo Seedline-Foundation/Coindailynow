@@ -4,6 +4,8 @@ import './globals.css';
 import { AuthProvider } from '../hooks/useAuth';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import TrafficCopClient from '@/components/security/TrafficCopClient';
+import AppInstallAndOfflinePrompt from '@/components/pwa/AppInstallAndOfflinePrompt';
+import PostHogProvider from '@/components/providers/PostHogProvider';
 
 // Font configurations
 const inter = Inter({ 
@@ -241,10 +243,13 @@ export default function RootLayout({
         {/* Main app content */}
         <LanguageProvider>
           <AuthProvider>
+            <PostHogProvider>
             <div id="main-content" className="min-h-screen">
               {children}
             </div>
+            <AppInstallAndOfflinePrompt />
             <TrafficCopClient />
+            </PostHogProvider>
           </AuthProvider>
         </LanguageProvider>
         

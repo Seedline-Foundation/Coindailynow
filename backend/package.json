@@ -90,6 +90,7 @@
     "openai": "^5.23.2",
     "otplib": "^12.0.1",
     "pdf-lib": "^1.17.1",
+    "posthog-node": "^5.28.0",
     "redis": "^5.8.3",
     "rss-parser": "^3.13.0",
     "sharp": "^0.34.4",
