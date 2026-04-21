@@ -131,3 +131,25 @@ dump.rdb
 
 # Prisma
 prisma/migrations/*/migration.sql
+
+# Jest run artifacts
+backend/jest-*.json
+jest-*.json
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Manual backup files
+*.old-backup
+*.broken.backup*
+
+# Ad-hoc scratch files at repo root
+/ollama-test.json
+/task-test.json
+/tmp-query.json
+/test-output.txt
+/test-gql.txt
+/test-agents.mjs
+/test-agents.ps1
+/validate-schema.js
+/validate-schema2.js
