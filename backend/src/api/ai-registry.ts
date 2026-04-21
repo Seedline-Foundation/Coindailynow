@@ -425,16 +425,18 @@ router.post('/agents/:id/tasks', async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    const taskId = await registry.submitTask(req.params.id, input, priority);
+    const task = await registry.submitTask(req.params.id, input, priority);
 
     res.status(201).json({
       success: true,
       message: 'Task submitted successfully',
       data: {
-        taskId,
+        id: task.id,
+        taskId: task.id,
         agentId: req.params.id,
-        priority,
-        status: 'queued',
+        priority: task.priority,
+        status: task.status,
+        createdAt: task.createdAt,
       },
       timestamp: new Date().toISOString(),
     });

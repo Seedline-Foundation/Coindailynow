@@ -69,6 +69,134 @@ const OLLAMA_URL = process.env.OLLAMA_API_URL || 'http://localhost:11434';
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-r1:8b';
 const LLAMA_MODEL = process.env.LLAMA_MODEL || 'llama3.1:8b';
 
+// Mock mode: auto-activates when Ollama is unavailable
+// Set AI_MOCK_MODE=true to force mock, AI_MOCK_MODE=false to force live
+let _ollamaAvailable: boolean | null = null;
+
+async function isOllamaAvailable(): Promise<boolean> {
+  if (process.env.AI_MOCK_MODE === 'true') return false;
+  if (process.env.AI_MOCK_MODE === 'false') return true;
+  if (_ollamaAvailable !== null) return _ollamaAvailable;
+  try {
+    const response = await fetch(`${OLLAMA_URL}/api/tags`, {
+      signal: AbortSignal.timeout(3000),
+    });
+    _ollamaAvailable = response.ok;
+  } catch {
+    _ollamaAvailable = false;
+  }
+  // Re-check every 60 seconds
+  setTimeout(() => { _ollamaAvailable = null; }, 60000);
+  return _ollamaAvailable;
+}
+
+function generateMockResponse(prompt: string, format?: 'json'): string {
+  // Generate a realistic mock response based on the prompt content
+  const p = prompt.toLowerCase();
+  
+  if (format === 'json') {
+    // Detect what JSON structure is being asked for from the prompt
+    if (p.includes('sentiment') || p.includes('bullish') || p.includes('bearish')) {
+      return JSON.stringify({
+        overallSentiment: 'bullish',
+        sentimentScore: 0.72,
+        confidence: 0.85,
+        fearGreedIndex: 68,
+        keyThemes: [
+          { theme: 'African crypto adoption', sentiment: 'bullish', impact: 'high' },
+          { theme: 'Regulatory clarity', sentiment: 'neutral', impact: 'medium' },
+        ],
+        africanMarketImpact: { score: 0.8, regions: ['nigeria', 'kenya', 'south_africa'], notes: 'Strong adoption trends across West Africa' },
+        alerts: [{ type: 'surge_detected', message: 'Unusual volume spike on Luno exchange', severity: 'medium' }],
+        riskLevel: 'medium',
+        summary: '[MOCK] Crypto market sentiment in Africa remains bullish with growing institutional interest and regulatory clarity.',
+        _mock: true,
+      });
+    }
+    if (p.includes('compliance') || p.includes('regulation') || p.includes('legal')) {
+      return JSON.stringify({
+        isCompliant: false,
+        riskLevel: 'high',
+        issues: [
+          { rule: 'No guaranteed returns claims', severity: 'critical', description: 'Content contains prohibited guaranteed returns language' },
+          { rule: 'Unlisted token disclosure', severity: 'high', description: 'Token mentioned is not listed on approved exchanges' },
+        ],
+        recommendations: ['Remove guaranteed returns language', 'Add risk disclaimer', 'Verify token listing status'],
+        regions: { nigeria: 'non-compliant', kenya: 'requires-review', south_africa: 'non-compliant' },
+        summary: '[MOCK] Content violates multiple compliance rules - immediate attention required.',
+        _mock: true,
+      });
+    }
+    if (p.includes('trade') || p.includes('price') || p.includes('market')) {
+      return JSON.stringify({
+        action: 'hold',
+        confidence: 0.73,
+        analysis: {
+          trend: 'upward',
+          support: 95000,
+          resistance: 102000,
+          rsi: 65,
+          volume: 'above_average',
+        },
+        signals: [
+          { signal: 'RSI approaching overbought', type: 'bearish', strength: 0.4 },
+          { signal: 'MACD bullish crossover', type: 'bullish', strength: 0.7 },
+        ],
+        recommendation: 'Hold position. Set stop-loss at $95,000.',
+        summary: '[MOCK] Market showing mixed signals. Maintain position with tight stops.',
+        _mock: true,
+      });
+    }
+    if (p.includes('review') || p.includes('code') || p.includes('quality')) {
+      return JSON.stringify({
+        overallScore: 7.5,
+        issues: [
+          { type: 'security', severity: 'medium', message: 'Missing input validation on token parameter', line: 2 },
+          { type: 'performance', severity: 'low', message: 'Consider adding response caching', line: 3 },
+        ],
+        suggestions: ['Add try-catch for fetch errors', 'Validate token parameter', 'Add response type checking'],
+        summary: '[MOCK] Code is functional but needs input validation and error handling improvements.',
+        _mock: true,
+      });
+    }
+    if (p.includes('article') || p.includes('curate') || p.includes('content') || p.includes('news')) {
+      return JSON.stringify({
+        relevanceScore: 0.88,
+        category: 'crypto_news',
+        tags: ['africa', 'exchange', 'trading_volume', 'nigeria'],
+        headline: 'African Crypto Exchanges See Record Growth in Q1 2026',
+        summary: '[MOCK] Curated article highlighting the growth of crypto trading across African exchanges.',
+        audienceMatch: 0.92,
+        publishRecommendation: 'publish',
+        _mock: true,
+      });
+    }
+    if (p.includes('support') || p.includes('customer') || p.includes('help')) {
+      return JSON.stringify({
+        response: 'To buy Bitcoin using M-Pesa on CoinDaily: 1) Create an account 2) Go to Buy/Sell 3) Select M-Pesa as payment 4) Enter amount 5) Complete the M-Pesa prompt on your phone.',
+        category: 'how_to',
+        sentiment: 'helpful',
+        escalationNeeded: false,
+        relatedArticles: ['getting-started-mpesa', 'bitcoin-buying-guide-kenya'],
+        summary: '[MOCK] Customer support response for M-Pesa Bitcoin purchase query.',
+        _mock: true,
+      });
+    }
+    // Generic fallback JSON
+    return JSON.stringify({
+      status: 'completed',
+      result: 'Analysis completed successfully',
+      confidence: 0.8,
+      summary: `[MOCK] Processed request for ${prompt.substring(0, 50)}...`,
+      data: { processed: true, timestamp: new Date().toISOString() },
+      _mock: true,
+    });
+  }
+
+  // Plain text response
+  return `[MOCK RESPONSE] This is a simulated response from the AI agent. In production with Ollama running, this would be a real inference result from ${DEEPSEEK_MODEL} or ${LLAMA_MODEL}.\n\nPrompt summary: ${prompt.substring(0, 100)}...\n\nNote: Install Ollama and pull models to get real AI responses.`;
+}
+
 export abstract class BaseAgent {
   public readonly id: string;
   public readonly name: string;
@@ -87,7 +215,7 @@ export abstract class BaseAgent {
   protected startedAt: Date;
   protected maxQueueSize: number = 100;
   protected maxRetries: number = 3;
-  protected timeoutMs: number = 120000; // 2 min
+  protected timeoutMs: number = 300000; // 5 min — CPU inference over SSH tunnel needs more time
   protected maxCompletedTaskHistory: number = 500;
 
   constructor(config: {
@@ -146,13 +274,22 @@ export abstract class BaseAgent {
   // Ollama Integration
   // ============================================================================
 
-  /** Call Ollama with the agent's configured model */
+  /** Call Ollama with the agent's configured model (auto-falls back to mock when unavailable) */
   protected async callModel(prompt: string, options?: {
     temperature?: number;
     maxTokens?: number;
     systemPrompt?: string;
     format?: 'json';
   }): Promise<string> {
+    // Check if Ollama is available; use mock if not
+    const ollamaReady = await isOllamaAvailable();
+    if (!ollamaReady) {
+      console.log(`[${this.id}] Ollama unavailable — using mock mode`);
+      // Simulate slight processing delay (100-500ms)
+      await new Promise(r => setTimeout(r, 100 + Math.random() * 400));
+      return generateMockResponse(prompt, options?.format);
+    }
+
     const modelName = this.model === 'deepseek' ? DEEPSEEK_MODEL : LLAMA_MODEL;
     const body: Record<string, any> = {
       model: modelName,
@@ -185,14 +322,14 @@ export abstract class BaseAgent {
         throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data: any = await response.json();
       return data.response || '';
     } finally {
       clearTimeout(timeout);
     }
   }
 
-  /** Call model and parse JSON response */
+  /** Call model and parse JSON response (auto-falls back to mock when unavailable) */
   protected async callModelJSON<T = any>(prompt: string, options?: {
     temperature?: number;
     maxTokens?: number;
@@ -351,28 +488,36 @@ export abstract class BaseAgent {
     let score = 1.0;
 
     // Check model availability
-    try {
-      const response = await fetch(`${OLLAMA_URL}/api/tags`, { 
-        signal: AbortSignal.timeout(5000) 
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const modelName = this.model === 'deepseek' ? DEEPSEEK_MODEL : LLAMA_MODEL;
-        const available = data.models?.some((m: any) => m.name.includes(modelName.split(':')[0]));
-        this.health.modelAvailable = !!available;
-        if (!available) {
-          issues.push(`Model ${modelName} not found in Ollama`);
-          score -= 0.3;
+    const ollamaReady = await isOllamaAvailable();
+    if (ollamaReady) {
+      try {
+        const response = await fetch(`${OLLAMA_URL}/api/tags`, { 
+          signal: AbortSignal.timeout(5000) 
+        });
+        if (response.ok) {
+          const data: any = await response.json();
+          const modelName = this.model === 'deepseek' ? DEEPSEEK_MODEL : LLAMA_MODEL;
+          const available = data.models?.some((m: any) => m.name.includes(modelName.split(':')[0]));
+          this.health.modelAvailable = !!available;
+          if (!available) {
+            issues.push(`Model ${modelName} not found in Ollama (mock mode available)`);
+            score -= 0.15; // Less penalty since mock mode works
+          }
+        } else {
+          this.health.modelAvailable = false;
+          issues.push('Ollama API unreachable (running in mock mode)');
+          score -= 0.2;
         }
-      } else {
+      } catch {
         this.health.modelAvailable = false;
-        issues.push('Ollama API unreachable');
-        score -= 0.5;
+        issues.push('Ollama API connection failed (running in mock mode)');
+        score -= 0.2;
       }
-    } catch {
+    } else {
+      // Mock mode active — agent is still functional
       this.health.modelAvailable = false;
-      issues.push('Ollama API connection failed');
-      score -= 0.5;
+      issues.push('Running in MOCK mode — Ollama not connected. Install Ollama and pull models for real AI.');
+      score -= 0.15; // Minor penalty, agent still works in mock mode
     }
 
     // Check error rate

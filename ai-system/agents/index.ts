@@ -52,7 +52,7 @@ export { KYCAgent } from './legal/KYCAgent';
 // Agent Registry - Central management for all agents
 // ============================================================
 
-import { BaseAgent, AgentInfo } from './base/BaseAgent';
+import { BaseAgent, AgentInfo, AgentTask } from './base/BaseAgent';
 import { SentimentAnalysisAgent } from './analysis/SentimentAnalysisAgent';
 import { TrendAnalysisAgent } from './analysis/TrendAnalysisAgent';
 import { EnhancedSentimentAgent } from './analysis/EnhancedSentimentAgent';
@@ -218,8 +218,8 @@ class AgentRegistry {
       } else {
         byStatus.inactive++;
       }
-      totalTasksProcessed += info.metrics.totalTasks;
-      totalTasksInQueue += info.metrics.queuedTasks;
+      totalTasksProcessed += info.metrics.tasksProcessed;
+      totalTasksInQueue += info.metrics.tasksInQueue;
       if (info.health.status === 'healthy') healthyCount++;
     }
 
@@ -327,7 +327,7 @@ class AgentRegistry {
   /**
    * Submit a task to a specific agent
    */
-  async submitTask(agentId: string, taskInput: any, priority: 'low' | 'normal' | 'high' | 'urgent' = 'normal'): Promise<string> {
+  async submitTask(agentId: string, taskInput: any, priority: 'low' | 'normal' | 'high' | 'urgent' = 'normal'): Promise<AgentTask> {
     const agent = this.agents.get(agentId);
     if (!agent) {
       throw new Error(`Agent not found: ${agentId}`);
