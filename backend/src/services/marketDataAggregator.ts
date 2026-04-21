@@ -31,6 +31,7 @@ import {
 import { logger } from '../utils/logger';
 import { BinanceAfricaAdapter } from './exchanges/BinanceAfricaAdapter';
 import { LunoExchangeAdapter } from './exchanges/LunoExchangeAdapter';
+import { QuidaxExchangeAdapter } from './exchanges/QuidaxExchangeAdapter';
 
 export class MarketDataAggregator extends EventEmitter implements IMarketDataAggregator {
   private prisma: PrismaClient;
@@ -373,6 +374,8 @@ export class MarketDataAggregator extends EventEmitter implements IMarketDataAgg
         return new BinanceAfricaAdapter(integration);
       case 'luno':
         return new LunoExchangeAdapter(integration);
+      case 'quidax':
+        return new QuidaxExchangeAdapter(integration);
       default:
         // Safe fallback adapter (no data) to keep service running even if misconfigured
         return {

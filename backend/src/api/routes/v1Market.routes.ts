@@ -217,6 +217,96 @@ router.get('/ticks/:symbol', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/v1/market/ticks/:symbol/export.csv
+ * Query params: exchange, interval, from, to, limit
+ */
+router.get('/ticks/:symbol/export.csv', async (req: Request, res: Response) => {
+  const { symbol } = req.params;
+  const exchange = req.query.exchange as string | undefined;
+  const interval = (req.query.interval as string) || '1m';
+  const from = req.query.from ? new Date(req.query.from as string) : new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const to = req.query.to ? new Date(req.query.to as string) : new Date();
+  const limit = Math.min(parseInt(req.query.limit as string) || 1000, 5000);
+
+  try {
+    const where: any = {
+      symbol: symbol.toUpperCase().replace('-', '/'),
+      interval,
+      timestamp: { gte: from, lte: to },
+    };
+    if (exchange) where.exchange = exchange;
+
+    const ticks = await prisma.priceTick.findMany({
+      where,
+      orderBy: { timestamp: 'desc' },
+      take: limit,
+    });
+
+    const header = ['symbol', 'exchange', 'interval', 'timestamp', 'open', 'high', 'low', 'close', 'volume'];
+    const lines = [header.join(',')].concat(
+      ticks.map((t: any) => [
+        t.symbol,
+        t.exchange,
+        t.interval,
+        new Date(t.timestamp).toISOString(),
+        t.open,
+        t.high,
+        t.low,
+        t.close,
+        t.volume,
+      ].join(','))
+    );
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="coindaily-ticks-${symbol.toUpperCase()}-${interval}.csv"`);
+    return res.send(lines.join('\n'));
+  } catch (error: any) {
+    return res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+  }
+});
+
+/**
+ * GET /api/v1/market/ticks/:symbol/export.json
+ * Query params: exchange, interval, from, to, limit
+ */
+router.get('/ticks/:symbol/export.json', async (req: Request, res: Response) => {
+  const { symbol } = req.params;
+  const exchange = req.query.exchange as string | undefined;
+  const interval = (req.query.interval as string) || '1m';
+  const from = req.query.from ? new Date(req.query.from as string) : new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const to = req.query.to ? new Date(req.query.to as string) : new Date();
+  const limit = Math.min(parseInt(req.query.limit as string) || 1000, 5000);
+
+  try {
+    const where: any = {
+      symbol: symbol.toUpperCase().replace('-', '/'),
+      interval,
+      timestamp: { gte: from, lte: to },
+    };
+    if (exchange) where.exchange = exchange;
+
+    const ticks = await prisma.priceTick.findMany({
+      where,
+      orderBy: { timestamp: 'desc' },
+      take: limit,
+    });
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="coindaily-ticks-${symbol.toUpperCase()}-${interval}.json"`);
+    return res.send(JSON.stringify({
+      symbol: symbol.toUpperCase(),
+      interval,
+      from: from.toISOString(),
+      to: to.toISOString(),
+      count: ticks.length,
+      data: ticks,
+    }));
+  } catch (error: any) {
+    return res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+  }
+});
+
+/**
  * GET /api/v1/market/fiat-stablecoin
  * Query params: fiat (NGN,KES,ZAR,GHS), stablecoin (USDT,USDC), exchange
  */

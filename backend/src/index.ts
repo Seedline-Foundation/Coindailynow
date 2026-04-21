@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import path from 'path';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { IncomingMessage } from 'http';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -55,6 +56,8 @@ import dataAnalysisAdminRouter from './routes/data-analysis-admin.routes';
 import adsRotationRouter from './routes/ads-rotation.routes';
 import rssFeedRouter from './routes/rss-feed.routes';
 import indexNowRouter from './routes/indexnow.routes';
+import structuredContentRouter from './routes/structured-content.routes';
+import knowledgeApiRouter from './api/routes/knowledgeApi.routes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
@@ -154,6 +157,43 @@ export async function setupApp() {
           authentication: { type: AuthType.PUBLIC, testnet: false },
         },
         priority: 7,
+        timeout: 4000,
+        retryPolicy: {
+          maxRetries: 2,
+          initialDelay: 250,
+          maxDelay: 2000,
+          backoffMultiplier: 2,
+          retryableErrors: ['ETIMEDOUT', 'ECONNRESET', 'Timeout'],
+        },
+        circuitBreaker: {
+          failureThreshold: 5,
+          recoveryTimeout: 30000,
+          monitoringWindow: 60000,
+        },
+      },
+      {
+        integration: {
+          id: 'quidax',
+          name: 'Quidax',
+          slug: 'quidax',
+          type: ExchangeType.AFRICAN,
+          region: ExchangeRegion.NIGERIA,
+          apiEndpoint: 'https://www.quidax.com/api/v1',
+          websocketEndpoint: 'wss://www.quidax.com/cable',
+          supportedCountries: ['NG', 'GH'],
+          supportedCurrencies: ['NGN', 'USDT', 'USD'],
+          rateLimitPerMinute: 120,
+          isActive: true,
+          health: {
+            status: HealthStatus.HEALTHY,
+            uptime: 100,
+            avgResponseTime: 280,
+            lastCheck: new Date(),
+            consecutiveFailures: 0,
+          },
+          authentication: { type: AuthType.PUBLIC, testnet: false },
+        },
+        priority: 8,
         timeout: 4000,
         retryPolicy: {
           maxRetries: 2,
@@ -310,6 +350,7 @@ export async function setupApp() {
       '/api/user',
       '/api/news',
       '/api/admin',
+      '/api/ai/registry',
       '/health',
       '/metrics',
       '/graphql'
@@ -348,6 +389,10 @@ export async function setupApp() {
   app.use('/api/v1/bounty', v1BountyRouter);
   app.use('/api/v1/press', v1PressReleaseRouter);
   app.use('/api/v1/influencer', v1InfluencerRouter);
+  app.use('/api/v1', structuredContentRouter);
+
+  // Knowledge API endpoints (manifest/search/feeds for RAG clients)
+  app.use('/api/knowledge-api', knowledgeApiRouter);
 
   // Frontend compatibility REST endpoints: /api/market-data, /api/african-exchanges, ...
   app.use('/api', marketCompatRouter);
@@ -420,6 +465,66 @@ export async function setupApp() {
   });
   const serverCleanup = useServer({ schema, context }, wsServer);
 
+  // Dedicated market stream endpoint: WS /api/v1/stream/:symbol
+  const marketStreamWss = new WebSocketServer({ noServer: true });
+  httpServer.on('upgrade', (request: IncomingMessage, socket, head) => {
+    try {
+      const reqUrl = request.url || '';
+      if (!reqUrl.startsWith('/api/v1/stream/')) return;
+      marketStreamWss.handleUpgrade(request, socket, head, (client) => {
+        marketStreamWss.emit('connection', client, request);
+      });
+    } catch {
+      socket.destroy();
+    }
+  });
+
+  marketStreamWss.on('connection', (client: any, request: IncomingMessage) => {
+    const reqUrl = request.url || '';
+    const parts = reqUrl.split('/').filter(Boolean);
+    const rawSymbol = parts[parts.length - 1] || 'BTC';
+    const symbol = rawSymbol.toUpperCase();
+    const marketAggregator = (app as any).locals.marketDataAggregator;
+
+    let closed = false;
+    const publish = async () => {
+      try {
+        const result = await marketAggregator.getMarketData([symbol], { maxAge: 15, includeAfricanData: true });
+        const row = (result?.data || [])[0];
+        if (!row) return;
+        client.send(JSON.stringify({
+          type: 'price_update',
+          symbol: row.symbol,
+          price: row.priceUsd,
+          change24h: row.priceChangePercent24h,
+          volume24h: row.volume24h,
+          exchange: row.exchange,
+          timestamp: row.timestamp,
+        }));
+      } catch {
+        if (!closed) {
+          client.send(JSON.stringify({
+            type: 'error',
+            symbol,
+            message: 'Unable to fetch market stream update',
+          }));
+        }
+      }
+    };
+
+    publish();
+    const timer = setInterval(publish, 5000);
+
+    client.on('close', () => {
+      closed = true;
+      clearInterval(timer);
+    });
+    client.on('error', () => {
+      closed = true;
+      clearInterval(timer);
+    });
+  });
+
   const server = new ApolloServer({
     schema,
     validationRules,
@@ -431,6 +536,10 @@ export async function setupApp() {
           return {
             async drainServer() {
               await serverCleanup.dispose();
+              marketStreamWss.clients.forEach((client: any) => {
+                try { client.close(); } catch { /* ignore close errors */ }
+              });
+              marketStreamWss.close();
             },
           };
         },

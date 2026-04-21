@@ -169,7 +169,10 @@ export class BinanceAfricaAdapter extends BaseExchangeAdapter {
    * Convert Binance symbol back to standard format
    */
   denormalizeSymbol(binanceSymbol: string): string {
-    return binanceSymbol.replace('USDT', '').replace('BUSD', '').replace('BTC', '');
+    if (binanceSymbol.endsWith('USDT')) return binanceSymbol.slice(0, -4);
+    if (binanceSymbol.endsWith('BUSD')) return binanceSymbol.slice(0, -4);
+    if (binanceSymbol.endsWith('BTC') && binanceSymbol.length > 3) return binanceSymbol.slice(0, -3);
+    return binanceSymbol;
   }
 
   /**
