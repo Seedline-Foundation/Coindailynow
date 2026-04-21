@@ -96,6 +96,16 @@ model Article {
   seoTitle           String?
   seoDescription     String?
   seoKeywords        String? // SEO keywords for optimization
+  language           String               @default("en")
+  territory          String[]             @default([])
+  sentimentScore     Decimal?             @db.Decimal(3, 2)
+  urgencyLevel       Int?
+  keyFacts           Json?
+  speakableContent   String?
+  factCheckStatus    String?
+  correctionOfId     String?
+  lastIndexedAt      DateTime?
+  citationCount      Int                  @default(0)
   metadata           String? // JSON field for AI feedback metadata
   aiGenerated        Boolean? // Whether article was AI-generated
   publishScheduledAt DateTime?
@@ -117,12 +127,18 @@ model Article {
   ContentRevisions   ContentRevision[]
   UserBookmarks      UserBookmark[]
   ReadingHistories   ReadingHistory[]
+  correctionOf       Article?             @relation("ArticleCorrections", fields: [correctionOfId], references: [id], onDelete: SetNull)
+  corrections        Article[]            @relation("ArticleCorrections")
+  ArticleEntity      ArticleEntity[]
+  RegulatoryEvent    RegulatoryEvent[]
 
   @@index([slug])
   @@index([isPremium])
   @@index([authorId, status])
   @@index([categoryId, publishedAt])
   @@index([status, publishedAt])
+  @@index([language, publishedAt])
+  @@index([factCheckStatus])
 }
 
 model ContentRevision {
@@ -4157,6 +4173,48 @@ model EntityMention {
   @@index([entityId, contentType])
   @@index([contentId, entityId])
   @@index([createdAt])
+}
+
+model Entity {
+  id                 String    @id @default(cuid())
+  slug               String    @unique
+  name               String
+  entityType         String
+  officialNames      Json?
+  aliases            Json?
+  identifiers        Json?
+  jurisdiction       String?   @db.Char(2)
+  parentEntityId     String?
+  cryptoType         String?
+  consensusMechanism String?
+  launchDate         DateTime? @db.Date
+  authorityType      String?
+  regulatoryStance   String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  parentEntity     Entity?          @relation("EntityHierarchy", fields: [parentEntityId], references: [id], onDelete: SetNull)
+  childEntities    Entity[]         @relation("EntityHierarchy")
+  articleLinks     ArticleEntity[]
+  regulatoryEvents RegulatoryEvent[] @relation("RegulatoryBodyEvents")
+
+  @@index([entityType])
+  @@index([jurisdiction])
+  @@map("entities")
+}
+
+model ArticleEntity {
+  articleId  String
+  entityId   String
+  role       String?
+  sentiment  Decimal? @db.Decimal(3, 2)
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  entity  Entity  @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, entityId])
+  @@index([entityId, role])
+  @@map("article_entities")
 }
 
 model VectorSearchIndex {
@@ -8940,21 +8998,32 @@ model LicensingRequirement {
 }
 
 model RegulatoryEvent {
-  id          String   @id @default(cuid())
-  countryCode String   @db.Char(2)
-  eventDate   DateTime
-  eventType   String
-  title       String
-  description String?
-  impactScore Int?
+  id                String   @id @default(cuid())
+  countryCode       String   @db.Char(2)
+  eventDate         DateTime
+  eventType         String
+  title             String
+  description       String?
+  impactScore       Int?
+  regulatoryBodyId  String?
+  effectiveDate     DateTime?
+  documentUrl       String?
+  citationReference String?
+  impactLevel       String?
+  marketImpactData  Json?
+  articleId         String?
 
-  country RegulatoryCountry @relation(fields: [countryCode], references: [code], onDelete: Cascade)
+  country        RegulatoryCountry @relation(fields: [countryCode], references: [code], onDelete: Cascade)
+  regulatoryBody Entity?           @relation("RegulatoryBodyEvents", fields: [regulatoryBodyId], references: [id], onDelete: SetNull)
+  article        Article?          @relation(fields: [articleId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([countryCode, eventDate])
   @@index([eventType])
+  @@index([articleId])
+  @@index([regulatoryBodyId])
   @@map("regulatory_events")
 }
 
