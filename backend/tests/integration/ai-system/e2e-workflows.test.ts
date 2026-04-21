@@ -17,7 +17,9 @@ import { setupApp } from '../../../src/index';
 import { AITask, ContentWorkflow, User, WorkflowStep } from '.prisma/client';
 import request from 'supertest';
 
-describe('AI System E2E Workflows', () => {
+const describeWithDb = process.env.DATABASE_URL?.startsWith('postgres') ? describe : describe.skip;
+
+describeWithDb('AI System E2E Workflows', () => {
   let app: Express;
   let prisma: PrismaClient;
   let user: User;

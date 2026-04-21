@@ -18,8 +18,9 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 
 const prisma = new PrismaClient();
+const hasPostgresTestDb = /^postgres(ql)?:\/\//i.test(process.env.DATABASE_URL || '');
 
-describe('AI System API Integration Tests', () => {
+(hasPostgresTestDb ? describe : describe.skip)('AI System API Integration Tests', () => {
   let app: Express;
   let authToken: string;
   let adminToken: string;

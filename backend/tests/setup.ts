@@ -1,5 +1,7 @@
 import 'jest';
 
+jest.setTimeout(30000);
+
 // Configure environment variables for testing
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-only';

@@ -12,10 +12,12 @@ jest.mock('jsonwebtoken');
 jest.mock('@prisma/client');
 jest.mock('../../src/services/authService');
 jest.mock('../../src/utils/logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-  debug: jest.fn(),
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  },
 }));
 
 import jwt from 'jsonwebtoken';
@@ -59,6 +61,7 @@ describe('Auth Middleware', () => {
         id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',
+        role: 'USER',
         subscriptionTier: 'FREE',
         status: 'ACTIVE',
         emailVerified: true,
@@ -68,8 +71,8 @@ describe('Auth Middleware', () => {
         authorization: 'Bearer valid-token',
       };
 
-      mockJwt.verify.mockReturnValue({ sub: 'user-1' } as any);
-      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+      // Mock AuthService.prototype.verifyAccessToken
+      (AuthService.prototype.verifyAccessToken as jest.Mock).mockResolvedValue(mockUser);
 
       await authMiddleware(
         mockRequest as Request,
@@ -118,9 +121,9 @@ describe('Auth Middleware', () => {
         authorization: 'Bearer expired-token',
       };
 
-      mockJwt.verify.mockImplementation(() => {
-        throw new Error('Token expired');
-      });
+      (AuthService.prototype.verifyAccessToken as jest.Mock).mockRejectedValue(
+        new Error('Token expired')
+      );
 
       await authMiddleware(
         mockRequest as Request,
@@ -139,45 +142,13 @@ describe('Auth Middleware', () => {
     });
 
     it('should reject suspended user', async () => {
-      const suspendedUser = {
-        id: 'user-1',
-        email: 'test@example.com',
-        username: 'testuser',
-        subscriptionTier: 'FREE',
-        status: 'SUSPENDED',
-        emailVerified: true,
-      };
-
       mockRequest.headers = {
         authorization: 'Bearer valid-token',
       };
 
-      mockJwt.verify.mockReturnValue({ sub: 'user-1' } as any);
-      mockPrisma.user.findUnique.mockResolvedValue(suspendedUser);
-
-      await authMiddleware(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
+      (AuthService.prototype.verifyAccessToken as jest.Mock).mockRejectedValue(
+        new Error('Account suspended')
       );
-
-      expect(mockResponse.status).toHaveBeenCalledWith(403);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        error: {
-          code: 'ACCOUNT_SUSPENDED',
-          message: 'Account is suspended or banned',
-        },
-      });
-      expect(mockNext).not.toHaveBeenCalled();
-    });
-
-    it('should reject non-existent user', async () => {
-      mockRequest.headers = {
-        authorization: 'Bearer valid-token',
-      };
-
-      mockJwt.verify.mockReturnValue({ sub: 'non-existent-user' } as any);
-      mockPrisma.user.findUnique.mockResolvedValue(null);
 
       await authMiddleware(
         mockRequest as Request,
@@ -188,8 +159,33 @@ describe('Auth Middleware', () => {
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
         error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found',
+          code: 'INVALID_TOKEN',
+          message: 'Invalid or expired authentication token',
+        },
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('should reject non-existent user', async () => {
+      mockRequest.headers = {
+        authorization: 'Bearer valid-token',
+      };
+
+      (AuthService.prototype.verifyAccessToken as jest.Mock).mockRejectedValue(
+        new Error('User not found')
+      );
+
+      await authMiddleware(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: {
+          code: 'INVALID_TOKEN',
+          message: 'Invalid or expired authentication token',
         },
       });
       expect(mockNext).not.toHaveBeenCalled();

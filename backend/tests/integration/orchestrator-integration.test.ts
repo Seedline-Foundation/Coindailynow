@@ -524,9 +524,12 @@ async function runIntegrationTest() {
 
   } catch (error) {
     console.error('❌ Integration test failed:', error);
-    process.exit(1);
+    throw error;
   }
 }
 
-// Run the test
-runIntegrationTest();
+describe('Task 9 Orchestrator Integration', () => {
+  it('runs orchestrator integration flow successfully', async () => {
+    await runIntegrationTest();
+  });
+});

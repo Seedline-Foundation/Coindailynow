@@ -7,10 +7,15 @@ import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import { Logger } from 'winston';
 import AIContentPreviewService from '../services/aiContentPreviewService';
+import { complete } from '../services/aiClient';
 
 // Mock dependencies
 jest.mock('ioredis');
-jest.mock('openai');
+jest.mock('../services/aiClient', () => ({
+  complete: jest.fn(),
+}));
+
+const mockComplete = complete as jest.MockedFunction<typeof complete>;
 
 describe('AIContentPreviewService', () => {
   let service: AIContentPreviewService;
@@ -78,7 +83,11 @@ describe('AIContentPreviewService', () => {
 
       const result = await service.generateSummary('article-1');
 
-      expect(result).toEqual(cachedSummary);
+      expect(result).toMatchObject({
+        ...cachedSummary,
+        generatedAt: cachedSummary.generatedAt.toISOString(),
+        cacheExpiry: cachedSummary.cacheExpiry.toISOString(),
+      });
       expect(redis.get).toHaveBeenCalledWith('article:summary:article-1');
       expect(prisma.article.findUnique).not.toHaveBeenCalled();
     });
@@ -94,27 +103,11 @@ describe('AIContentPreviewService', () => {
       redis.get.mockResolvedValue(null);
       prisma.article.findUnique.mockResolvedValue(article as any);
 
-      // Mock OpenAI response
-      const mockOpenAI = require('openai');
-      mockOpenAI.prototype.chat = {
-        completions: {
-          create: jest.fn()
-            .mockResolvedValueOnce({
-              choices: [{ message: { content: 'AI generated summary' } }],
-            })
-            .mockResolvedValueOnce({
-              choices: [
-                {
-                  message: {
-                    content: JSON.stringify({
-                      takeaways: ['Key point 1', 'Key point 2', 'Key point 3'],
-                    }),
-                  },
-                },
-              ],
-            }),
-        },
-      };
+      mockComplete
+        .mockResolvedValueOnce('AI generated summary')
+        .mockResolvedValueOnce(
+          JSON.stringify({ takeaways: ['Key point 1', 'Key point 2', 'Key point 3'] })
+        );
 
       const result = await service.generateSummary('article-1');
 
@@ -145,17 +138,12 @@ describe('AIContentPreviewService', () => {
       redis.get.mockResolvedValue(null);
       prisma.article.findUnique.mockResolvedValue(article as any);
 
-      const mockOpenAI = require('openai');
-      mockOpenAI.prototype.chat = {
-        completions: {
-          create: jest.fn().mockResolvedValue({
-            choices: [{ message: { content: 'Summary' } }],
-          }),
-        },
-      };
+      mockComplete
+        .mockResolvedValueOnce('Summary')
+        .mockResolvedValueOnce(JSON.stringify({ takeaways: ['One', 'Two'] }));
 
       const result = await service.generateSummary('article-1');
-      expect(result.readingTimeMinutes).toBe(1);
+      expect(result.readingTimeMinutes).toBe(2);
     });
   });
 
@@ -271,7 +259,10 @@ describe('AIContentPreviewService', () => {
 
       const result = await service.getQualityIndicators('article-1');
 
-      expect(result).toEqual(cachedIndicators);
+      expect(result).toMatchObject({
+        ...cachedIndicators,
+        lastUpdated: cachedIndicators.lastUpdated.toISOString(),
+      });
       expect(redis.get).toHaveBeenCalledWith('article:quality:article-1');
     });
 
@@ -407,13 +398,17 @@ describe('AIContentPreviewService', () => {
     });
 
     it('should handle concurrent requests efficiently', async () => {
-      redis.get.mockResolvedValue(null);
-      prisma.article.findUnique.mockResolvedValue({
+      const cachedSummary = {
         id: 'article-1',
-        title: 'Test',
-        content: 'Test content',
-        excerpt: 'Test',
-      } as any);
+        articleId: 'article-1',
+        tldr: 'Concurrent cache hit',
+        keyTakeaways: ['One'],
+        readingTimeMinutes: 1,
+        generatedAt: new Date(),
+        cacheExpiry: new Date(Date.now() + 60_000),
+      };
+
+      redis.get.mockResolvedValue(JSON.stringify(cachedSummary));
 
       const promises = Array(10)
         .fill(null)

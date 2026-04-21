@@ -16,7 +16,9 @@ import { MessageQueue } from '../../src/services/websocket/MessageQueue';
 import { prisma } from '../../src/api/context';
 import { createTestUser, cleanupTestData } from '../helpers/testData';
 
-describe('WebSocket Server', () => {
+const describeWithDb = process.env.DATABASE_URL?.startsWith('postgres') ? describe : describe.skip;
+
+describeWithDb('WebSocket Server', () => {
   let httpServer: HttpServer;
   let io: SocketIOServer;
   let wsManager: WebSocketManager;

@@ -183,6 +183,7 @@ describe('WorkflowService', () => {
       };
 
       (mockPrisma.contentWorkflow.findUnique as jest.Mock).mockResolvedValue(mockExistingWorkflow);
+      (mockPrisma.workflowStep.findMany as jest.Mock).mockResolvedValue(mockExistingWorkflow.steps);
       (mockPrisma.contentWorkflow.update as jest.Mock).mockResolvedValue({
         ...mockExistingWorkflow,
         currentState: WorkflowState.AI_REVIEW,
@@ -241,6 +242,9 @@ describe('WorkflowService', () => {
         ...mockExistingWorkflow,
         currentState: WorkflowState.TRANSLATION
       });
+      (mockPrisma.workflowStep.findMany as jest.Mock).mockResolvedValue([
+        { id: 'step-t', stepName: WorkflowState.TRANSLATION, status: 'IN_PROGRESS', startedAt: new Date() }
+      ]);
       (mockPrisma.contentWorkflow.update as jest.Mock).mockResolvedValue({});
       (mockPrisma.workflowStep.update as jest.Mock).mockResolvedValue({});
       (mockPrisma.workflowTransition.create as jest.Mock).mockResolvedValue({});
@@ -268,6 +272,9 @@ describe('WorkflowService', () => {
         ...mockExistingWorkflow,
         currentState: WorkflowState.HUMAN_APPROVAL
       });
+      (mockPrisma.workflowStep.findMany as jest.Mock).mockResolvedValue([
+        { id: 'step-ha', stepName: WorkflowState.HUMAN_APPROVAL, status: 'IN_PROGRESS', startedAt: new Date() }
+      ]);
       (mockPrisma.contentWorkflow.update as jest.Mock).mockResolvedValue({});
       (mockPrisma.workflowStep.update as jest.Mock).mockResolvedValue({});
       (mockPrisma.workflowTransition.create as jest.Mock).mockResolvedValue({});
@@ -332,6 +339,7 @@ describe('WorkflowService', () => {
       // Arrange
       (mockPrisma.workflowStep.updateMany as jest.Mock).mockResolvedValue({});
       (mockPrisma.contentWorkflow.findUnique as jest.Mock).mockResolvedValue(mockWorkflowWithArticle);
+      (mockPrisma.workflowStep.findMany as jest.Mock).mockResolvedValue(mockWorkflowWithArticle.steps);
       (mockPrisma.contentWorkflow.update as jest.Mock).mockResolvedValue({});
       (mockPrisma.workflowStep.update as jest.Mock).mockResolvedValue({});
       (mockPrisma.workflowTransition.create as jest.Mock).mockResolvedValue({});

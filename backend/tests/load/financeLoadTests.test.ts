@@ -2,7 +2,9 @@ import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 import { PrismaClient } from '@prisma/client';
 import { FinancePerformanceMonitor } from '../../src/services/finance/FinancePerformanceMonitor';
 
-describe('Finance Load Testing Suite', () => {
+const describeWithDb = process.env.DATABASE_URL?.startsWith('postgres') ? describe : describe.skip;
+
+describeWithDb('Finance Load Testing Suite', () => {
   let prisma: PrismaClient;
   let performanceMonitor: FinancePerformanceMonitor;
 

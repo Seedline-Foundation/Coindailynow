@@ -8,7 +8,10 @@ import { setupApp } from '../../src/index';
 import { prisma } from '../../src/lib/prisma';
 import { generateJWT } from '../../src/utils/auth';
 
-describe('Security API Endpoints', () => {
+const hasDatabase = /^postgres(ql)?:\/\//.test(process.env.DATABASE_URL || '');
+const describeIfDatabase = hasDatabase ? describe : describe.skip;
+
+describeIfDatabase('Security API Endpoints', () => {
   let app: any;
   let adminToken: string;
   let superAdminToken: string;

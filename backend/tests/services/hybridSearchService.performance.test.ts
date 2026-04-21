@@ -6,15 +6,20 @@
 import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { HybridSearchService, SearchResultType } from '../../src/services/hybridSearchService';
 
+// Mock aiClient
+jest.mock('../../src/services/aiClient', () => ({
+  generateEmbeddings: jest.fn<() => Promise<number[]>>().mockResolvedValue(new Array(384).fill(0.1)),
+  complete: jest.fn<() => Promise<string>>().mockResolvedValue('test response'),
+  AI_MODELS: {
+    LLAMA: 'llama3.1:8b',
+    DEEPSEEK: 'deepseek-r1:8b',
+    EMBEDDINGS: 'BAAI/bge-small-en-v1.5'
+  }
+}));
+
 // Mock dependencies
 const mockElasticsearchService = {
   searchArticles: jest.fn()
-} as any;
-
-const mockOpenAI = {
-  embeddings: {
-    create: jest.fn()
-  }
 } as any;
 
 const mockLogger = {
@@ -31,7 +36,6 @@ describe('HybridSearchService - Performance Tests', () => {
     jest.clearAllMocks();
     hybridSearchService = new HybridSearchService(
       mockElasticsearchService as any,
-      mockOpenAI as any,
       mockLogger
     );
   });
@@ -109,9 +113,7 @@ describe('HybridSearchService - Performance Tests', () => {
         took: 120
       });
 
-      mockOpenAI.embeddings.create.mockResolvedValue({
-        data: [{ embedding: new Array(1536).fill(0.1) }]
-      });
+      // aiClient mock already set up via jest.mock
 
       const result = await hybridSearchService.hybridSearch(query, {
         type: SearchResultType.ARTICLES,
@@ -380,9 +382,10 @@ describe('HybridSearchService - Performance Tests', () => {
         took: 100
       });
 
-      // Simulate semantic search failure
-      mockOpenAI.embeddings.create.mockRejectedValue(
-        new Error('OpenAI API timeout')
+      // Simulate semantic search failure via aiClient mock
+      const { generateEmbeddings } = require('../../src/services/aiClient');
+      (generateEmbeddings as jest.Mock<() => Promise<number[]>>).mockRejectedValue(
+        new Error('AI API timeout')
       );
 
       const startTime = performance.now();

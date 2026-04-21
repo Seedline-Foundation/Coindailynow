@@ -8,7 +8,9 @@ import { performance } from 'perf_hooks';
 
 const prisma = new PrismaClient();
 
-describe('AI System Performance Tests', () => {
+const describeWithDb = process.env.DATABASE_URL?.startsWith('postgres') ? describe : describe.skip;
+
+describeWithDb('AI System Performance Tests', () => {
   let testUserId: string;
 
   beforeAll(async () => {

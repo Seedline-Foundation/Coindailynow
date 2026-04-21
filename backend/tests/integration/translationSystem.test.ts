@@ -8,7 +8,9 @@ import { TranslationService } from '../../src/services/translationService';
 import { TranslationAgent } from '../../src/agents/translationAgent';
 import { logger } from '../../src/utils/logger';
 
-describe('Translation System Integration - Task 7', () => {
+const describeWithDb = process.env.DATABASE_URL?.startsWith('postgres') ? describe : describe.skip;
+
+describeWithDb('Translation System Integration - Task 7', () => {
   let prisma: PrismaClient;
   let translationService: TranslationService;
   let translationAgent: TranslationAgent;

@@ -5,7 +5,12 @@ import { AuthService } from '../../src/services/authService';
 // Mock the AuthService
 jest.mock('../../src/services/authService');
 jest.mock('../../src/utils/logger', () => ({
-  error: jest.fn(),
+  logger: {
+    error: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  },
 }));
 
 const MockedAuthService = AuthService as jest.MockedClass<typeof AuthService>;
@@ -51,11 +56,11 @@ describe('Auth Middleware', () => {
         status: 'ACTIVE',
       };
 
-      mockAuthServiceInstance.verifyAccessToken.mockResolvedValue(mockUser);
+      (AuthService.prototype.verifyAccessToken as jest.Mock).mockResolvedValue(mockUser);
 
       await authMiddleware(req as Request, res as Response, next);
 
-      expect(mockAuthServiceInstance.verifyAccessToken).toHaveBeenCalledWith('valid-token-123');
+      expect(AuthService.prototype.verifyAccessToken).toHaveBeenCalledWith('valid-token-123');
       expect(req.user).toEqual(mockUser);
       expect(next).toHaveBeenCalled();
       expect(res.status).not.toHaveBeenCalled();
@@ -81,7 +86,7 @@ describe('Auth Middleware', () => {
         authorization: 'Bearer invalid-token',
       };
 
-      mockAuthServiceInstance.verifyAccessToken.mockRejectedValue(new Error('Invalid token'));
+      (AuthService.prototype.verifyAccessToken as jest.Mock).mockRejectedValue(new Error('Invalid token'));
 
       await authMiddleware(req as Request, res as Response, next);
 
@@ -130,9 +135,11 @@ describe('Auth Middleware', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: {
           code: 'INSUFFICIENT_SUBSCRIPTION',
-          message: 'Premium subscription required',
-          requiredTier: 'PREMIUM',
-          currentTier: 'FREE',
+          message: 'PREMIUM subscription required',
+          details: {
+            currentTier: 'FREE',
+            requiredTier: 'PREMIUM',
+          },
         },
       });
       expect(next).not.toHaveBeenCalled();

@@ -87,7 +87,7 @@ describe('Redis Caching Layer - Task 4 Implementation', () => {
       
       await cacheService.set('article:1', articleData, 3600);
 
-      expect(mockRedis.setex).toHaveBeenCalledWith('coindaily:article:1', 3600, JSON.stringify(articleData));
+      expect(mockRedis.setex).toHaveBeenCalledWith('article:1', 3600, JSON.stringify(articleData));
     });
 
     it('should implement market data caching with 30 seconds TTL', async () => {
@@ -95,7 +95,7 @@ describe('Redis Caching Layer - Task 4 Implementation', () => {
       
       await cacheService.set('market:prices', marketData, 30);
 
-      expect(mockRedis.setex).toHaveBeenCalledWith('coindaily:market:prices', 30, JSON.stringify(marketData));
+      expect(mockRedis.setex).toHaveBeenCalledWith('market:prices', 30, JSON.stringify(marketData));
     });
 
     it('should implement user data caching with 5 minutes TTL', async () => {
@@ -103,7 +103,7 @@ describe('Redis Caching Layer - Task 4 Implementation', () => {
       
       await cacheService.set('user:1', userData, 300);
 
-      expect(mockRedis.setex).toHaveBeenCalledWith('coindaily:user:1', 300, JSON.stringify(userData));
+      expect(mockRedis.setex).toHaveBeenCalledWith('user:1', 300, JSON.stringify(userData));
     });
 
     it('should implement AI content caching with 2 hours TTL', async () => {
@@ -115,7 +115,7 @@ describe('Redis Caching Layer - Task 4 Implementation', () => {
       
       await cacheService.set('ai:content:1', aiContent, 7200);
 
-      expect(mockRedis.setex).toHaveBeenCalledWith('coindaily:ai:content:1', 7200, JSON.stringify(aiContent));
+      expect(mockRedis.setex).toHaveBeenCalledWith('ai:content:1', 7200, JSON.stringify(aiContent));
     });
 
     it('should automatically select correct TTL based on operation type', () => {
@@ -242,7 +242,7 @@ describe('Redis Caching Layer - Task 4 Implementation', () => {
       await cacheService.cacheAfricanExchangeData('luno', africanExchangeData.luno);
 
       expect(mockRedis.setex).toHaveBeenCalledWith(
-        'coindaily:african:luno',
+        'african:luno',
         30, // 30 seconds for African exchange data
         JSON.stringify(africanExchangeData.luno)
       );
@@ -258,7 +258,7 @@ describe('Redis Caching Layer - Task 4 Implementation', () => {
       await cacheService.cacheMobileMoneyRates('mpesa', mobileMoneyData);
 
       expect(mockRedis.setex).toHaveBeenCalledWith(
-        'coindaily:mobile:mpesa',
+        'mobile:mpesa',
         300, // 5 minutes for mobile money rates
         JSON.stringify(mobileMoneyData)
       );
@@ -275,7 +275,7 @@ describe('Redis Caching Layer - Task 4 Implementation', () => {
       await cacheService.cacheMultiLanguageContent('1', 'sw', multiLangContent.sw);
 
       expect(mockRedis.setex).toHaveBeenCalledWith(
-        'coindaily:multilang:article:1:sw',
+        'multilang:article:1:sw',
         3600, // 1 hour for multi-language content
         JSON.stringify(multiLangContent.sw)
       );

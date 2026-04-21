@@ -9,7 +9,10 @@ import { setupApp } from '../index'; // Your Express app setup
 import { redisClient } from '../config/redis';
 let app: any;
 
-describe('AI Agent CRUD Operations - Integration Tests', () => {
+const hasDatabase = /^postgres(ql)?:\/\//.test(process.env.DATABASE_URL || '');
+const describeIfDatabase = hasDatabase ? describe : describe.skip;
+
+describeIfDatabase('AI Agent CRUD Operations - Integration Tests', () => {
   // Test data
   const testAgent = {
     id: 'test-agent-integration',

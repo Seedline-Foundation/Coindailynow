@@ -1,16 +1,29 @@
 import { authResolvers } from '../../src/api/auth-resolvers';
-import { AuthService } from '../../src/services/authService';
+import { authService } from '../../src/services/authService';
 
 // Mock dependencies
-jest.mock('../../src/services/authService');
+jest.mock('../../src/services/authService', () => ({
+  authService: {
+    register: jest.fn(),
+    login: jest.fn(),
+    logout: jest.fn(),
+    refreshToken: jest.fn(),
+    verifyAccessToken: jest.fn(),
+    initiatePasswordReset: jest.fn(),
+    completePasswordReset: jest.fn(),
+    changePassword: jest.fn(),
+  },
+}));
 jest.mock('../../src/utils/logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-  debug: jest.fn(),
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  },
 }));
 
-const mockAuthService = AuthService as jest.MockedClass<typeof AuthService>;
+const mockedAuthService = authService as jest.Mocked<typeof authService>;
 
 // Helper to create mock authenticated user
 const createMockUser = (overrides: any = {}) => ({
@@ -27,35 +40,17 @@ const createMockUser = (overrides: any = {}) => ({
 });
 
 describe('Auth Resolvers', () => {
-  let authServiceInstance: jest.Mocked<AuthService>;
   let context: any;
 
   beforeEach(() => {
-    authServiceInstance = {
-      register: jest.fn(),
-      login: jest.fn(),
-      logout: jest.fn(),
-      refreshToken: jest.fn(),
-      verifyAccessToken: jest.fn(),
-      requestPasswordReset: jest.fn(),
-      resetPassword: jest.fn(),
-      changePassword: jest.fn(),
-    } as any;
-
-    mockAuthService.mockImplementation(() => authServiceInstance);
-
     context = {
       user: {
         id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',
       },
-      req: {
-        ip: '127.0.0.1',
-        headers: {
-          'user-agent': 'Test Browser',
-        },
-      },
+      ipAddress: '127.0.0.1',
+      userAgent: 'Test Browser',
     };
 
     jest.clearAllMocks();
@@ -65,13 +60,18 @@ describe('Auth Resolvers', () => {
     describe('me', () => {
       it('should return current user when authenticated', async () => {
         const result = await authResolvers.Query.me(null, {}, context);
-        expect(result).toBe(context.user);
+        expect(result).toEqual({
+          success: true,
+          user: context.user,
+          message: 'User retrieved successfully',
+        });
       });
 
-      it('should return null when not authenticated', async () => {
+      it('should return an auth error when not authenticated', async () => {
         context.user = null;
         const result = await authResolvers.Query.me(null, {}, context);
-        expect(result).toBeNull();
+        expect(result.success).toBe(false);
+        expect(result.error?.code).toBe('USER_RETRIEVAL_FAILED');
       });
     });
 
@@ -121,7 +121,7 @@ describe('Auth Resolvers', () => {
           },
         };
 
-        authServiceInstance.register.mockResolvedValue(mockResult);
+        mockedAuthService.register.mockResolvedValue(mockResult as any);
 
         const result = await authResolvers.Mutation.register(
           null,
@@ -129,7 +129,7 @@ describe('Auth Resolvers', () => {
           context
         );
 
-        expect(authServiceInstance.register).toHaveBeenCalledWith({
+        expect(mockedAuthService.register).toHaveBeenCalledWith({
           ...registerInput,
           deviceFingerprint: undefined,
           ipAddress: '127.0.0.1',
@@ -145,7 +145,7 @@ describe('Auth Resolvers', () => {
       });
 
       it('should handle registration errors', async () => {
-        authServiceInstance.register.mockRejectedValue(new Error('Email already registered'));
+        mockedAuthService.register.mockRejectedValue(new Error('Email already registered'));
 
         const result = await authResolvers.Mutation.register(null, { input: registerInput }, context);
 
@@ -153,7 +153,7 @@ describe('Auth Resolvers', () => {
         expect(result.error).toBeDefined();
         expect(result.error?.message).toContain('Email already registered');
 
-        expect(authServiceInstance.register).toHaveBeenCalledWith({
+        expect(mockedAuthService.register).toHaveBeenCalledWith({
           ...registerInput,
           deviceFingerprint: undefined,
           ipAddress: '127.0.0.1',
@@ -180,7 +180,7 @@ describe('Auth Resolvers', () => {
           },
         };
 
-        authServiceInstance.login.mockResolvedValue(mockResult);
+        mockedAuthService.login.mockResolvedValue(mockResult as any);
 
         const result = await authResolvers.Mutation.login(
           null,
@@ -188,7 +188,7 @@ describe('Auth Resolvers', () => {
           context
         );
 
-        expect(authServiceInstance.login).toHaveBeenCalledWith({
+        expect(mockedAuthService.login).toHaveBeenCalledWith({
           ...loginInput,
           deviceFingerprint: undefined,
           ipAddress: '127.0.0.1',
@@ -204,7 +204,7 @@ describe('Auth Resolvers', () => {
       });
 
       it('should handle login errors', async () => {
-        authServiceInstance.login.mockRejectedValue(new Error('Invalid email or password'));
+        mockedAuthService.login.mockRejectedValue(new Error('Invalid email or password'));
 
         const result = await authResolvers.Mutation.login(null, { input: loginInput }, context);
 
@@ -215,7 +215,7 @@ describe('Auth Resolvers', () => {
 
     describe('logout', () => {
       it('should successfully logout a user', async () => {
-        authServiceInstance.logout.mockResolvedValue(undefined);
+        mockedAuthService.logout.mockResolvedValue(undefined);
 
         const result = await authResolvers.Mutation.logout(
           null,
@@ -239,7 +239,7 @@ describe('Auth Resolvers', () => {
           refreshToken: 'new-refresh-token',
         };
 
-        authServiceInstance.refreshToken.mockResolvedValue(mockResult);
+        mockedAuthService.refreshToken.mockResolvedValue(mockResult as any);
 
         const result = await authResolvers.Mutation.refreshToken(
           null,
@@ -254,7 +254,7 @@ describe('Auth Resolvers', () => {
       });
 
       it('should handle refresh token errors', async () => {
-        authServiceInstance.refreshToken.mockRejectedValue(new Error('Invalid refresh token'));
+        mockedAuthService.refreshToken.mockRejectedValue(new Error('Invalid refresh token'));
 
         const result = await authResolvers.Mutation.refreshToken(
           null,
@@ -268,7 +268,7 @@ describe('Auth Resolvers', () => {
 
     describe('requestPasswordReset', () => {
       it('should always return success for security', async () => {
-        authServiceInstance.initiatePasswordReset.mockResolvedValue(undefined);
+        mockedAuthService.initiatePasswordReset.mockResolvedValue(undefined);
 
         const result = await authResolvers.Mutation.requestPasswordReset(
           null,
@@ -283,7 +283,7 @@ describe('Auth Resolvers', () => {
 
     describe('resetPassword', () => {
       it('should handle reset password errors', async () => {
-        authServiceInstance.resetPassword.mockRejectedValue(new Error('Invalid token'));
+        mockedAuthService.completePasswordReset.mockRejectedValue(new Error('Invalid token'));
 
         const result = await authResolvers.Mutation.resetPassword(
           null,
@@ -297,7 +297,7 @@ describe('Auth Resolvers', () => {
 
     describe('changePassword', () => {
       it('should successfully change password', async () => {
-        authServiceInstance.changePassword.mockResolvedValue(undefined);
+        mockedAuthService.changePassword.mockResolvedValue(undefined);
 
         const result = await authResolvers.Mutation.changePassword(
           null,
@@ -315,7 +315,7 @@ describe('Auth Resolvers', () => {
       });
 
       it('should handle change password errors', async () => {
-        authServiceInstance.changePassword.mockRejectedValue(new Error('Current password incorrect'));
+        mockedAuthService.changePassword.mockRejectedValue(new Error('Current password incorrect'));
 
         const result = await authResolvers.Mutation.changePassword(
           null,
@@ -335,7 +335,7 @@ describe('Auth Resolvers', () => {
       it('should successfully verify access token', async () => {
         const mockUser = createMockUser();
 
-        authServiceInstance.verifyAccessToken.mockResolvedValue(mockUser);
+        mockedAuthService.verifyAccessToken.mockResolvedValue(mockUser as any);
 
         const result = await authResolvers.Mutation.verifyToken(
           null,
@@ -350,7 +350,7 @@ describe('Auth Resolvers', () => {
       });
 
       it('should handle invalid token', async () => {
-        authServiceInstance.verifyAccessToken.mockRejectedValue(new Error('Invalid token'));
+        mockedAuthService.verifyAccessToken.mockRejectedValue(new Error('Invalid token'));
 
         const result = await authResolvers.Mutation.verifyToken(
           null,

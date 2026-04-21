@@ -13,21 +13,25 @@ const MockedRedis = Redis as jest.MockedClass<typeof Redis>;
 describe('MessageQueue', () => {
   let messageQueue: MessageQueue;
   let mockRedis: jest.Mocked<Redis>;
+  let mockPipeline: any;
   const testUserId = 'test-user-123';
 
   beforeEach(() => {
+    mockPipeline = {
+      rpush: jest.fn().mockReturnThis(),
+      lpop: jest.fn().mockReturnThis(),
+      hset: jest.fn().mockReturnThis(),
+      del: jest.fn().mockReturnThis(),
+      expire: jest.fn().mockReturnThis(),
+      incr: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue([]),
+    };
+
     mockRedis = {
-      pipeline: jest.fn(() => ({
-        rpush: jest.fn().mockReturnThis(),
-        lpop: jest.fn().mockReturnThis(),
-        hset: jest.fn().mockReturnThis(),
-        del: jest.fn().mockReturnThis(),
-        expire: jest.fn().mockReturnThis(),
-        incr: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([])
-      })),
+      pipeline: jest.fn(() => mockPipeline),
       llen: jest.fn(),
       lrange: jest.fn(),
+      lpop: jest.fn(),
       rpush: jest.fn(),
       del: jest.fn(),
       keys: jest.fn(),
@@ -51,12 +55,11 @@ describe('MessageQueue', () => {
 
       expect(mockRedis.llen).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
       expect(mockRedis.pipeline).toHaveBeenCalled();
-      
-      const pipeline = mockRedis.pipeline();
-      expect(pipeline.rpush).toHaveBeenCalled();
-      expect(pipeline.expire).toHaveBeenCalled();
-      expect(pipeline.hset).toHaveBeenCalled();
-      expect(pipeline.exec).toHaveBeenCalled();
+
+      expect(mockPipeline.rpush).toHaveBeenCalled();
+      expect(mockPipeline.expire).toHaveBeenCalled();
+      expect(mockPipeline.hset).toHaveBeenCalled();
+      expect(mockPipeline.exec).toHaveBeenCalled();
     });
 
     test('should remove oldest message when queue size limit is reached', async () => {
@@ -69,8 +72,7 @@ describe('MessageQueue', () => {
 
       await messageQueue.queueMessage(testUserId, message);
 
-      const pipeline = mockRedis.pipeline();
-      expect(pipeline.lpop).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
+      expect(mockRedis.lpop).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
     });
 
     test('should set custom priority and TTL', async () => {
@@ -90,21 +92,21 @@ describe('MessageQueue', () => {
       await messageQueue.queueMessage(testUserId, message, options);
 
       expect(mockRedis.pipeline).toHaveBeenCalled();
-      const pipeline = mockRedis.pipeline();
-      expect(pipeline.expire).toHaveBeenCalledWith(`ws:queue:${testUserId}`, 3600);
+      expect(mockPipeline.expire).toHaveBeenCalledWith(`ws:queue:${testUserId}`, 3600);
     });
   });
 
   describe('getQueuedMessages', () => {
     test('should return queued messages sorted by priority', async () => {
+      const now = Date.now();
       const mockMessages = [
         JSON.stringify({
           id: 'msg1',
           type: 'market_data',
           data: { symbol: 'BTC/USD' },
           priority: 'normal',
-          timestamp: new Date('2024-01-01T10:00:00Z'),
-          expiresAt: new Date('2024-01-02T10:00:00Z'),
+          timestamp: new Date(now - 5 * 60 * 1000),
+          expiresAt: new Date(now + 60 * 60 * 1000),
           retryCount: 0,
           maxRetries: 3
         }),
@@ -113,8 +115,8 @@ describe('MessageQueue', () => {
           type: 'urgent_alert',
           data: { message: 'Price alert' },
           priority: 'urgent',
-          timestamp: new Date('2024-01-01T10:05:00Z'),
-          expiresAt: new Date('2024-01-02T10:05:00Z'),
+          timestamp: new Date(now - 2 * 60 * 1000),
+          expiresAt: new Date(now + 60 * 60 * 1000),
           retryCount: 0,
           maxRetries: 3
         })
@@ -194,10 +196,9 @@ describe('MessageQueue', () => {
       await messageQueue.clearMessages(testUserId);
 
       expect(mockRedis.pipeline).toHaveBeenCalled();
-      const pipeline = mockRedis.pipeline();
-      expect(pipeline.del).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
-      expect(pipeline.del).toHaveBeenCalledWith(`ws:queue_meta:${testUserId}`);
-      expect(pipeline.exec).toHaveBeenCalled();
+      expect(mockPipeline.del).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
+      expect(mockPipeline.del).toHaveBeenCalledWith(`ws:queue_meta:${testUserId}`);
+      expect(mockPipeline.exec).toHaveBeenCalled();
     });
   });
 
@@ -232,9 +233,8 @@ describe('MessageQueue', () => {
       await messageQueue.removeMessages(testUserId, ['msg1']);
 
       expect(mockRedis.pipeline).toHaveBeenCalled();
-      const pipeline = mockRedis.pipeline();
-      expect(pipeline.del).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
-      expect(pipeline.rpush).toHaveBeenCalled(); // Should re-add remaining messages
+      expect(mockPipeline.del).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
+      expect(mockPipeline.rpush).toHaveBeenCalled(); // Should re-add remaining messages
     });
 
     test('should delete entire queue when no messages remain', async () => {
@@ -256,9 +256,8 @@ describe('MessageQueue', () => {
       await messageQueue.removeMessages(testUserId, ['msg1']);
 
       expect(mockRedis.pipeline).toHaveBeenCalled();
-      const pipeline = mockRedis.pipeline();
-      expect(pipeline.del).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
-      expect(pipeline.rpush).not.toHaveBeenCalled(); // No messages to re-add
+      expect(mockPipeline.del).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
+      expect(mockPipeline.rpush).not.toHaveBeenCalled(); // No messages to re-add
     });
   });
 

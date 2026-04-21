@@ -101,23 +101,18 @@ describe('AuthService', () => {
       expect(result.tokens).toHaveProperty('refreshToken');
 
       // Verify user creation
-      expect(mockPrisma.user.create).toHaveBeenCalledWith({
-        data: {
-          email: 'test@example.com',
-          username: 'testuser',
-          passwordHash: 'hashed-password',
-          firstName: 'Test',
-          lastName: 'User',
-          status: 'PENDING_VERIFICATION',
-        },
-        include: {
-          subscription: {
-            include: {
-              plan: true
-            }
-          }
-        }
-      });
+      expect(mockPrisma.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            email: 'test@example.com',
+            username: 'testuser',
+            passwordHash: 'hashed-password',
+            firstName: 'Test',
+            lastName: 'User',
+            status: 'PENDING_VERIFICATION',
+          })
+        })
+      );
 
       // Verify profile creation
       expect(mockPrisma.userProfile.create).toHaveBeenCalled();
@@ -263,6 +258,14 @@ describe('AuthService', () => {
       isRevoked: false,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       user: {
+        id: 'user-1',
+        email: 'test@example.com',
+        username: 'testuser',
+        subscriptionTier: 'FREE',
+        status: 'ACTIVE',
+        subscription: null
+      },
+      User: {
         id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',

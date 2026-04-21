@@ -105,3 +105,9 @@ if (require.main === module) {
 }
 
 export { testSubscriptionOperations };
+
+describe('Subscription Operations Script', () => {
+  it('exports the runner function', () => {
+    expect(typeof testSubscriptionOperations).toBe('function');
+  });
+});

@@ -52,7 +52,9 @@ jest.mock('@prisma/client', () => ({
   }))
 }));
 
-describe('Task 14: WebSocket Real-Time System Integration', () => {
+const describeWithDb = process.env.DATABASE_URL?.startsWith('postgres') ? describe : describe.skip;
+
+describeWithDb('Task 14: WebSocket Real-Time System Integration', () => {
   let httpServer: any;
   let wsManager: WebSocketManager;
 

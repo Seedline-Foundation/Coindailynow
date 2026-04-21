@@ -8,7 +8,9 @@ import { PrismaClient } from '@prisma/client';
 import { WorkflowService } from '../../src/services/workflowService';
 import { Logger } from 'winston';
 
-describe('Workflow System Integration Tests', () => {
+const describeWithDb = process.env.DATABASE_URL?.startsWith('postgres') ? describe : describe.skip;
+
+describeWithDb('Workflow System Integration Tests', () => {
   let prisma: PrismaClient;
   let workflowService: WorkflowService;
   let testUser: any;

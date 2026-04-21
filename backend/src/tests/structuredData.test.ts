@@ -7,7 +7,10 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import prisma from '../lib/prisma';
 import { structuredDataService } from '../services/structuredDataService';
 
-describe('Structured Data Service - Task 57', () => {
+const hasDatabase = /^postgres(ql)?:\/\//.test(process.env.DATABASE_URL || '');
+const describeIfDatabase = hasDatabase ? describe : describe.skip;
+
+describeIfDatabase('Structured Data Service - Task 57', () => {
   let testArticleId: string;
   let testUserId: string;
   let testCategoryId: string;

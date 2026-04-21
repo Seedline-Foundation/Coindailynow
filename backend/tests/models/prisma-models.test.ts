@@ -2,8 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 
 const prisma = new PrismaClient();
+const hasPostgresTestDb = /^postgres(ql)?:\/\//i.test(process.env.DATABASE_URL || '');
 
-describe('Prisma Models', () => {
+(hasPostgresTestDb ? describe : describe.skip)('Prisma Models', () => {
   beforeAll(async () => {
     // Clean up database before tests
     await prisma.contentPerformance.deleteMany();

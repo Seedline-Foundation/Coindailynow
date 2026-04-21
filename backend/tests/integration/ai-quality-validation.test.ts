@@ -11,9 +11,17 @@ import Redis from 'ioredis';
 import * as qualityService from '../../src/services/aiQualityValidationService';
 
 const prisma = new PrismaClient();
+const hasPostgresTestDb = /^postgres(ql)?:\/\//i.test(process.env.DATABASE_URL || '');
+const runExternalIntegrationTests = process.env.RUN_EXTERNAL_INTEGRATION_TESTS === 'true';
+const shouldRunSuite = hasPostgresTestDb && runExternalIntegrationTests;
+const describeIf = shouldRunSuite ? describe : describe.skip;
+
 const redisConfig: any = {
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),
+  lazyConnect: true,
+  maxRetriesPerRequest: 1,
+  enableOfflineQueue: false,
 };
 if (process.env.REDIS_PASSWORD) {
   redisConfig.password = process.env.REDIS_PASSWORD;
@@ -36,6 +44,9 @@ let testArticleId: string;
 let testAgentType: string;
 
 beforeAll(async () => {
+  if (!shouldRunSuite) return;
+  await redis.connect();
+
   // Create test data
   const article = await prisma.article.create({
     data: {
@@ -111,6 +122,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  if (!shouldRunSuite) return;
+
   // Cleanup
   // HumanApproval cleanup skipped
   await prisma.aICostTracking.deleteMany({ where: { agentType: testAgentType } });
@@ -127,7 +140,7 @@ afterAll(async () => {
 // CONTENT QUALITY TESTS
 // ============================================================================
 
-describe('Content Quality Validation', () => {
+describeIf('Content Quality Validation', () => {
   beforeEach(async () => {
     await qualityService.invalidateQualityCache('content');
   });
@@ -196,7 +209,7 @@ describe('Content Quality Validation', () => {
 // AGENT PERFORMANCE TESTS
 // ============================================================================
 
-describe('Agent Performance Validation', () => {
+describeIf('Agent Performance Validation', () => {
   beforeEach(async () => {
     await qualityService.invalidateQualityCache('agent');
   });
@@ -271,7 +284,7 @@ describe('Agent Performance Validation', () => {
 // HUMAN REVIEW ACCURACY TESTS
 // ============================================================================
 
-describe('Human Review Accuracy Validation', () => {
+describeIf('Human Review Accuracy Validation', () => {
   beforeEach(async () => {
     await qualityService.invalidateQualityCache('human');
   });
@@ -337,7 +350,7 @@ describe('Human Review Accuracy Validation', () => {
 // COMPREHENSIVE VALIDATION REPORT TESTS
 // ============================================================================
 
-describe('Quality Validation Reports', () => {
+describeIf('Quality Validation Reports', () => {
   test('should generate comprehensive quality report', async () => {
     const report = await qualityService.generateQualityValidationReport('comprehensive');
 
@@ -408,7 +421,7 @@ describe('Quality Validation Reports', () => {
 // QUALITY TRENDS TESTS
 // ============================================================================
 
-describe('Quality Trends', () => {
+describeIf('Quality Trends', () => {
   test('should get quality trends', async () => {
     const trends = await qualityService.getQualityTrends(30);
 
@@ -449,7 +462,7 @@ describe('Quality Trends', () => {
 // REST API TESTS
 // ============================================================================
 
-describe('REST API Endpoints', () => {
+describeIf('REST API Endpoints', () => {
   test('GET /api/ai/quality/content/:articleId', async () => {
     const response = await request(app)
       .get(`/api/ai/quality/content/${testArticleId}`)
@@ -539,7 +552,7 @@ describe('REST API Endpoints', () => {
 // PERFORMANCE TESTS
 // ============================================================================
 
-describe('Performance Tests', () => {
+describeIf('Performance Tests', () => {
   test('content quality validation should complete in < 500ms', async () => {
     const start = Date.now();
     await qualityService.validateContentQuality(testArticleId);
@@ -581,7 +594,7 @@ describe('Performance Tests', () => {
 // CACHE TESTS
 // ============================================================================
 
-describe('Cache Management', () => {
+describeIf('Cache Management', () => {
   test('should invalidate specific cache types', async () => {
     await qualityService.invalidateQualityCache('content');
     await qualityService.invalidateQualityCache('agent');

@@ -12,7 +12,9 @@ import { createTestUser, cleanupTestData } from '../helpers/testData';
 jest.mock('ioredis');
 const MockedRedis = Redis as jest.MockedClass<typeof Redis>;
 
-describe('SubscriptionManager', () => {
+const describeWithDb = process.env.DATABASE_URL?.startsWith('postgres') ? describe : describe.skip;
+
+describeWithDb('SubscriptionManager', () => {
   let subscriptionManager: SubscriptionManager;
   let mockRedis: jest.Mocked<Redis>;
   let prisma: PrismaClient;

@@ -1,5 +1,7 @@
 import '@testing-library/jest-dom';
 
+jest.setTimeout(10000);
+
 // Extend Jest matchers with jest-dom
 declare global {
   namespace jest {

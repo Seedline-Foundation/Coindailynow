@@ -6,19 +6,18 @@
 
 import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 
-// Mock OpenAI before importing
-const mockOpenAI = {
-  chat: {
-    completions: {
-      create: jest.fn() as jest.MockedFunction<any>
-    }
+// Mock aiClient before importing
+const mockReasoningComplete = jest.fn<() => Promise<string>>();
+const mockComplete = jest.fn<() => Promise<string>>();
+jest.mock('../../src/services/aiClient', () => ({
+  complete: mockComplete,
+  reasoningComplete: mockReasoningComplete,
+  AI_MODELS: {
+    LLAMA: 'llama3.1:8b',
+    DEEPSEEK: 'deepseek-r1:8b',
+    EMBEDDINGS: 'BAAI/bge-small-en-v1.5'
   }
-};
-jest.mock('openai', () => {
-  return {
-    default: jest.fn(() => mockOpenAI)
-  };
-});
+}));
 
 // Mock other dependencies
 jest.mock('../../src/agents/marketAnalysisAgent');
@@ -108,6 +107,12 @@ describe('ContentRecommendationService', () => {
       userEngagements: [
         { actionType: 'VIEW', userId: 'user-123' },
         { actionType: 'LIKE', userId: 'user-123' }
+      ],
+      User: { id: 'author-1', username: 'crypto_expert', email: 'expert@example.com' },
+      Category: { id: 'crypto-news', name: 'Cryptocurrency News', slug: 'crypto-news' },
+      UserEngagement: [
+        { actionType: 'VIEW', userId: 'user-123', createdAt: new Date() },
+        { actionType: 'LIKE', userId: 'user-123', createdAt: new Date() }
       ]
     },
     {
@@ -145,7 +150,10 @@ describe('ContentRecommendationService', () => {
         name: 'Exchange News',
         slug: 'exchange-news'
       },
-      userEngagements: []
+      userEngagements: [],
+      User: { id: 'author-2', username: 'exchange_watcher', email: 'watcher@example.com' },
+      Category: { id: 'exchange-news', name: 'Exchange News', slug: 'exchange-news' },
+      UserEngagement: []
     }
   ];
 
@@ -231,8 +239,7 @@ describe('ContentRecommendationService', () => {
     hybridSearchService = {} as any;
 
     config = {
-      openaiApiKey: 'test-key',
-      model: 'gpt-4-turbo-preview',
+      model: 'llama3.1:8b',
       maxTokens: 4096,
       temperature: 0.7,
       diversityThreshold: 0.4,
@@ -258,7 +265,6 @@ describe('ContentRecommendationService', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    mockOpenAI.chat.completions.create.mockClear();
   });
 
   describe('User Behavior Analysis', () => {
@@ -363,28 +369,33 @@ describe('ContentRecommendationService', () => {
       prisma.article.findMany.mockResolvedValue(mockArticles as any);
       redis.get.mockResolvedValue(null); // No cache
 
-      // Mock AI response
-      mockOpenAI.chat.completions.create.mockResolvedValue({
-        choices: [{
-          message: {
-            content: JSON.stringify({
-              recommendations: [
-                {
-                  score: 0.85,
-                  reasons: [
-                    {
-                      type: 'behavioral',
-                      description: 'Matches user preferences for Nigerian crypto content',
-                      confidence: 0.9,
-                      weight: 0.4
-                    }
-                  ]
-                }
-              ]
-            })
+      // Mock AI response - reasoningComplete returns a string directly
+      mockReasoningComplete.mockResolvedValue(JSON.stringify({
+        recommendations: [
+          {
+            score: 0.85,
+            reasons: [
+              {
+                type: 'behavioral',
+                description: 'Matches user preferences for Nigerian crypto content',
+                confidence: 0.9,
+                weight: 0.4
+              }
+            ]
+          },
+          {
+            score: 0.75,
+            reasons: [
+              {
+                type: 'behavioral',
+                description: 'Related exchange content',
+                confidence: 0.7,
+                weight: 0.3
+              }
+            ]
           }
-        }]
-      });
+        ]
+      }));
 
       // Act
       const result = await service.getRecommendations(request);
@@ -460,8 +471,8 @@ describe('ContentRecommendationService', () => {
       prisma.article.findMany.mockResolvedValue(mockArticles as any);
       redis.get.mockResolvedValue(null);
 
-      // Mock OpenAI failure
-      mockOpenAI.chat.completions.create.mockRejectedValue(new Error('OpenAI API error'));
+      // Mock AI failure
+      mockReasoningComplete.mockRejectedValue(new Error('AI API error'));
 
       const request: RecommendationRequest = {
         userId: 'user-123',
@@ -597,7 +608,7 @@ describe('ContentRecommendationService', () => {
 
       // Assert
       expect(prisma.userEngagement.create).toHaveBeenCalledWith({
-        data: {
+        data: expect.objectContaining({
           userId: 'user-123',
           articleId: 'article-1',
           actionType: 'VIEW',
@@ -605,7 +616,7 @@ describe('ContentRecommendationService', () => {
           deviceType: 'mobile',
           userAgent: 'system',
           ipAddress: '0.0.0.0'
-        }
+        })
       });
 
       expect(redis.del).toHaveBeenCalledWith('user_profile:user-123');
@@ -672,15 +683,12 @@ describe('ContentRecommendationService', () => {
       prisma.article.findMany.mockResolvedValue(mockArticles as any);
       redis.get.mockResolvedValue(null);
 
-      mockOpenAI.chat.completions.create.mockResolvedValue({
-        choices: [{
-          message: {
-            content: JSON.stringify({
-              recommendations: [{ score: 0.8, reasons: [] }]
-            })
-          }
-        }]
-      });
+      mockReasoningComplete.mockResolvedValue(JSON.stringify({
+        recommendations: [
+          { score: 0.8, reasons: [] },
+          { score: 0.7, reasons: [] }
+        ]
+      }));
 
       const startTime = Date.now();
 
@@ -747,25 +755,19 @@ describe('ContentRecommendationService', () => {
       redis.get.mockResolvedValue(null); // No cache
       redis.setex.mockResolvedValue('OK');
 
-      mockOpenAI.chat.completions.create.mockResolvedValue({
-        choices: [{
-          message: {
-            content: JSON.stringify({
-              recommendations: mockArticles.map(() => ({
-                score: 0.8,
-                reasons: [
-                  {
-                    type: 'behavioral',
-                    description: 'Matches user interests',
-                    confidence: 0.8,
-                    weight: 0.4
-                  }
-                ]
-              }))
-            })
-          }
-        }]
-      });
+      mockReasoningComplete.mockResolvedValue(JSON.stringify({
+        recommendations: mockArticles.map(() => ({
+          score: 0.8,
+          reasons: [
+            {
+              type: 'behavioral',
+              description: 'Matches user interests',
+              confidence: 0.8,
+              weight: 0.4
+            }
+          ]
+        }))
+      }));
 
       const request: RecommendationRequest = {
         userId: 'user-123',

@@ -21,8 +21,9 @@ const mockLogger = {
 };
 
 // Mock the aiClient module
+const mockGenerateEmbeddings = jest.fn().mockResolvedValue(new Array(384).fill(0.1));
 jest.mock('../../src/services/aiClient', () => ({
-  generateEmbeddings: jest.fn().mockResolvedValue(new Array(384).fill(0.1)),
+  generateEmbeddings: (...args: any[]) => mockGenerateEmbeddings(...args),
   complete: jest.fn().mockResolvedValue('test response'),
   AI_MODELS: {
     LLAMA: 'llama3.1:8b',
@@ -50,19 +51,13 @@ describe('HybridSearchService', () => {
   describe('Semantic Search', () => {
     test('should generate embeddings for search query', async () => {
       const query = 'Bitcoin price in Nigeria';
-      const mockEmbedding = new Array(1536).fill(0.1);
+      const mockEmbedding = new Array(384).fill(0.1);
       
-      mockOpenAI.embeddings.create.mockResolvedValue({
-        data: [{ embedding: mockEmbedding }]
-      });
+      mockGenerateEmbeddings.mockResolvedValue(mockEmbedding);
 
       const result = await hybridSearchService.generateEmbedding(query);
       
-      expect(mockOpenAI.embeddings.create).toHaveBeenCalledWith({
-        model: 'text-embedding-3-small',
-        input: query,
-        dimensions: 1536
-      });
+      expect(mockGenerateEmbeddings).toHaveBeenCalledWith(query);
       expect(result).toEqual(mockEmbedding);
     });
 
@@ -75,20 +70,16 @@ describe('HybridSearchService', () => {
       ];
 
       for (const query of queries) {
-        mockOpenAI.embeddings.create.mockResolvedValue({
-          data: [{ embedding: new Array(1536).fill(0.1) }]
-        });
+        mockGenerateEmbeddings.mockResolvedValue(new Array(384).fill(0.1));
 
         const result = await hybridSearchService.generateEmbedding(query);
-        expect(result).toHaveLength(1536);
+        expect(result).toHaveLength(384);
       }
     });
 
     test('should optimize embeddings for African context', async () => {
       const africanContextQuery = 'mobile money cryptocurrency integration M-Pesa';
-      mockOpenAI.embeddings.create.mockResolvedValue({
-        data: [{ embedding: new Array(1536).fill(0.2) }]
-      });
+      mockGenerateEmbeddings.mockResolvedValue(new Array(384).fill(0.2));
 
       const result = await hybridSearchService.semanticSearch(africanContextQuery, {
         includeAfricanContext: true,
@@ -96,7 +87,7 @@ describe('HybridSearchService', () => {
         optimizeForMobile: true
       });
       
-      expect(mockOpenAI.embeddings.create).toHaveBeenCalled();
+      expect(mockGenerateEmbeddings).toHaveBeenCalled();
       expect(result.africanContextWeight).toBeGreaterThan(1);
     });
   });
@@ -121,9 +112,7 @@ describe('HybridSearchService', () => {
       };
 
       mockElasticsearchService.searchArticles.mockResolvedValue(elasticResults);
-      mockOpenAI.embeddings.create.mockResolvedValue({
-        data: [{ embedding: new Array(1536).fill(0.1) }]
-      });
+      mockGenerateEmbeddings.mockResolvedValue(new Array(384).fill(0.1));
 
       const result = await hybridSearchService.hybridSearch(query, {
         type: SearchResultType.ARTICLES,
@@ -221,7 +210,7 @@ describe('HybridSearchService', () => {
       });
 
       // Simulate semantic search failure
-      mockOpenAI.embeddings.create.mockRejectedValue(new Error('API timeout'));
+      mockGenerateEmbeddings.mockRejectedValue(new Error('API timeout'));
 
       const result = await hybridSearchService.hybridSearch(query, {
         type: SearchResultType.ARTICLES,
