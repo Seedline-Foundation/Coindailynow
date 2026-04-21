@@ -1,0 +1,63 @@
+# CoinDaily production database stack
+# Single Postgres 16 instance running the TimescaleDB extension.
+# Hypertables (price_ticks, fiat_stablecoin_pairs) live in the same DB
+# as the rest of the Prisma schema; see prisma/migrations/timescaledb_setup.sql.
+#
+# Usage (on Contabo VPS):
+#   cd ~/news-platform/infrastructure/db
+#   cp .env.example .env            # edit with a fresh strong password
+#   docker compose --env-file .env -f docker-compose.db.yml up -d
+#   docker compose --env-file .env -f docker-compose.db.yml ps
+#
+# Data and backups are bind-mounted to ~/coindaily/ so the host filesystem
+# has clear separation and backups survive container rebuilds.
+
+services:
+  postgres:
+    image: timescale/timescaledb:2.17.2-pg16
+    container_name: coindaily-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB required}
+      PGDATA: /var/lib/postgresql/data/pgdata
+      # Timescale tuning hints; safe defaults for a 4-8 GB VPS.
+      TS_TUNE_MEMORY: ${TS_TUNE_MEMORY:-4GB}
+      TS_TUNE_NUM_CPUS: ${TS_TUNE_NUM_CPUS:-2}
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=timescaledb
+      - -c
+      - max_connections=200
+      - -c
+      - log_min_duration_statement=500
+      - -c
+      - log_connections=on
+      - -c
+      - log_disconnections=on
+      - -c
+      - log_lock_waits=on
+    ports:
+      # Bind to loopback only. Backend reaches it via 127.0.0.1:5432.
+      # Do NOT expose to 0.0.0.0; cross-host access must go through WireGuard/SSH.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ${HOST_PGDATA_DIR:-${HOME}/coindaily/pgdata}:/var/lib/postgresql/data
+      - ${HOST_BACKUPS_DIR:-${HOME}/coindaily/backups}:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+networks:
+  default:
+    name: coindaily-db-net
