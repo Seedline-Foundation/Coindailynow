@@ -220,7 +220,19 @@ export function SuperAdminProvider({ children }: SuperAdminProviderProps) {
           : parseFloat(statsData.system?.serverUptime) || 99.8,
         dailyActiveUsers: statsData.users?.activeUsers || 0,
         apiRequests: statsData.platform?.totalAnalyticsEvents || 0,
-        errorRate: statsData.system?.errorRate || 0
+        errorRate: statsData.system?.errorRate || 0,
+        kpis: {
+          mau: { current: statsData.users?.activeUsers || 0, target: 50000, change: 0 },
+          apiMrr: { current: statsData.revenue?.monthlyRecurringRevenue || 0, target: 100000, change: 0 },
+          contentVelocity: { current: statsData.content?.articlesPerDay || 0, target: 20, change: 0 },
+          subscriptionConversion: { current: statsData.revenue?.conversionRate || 0, target: 7.5, change: 0 },
+          exchangeCoverage: { current: statsData.market?.exchangeCoverage || 0, target: 95, exchanges: statsData.market?.integratedExchanges || 0, total: statsData.market?.totalExchanges || 0 },
+          aiQualityScore: { current: statsData.ai?.qualityScore || 0, target: 90, change: 0 },
+          pageLoadTime: { current: statsData.performance?.avgPageLoadMs || 0, target: 2000, change: 0 },
+          subscriberGrowth: { current: statsData.users?.subscriberGrowth || 0, target: 12, change: 0 },
+          stablecoinAccuracy: { current: statsData.market?.stablecoinAccuracy || 0, target: 98 },
+          alertResponseTime: { current: statsData.ops?.alertResponseMin || 0, target: 10, change: 0 },
+        },
       };
 
       // Generate system alerts based on thresholds

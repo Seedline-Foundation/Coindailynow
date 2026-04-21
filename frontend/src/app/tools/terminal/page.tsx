@@ -31,6 +31,7 @@ type ExchangeRate = {
 };
 
 type NewsItem = { id: string; title: string; source: string; ts: string; sentiment: 'bullish' | 'bearish' | 'neutral' };
+type PremiumRow = { fiatCurrency: string; stablecoin: string; exchange: string; premiumPct: number; spreadPct: number; buyPrice: number; sellPrice: number };
 
 /* ── Seed data (powers page even without a live backend) ──────────── */
 function spark(base: number, n = 24): number[] {
@@ -157,6 +158,40 @@ function VolumeBar({ data, w = 700, h = 60 }: { data: OHLC[]; w?: number; h?: nu
   );
 }
 
+function TradingViewWidget({ symbol }: { symbol: string }) {
+  const containerId = `tv-widget-${symbol.toLowerCase()}`;
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      autosize: true,
+      symbol: `BINANCE:${symbol}USDT`,
+      interval: '60',
+      timezone: 'Africa/Lagos',
+      theme: 'dark',
+      style: '1',
+      locale: 'en',
+      hide_side_toolbar: false,
+      allow_symbol_change: true,
+      watchlist: ['BINANCE:BTCUSDT', 'BINANCE:ETHUSDT', 'BINANCE:SOLUSDT'],
+      details: true,
+      studies: ['MACD@tv-basicstudies', 'RSI@tv-basicstudies'],
+      withdateranges: true,
+      container_id: containerId,
+    });
+
+    const target = document.getElementById(containerId);
+    if (target) {
+      target.innerHTML = '';
+      target.appendChild(script);
+    }
+  }, [symbol, containerId]);
+
+  return <div id={containerId} className="w-full h-[360px]" />;
+}
+
 /* ─────────────────────────────────────────────────────────────────── */
 /* ── Page Component ───────────────────────────────────────────────── */
 /* ─────────────────────────────────────────────────────────────────── */
@@ -167,7 +202,9 @@ export default function TerminalPage() {
   const [timeframe, setTimeframe] = useState('1H');
   const [africanRates, setAfricanRates] = useState<ExchangeRate[]>(seedAfricanRates);
   const [news, setNews] = useState<NewsItem[]>(seedNews);
+  const [premiumRows, setPremiumRows] = useState<PremiumRow[]>([]);
   const [searchQ, setSearchQ] = useState('');
+  const [chartMode, setChartMode] = useState<'native' | 'tradingview'>('tradingview');
   const [wsStatus, setWsStatus] = useState<'connected' | 'connecting' | 'disconnected'>('disconnected');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -191,18 +228,40 @@ export default function TerminalPage() {
     } catch { /* keep seed data */ }
   }, [apiBase, tickers]);
 
+  const fetchPremiums = useCallback(async () => {
+    try {
+      const res = await fetch(`${apiBase}/api/v1/market/fiat-stablecoin?fiat=NGN&stablecoin=USDT`, { cache: 'no-store' });
+      if (!res.ok) return;
+      const json = await res.json();
+      const rows = Array.isArray(json?.data) ? json.data : [];
+      const normalized = rows.map((r: any) => ({
+        fiatCurrency: String(r.fiatCurrency || 'NGN'),
+        stablecoin: String(r.stablecoin || 'USDT'),
+        exchange: String(r.exchange || 'Unknown'),
+        premiumPct: Number(r.premiumPct || 0),
+        spreadPct: Number(r.spreadPct || 0),
+        buyPrice: Number(r.buyPrice || 0),
+        sellPrice: Number(r.sellPrice || 0),
+      }));
+      setPremiumRows(normalized);
+    } catch {
+      setPremiumRows([]);
+    }
+  }, [apiBase]);
+
   useEffect(() => {
     fetchData();
+    fetchPremiums();
     intervalRef.current = setInterval(fetchData, 30000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [fetchData]);
+  }, [fetchData, fetchPremiums]);
 
   /* ── WebSocket for live streaming ──────────────────────────────── */
   useEffect(() => {
     let ws: WebSocket | null = null;
     try {
       const wsUrl = apiBase.replace(/^http/, 'ws');
-      ws = new WebSocket(`${wsUrl}/ws/market`);
+      ws = new WebSocket(`${wsUrl}/api/v1/stream/${selected}`);
       ws.onopen = () => setWsStatus('connected');
       ws.onclose = () => setWsStatus('disconnected');
       ws.onerror = () => setWsStatus('disconnected');
@@ -217,7 +276,7 @@ export default function TerminalPage() {
       setWsStatus('connecting');
     } catch { setWsStatus('disconnected'); }
     return () => { ws?.close(); };
-  }, [apiBase]);
+  }, [apiBase, selected]);
 
   /* ── Switch chart data when ticker changes ─────────────────────── */
   useEffect(() => {
@@ -304,6 +363,12 @@ export default function TerminalPage() {
                 </span>
               </div>
               <div className="flex gap-1">
+                <button
+                  onClick={() => setChartMode(chartMode === 'tradingview' ? 'native' : 'tradingview')}
+                  className="px-2 py-1 rounded text-[10px] font-medium text-cyan-300 hover:bg-[#1a2235]"
+                >
+                  {chartMode === 'tradingview' ? 'Use Native' : 'Use TradingView'}
+                </button>
                 {timeframes.map(tf => (
                   <button key={tf} onClick={() => setTimeframe(tf)}
                     className={`px-2 py-1 rounded text-[10px] font-medium ${timeframe === tf ? 'bg-yellow-500 text-black' : 'text-gray-400 hover:bg-[#1a2235]'}`}>
@@ -324,8 +389,14 @@ export default function TerminalPage() {
 
             {/* Candlestick chart */}
             <div className="bg-[#0d1117] rounded-lg p-2">
-              <CandleChart data={chartData} />
-              <VolumeBar data={chartData} />
+              {chartMode === 'tradingview' ? (
+                <TradingViewWidget symbol={activeTicker.symbol} />
+              ) : (
+                <>
+                  <CandleChart data={chartData} />
+                  <VolumeBar data={chartData} />
+                </>
+              )}
             </div>
           </div>
 
@@ -355,6 +426,19 @@ export default function TerminalPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            {/* Market Heatmap */}
+            <div className="bg-[#111827] rounded-lg p-3">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">Market Heatmap</h3>
+              <div className="grid grid-cols-4 gap-1">
+                {tickers.slice(0, 8).map((t) => (
+                  <div key={t.symbol} className={`rounded p-2 text-[10px] ${t.change24h >= 0 ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
+                    <div className="text-white font-semibold">{t.symbol}</div>
+                    <div className={t.change24h >= 0 ? 'text-green-300' : 'text-red-300'}>{t.change24h.toFixed(2)}%</div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -402,6 +486,46 @@ export default function TerminalPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* NGN Premium Tracker */}
+        <div className="mt-4 bg-[#111827] rounded-lg p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">NGN Premium Tracker (USDT)</h2>
+            <span className="text-xs text-gray-500">Live from /api/v1/market/fiat-stablecoin</span>
+          </div>
+          {premiumRows.length === 0 ? (
+            <p className="text-xs text-gray-500">Premium feed unavailable.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-gray-500 border-b border-gray-800">
+                    <th className="py-2 text-left">Exchange</th>
+                    <th className="py-2 text-right">Buy</th>
+                    <th className="py-2 text-right">Sell</th>
+                    <th className="py-2 text-right">Spread</th>
+                    <th className="py-2 text-right">Premium</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50">
+                  {premiumRows.slice(0, 8).map((r, i) => (
+                    <tr key={`${r.exchange}-${i}`}>
+                      <td className="py-2 text-white">{r.exchange}</td>
+                      <td className="py-2 text-right font-mono text-green-400">{r.buyPrice.toLocaleString()}</td>
+                      <td className="py-2 text-right font-mono text-red-400">{r.sellPrice.toLocaleString()}</td>
+                      <td className="py-2 text-right text-gray-400">{r.spreadPct.toFixed(2)}%</td>
+                      <td className="py-2 text-right">
+                        <span className={`${r.premiumPct > 3 ? 'text-red-400' : r.premiumPct > 1 ? 'text-yellow-400' : 'text-green-400'}`}>
+                          {r.premiumPct.toFixed(2)}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* ── African Exchange Rates Table ─────────────────────────── */}

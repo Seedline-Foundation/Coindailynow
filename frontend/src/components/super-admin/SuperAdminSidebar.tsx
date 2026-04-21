@@ -85,7 +85,7 @@ function detectSidebarRole(): { isCeo: boolean; staffId: string; assignedMenus: 
 
 export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebarProps) {
   const pathname = usePathname();
-  const [expandedItems, setExpandedItems] = useState<string[]>(['overview']);
+  const [expandedItems, setExpandedItems] = useState<string[]>(['overview', 'content-management']);
   const [userRole, setUserRole] = useState<{ isCeo: boolean; staffId: string; assignedMenus: string[] }>({ isCeo: true, staffId: 'ceo', assignedMenus: [] });
 
   useEffect(() => {

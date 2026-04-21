@@ -197,6 +197,11 @@ export default function RegulationTrackerPage() {
                 <span>Updated: {country.lastUpdate}</span>
                 <span>{country.exchanges.length} exchanges</span>
               </div>
+              <div className="mt-3">
+                <Link href={`/regulation/${country.code.toLowerCase()}`} className="text-xs text-orange-600 dark:text-orange-400 hover:underline">
+                  View detailed country profile →
+                </Link>
+              </div>
               {compareMode && (
                 <div className="mt-3">
                   <input type="checkbox" checked={compareList.includes(country.code)} readOnly className="mr-2" />

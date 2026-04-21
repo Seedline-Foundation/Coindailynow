@@ -128,7 +128,7 @@ function SuperAdminSettingsPage() {
   const [config, setConfig] = useState<SystemConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'general');
+  const [activeTab, setActiveTab] = useState(searchParams?.get('tab') || 'general');
   const [message, setMessage] = useState<{type: 'success' | 'error' | 'info'; text: string} | null>(null);
 
   const tabs = [
@@ -144,7 +144,7 @@ function SuperAdminSettingsPage() {
 
   // Sync activeTab when URL search params change (e.g. sidebar link click)
   useEffect(() => {
-    const tabParam = searchParams.get('tab');
+    const tabParam = searchParams?.get('tab');
     if (tabParam && tabs.some(t => t.id === tabParam)) {
       setActiveTab(tabParam);
     }

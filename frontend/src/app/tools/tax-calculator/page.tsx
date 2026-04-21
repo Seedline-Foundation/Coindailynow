@@ -29,6 +29,8 @@ export default function TaxCalculatorPage() {
   const [quantity, setQuantity] = useState('');
   const [result, setResult] = useState<null | { gain: number; tax: number; rate: string }>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [importedRows, setImportedRows] = useState(0);
+  const [reportLanguage, setReportLanguage] = useState<'en' | 'fr' | 'pt'>('en');
 
   const country = countries.find(c => c.code === selectedCountry)!;
 
@@ -78,6 +80,39 @@ export default function TaxCalculatorPage() {
     }
   };
 
+  const handleImportCsv = async (file: File | null) => {
+    if (!file) return;
+    const text = await file.text();
+    const rows = text.split(/\r?\n/).filter(Boolean);
+    // Minimal import helper for Binance/Luno-style exports (header + rows)
+    setImportedRows(Math.max(0, rows.length - 1));
+  };
+
+  const downloadPdfReport = async () => {
+    const buy = parseFloat(buyPrice) || 0;
+    const sell = parseFloat(sellPrice) || 0;
+    const qty = parseFloat(quantity) || 1;
+    const taxYear = new Date().getUTCFullYear();
+    const tx = [
+      { txType: 'BUY', asset: 'BTC', quantity: qty, priceUsd: buy, timestamp: new Date(Date.now() - 86400000).toISOString() },
+      { txType: 'SELL', asset: 'BTC', quantity: qty, priceUsd: sell, timestamp: new Date().toISOString() },
+    ];
+
+    const response = await fetch(`${backendUrl}/api/v1/tax/report.pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ countryCode: selectedCountry, taxYear, costBasis: 'FIFO', transactions: tx, language: reportLanguage }),
+    });
+    if (!response.ok) return;
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `coindaily-tax-report-${selectedCountry}-${taxYear}-${reportLanguage}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
@@ -99,6 +134,18 @@ export default function TaxCalculatorPage() {
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">💰 Tax Calculator</h2>
               
               <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Import Exchange CSV</label>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => handleImportCsv(e.target.files?.[0] || null)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  {importedRows > 0 && (
+                    <p className="text-xs text-green-600 dark:text-green-400 mt-1">Imported {importedRows} transaction rows.</p>
+                  )}
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Country</label>
                   <select value={selectedCountry} onChange={e => { setSelectedCountry(e.target.value); setResult(null); }}
@@ -128,6 +175,21 @@ export default function TaxCalculatorPage() {
                 >
                   {isCalculating ? 'Calculating…' : 'Calculate Tax'}
                 </button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <select
+                    value={reportLanguage}
+                    onChange={(e) => setReportLanguage(e.target.value as 'en' | 'fr' | 'pt')}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm"
+                  >
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="pt">Português</option>
+                  </select>
+                  <button onClick={downloadPdfReport} className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
+                    Download PDF
+                  </button>
+                </div>
 
                 {result && (
                   <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
