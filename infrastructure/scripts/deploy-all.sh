@@ -31,11 +31,12 @@ echo -e "${GREEN}✓ SSH connection successful${NC}"
 # Create directory structure
 echo -e "${YELLOW}[2/10] Creating directory structure...${NC}"
 ssh ${SERVER_USER}@${SERVER_IP} << 'EOF'
-mkdir -p /var/www/coindaily-backend
-mkdir -p /var/www/coindaily-news
+mkdir -p /var/www/coindaily-app
+mkdir -p /var/www/coindaily
 mkdir -p /var/www/coindaily-admin
-mkdir -p /var/www/coindaily-pr
+mkdir -p /var/www/coindaily-press
 mkdir -p /var/www/coindaily-ai
+mkdir -p /var/www/coindaily-token
 mkdir -p /var/log/coindaily
 chmod 755 /var/log/coindaily
 echo "✓ Directories created"
@@ -49,7 +50,7 @@ rsync -avz --delete \
     --exclude 'tests' \
     --exclude '*.log' \
     --exclude '.env.local' \
-    ${LOCAL_DIR}/backend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-backend/
+    ${LOCAL_DIR}/backend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-app/
 echo -e "${GREEN}✓ Backend synced${NC}"
 
 # Sync News Frontend
@@ -59,7 +60,7 @@ rsync -avz --delete \
     --exclude '.git' \
     --exclude '.next/cache' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/frontend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-news/
+    ${LOCAL_DIR}/frontend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily/
 echo -e "${GREEN}✓ News Frontend synced${NC}"
 
 # Sync Admin Portal
@@ -80,7 +81,7 @@ rsync -avz --delete \
     --exclude '.git' \
     --exclude '.next/cache' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/frontend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-pr/
+    ${LOCAL_DIR}/frontend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-press/
 echo -e "${GREEN}✓ PR System synced${NC}"
 
 # Sync AI System
@@ -121,11 +122,11 @@ cd /var/www
 
 # Backend
 echo "Installing backend dependencies..."
-cd coindaily-backend && npm ci --production && cd ..
+cd coindaily-app && npm ci --production && cd ..
 
 # News Frontend
 echo "Installing news frontend dependencies..."
-cd coindaily-news && npm ci --production && cd ..
+cd coindaily && npm ci --production && cd ..
 
 # Admin Portal
 echo "Installing admin dependencies..."
@@ -133,7 +134,7 @@ cd coindaily-admin && npm ci --production && cd ..
 
 # PR System
 echo "Installing PR system dependencies..."
-cd coindaily-pr && npm ci --production && cd ..
+cd coindaily-press && npm ci --production && cd ..
 
 # AI System
 echo "Installing AI system dependencies..."
