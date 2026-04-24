@@ -24,6 +24,9 @@ BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/coindaily/backups}"
 
 mkdir -p "$PGDATA_DIR" "$BACKUPS_DIR"
 chmod 700 "$PGDATA_DIR"
+# Ensure the postgres user inside the container (uid 999) owns the data dir.
+# The TimescaleDB image extends the official postgres image which uses uid 999.
+chown -R 999:999 "$PGDATA_DIR" "$BACKUPS_DIR" 2>/dev/null || true
 
 echo "[provision] data dir    : $PGDATA_DIR"
 echo "[provision] backups dir : $BACKUPS_DIR"
