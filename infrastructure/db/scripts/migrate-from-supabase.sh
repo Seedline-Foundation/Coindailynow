@@ -4,13 +4,13 @@
 # What it does:
 #   1. pg_dump the Supabase DB from its DIRECT (non-pooler) endpoint,
 #      excluding Supabase-internal schemas.
-#   2. pg_restore into the local Contabo Postgres container.
+#   2. psql restore into the local Contabo Postgres container.
 #   3. Leaves the dump file in ~/coindaily/backups/ for audit/rollback.
 #
 # Prerequisites:
 #   - provision.sh already ran successfully.
-#   - postgresql-client-16 installed on the VPS:
-#       sudo apt-get update && sudo apt-get install -y postgresql-client-16
+#   - postgresql-client-17+ installed on the VPS (Supabase runs PG 17):
+#       sudo apt-get update && sudo apt-get install -y postgresql-client-17
 #   - App is in maintenance mode (see cutover README).
 #
 # Usage:
@@ -37,7 +37,7 @@ set -a; source .env; set +a
 
 BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/coindaily/backups}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-DUMP_FILE="$BACKUPS_DIR/supabase-${STAMP}.dump"
+DUMP_FILE="$BACKUPS_DIR/supabase-${STAMP}.sql"
 
 mkdir -p "$BACKUPS_DIR"
 
@@ -68,7 +68,7 @@ done
 
 echo "[migrate] dumping Supabase -> $DUMP_FILE"
 pg_dump \
-  --format=custom \
+  --format=plain \
   --no-owner \
   --no-privileges \
   --no-publications \
@@ -94,19 +94,14 @@ if [[ "$TABLE_COUNT" -gt 0 ]]; then
 fi
 
 echo "[migrate] copying dump into container..."
-docker cp "$DUMP_FILE" coindaily-postgres:/backups/restore.dump
+docker cp "$DUMP_FILE" coindaily-postgres:/backups/restore.sql
 
 echo "[migrate] restoring into $POSTGRES_DB ..."
 docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
-  pg_restore \
-    --username="$POSTGRES_USER" \
-    --dbname="$POSTGRES_DB" \
-    --no-owner \
-    --no-privileges \
-    --no-comments \
-    --exit-on-error \
-    --verbose \
-    /backups/restore.dump
+  psql \
+    -U "$POSTGRES_USER" \
+    -d "$POSTGRES_DB" \
+    -f /backups/restore.sql
 
 echo "[migrate] restore complete."
 docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
