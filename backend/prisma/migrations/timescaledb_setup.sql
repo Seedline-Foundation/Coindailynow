@@ -93,9 +93,9 @@ FROM price_ticks
 WHERE "interval" = '1m'
 GROUP BY bucket, symbol, exchange;
 
--- Refresh policy: materialise every 30 minutes, covering last 2 hours
+-- Refresh policy: materialise every 30 minutes, covering last 3 hours
 SELECT add_continuous_aggregate_policy('price_ticks_1h',
-  start_offset  => INTERVAL '2 hours',
+  start_offset  => INTERVAL '3 hours',
   end_offset    => INTERVAL '30 minutes',
   schedule_interval => INTERVAL '30 minutes',
   if_not_exists => true
@@ -140,7 +140,7 @@ FROM fiat_stablecoin_pairs
 GROUP BY bucket, "fiatCurrency", stablecoin, exchange;
 
 SELECT add_continuous_aggregate_policy('ngn_premium_1h',
-  start_offset    => INTERVAL '2 hours',
+  start_offset    => INTERVAL '3 hours',
   end_offset      => INTERVAL '30 minutes',
   schedule_interval => INTERVAL '30 minutes',
   if_not_exists   => true
