@@ -74,6 +74,7 @@ bash scripts/migrate-from-supabase.sh
 ```bash
 cd $REPO_DIR/backend
 export DATABASE_URL='postgresql://coindaily:<password>@127.0.0.1:5432/coindaily?sslmode=disable'
+export DIRECT_URL='postgresql://coindaily:<password>@127.0.0.1:5432/coindaily?sslmode=disable'
 npx prisma db push
 
 cd $REPO_DIR/infrastructure/db
@@ -82,26 +83,29 @@ bash scripts/apply-timescale.sh
 
 ## Step 9 — Cutover Env + Restart
 
-Edit `backend/.env.production`:
+The deployed backend lives at `/var/www/coindaily-app/`, not in the repo.
+
+Edit **the deployed** backend env:
 ```bash
-nano $REPO_DIR/backend/.env.production
+nano /var/www/coindaily-app/.env.production
 ```
 
-Replace `DATABASE_URL` and `DIRECT_URL` with:
+Replace **only** the database lines:
 ```
-postgresql://coindaily:<password>@127.0.0.1:5432/coindaily?sslmode=disable
+DATABASE_URL="postgresql://coindaily:<password>@127.0.0.1:5432/coindaily_prod?sslmode=disable"
+DIRECT_URL="postgresql://coindaily:<password>@127.0.0.1:5432/coindaily_prod?sslmode=disable"
 ```
+Save (`Ctrl+O`, `Enter`, `Ctrl+X`).
 
-Restart:
+Restart services with the new env:
 ```bash
-cd $REPO_DIR/backend
-pm2 start ecosystem.config.js --update-env
-pm2 status
+pm2 start /var/www/ecosystem.config.js --update-env
+pm2 save
 ```
 
 Health checks:
 ```bash
-curl -fsS https://app.coindaily.online/api/health
+curl -fsS https://backend.coindaily.online/health
 curl -I -s -o /dev/null -w "%{http_code}" https://coindaily.online
 curl -I -s -o /dev/null -w "%{http_code}" https://jet.coindaily.online
 ```
