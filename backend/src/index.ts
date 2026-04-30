@@ -81,6 +81,7 @@ const GRAPHQL_PATH = '/graphql';
 export async function setupApp() {
   // Create Express app
   const app = express();
+  app.set('trust proxy', 1);
   const httpServer = createServer(app);
 
   // Initialize optimization services
