@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { AdminWalletDashboard } from '../../../components/admin/wallet/AdminWalletDashboard';
+import AdminWalletDashboard from '@admin-components/admin/wallet/AdminWalletDashboard';
 import Layout from '../../../components/Layout';
 
 export default function AdminWalletPage() {

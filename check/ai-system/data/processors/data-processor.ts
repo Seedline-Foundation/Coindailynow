@@ -1,7 +1,7 @@
 // Data Processor - Processes and enriches collected data for AI analysis
 // Optimized for single I/O operations with comprehensive validation
 
-import { createAuditLog, AuditActions } from '../../../lib/audit';
+import { createAuditLog } from '../../../backend/src/services/aiAuditService';
 import { DataCollectionResult } from '../../types/ai-types';
 
 export interface ProcessingRequest {

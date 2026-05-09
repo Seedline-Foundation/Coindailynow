@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { countryCodeToRoute } from '@/lib/geo';
 
 /**
  * Next.js Middleware — Server-side route protection
@@ -45,8 +46,30 @@ const PUBLIC_ROUTES = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (pathname === '/' || pathname === '/news') {
+    const headerCountry =
+      request.headers.get('x-vercel-ip-country') ||
+      request.headers.get('cf-ipcountry') ||
+      request.cookies.get('country')?.value ||
+      'NG';
+    const routeCountry = countryCodeToRoute(headerCountry);
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = `/${routeCountry}/news`;
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  const countryNewsMatch = pathname.match(/^\/([a-z]{2})\/news(?:\/|$)/i);
+  if (countryNewsMatch) {
+    const response = NextResponse.next();
+    response.cookies.set('country', countryNewsMatch[1].toUpperCase(), {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+    });
+    return response;
+  }
+
   // Skip middleware for public/static/API routes
-  if (pathname === '/' || PUBLIC_ROUTES.some(route => route !== '/' && pathname.startsWith(route))) {
+  if (PUBLIC_ROUTES.some(route => route !== '/' && pathname.startsWith(route))) {
     return NextResponse.next();
   }
 

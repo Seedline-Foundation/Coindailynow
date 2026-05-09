@@ -2,7 +2,7 @@
 // Handles research verification, content quality assessment, and translation review
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { createAuditLog, AuditActions } from '../../../lib/audit';
+import { createAuditLog } from '../../../../backend/src/services/aiAuditService';
 
 export interface ReviewRequest {
   reviewType: 'research' | 'content' | 'translation' | 'quality' | 'factcheck' | 'sentiment';

@@ -1,6 +1,6 @@
 /**
  * AI Cost Control & Budget Management API (STUB)
- * See docs/ai-system/TASK_10.3_IMPLEMENTATION.md for full implementation
+ * See documentations/ai/TASK_10.3_IMPLEMENTATION.md for full implementation
  */
 
 import express, { Request, Response } from 'express';
@@ -24,7 +24,7 @@ router.get('/health', (req: Request, res: Response): void => {
   res.json({
     status: 'stub_mode',
     message: 'AI Cost system is in stub mode. Run migration to activate full implementation.',
-    documentation: 'docs/ai-system/TASK_10.3_IMPLEMENTATION.md'
+    documentation: 'documentations/ai/TASK_10.3_IMPLEMENTATION.md'
   });
 });
 

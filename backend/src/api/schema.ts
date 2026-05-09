@@ -155,6 +155,85 @@ export const typeDefs = `
     updatedAt: DateTime!
   }
 
+  type UserBookmarkItem {
+    id: ID!
+    userId: ID!
+    articleId: ID!
+    createdAt: DateTime!
+    article: Article
+  }
+
+  type ReadingHistoryItem {
+    id: ID!
+    userId: ID!
+    articleId: ID!
+    readAt: DateTime!
+    readDurationSec: Int
+    scrollPercent: Float
+    completed: Boolean!
+    article: Article
+  }
+
+  type UserNotificationItem {
+    id: ID!
+    userId: ID!
+    type: String!
+    title: String!
+    message: String!
+    link: String
+    read: Boolean!
+    createdAt: DateTime!
+  }
+
+  type UserWalletSummary {
+    id: ID!
+    walletAddress: String!
+    walletType: String!
+    availableBalance: Float!
+    lockedBalance: Float!
+    totalBalance: Float!
+    cePoints: Float!
+    joyTokens: Float!
+    currency: String!
+    status: String!
+    lastTransactionAt: DateTime
+    updatedAt: DateTime!
+  }
+
+  type UserSubscriptionStatus {
+    id: ID!
+    userId: ID!
+    status: String!
+    currentPeriodStart: DateTime!
+    currentPeriodEnd: DateTime!
+    cancelAtPeriodEnd: Boolean!
+    cancelledAt: DateTime
+    planName: String
+    planDescription: String
+  }
+
+  type UserActivityEvent {
+    id: ID!
+    userId: ID
+    sessionId: String!
+    eventType: String!
+    resourceId: String
+    resourceType: String
+    properties: String
+    metadata: String
+    timestamp: DateTime!
+  }
+
+  type UserDashboard {
+    user: User!
+    bookmarks: [UserBookmarkItem!]!
+    readingHistory: [ReadingHistoryItem!]!
+    notifications: [UserNotificationItem!]!
+    subscription: UserSubscriptionStatus
+    wallet: UserWalletSummary
+    activityEvents: [UserActivityEvent!]!
+  }
+
   enum BillingInterval {
     MONTHLY
     YEARLY
@@ -715,6 +794,14 @@ export const typeDefs = `
     # User queries
     user(id: ID!): User
     users(limit: Int = 20, offset: Int = 0, filter: String): [User!]!
+    myBookmarks(limit: Int = 50, offset: Int = 0): [UserBookmarkItem!]!
+    myReadingHistory(limit: Int = 50, offset: Int = 0): [ReadingHistoryItem!]!
+    myNotifications(unreadOnly: Boolean = false, limit: Int = 50, offset: Int = 0): [UserNotificationItem!]!
+    mySubscriptionStatus: UserSubscriptionStatus
+    myWalletSummary: UserWalletSummary
+    myActivityEvents(limit: Int = 100, offset: Int = 0): [UserActivityEvent!]!
+    adminUserDashboard(userId: ID!): UserDashboard!
+    adminUserMessages(userId: ID!, limit: Int = 50, offset: Int = 0): [UserNotificationItem!]!
 
     # Article queries
     article(id: ID, slug: String): Article
@@ -726,6 +813,8 @@ export const typeDefs = `
       status: ArticleStatus
       isPremium: Boolean
       authorId: ID
+      countryCode: String
+      language: String
     ): [Article!]!
 
     # Translation queries for Task 7
@@ -944,6 +1033,18 @@ export const typeDefs = `
     # Content interactions
     likeArticle(id: ID!): Article!
     bookmarkArticle(id: ID!): Boolean!
+    markMyNotificationRead(notificationId: ID!): UserNotificationItem!
+    markAllMyNotificationsRead: Int!
+    removeMyBookmark(articleId: ID!): Boolean!
+    clearMyReadingHistory: Int!
+    deleteMyNotification(notificationId: ID!): Boolean!
+    trackMyReading(articleId: ID!, readDurationSec: Int, scrollPercent: Float, completed: Boolean): ReadingHistoryItem!
+    adminMarkNotificationRead(userId: ID!, notificationId: ID!): UserNotificationItem!
+    adminCreateUserNotification(userId: ID!, type: String!, title: String!, message: String!, link: String): UserNotificationItem!
+    adminCancelUserSubscription(userId: ID!, reason: String): Boolean!
+    adminRefundSubscriptionPayment(paymentId: ID!, reason: String): Boolean!
+    adminResetNotificationPreferences(userId: ID!, reason: String): Boolean!
+    adminToggleUserShadowBan(userId: ID!, shadowBanned: Boolean!, reason: String): Boolean!
     shareContent(contentId: ID!, contentType: ContentType!, platform: String!): Boolean!
 
     # AI System

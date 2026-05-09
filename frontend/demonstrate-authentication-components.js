@@ -196,7 +196,7 @@ function main() {
   
   const docPaths = [
     'src/pages/auth-demo.tsx',
-    'docs/tasks/TASK_20_AUTHENTICATION_UI_COMPLETION_SUMMARY.md'
+    'documentations/tasks/TASK_20_AUTHENTICATION_UI_COMPLETION_SUMMARY.md'
   ];
 
   docPaths.forEach(docPath => {

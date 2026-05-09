@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { CEPointsManager } from '../../../components/admin/wallet/CEPointsManager';
+import CEPointsManager from '@admin-components/admin/wallet/CEPointsManager';
 import Layout from '../../../components/Layout';
 
 export default function CEPointsPage() {

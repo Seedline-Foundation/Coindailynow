@@ -1,8 +1,7 @@
 // Image Generation Agent - DALL-E powered visual content creation
 // Handles article thumbnails, charts, and promotional images for CoinDaily Africa
 
-import { createAuditLog } from '../../../lib/audit';
-import { AuditActions } from '../../../lib/audit';
+import { createAuditLog } from '../../../../backend/src/services/aiAuditService';
 
 export interface ImageGenerationRequest {
   type: 'thumbnail' | 'chart' | 'social_image' | 'banner' | 'infographic';

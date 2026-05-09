@@ -2,12 +2,12 @@
  * AI Cost Control & Budget Management Service
  * 
  * NOTE: This is a STUB implementation. The full implementation has been completed
- * and documented in docs/ai-system/TASK_10.3_IMPLEMENTATION.md
+ * and documented in documentations/ai/TASK_10.3_IMPLEMENTATION.md
  * 
  * To activate the full implementation:
  * 1. Run database migration: npx prisma migrate dev
  * 2. Regenerate Prisma client: npx prisma generate  
- * 3. Restore the full implementation from: docs/ai-system/task-10.3-backup-*
+ * 3. Restore the full implementation from: documentations/ai/task-10.3-backup-*
  * 
  * The complete production-ready implementation includes:
  * - Real-time cost tracking for all AI operations
@@ -18,7 +18,7 @@
  * - REST & GraphQL APIs
  * - Background worker for scheduled jobs
  * 
- * See: docs/ai-system/TASK_10.3_COMPLETION_SUMMARY.md for full details
+ * See: documentations/ai/TASK_10.3_COMPLETION_SUMMARY.md for full details
  */
 
 import { logger } from '../utils/logger';

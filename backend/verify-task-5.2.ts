@@ -57,22 +57,22 @@ const filesToCheck: FileCheck[] = [
 
   // Documentation
   {
-    path: 'docs/ai-system/TASK_5.2_IMPLEMENTATION.md',
+    path: 'documentations/ai/TASK_5.2_IMPLEMENTATION.md',
     description: 'Implementation Documentation',
     minLines: 500
   },
   {
-    path: 'docs/ai-system/TASK_5.2_QUICK_REFERENCE.md',
+    path: 'documentations/ai/TASK_5.2_QUICK_REFERENCE.md',
     description: 'Quick Reference Guide',
     minLines: 200
   },
   {
-    path: 'docs/ai-system/AI_TASK_SYSTEM_README.md',
+    path: 'documentations/ai/AI_TASK_SYSTEM_README.md',
     description: 'Integration Guide',
     minLines: 300
   },
   {
-    path: 'docs/ai-system/TASK_5.2_COMPLETE_SUMMARY.md',
+    path: 'documentations/ai/TASK_5.2_COMPLETE_SUMMARY.md',
     description: 'Completion Summary',
     minLines: 200
   }

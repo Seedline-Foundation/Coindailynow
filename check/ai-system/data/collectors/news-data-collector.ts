@@ -1,7 +1,7 @@
 // News Data Collector - Real-time news collection for African cryptocurrency journalism
 // Optimized for single I/O operations with comprehensive caching
 
-import { createAuditLog, AuditActions } from '../../../lib/audit';
+import { createAuditLog } from '../../../backend/src/services/aiAuditService';
 import { DataCollectionResult } from '../../types/ai-types';
 
 export interface NewsDataRequest {

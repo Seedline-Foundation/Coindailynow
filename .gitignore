@@ -153,3 +153,20 @@ jest-*.json
 /test-agents.ps1
 /validate-schema.js
 /validate-schema2.js
+# Temporary build and error files
+build-errors.txt
+errors.txt
+test-output.txt
+*.broken.backup*
+*.log.old
+
+# Backup files
+documentations/backups/
+*.backup
+*.bak
+
+# Temporary query files
+tmp-query.json
+task-test.json
+ollama-test.json
+

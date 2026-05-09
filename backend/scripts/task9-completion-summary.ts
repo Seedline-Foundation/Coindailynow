@@ -95,7 +95,7 @@ console.log('   Testing & Documentation:');
 console.log('   • backend/tests/ai/orchestrator.test.ts - Comprehensive test suite');
 console.log('   • backend/scripts/demonstrate-orchestrator.ts - Integration demo');
 console.log('   • backend/tests/integration/orchestrator-integration.test.ts - Integration test');
-console.log('   • docs/tasks/TASK_9_AI_ORCHESTRATOR_COMPLETION.md - Complete documentation');
+console.log('   • documentations/tasks/TASK_9_AI_ORCHESTRATOR_COMPLETION.md - Complete documentation');
 console.log('');
 
 console.log('🧪 TEST-DRIVEN DEVELOPMENT:');

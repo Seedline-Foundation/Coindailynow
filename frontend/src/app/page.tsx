@@ -1,16 +1,11 @@
-'use client';
-
-import React from 'react';
-import { 
-  Header, 
-  HeroSection, 
-  ThreeColumnLayout,
-  LeftSidebar,
-  RightSidebar 
-} from '@/components/landing';
+import { Header } from '@/components/landing';
 import MarqueeWrapper from '@/components/landing/MarqueeWrapper';
 import Footer from '@/components/footer/Footer';
-import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageBanner from '@/components/geo/LanguageBanner';
+import CountrySwitcher from '@/components/news/CountrySwitcher';
+import { countryCodeToRoute, routeToCountryCode } from '@/lib/geo';
+import Link from 'next/link';
+import { cookies } from 'next/headers';
 
 // Mock data for demonstration
 const mockTrendingTokens = [
@@ -70,74 +65,75 @@ const mockTrendingTokens = [
   },
 ];
 
-const mockFeaturedNews = [
-  {
-    id: '1',
-    title: 'Bitcoin Reaches New All-Time High as African Adoption Surges',
-    excerpt: 'Bitcoin has hit a new record high of $43,250 as adoption across African countries continues to accelerate, driven by mobile money integration.',
-    category: 'Bitcoin',
-    publishedAt: '2 hours ago',
-    imageUrl: '/images/news/bitcoin-ath-africa.jpg',
-    author: 'Kwame Osei',
-    readTime: '5 min read',
-    slug: 'bitcoin-ath-african-adoption-surge',
-  },
-  {
-    id: '2',
-    title: 'Nigerian Central Bank Announces Digital Naira Phase 2',
-    excerpt: 'The Central Bank of Nigeria reveals plans for the second phase of the eNaira rollout, focusing on rural areas and cross-border payments.',
-    category: 'CBDC',
-    publishedAt: '4 hours ago',
-    imageUrl: '/images/news/enaira-phase-2.jpg',
-    author: 'Amina Hassan',
-    readTime: '4 min read',
-    slug: 'nigeria-enaira-phase-2-announcement',
-  },
-  {
-    id: '3',
-    title: 'M-Pesa Crypto Integration Goes Live in Kenya',
-    excerpt: 'Safaricom launches crypto buying and selling directly through M-Pesa, making cryptocurrency accessible to 30 million Kenyan users.',
-    category: 'Mobile Money',
-    publishedAt: '6 hours ago',
-    imageUrl: '/images/news/mpesa-crypto-integration.jpg',
-    author: 'Thabo Mthembu',
-    readTime: '3 min read',
-    slug: 'mpesa-crypto-integration-kenya-launch',
-  },
-  {
-    id: '4',
-    title: 'Ethereum Scaling Solutions Gain Traction in South Africa',
-    excerpt: 'Layer 2 solutions see rapid adoption among South African DeFi users, reducing transaction costs by up to 90%.',
-    category: 'Ethereum',
-    publishedAt: '8 hours ago',
-    imageUrl: '/images/news/ethereum-scaling-south-africa.jpg',
-    author: 'Nkosazana Duma',
-    readTime: '6 min read',
-    slug: 'ethereum-scaling-south-africa-adoption',
-  },
-];
+interface ArticleListItem {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt?: string | null;
+  featuredImageUrl?: string | null;
+  publishedAt?: string | null;
+  updatedAt?: string | null;
+  category?: { name?: string | null; slug?: string | null } | null;
+}
 
-const mockBreakingNews = [
-  {
-    id: 'breaking-1',
-    title: 'BREAKING: Binance Africa Announces $100M Fund for African Crypto Startups',
-    excerpt: 'Binance launches dedicated venture fund to support cryptocurrency and blockchain startups across the African continent.',
-    category: 'Breaking',
-    publishedAt: '30 minutes ago',
-    author: 'Breaking News Team',
-    readTime: '2 min read',
-    slug: 'binance-africa-100m-startup-fund',
-    isBreaking: true,
-  },
-];
+async function getHomepageArticles(countryCode: string, languageCode: string): Promise<ArticleListItem[]> {
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:4000';
+  const response = await fetch(`${backendUrl}/graphql`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: `
+        query HomepageArticles($limit: Int!, $status: ArticleStatus, $countryCode: String, $language: String) {
+          articles(limit: $limit, status: $status, countryCode: $countryCode, language: $language) {
+            id
+            slug
+            title
+            excerpt
+            featuredImageUrl
+            publishedAt
+            updatedAt
+            category {
+              name
+              slug
+            }
+          }
+        }
+      `,
+      variables: { limit: 24, status: 'PUBLISHED', countryCode, language: languageCode },
+    }),
+    next: { revalidate: 60 },
+  });
+  if (!response.ok) return [];
+  const data = await response.json();
+  return data?.data?.articles ?? [];
+}
 
-export default function Home() {
-  const { t } = useLanguage();
+function formatDate(dateString?: string | null) {
+  if (!dateString) return 'Draft';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return 'Draft';
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: { country?: string; lang?: string };
+}) {
+  const params = searchParams || {};
+  const cookieStore = await cookies();
+  const countryCode = routeToCountryCode(params.country || cookieStore.get('country')?.value || 'ng');
+  const countrySlug = countryCodeToRoute(countryCode);
+  const languageCode = params.lang || cookieStore.get('lang')?.value || 'en';
+  const articles = await getHomepageArticles(countryCode, languageCode);
+  const featured = articles[0];
+  const latest = articles.slice(1, 7);
+  const more = articles.slice(7);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header with Date/Time, Logo, Search, Auth */}
       <Header showDateTime={true} />
+      <LanguageBanner />
 
       {/* Marquee Ticker for Trending Tokens */}
       <MarqueeWrapper 
@@ -148,78 +144,102 @@ export default function Home() {
         showVolume={true}
       />
 
-      {/* Hero Section with Latest News */}
-      <HeroSection 
-        featuredNews={mockFeaturedNews}
-        breakingNews={mockBreakingNews}
-        className="py-8 lg:py-12"
-      />
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <CountrySwitcher currentCountryCode={countryCode} />
 
-      {/* Three Column Layout with Sidebar Content */}
-      <div className="py-8">
-        <ThreeColumnLayout
-          leftColumn={<LeftSidebar />}
-          centerColumn={
-            <div className="space-y-8">
-              {/* Featured Content Area */}
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  {t('latestAfricanCryptoNews')}
-                </h2>
-                <div className="grid gap-6">
-                  {mockFeaturedNews.map((article) => (
-                    <article key={article.id} className="border-b border-gray-100 pb-6 last:border-b-0">
-                      <div className="flex gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                              {article.category}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                              {article.publishedAt}
-                            </span>
-                          </div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2 hover:text-blue-600 transition-colors cursor-pointer">
-                            {article.title}
-                          </h3>
-                          <p className="text-gray-600 mb-3">
-                            {article.excerpt}
-                          </p>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <span>{t('by')} {article.author}</span>
-                            <span>•</span>
-                            <span>{article.readTime}</span>
-                          </div>
-                        </div>
-                        {article.imageUrl && (
-                          <div className="w-32 h-24 bg-gray-200 rounded-lg flex-shrink-0">
-                            {/* Placeholder for image */}
-                            <div className="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
-                              <span className="text-gray-500 text-xs">{t('image')}</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </article>
-                  ))}
+        {featured ? (
+          <section className="mb-10">
+            <Link href={`/${countrySlug}/news/${featured.slug}`} className="group block">
+              <div className="relative rounded-2xl overflow-hidden bg-dark-800 border border-dark-700">
+                {featured.featuredImageUrl ? (
+                  <img
+                    src={featured.featuredImageUrl}
+                    alt={featured.title}
+                    className="w-full h-[380px] object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-[380px] bg-gradient-to-br from-primary-500/20 to-dark-800 flex items-center justify-center">
+                    <span className="text-6xl">N</span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-8">
+                  <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+                    {featured.title}
+                  </h1>
+                  <p className="text-gray-200 text-lg max-w-2xl line-clamp-2">{featured.excerpt}</p>
                 </div>
               </div>
+            </Link>
+          </section>
+        ) : (
+          <section className="mb-10 rounded-2xl bg-dark-800 border border-dark-700 p-12 text-center">
+            <h2 className="text-2xl font-display font-bold text-white mb-3">Welcome to CoinDaily</h2>
+            <p className="text-gray-400">No published articles yet for this country and language.</p>
+          </section>
+        )}
 
-              {/* Load More Button */}
-              <div className="text-center">
-                <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                  {t('loadMoreArticles')}
-                </button>
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            {latest.length > 0 && (
+              <section>
+                <h2 className="text-xl font-display font-bold text-gray-900 mb-5">Latest News</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {latest.map((article) => (
+                    <Link
+                      key={article.id}
+                      href={`/${countrySlug}/news/${article.slug}`}
+                      className="group rounded-xl bg-white shadow-sm hover:shadow-md transition overflow-hidden border"
+                    >
+                      {article.featuredImageUrl ? (
+                        <img src={article.featuredImageUrl} alt={article.title} className="h-44 w-full object-cover" />
+                      ) : (
+                        <div className="h-44 w-full bg-gradient-to-br from-blue-50 to-purple-50" />
+                      )}
+                      <div className="p-4">
+                        <div className="text-xs text-gray-500 mb-2">
+                          {article.category?.name || 'News'} · {formatDate(article.publishedAt || article.updatedAt)}
+                        </div>
+                        <h3 className="text-base font-semibold text-gray-900 group-hover:text-blue-700 transition">
+                          {article.title}
+                        </h3>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+            {more.length > 0 && (
+              <section>
+                <h2 className="text-xl font-display font-bold text-gray-900 mb-5">More Stories</h2>
+                <div className="space-y-3">
+                  {more.map((article) => (
+                    <Link
+                      key={article.id}
+                      href={`/${countrySlug}/news/${article.slug}`}
+                      className="block bg-white border rounded-lg p-4 hover:bg-gray-50"
+                    >
+                      <div className="text-xs text-gray-500 mb-1">
+                        {article.category?.name || 'News'} · {formatDate(article.publishedAt || article.updatedAt)}
+                      </div>
+                      <h3 className="text-base font-semibold text-gray-900">{article.title}</h3>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+
+          <aside className="space-y-6">
+            <div className="bg-white border rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wider">Country Feed</h3>
+              <p className="text-sm text-gray-600">
+                You are reading localized coverage for <span className="font-semibold">{countryCode}</span>.
+              </p>
             </div>
-          }
-          rightColumn={<RightSidebar />}
-          showAds={true}
-          adKeywords={['cryptocurrency', 'bitcoin', 'africa', 'trading']}
-        />
+          </aside>
+        </div>
       </div>
-
-      {/* Comprehensive Footer */}
       <Footer />
     </div>
   );

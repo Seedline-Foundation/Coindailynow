@@ -76,7 +76,9 @@ export const cmsResolvers: IResolvers<any, GraphQLContext> = {
         status, 
         isPremium, 
         authorId,
-        workflowStatus 
+        workflowStatus,
+        countryCode,
+        language
       }: {
         limit?: number;
         offset?: number;
@@ -85,6 +87,8 @@ export const cmsResolvers: IResolvers<any, GraphQLContext> = {
         isPremium?: boolean;
         authorId?: string;
         workflowStatus?: string;
+        countryCode?: string;
+        language?: string;
       },
       context: GraphQLContext
     ) => {
@@ -94,6 +98,10 @@ export const cmsResolvers: IResolvers<any, GraphQLContext> = {
       if (status) where.status = status;
       if (isPremium !== undefined) where.isPremium = isPremium;
       if (authorId) where.authorId = authorId;
+      if (language) where.language = language;
+      if (countryCode) {
+        where.OR = [{ territory: { has: countryCode.toUpperCase() } }, { territory: { isEmpty: true } }];
+      }
 
       // If user is not authenticated or doesn't have editor role, only show published articles
       if (!context.user || !['EDITOR', 'ADMIN'].includes(context.user.role || '')) {

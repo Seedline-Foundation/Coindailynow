@@ -69,7 +69,9 @@
       "@/constants/*": ["./src/constants/*"],
       "@/contexts/*": ["./src/contexts/*"],
       "@/store/*": ["./src/store/*"],
-      "@/public/*": ["./public/*"]
+      "@/public/*": ["./public/*"],
+      "@admin/*": ["../apps/admin/src/*"],
+      "@admin-components/*": ["../apps/admin/src/components/*"]
     }
   },
   "include": [

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { TransactionFeed } from '../../../components/wallet';
+import { TransactionFeed } from '@admin-components/wallet';
 import { WebSocketProvider, WebSocketStatus } from '../../../contexts/WebSocketContext';
 import { useAuth } from '../../../hooks/useAuth';
 

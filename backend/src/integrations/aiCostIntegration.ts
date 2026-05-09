@@ -1,6 +1,6 @@
 /**
  * AI Cost Integration (STUB)
- * See docs/ai-system/TASK_10.3_IMPLEMENTATION.md for full implementation
+ * See documentations/ai/TASK_10.3_IMPLEMENTATION.md for full implementation
  */
 
 import { Express } from 'express';
@@ -19,5 +19,5 @@ export async function mountAICostSystem(
   app.use(`${basePath}/ai/costs`, aiCostRoutes);
   
   logger.info('AI Cost stub system mounted successfully');
-  logger.info('See docs/ai-system/TASK_10.3_IMPLEMENTATION.md for details');
+  logger.info('See documentations/ai/TASK_10.3_IMPLEMENTATION.md for details');
 }

@@ -6,6 +6,7 @@ import { translationResolvers } from './translationResolvers';
 import { workflowResolvers } from './workflowResolvers';
 import { analyticsResolvers } from './graphql/resolvers/analyticsResolvers';
 import { legalResolvers } from './resolvers/legal.resolvers';
+import { userDashboardResolvers } from './userDashboardResolvers';
 import { walletModalResolvers } from '../graphql/resolvers/walletModalResolvers';
 import { withdrawalResolvers } from '../graphql/resolvers/withdrawalResolvers';
 
@@ -48,12 +49,16 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
       });
     },
 
-    articles: async (_: any, { limit = 20, offset = 0, categoryId, isPremium, status = 'PUBLISHED' }: { 
-      limit?: number; offset?: number; categoryId?: string; isPremium?: boolean; status?: string 
+    articles: async (_: any, { limit = 20, offset = 0, categoryId, isPremium, status = 'PUBLISHED', countryCode, language }: { 
+      limit?: number; offset?: number; categoryId?: string; isPremium?: boolean; status?: string; countryCode?: string; language?: string;
     }, context: GraphQLContext) => {
       const where: any = { status };
       if (categoryId) where.categoryId = categoryId;
       if (isPremium !== undefined) where.isPremium = isPremium;
+      if (language) where.language = language;
+      if (countryCode) {
+        where.OR = [{ territory: { has: countryCode.toUpperCase() } }, { territory: { isEmpty: true } }];
+      }
 
       return await context.prisma.article.findMany({
         where,
@@ -130,6 +135,9 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
     // Merge legal queries - Task 30
     ...((legalResolvers as any).Query || {}),
 
+    // User dashboard and backoffice mirror queries
+    ...((userDashboardResolvers as any).Query || {}),
+
     // Merge wallet modal queries - Wallet System
     ...((walletModalResolvers as any).Query || {}),
 
@@ -155,6 +163,9 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
 
     // Merge legal mutations - Task 30
     ...((legalResolvers as any).Mutation || {}),
+
+    // User dashboard and backoffice mirror mutations
+    ...((userDashboardResolvers as any).Mutation || {}),
 
     // Merge wallet modal mutations - Wallet System
     ...((walletModalResolvers as any).Mutation || {}),
@@ -223,6 +234,11 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
   ...((workflowResolvers as any).ContentWorkflow ? { ContentWorkflow: (workflowResolvers as any).ContentWorkflow } : {}),
   ...((workflowResolvers as any).WorkflowStep ? { WorkflowStep: (workflowResolvers as any).WorkflowStep } : {}),
   ...((workflowResolvers as any).WorkflowNotification ? { WorkflowNotification: (workflowResolvers as any).WorkflowNotification } : {}),
+  ...((userDashboardResolvers as any).UserDashboard ? { UserDashboard: (userDashboardResolvers as any).UserDashboard } : {}),
+  ...((userDashboardResolvers as any).UserBookmarkItem ? { UserBookmarkItem: (userDashboardResolvers as any).UserBookmarkItem } : {}),
+  ...((userDashboardResolvers as any).ReadingHistoryItem ? { ReadingHistoryItem: (userDashboardResolvers as any).ReadingHistoryItem } : {}),
+  ...((userDashboardResolvers as any).UserActivityEvent ? { UserActivityEvent: (userDashboardResolvers as any).UserActivityEvent } : {}),
+  ...((userDashboardResolvers as any).UserSubscriptionStatus ? { UserSubscriptionStatus: (userDashboardResolvers as any).UserSubscriptionStatus } : {}),
 
   // Date scalar
   DateTime: {

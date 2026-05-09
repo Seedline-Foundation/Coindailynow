@@ -154,6 +154,7 @@ export const context = async ({ req, connectionParams }: any): Promise<GraphQLCo
           id: true,
           email: true,
           username: true,
+          role: true,
           subscriptionTier: true,
           status: true,
           emailVerified: true,
@@ -163,10 +164,11 @@ export const context = async ({ req, connectionParams }: any): Promise<GraphQLCo
 
       if (fullUser) {
         // Simple role determination logic
-        let role = 'USER';
-        if (fullUser.email.includes('admin')) role = 'ADMIN';
-        else if (fullUser.email.includes('editor')) role = 'EDITOR'; 
-        else if (fullUser.email.includes('translator')) role = 'TRANSLATOR';
+        let role = fullUser.role || 'USER';
+        if (fullUser.email.toLowerCase().includes('support')) role = 'SUPPORT';
+        else if (fullUser.email.toLowerCase().includes('admin')) role = 'ADMIN';
+        else if (fullUser.email.toLowerCase().includes('editor')) role = 'EDITOR';
+        else if (fullUser.email.toLowerCase().includes('translator')) role = 'TRANSLATOR';
         else if (fullUser.Article.length > 0) role = 'AUTHOR';
 
         baseContext.user = {
@@ -199,6 +201,7 @@ export const context = async ({ req, connectionParams }: any): Promise<GraphQLCo
           id: true,
           email: true,
           username: true,
+          role: true,
           subscriptionTier: true,
           status: true,
           emailVerified: true,
@@ -208,10 +211,11 @@ export const context = async ({ req, connectionParams }: any): Promise<GraphQLCo
 
       if (fullUser) {
         // Simple role determination logic
-        let role = 'USER';
-        if (fullUser.email.includes('admin')) role = 'ADMIN';
-        else if (fullUser.email.includes('editor')) role = 'EDITOR'; 
-        else if (fullUser.email.includes('translator')) role = 'TRANSLATOR';
+        let role = fullUser.role || 'USER';
+        if (fullUser.email.toLowerCase().includes('support')) role = 'SUPPORT';
+        else if (fullUser.email.toLowerCase().includes('admin')) role = 'ADMIN';
+        else if (fullUser.email.toLowerCase().includes('editor')) role = 'EDITOR';
+        else if (fullUser.email.toLowerCase().includes('translator')) role = 'TRANSLATOR';
         else if (fullUser.Article.length > 0) role = 'AUTHOR';
 
         baseContext.user = {

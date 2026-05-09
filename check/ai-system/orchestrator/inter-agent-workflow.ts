@@ -3,7 +3,7 @@
 // Optimized for CoinDaily Africa's requirements: <500ms response, single I/O, SEO-focused
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { createAuditLog, AuditActions } from '../../lib/audit';
+import { createAuditLog } from '../../../backend/src/services/aiAuditService';
 import { CentralAIOrchestrator, AIOrchestrationResult } from './central-ai-orchestrator';
 import { AITask, AITaskType } from '../types/ai-types';
 

@@ -1,6 +1,6 @@
 /**
  * AI Cost GraphQL Resolvers (STUB)
- * See docs/ai-system/TASK_10.3_IMPLEMENTATION.md for full implementation
+ * See documentations/ai/TASK_10.3_IMPLEMENTATION.md for full implementation
  */
 
 export const aiCostResolvers = {

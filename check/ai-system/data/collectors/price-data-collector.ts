@@ -1,7 +1,7 @@
 // Price Data Collector - Real-time cryptocurrency price collection for African markets
 // Optimized for single I/O operations with comprehensive caching
 
-import { createAuditLog, AuditActions } from '../../../lib/audit';
+import { createAuditLog } from '../../../backend/src/services/aiAuditService';
 import { DataCollectionResult } from '../../types/ai-types';
 
 export interface PriceDataRequest {

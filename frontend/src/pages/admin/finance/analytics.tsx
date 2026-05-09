@@ -6,7 +6,7 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import FinanceAnalyticsDashboard from '@/components/admin/FinanceAnalyticsDashboard';
+import FinanceAnalyticsDashboard from '@admin-components/admin/FinanceAnalyticsDashboard';
 
 interface AnalyticsPageProps {
   user: {

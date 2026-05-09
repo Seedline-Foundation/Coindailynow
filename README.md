@@ -85,15 +85,31 @@ Visit `http://localhost:3000` to see the token presale page.
 
 ```
 news-platform/
+├── documentations/    # Centralized documentation (organized by category)
 ├── backend/           # Backend API (Express + GraphQL)
 ├── frontend/          # Main web application (Next.js)
+├── apps/              # Additional applications (admin, news, ai, press)
 ├── ai-system/         # AI agent orchestration
-├── MVP/
-│   └── token-landing/ # JY Token presale website
-├── contracts/         # Smart contracts
-├── infrastructure/    # Deployment configs
+├── MVP/token-landing/ # JY Token presale website
+├── contracts/         # Smart contracts (Solidity)
+├── finance-system/    # Financial operations
+├── translation-service/ # Multi-language translation
+├── infrastructure/    # Deployment configs & DevOps
+├── packages/          # Shared packages (monorepo)
 └── shared/            # Shared types and utilities
 ```
+
+**📖 For detailed directory structure, see [documentations/architecture/DIRECTORY_STRUCTURE.md](documentations/architecture/DIRECTORY_STRUCTURE.md)**
+
+### Documentation Organization
+
+All project documentation is now centralized in `documentations/` for easy reference:
+- **[AI Documentation](documentations/ai/)** - AI system setup and guides
+- **[Deployment Guides](documentations/deployment/)** - Production deployment steps
+- **[Architecture Docs](documentations/architecture/)** - System design and blueprints
+- **[Feature Documentation](documentations/features/)** - Feature implementations
+- **[Quick Reference Guides](documentations/guides/)** - Getting started guides
+- **[Marketing Materials](documentations/marketing/)** - Strategy and content
 
 ## 🎯 Key Features
 
