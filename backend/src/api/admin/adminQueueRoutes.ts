@@ -239,7 +239,16 @@ router.post('/queue/:id/request-edit', async (req: Request, res: Response) => {
 router.get('/stats', async (req: Request, res: Response) => {
   try {
     const pendingCount = await redis.llen('admin_queue:pending');
-    const approvedCount = await redis.llen('admin_queue:approved');
+
+    // Get all approved items to filter by today
+    const allApproved = await redis.lrange('admin_queue:approved', 0, -1);
+    const startOfToday = new Date().setHours(0, 0, 0, 0);
+
+    const approvedTodayCount = allApproved.filter(item => {
+      const parsed: AdminQueueItem = JSON.parse(item);
+      if (!parsed.reviewed_at) return false;
+      return new Date(parsed.reviewed_at).getTime() >= startOfToday;
+    }).length;
 
     // Get items with edit requests
     const allPending = await redis.lrange('admin_queue:pending', 0, -1);
@@ -253,7 +262,7 @@ router.get('/stats', async (req: Request, res: Response) => {
       stats: {
         pending_approval: pendingCount - editRequestedCount,
         edit_requested: editRequestedCount,
-        approved_today: approvedCount, // TODO: Filter by today
+        approved_today: approvedTodayCount,
         total_pending: pendingCount
       }
     });
