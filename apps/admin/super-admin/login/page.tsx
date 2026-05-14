@@ -16,8 +16,6 @@ export default function SuperAdminLoginPage() {
     setLoading(true);
     
     try {
-      console.log('Attempting login with:', { email, password: '***' });
-      
       const response = await fetch('/api/super-admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -25,25 +23,14 @@ export default function SuperAdminLoginPage() {
       });
       
       const data = await response.json();
-      console.log('Login response:', { success: data.success, error: data.error });
-      
+
       if (data.success && data.token) {
-        // Store token in localStorage
         localStorage.setItem('super_admin_token', data.token);
-        console.log('✅ Token stored successfully!');
-        console.log('Token preview:', data.token.substring(0, 30) + '...');
-        console.log('Checking localStorage...', localStorage.getItem('super_admin_token') ? 'Token confirmed in storage' : 'ERROR: Token not in storage!');
-        
-        // Small delay to ensure token is saved
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        console.log('🚀 Navigating to dashboard...');
         router.push('/super-admin/dashboard');
       } else {
         setError(data.error || 'Login failed. Please try again.');
       }
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch {
       setError('Network error. Please check your connection.');
     } finally {
       setLoading(false);
@@ -91,11 +78,7 @@ export default function SuperAdminLoginPage() {
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm font-semibold text-blue-900 mb-2">Demo Credentials:</p>
-          <p className="text-sm text-blue-800">Email: <span className="font-mono">admin@coindaily.africa</span></p>
-          <p className="text-sm text-blue-800">Password: <span className="font-mono">Admin@2024</span></p>
-        </div>
+        {/* Demo credentials block removed — security risk in production */}
       </div>
     </div>
   );

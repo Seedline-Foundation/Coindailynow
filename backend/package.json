@@ -50,13 +50,9 @@
   "dependencies": {
     "@apollo/server": "^4.9.0",
     "@elastic/elasticsearch": "^8.10.0",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
     "@google-cloud/vertexai": "^1.10.0",
     "@graphql-tools/schema": "^10.0.0",
     "@graphql-tools/utils": "^10.0.0",
-    "@mui/icons-material": "^7.3.4",
-    "@mui/material": "^7.3.4",
     "@prisma/client": "^6.19.2",
     "@types/helmet": "^4.0.0",
     "@types/multer": "^2.0.0",

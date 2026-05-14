@@ -45,22 +45,35 @@ export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
       try {
         const token = localStorage.getItem('super_admin_token');
         if (!token) {
-          console.log('No token found, redirecting to login');
           router.push('/super-admin/login');
           return;
         }
 
-        console.log('Token found:', token.substring(0, 20) + '...');
+        // Verify token server-side — never trust client-side format checks
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        try {
+          const response = await fetch(`${API_URL}/graphql`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ query: '{ me { success user { id email role } } }' }),
+          });
 
-        // Accept both mock tokens and JWT tokens for demo
-        // JWT tokens start with "eyJ" (base64 encoded)
-        const isValidToken = token.startsWith('mock_super_admin_token_') || token.startsWith('eyJ');
-        
-        if (isValidToken) {
-          console.log('Token valid, user authenticated');
-          setIsAuthenticated(true);
-        } else {
-          console.log('Invalid token format, clearing and redirecting');
+          if (response.ok) {
+            const data = await response.json();
+            const user = data.data?.me?.user;
+            if (user && user.role === 'SUPER_ADMIN') {
+              setIsAuthenticated(true);
+            } else {
+              // Valid token but not SUPER_ADMIN — deny access
+              localStorage.removeItem('super_admin_token');
+              router.push('/super-admin/login');
+            }
+          } else {
+            localStorage.removeItem('super_admin_token');
+            router.push('/super-admin/login');
+          }
+        } catch {
+          // Backend unreachable — deny access, never auto-grant
           localStorage.removeItem('super_admin_token');
           router.push('/super-admin/login');
         }

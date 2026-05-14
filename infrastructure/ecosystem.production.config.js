@@ -159,6 +159,37 @@ module.exports = {
     },
 
     // ============================================
+    // AI AGENT PIPELINE - content generation, translation, review
+    // This is the Node.js agent orchestrator (ai-system/),
+    // NOT the Next.js dashboard (apps/ai/).
+    // ============================================
+    {
+      name: 'coindaily-ai-pipeline',
+      cwd: '/var/www/coindaily-ai-system',
+      script: 'dist/orchestrator/index.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        OLLAMA_API_URL: 'http://localhost:11434',
+        NLLB_API_ENDPOINT: 'http://localhost:8080',
+        SDXL_API_ENDPOINT: 'http://localhost:7860',
+        DEEPSEEK_API_URL: 'http://localhost:11434',
+        REDIS_URL: 'redis://localhost:6379'
+      },
+      error_file: '/var/log/coindaily/ai-pipeline-error.log',
+      out_file: '/var/log/coindaily/ai-pipeline-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      max_memory_restart: '1G',
+      autorestart: true,
+      watch: false,
+      max_restarts: 5,
+      min_uptime: '30s',
+      restart_delay: 5000
+    },
+
+    // ============================================
     // TOKEN LANDING - token.coindaily.online (Already deployed)
     // ============================================
     {
