@@ -3,6 +3,8 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title CDPPoints — CoinDaily Points
@@ -19,6 +21,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  *        - Managed by OPERATOR_ROLE (backend services) and ADMIN_ROLE (super admin).
  */
 contract CDPPoints is AccessControl, ReentrancyGuard {
+    using SafeERC20 for IERC20;
 
     // ═══════════════════════════════════════════════════════════════════════
     // Roles
@@ -151,24 +154,17 @@ contract CDPPoints is AccessControl, ReentrancyGuard {
 
         uint256 joyAmount = (cdpAmount * 1e12) / cdpPerJoy; // 1e12 = JOY decimal base
 
-        // Check JOY balance in this contract
-        (bool success, bytes memory data) = joyToken.call(
-            abi.encodeWithSignature("balanceOf(address)", address(this))
-        );
-        require(success, "JOY balance check failed");
-        uint256 joyBal = abi.decode(data, (uint256));
-        require(joyBal >= joyAmount, "Insufficient JOY in pool");
+        // Check JOY balance in this contract using IERC20 interface (not raw call)
+        IERC20 joy = IERC20(joyToken);
+        require(joy.balanceOf(address(this)) >= joyAmount, "Insufficient JOY in pool");
 
         // Burn CDP
         balanceOf[msg.sender] -= cdpAmount;
         totalBurned += cdpAmount;
         totalSupply -= cdpAmount;
 
-        // Transfer JOY
-        (bool txSuccess, ) = joyToken.call(
-            abi.encodeWithSignature("transfer(address,uint256)", msg.sender, joyAmount)
-        );
-        require(txSuccess, "JOY transfer failed");
+        // Transfer JOY using SafeERC20 (reverts on failure, handles non-standard returns)
+        joy.safeTransfer(msg.sender, joyAmount);
 
         emit PointsConverted(msg.sender, cdpAmount, joyAmount);
     }
@@ -207,9 +203,6 @@ contract CDPPoints is AccessControl, ReentrancyGuard {
      * @dev Withdraw JOY tokens from the contract (admin only).
      */
     function withdrawJOY(uint256 amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        (bool success, ) = joyToken.call(
-            abi.encodeWithSignature("transfer(address,uint256)", msg.sender, amount)
-        );
-        require(success, "JOY withdrawal failed");
+        IERC20(joyToken).safeTransfer(msg.sender, amount);
     }
 }

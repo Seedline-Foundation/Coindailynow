@@ -562,8 +562,8 @@ export class AIVerificationAgent {
 
   private async getRecentWithdrawals(walletId: string, hours: number): Promise<any[]> {
     const result = await db.query(
-      `SELECT * FROM transactions WHERE from_wallet_id = $1 AND tx_type IN ('TOKEN_WITHDRAWAL','POINT_REDEEM') AND created_at > NOW() - INTERVAL '${hours} hours'`,
-      [walletId]
+      `SELECT * FROM transactions WHERE from_wallet_id = $1 AND tx_type IN ('TOKEN_WITHDRAWAL','POINT_REDEEM') AND created_at > NOW() - $2 * INTERVAL '1 hour'`,
+      [walletId, hours]
     );
     return result.rows;
   }

@@ -19,6 +19,7 @@ contract Airdrop is Ownable {
     function distribute(address[] calldata recipients, uint256[] calldata amounts) external onlyOwner {
         require(recipients.length == amounts.length, "Arrays length mismatch");
         require(recipients.length > 0, "No recipients");
+        require(recipients.length <= 200, "Batch too large, max 200 per tx");
 
         uint256 totalAmount = 0;
         for (uint256 i = 0; i < recipients.length; i++) {

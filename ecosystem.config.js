@@ -42,10 +42,13 @@ module.exports = {
 
     // ============================================
     // NEWS APP - coindaily.online
+    // The main public news site lives in ./frontend (Next.js 14).
+    // There is intentionally NO ./apps/news directory — frontend/ IS the news app.
+    // If you ever split it into apps/news, update this cwd in lockstep.
     // ============================================
     {
       name: 'coindaily-news',
-      cwd: './apps/news',
+      cwd: './frontend',
       script: 'npm',
       args: 'start',
       instances: 2,
@@ -150,6 +153,38 @@ module.exports = {
       watch: false,
       max_restarts: 10,
       min_uptime: '10s'
+    },
+
+    // ============================================
+    // AI AGENT PIPELINE - content generation, translation, review
+    // This is the Node.js agent orchestrator (ai-system/),
+    // NOT the Next.js dashboard (apps/ai/).
+    // ============================================
+    {
+      name: 'coindaily-ai-pipeline',
+      cwd: './ai-system',
+      script: 'dist/orchestrator/index.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        OLLAMA_API_URL: 'http://localhost:11434',
+        NLLB_API_ENDPOINT: 'http://localhost:8080',
+        SDXL_API_ENDPOINT: 'http://localhost:7860',
+        DEEPSEEK_API_URL: 'http://localhost:11434',
+        REDIS_URL: 'redis://localhost:6379'
+      },
+      error_file: './logs/ai-pipeline-error.log',
+      out_file: './logs/ai-pipeline-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      max_memory_restart: '1G',
+      autorestart: true,
+      watch: false,
+      max_restarts: 5,
+      min_uptime: '30s',
+      // Restart delay to avoid hammering Ollama on repeated failures
+      restart_delay: 5000
     },
 
     // ============================================

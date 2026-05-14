@@ -14,7 +14,7 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Server as HTTPServer } from 'http';
 import * as aiTaskService from '../aiTaskService';
 import { logger } from '../../utils/logger';
-import jwt from 'jsonwebtoken';
+import { verifyJWT } from '../../utils/auth';
 
 let io: SocketIOServer | null = null;
 
@@ -44,7 +44,7 @@ export function initializeAITaskWebSocket(httpServer: HTTPServer) {
         return next(new Error('Authentication required'));
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+      const decoded = verifyJWT(token);
       (socket as any).user = decoded;
       
       logger.info(`WebSocket client authenticated: ${(decoded as any).userId}`);

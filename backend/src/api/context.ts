@@ -163,13 +163,8 @@ export const context = async ({ req, connectionParams }: any): Promise<GraphQLCo
       });
 
       if (fullUser) {
-        // Simple role determination logic
-        let role = fullUser.role || 'USER';
-        if (fullUser.email.toLowerCase().includes('support')) role = 'SUPPORT';
-        else if (fullUser.email.toLowerCase().includes('admin')) role = 'ADMIN';
-        else if (fullUser.email.toLowerCase().includes('editor')) role = 'EDITOR';
-        else if (fullUser.email.toLowerCase().includes('translator')) role = 'TRANSLATOR';
-        else if (fullUser.Article.length > 0) role = 'AUTHOR';
+        // Role comes from the database — never inferred from email content
+        const role = fullUser.role || 'USER';
 
         baseContext.user = {
           id: fullUser.id,
@@ -210,13 +205,8 @@ export const context = async ({ req, connectionParams }: any): Promise<GraphQLCo
       });
 
       if (fullUser) {
-        // Simple role determination logic
-        let role = fullUser.role || 'USER';
-        if (fullUser.email.toLowerCase().includes('support')) role = 'SUPPORT';
-        else if (fullUser.email.toLowerCase().includes('admin')) role = 'ADMIN';
-        else if (fullUser.email.toLowerCase().includes('editor')) role = 'EDITOR';
-        else if (fullUser.email.toLowerCase().includes('translator')) role = 'TRANSLATOR';
-        else if (fullUser.Article.length > 0) role = 'AUTHOR';
+        // Role comes from the database — never inferred from email content
+        const role = fullUser.role || 'USER';
 
         baseContext.user = {
           id: fullUser.id,

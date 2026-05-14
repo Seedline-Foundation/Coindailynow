@@ -548,6 +548,30 @@ Generate a comprehensive, well-structured response:`;
   // PROMPT BUILDERS FOR DIFFERENT CONTENT TYPES
   // ============================================
 
+  /**
+   * CoinDaily Editorial Tone Constraint — Bloomberg-tier, not CoinDesk/tabloid.
+   * Applied to every article and SEO prompt. Ensures confident neutral reporting.
+   */
+  private static readonly EDITORIAL_TONE_CONSTRAINT = `
+=== EDITORIAL TONE POLICY (MANDATORY) ===
+You are writing for CoinDaily Africa — a Bloomberg-tier financial news platform, NOT a crypto hype blog.
+
+BANNED LANGUAGE — never use these words or their synonyms:
+"moon", "mooning", "to the moon", "rocket", "skyrocket", "parabolic",
+"crash", "plunge", "tank", "doom", "collapse", "bloodbath", "carnage",
+"WAGMI", "NGMI", "diamond hands", "paper hands", "ape in", "degen",
+"lambo", "pump", "dump", "shill", "FUD" (as dismissal), "hopium",
+"gem", "100x", "guaranteed returns", "can't lose", "next Bitcoin"
+
+REQUIRED TONE:
+- Confident, neutral, data-driven — like Bloomberg, Reuters, or the Financial Times
+- Use precise language: "rose 12%", "declined to $X", "regulatory framework"
+- Attribute claims: "according to CBN data", "analysts at X estimate"
+- No exclamation marks in body text. No clickbait headlines.
+- Every claim must be attributable to data or a named source
+- Africa-first framing: lead with African market impact, not US/EU context
+=== END EDITORIAL TONE POLICY ===`;
+
   private buildArticlePrompt(request: ImoPromptRequest): string {
     const { topic, tone = 'professional', targetAudience = 'general', africanFocus, keywords = [] } = request.context;
 
@@ -557,9 +581,10 @@ TOPIC: ${topic || 'cryptocurrency news'}
 AUDIENCE: ${targetAudience}
 TONE: ${tone}
 ${africanFocus ? 'FOCUS: African cryptocurrency market, regulations, adoption, and impact' : ''}
+${ImoPromptAgent.EDITORIAL_TONE_CONSTRAINT}
 ${keywords.length > 0 ? `TARGET KEYWORDS: ${keywords.join(', ')}` : ''}
 
-=== MANDATORY: RANKBRAIN-FRIENDLY CONTENT FRAMEWORK (6 STEPS) ===
+=== MANDATORY: RANKBRAIN-FRIENDLY CONTENT FRAMEWORK (8 STEPS) ===
 
 STEP 1 - HOOK (first 100 words): Start with problem agitation. What is the reader's pain point or burning question about "${topic}"? Create urgency and curiosity. Include the primary keyword naturally in the opening.
 
@@ -569,9 +594,32 @@ STEP 3 - H2/H3 HIERARCHY WITH KEYWORD VARIATIONS: Structure using clear H2 and H
 
 STEP 4 - MULTIMEDIA PLACEHOLDERS EVERY 300 WORDS: Insert [IMAGE: description], [VIDEO: description], or [CHART: description] markers every ~300 words for media to be added in post-production.
 
-STEP 5 - FAQ SECTION: Include 3-5 FAQs targeting "People Also Ask" with concise answers.
+STEP 5 - FAQ SECTION (with JSON-LD): Include 3-5 FAQs targeting "People Also Ask" with concise answers. After the human-readable FAQ section, include a JSON-LD block in this exact format:
+\`\`\`json-ld
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "...", "acceptedAnswer": { "@type": "Answer", "text": "..." } }
+  ]
+}
+\`\`\`
 
-STEP 6 - STRONG CTA: End with a call-to-action directing readers to related CoinDaily content and newsletter subscription.
+STEP 6 - SOURCES CITED: At the end of the article, include a "Sources" section listing every factual claim's source. Each source must include:
+  - Source name (e.g., "Central Bank of Nigeria", "CoinGecko", "Reuters")
+  - Date of data/publication (if known)
+  - URL or document reference (if available)
+Format: numbered list. Minimum 3 sources per article. Bloomberg and Reuters cite every claim — so do we.
+
+STEP 7 - STRONG CTA: End with a call-to-action directing readers to related CoinDaily content and newsletter subscription.
+
+STEP 8 - METADATA: Output a structured metadata block at the very end:
+\`\`\`metadata
+sources_count: [number]
+faq_count: [number]
+word_count: [approximate]
+primary_region: [African country/region most relevant]
+\`\`\`
 
 === END FRAMEWORK ===
 
@@ -581,8 +629,10 @@ Write a comprehensive, engaging article that:
 3. Provides accurate, well-researched information in H2/H3 hierarchy
 4. Includes multimedia placeholders every 300 words
 5. Addresses African market context and implications
-6. Ends with FAQ section and strong CTA
-${keywords.length > 0 ? `7. Naturally incorporates target keywords: ${keywords.join(', ')}` : ''}
+6. Includes FAQ section with FAQPage JSON-LD structured data
+7. Includes a "Sources" section citing every factual claim
+8. Ends with strong CTA + metadata block
+${keywords.length > 0 ? `9. Naturally incorporates target keywords: ${keywords.join(', ')}` : ''}
 
 ${request.context.customInstructions || ''}`;
   }
@@ -633,6 +683,7 @@ TEXT TO TRANSLATE:`;
     const { topic, targetKeywords = [], wordCount = 1000, targetAudience = 'general' } = request.context;
 
     return `You are an SEO expert specializing in cryptocurrency content for African markets.
+${ImoPromptAgent.EDITORIAL_TONE_CONSTRAINT}
 
 Create an SEO-optimized article about: ${topic}
 
@@ -658,9 +709,11 @@ STEP 3 - H2/H3 HIERARCHY WITH KEYWORD VARIATIONS: Use at least 5-7 H2 sections w
 
 STEP 4 - MULTIMEDIA EVERY 300 WORDS: Insert [IMAGE: description], [VIDEO: description], or [CHART: description] placeholders every ~300 words for post-production media insertion.
 
-STEP 5 - FAQ SECTION (3-5 questions): Target Google "People Also Ask" boxes. Write common questions African users would search. Include direct, concise answers (2-3 sentences each).
+STEP 5 - FAQ SECTION (3-5 questions): Target Google "People Also Ask" boxes. Write common questions African users would search. Include direct, concise answers (2-3 sentences each). Include FAQPage JSON-LD structured data block after the FAQ section.
 
-STEP 6 - STRONG CTA: End with call-to-action directing to related CoinDaily content, newsletter signup, or community. Format: "What to read next: [topic]" and "Stay informed: Subscribe to CoinDaily's African crypto briefing."
+STEP 6 - SOURCES CITED: Numbered list of every source referenced in the article. Each source: name, date, URL/reference. Minimum 3 sources.
+
+STEP 7 - STRONG CTA: End with call-to-action directing to related CoinDaily content, newsletter signup, or community. Format: "What to read next: [topic]" and "Stay informed: Subscribe to CoinDaily's African crypto briefing."
 === END FRAMEWORK ===
 
 Structure:
@@ -670,8 +723,9 @@ Structure:
 4. Detailed solution/information sections (H2/H3 with keyword variations)
 5. African market implications
 6. Actionable conclusion
-7. FAQ section (3-5 questions targeting People Also Ask)
-8. CTA to related content and newsletter`;
+7. FAQ section (3-5 questions targeting People Also Ask) with FAQPage JSON-LD
+8. Sources Cited section (minimum 3 sources with attribution)
+9. CTA to related content and newsletter`;
   }
 
   private buildGenericPrompt(request: ImoPromptRequest): string {
@@ -756,7 +810,9 @@ TASK: Create a comprehensive content outline using the RankBrain 6-Step Framewor
    - Regional regulations or trends
    - Mobile money integration if relevant
 
-Return detailed outline with estimated word count per section.`;
+Return detailed outline with estimated word count per section.
+
+${ImoPromptAgent.EDITORIAL_TONE_CONSTRAINT}`;
   }
 
   private buildWritingPrompt(request: ImoPromptRequest): string {

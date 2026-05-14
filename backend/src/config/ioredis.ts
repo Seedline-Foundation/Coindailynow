@@ -153,15 +153,39 @@ const createRedisClient = (options?: any) => {
   });
   
   client.on('error', (err: Error) => {
-    // Suppress connection refused errors after initial warning
+    // Suppress repetitive connection refused errors
+    times++;
     if (!err.message.includes('ECONNREFUSED') || times <= 1) {
       console.error('IORedis error:', err.message);
     }
   });
-  
+
+  client.on('connect', () => {
+    times = 0; // Reset error counter on successful connect
+    console.log('IORedis connected');
+  });
+
   return client;
 };
 
 let times = 0;
 
-export { IORedis as default, createRedisClient, MockIORedis };
+/**
+ * Singleton Redis instance for general use.
+ * Import this instead of creating `new Redis()` directly.
+ * Falls back to in-memory mock when Redis is unavailable.
+ *
+ * Usage:
+ *   import { redis } from '../config/ioredis';
+ *   await redis.get('key');
+ */
+const redis = createRedisClient({ lazyConnect: true });
+
+// Connect eagerly but don't crash if Redis is down
+if (isRedisEnabled) {
+  (redis as any).connect?.().catch?.((err: Error) => {
+    console.warn('Redis initial connection failed — will retry on first use:', err.message);
+  });
+}
+
+export { IORedis as default, createRedisClient, MockIORedis, redis };

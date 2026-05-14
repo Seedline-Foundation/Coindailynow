@@ -3,7 +3,6 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title ReputationSBT - Soulbound Token for Eco-Zone Merchant Reputation
@@ -20,13 +19,11 @@ import "@openzeppelin/contracts/utils/Counters.sol";
  * - DISPUTE_FREE: 50+ transactions with zero disputes
  */
 contract ReputationSBT is ERC721, AccessControl {
-    using Counters for Counters.Counter;
-
     bytes32 public constant UPDATER_ROLE = keccak256("UPDATER_ROLE");
     bytes32 public constant DISPUTE_RESOLVER_ROLE = keccak256("DISPUTE_RESOLVER_ROLE");
     bytes32 public constant ZK_VERIFIER_ROLE = keccak256("ZK_VERIFIER_ROLE");
 
-    Counters.Counter private _tokenIdCounter;
+    uint256 private _nextTokenId;
 
     // Badge type enum
     enum BadgeType {
@@ -85,8 +82,8 @@ contract ReputationSBT is ERC721, AccessControl {
         require(walletToToken[to] == 0, "Wallet already has reputation token");
         require(to != address(0), "Cannot mint to zero address");
 
-        _tokenIdCounter.increment();
-        uint256 tokenId = _tokenIdCounter.current();
+        _nextTokenId++;
+        uint256 tokenId = _nextTokenId;
 
         _safeMint(to, tokenId);
         walletToToken[to] = tokenId;
@@ -327,16 +324,19 @@ contract ReputationSBT is ERC721, AccessControl {
     }
 
     /**
-     * @dev Override transfer to make token soulbound (non-transferable)
+     * @dev Override _update to make token soulbound (non-transferable).
+     * OZ v5: _beforeTokenTransfer was replaced by _update(to, tokenId, auth).
+     * Minting (from==0) and burning (to==0) are allowed; transfers are blocked.
      */
-    function _beforeTokenTransfer(
-        address from,
+    function _update(
         address to,
         uint256 tokenId,
-        uint256 batchSize
-    ) internal virtual override {
+        address auth
+    ) internal virtual override returns (address) {
+        address from = _ownerOf(tokenId);
+        // Allow minting (from == 0) and burning (to == 0), block transfers
         require(from == address(0) || to == address(0), "Soulbound: non-transferable");
-        super._beforeTokenTransfer(from, to, tokenId, batchSize);
+        return super._update(to, tokenId, auth);
     }
 
     /**

@@ -236,14 +236,7 @@ export default function SuperAdminHeader({ sidebarOpen, setSidebarOpen }: SuperA
                     User Dashboard
                     <span className="ml-auto text-[10px] text-gray-400">coindaily.online</span>
                   </a>
-                  <a
-                    href="/ceo/login"
-                    className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
-                  >
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
-                    CEO Dashboard
-                    <span className="ml-auto text-[10px] text-gray-400">secured</span>
-                  </a>
+                  {/* CEO Dashboard link removed — CEO uses super-admin with SUPER_ADMIN role */}
                 </div>
 
                 <div className="p-2">

@@ -178,7 +178,7 @@ export default function CEOLoginPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full pl-10 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all"
-                  placeholder="ceo@coindaily.africa"
+                  placeholder="admin@coindaily.online"
                 />
               </div>
             </div>

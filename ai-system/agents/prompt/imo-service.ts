@@ -27,8 +27,8 @@ export class ImoService {
   private ragCache: Map<string, { results: SearchResult[]; timestamp: number }> = new Map();
   private readonly RAG_CACHE_TTL = 1000 * 60 * 30; // 30 minutes
 
-  constructor() {
-    this.agent = new ImoPromptAgent();
+  constructor(agent?: ImoPromptAgent) {
+    this.agent = agent || new ImoPromptAgent();
   }
 
   async initialize(): Promise<void> {
@@ -41,24 +41,48 @@ export class ImoService {
 
   /**
    * Generate optimized prompt for article hero images
+   * Accepts both simple API (articleTitle + category) and Review Agent API
+   * (article_title, article_theme, style, include_african_elements, avoid_elements)
    */
   async generateHeroImagePrompt(params: {
-    articleTitle: string;
-    category: string;
+    articleTitle?: string;
+    category?: string;
     keywords?: string[];
     africanFocus?: boolean;
     aspectRatio?: '16:9' | '4:3' | '1:1';
+    // Extended fields used by AIReviewAgent
+    article_title?: string;
+    article_theme?: string;
+    style?: string;
+    include_african_elements?: boolean;
+    avoid_elements?: string[];
   }): Promise<ImoPromptResult> {
+    const title = params.articleTitle || params.article_title || '';
+    const topic = params.category || params.article_theme || '';
+    const africanFocus = params.africanFocus ?? params.include_african_elements ?? true;
+
+    // Build visual style from style param or default
+    let visualStyle = 'modern professional cryptocurrency illustration';
+    if (params.style) {
+      visualStyle = params.style.replace(/_/g, ' ');
+    }
+
+    // Build negative prompt additions from avoid_elements
+    const customInstructions = params.avoid_elements?.length
+      ? `Avoid: ${params.avoid_elements.join(', ')}`
+      : undefined;
+
     const request: ImoPromptRequest = {
       contentType: 'image',
-      strategy: 'negative', // Always use negative prompting for images
+      strategy: 'negative',
       context: {
-        articleTitle: params.articleTitle,
-        topic: params.category,
+        articleTitle: title,
+        topic,
         keywords: params.keywords,
-        africanFocus: params.africanFocus ?? true,
+        africanFocus,
         aspectRatio: params.aspectRatio || '16:9',
-        visualStyle: 'modern professional cryptocurrency illustration'
+        visualStyle,
+        ...(customInstructions && { customInstructions })
       },
       options: {
         includeNegativePrompt: true,
@@ -134,24 +158,54 @@ export class ImoService {
 
   /**
    * Generate SEO-optimized article prompts using Writer-Editor pattern
+   * Accepts both the simple API (topic + keywords) and the full Review Agent API
+   * (target_word_count, facts_to_preserve, core_message, etc.)
    */
   async generateArticlePrompt(params: {
     topic: string;
-    keywords: string[];
-    targetAudience?: 'beginner' | 'intermediate' | 'expert';
+    keywords?: string[];
+    targetAudience?: 'beginner' | 'intermediate' | 'expert' | string;
     wordCount?: number;
     africanFocus?: boolean;
+    // Extended fields used by AIReviewAgent
+    target_word_count?: number;
+    facts_to_preserve?: string[];
+    core_message?: string;
+    tone?: string;
+    audience?: string;
+    seo_optimization?: boolean;
+    include_faq?: boolean;
+    sources?: string[];
   }): Promise<ImoPromptResult> {
+    const wordCount = params.wordCount || params.target_word_count || 1200;
+    const audience = params.targetAudience || params.audience || 'general';
+
+    // Build custom instructions from extended fields
+    const customParts: string[] = [];
+    if (params.facts_to_preserve?.length) {
+      customParts.push(`Facts to preserve: ${params.facts_to_preserve.join('; ')}`);
+    }
+    if (params.core_message) {
+      customParts.push(`Core message: ${params.core_message}`);
+    }
+    if (params.include_faq) {
+      customParts.push('Include FAQ section at end');
+    }
+    if (params.sources?.length) {
+      customParts.push(`Sources to cite: ${params.sources.join(', ')}`);
+    }
+
     return this.agent.generatePrompt({
       contentType: 'seo',
       strategy: 'writer_editor',
       context: {
         topic: params.topic,
-        targetKeywords: params.keywords,
-        targetAudience: params.targetAudience || 'general',
-        wordCount: params.wordCount || 1200,
+        targetKeywords: params.keywords || [],
+        targetAudience: audience as any,
+        wordCount,
         africanFocus: params.africanFocus ?? true,
-        tone: 'professional'
+        tone: (params.tone || 'professional') as any,
+        ...(customParts.length > 0 && { customInstructions: customParts.join('\n') })
       },
       options: {
         maxSteps: 2,
@@ -204,23 +258,51 @@ export class ImoService {
 
   /**
    * Generate translation prompts with terminology preservation
+   * Accepts both simple API and Review Agent API (source_text, source_language, etc.)
    */
   async generateTranslationPrompt(params: {
-    sourceText: string;
-    sourceLanguage: string;
-    targetLanguage: string;
+    sourceText?: string;
+    sourceLanguage?: string;
+    targetLanguage?: string;
     contentType?: 'article' | 'headline' | 'social_post' | 'meta_description';
     preserveTerms?: string[];
+    // Extended fields used by AIReviewAgent
+    source_text?: string;
+    source_language?: string;
+    target_language?: string;
+    preserve_terminology?: boolean;
+    preserve_tone?: boolean;
+    preserve_facts?: string[];
+    domain?: string;
   }): Promise<ImoPromptResult & { sourceText: string }> {
+    const sourceText = params.sourceText || params.source_text || '';
+    const sourceLanguage = params.sourceLanguage || params.source_language || 'English';
+    const targetLanguage = params.targetLanguage || params.target_language || '';
+
+    // Build custom instructions from extended fields
+    const customParts: string[] = [`Content type: ${params.contentType || 'article'}`];
+    if (params.preserve_terminology) {
+      customParts.push('Preserve all cryptocurrency and financial terminology');
+    }
+    if (params.preserve_tone) {
+      customParts.push('Maintain the same professional tone as the source');
+    }
+    if (params.preserve_facts?.length) {
+      customParts.push(`Key facts to preserve: ${params.preserve_facts.join('; ')}`);
+    }
+    if (params.domain) {
+      customParts.push(`Domain: ${params.domain.replace(/_/g, ' ')}`);
+    }
+
     const result = await this.agent.generatePrompt({
       contentType: 'translation',
       strategy: 'chain',
       context: {
-        sourceLanguage: params.sourceLanguage,
-        targetLanguage: params.targetLanguage,
+        sourceLanguage,
+        targetLanguage,
         keywords: params.preserveTerms,
         tone: 'professional',
-        customInstructions: `Content type: ${params.contentType || 'article'}`
+        customInstructions: customParts.join('\n')
       },
       options: {
         maxSteps: 2,
@@ -230,7 +312,7 @@ export class ImoService {
 
     return {
       ...result,
-      sourceText: params.sourceText
+      sourceText
     };
   }
 

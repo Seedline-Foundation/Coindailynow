@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import prisma from '../lib/prisma';
 import MarqueeService, { MarqueeData, MarqueeItemData, MarqueeTemplateData } from '../services/MarqueeService';
 import { body, param, query, validationResult } from 'express-validator';
+import { authMiddleware } from '../middleware/auth';
 
 const router = express.Router();
 const marqueeService = new MarqueeService(prisma);
@@ -20,16 +21,21 @@ const validateRequest = (req: Request, res: Response, next: NextFunction): void 
   next();
 };
 
-// Simple auth middleware (replace with real auth)
-const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
-  // For demo purposes, we'll skip authentication
-  // In production, verify JWT token here
-  next();
-};
+// Real auth middleware — verifies JWT and attaches user to request
+const authenticateUser = authMiddleware;
 
+// Role-based access control — checks user role after authentication
 const requireRole = (role: string) => (req: Request, res: Response, next: NextFunction) => {
-  // For demo purposes, we'll skip role checking
-  // In production, check user role here
+  const user = (req as any).user;
+  if (!user) {
+    res.status(401).json({ success: false, error: 'Authentication required' });
+    return;
+  }
+  const allowedRoles = ['ADMIN', 'SUPER_ADMIN'];
+  if (role === 'admin' && !allowedRoles.includes(user.role)) {
+    res.status(403).json({ success: false, error: 'Admin access required' });
+    return;
+  }
   next();
 };
 

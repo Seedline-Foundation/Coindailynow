@@ -58,6 +58,11 @@ import rssFeedRouter from './routes/rss-feed.routes';
 import indexNowRouter from './routes/indexnow.routes';
 import structuredContentRouter from './routes/structured-content.routes';
 import knowledgeApiRouter from './api/routes/knowledgeApi.routes';
+import authRouter from './routes/auth.routes';
+import walletCallbackRouter from './routes/walletCallbackRoutes';
+import sitemapRouter from './routes/sitemap.routes';
+import structuredDataRouter from './routes/structured-data.routes';
+import marqueeRouter from './routes/marquee';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
@@ -323,9 +328,31 @@ export async function setupApp() {
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // Static assets for uploaded ad creatives
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  // Security: disable directory listing, restrict to safe MIME types, add cache headers
+  app.use('/uploads', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // Block directory traversal attempts
+    if (req.path.includes('..') || req.path.includes('\0')) {
+      return res.status(400).json({ success: false, error: 'Invalid path' });
+    }
+    // Only allow known safe file extensions
+    const allowedExtensions = /\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|pdf|ico)$/i;
+    if (!allowedExtensions.test(req.path)) {
+      return res.status(403).json({ success: false, error: 'File type not allowed' });
+    }
+    // Prevent content sniffing and framing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Content-Security-Policy', "default-src 'none'");
+    next();
+  }, express.static(path.join(process.cwd(), 'uploads'), {
+    dotfiles: 'deny',      // Block .htaccess, .env, etc.
+    index: false,           // Disable directory listing
+    maxAge: '7d',           // Cache uploaded assets for 7 days
+  }));
 
-  // Rate limiting
+  // Rate limiting — runs before auth, so tier-based limits are not active yet.
+  // All users get the same rate limit (100 req/15min in production).
+  // TODO(post-launch): move per-route rate limiting after auth middleware for tier-based enforcement.
   app.use(rateLimitMiddleware);
 
   // AI Prompt Injection Guard — scans POST/PUT/PATCH bodies for LLM attacks
@@ -335,43 +362,64 @@ export async function setupApp() {
     maxInputLength: 50_000,
     enableDeepAnalysis: false,
     logToDatabase: true,
-    excludedPaths: ['/health', '/metrics', '/api/auth/login', '/api/auth/register'],
+    excludedPaths: ['/health', '/metrics', '/api/auth/login', '/api/auth/register', '/api/auth/verify-email', '/api/auth/resend-verification'],
   }));
 
   // CSRF protection for state-changing requests
   // GraphQL has its own auth via Authorization header + CORS
   app.use(csrfProtection({
     excludedPaths: [
+      // Auth endpoints (no session yet, can't have CSRF token)
       '/api/auth/login',
       '/api/auth/register',
       '/api/auth/refresh',
+      '/api/auth/verify-email',
+      '/api/auth/resend-verification',
+      // Webhook callbacks (external services, use HMAC signature verification instead)
+      '/api/wallet/callbacks',
       '/api/v1/traffic',
-      '/api/super-admin',
-      '/api/content-automation',
-      '/api/user',
-      '/api/news',
-      '/api/admin',
-      '/api/ai/registry',
+      // Health/metrics (read-only, no state changes)
       '/health',
       '/metrics',
+      // GraphQL (uses Authorization header + CORS, not cookie-based)
       '/graphql'
     ]
   }));
 
-  // Health check endpoint with detailed status
-  app.get('/health', (req, res) => {
-    res.json({
-      status: 'healthy',
+  // Health check endpoint with actual service probes
+  app.get('/health', async (req, res) => {
+    const checks: Record<string, 'ok' | 'degraded' | 'down'> = {
+      database: 'down',
+      redis: 'down',
+    };
+
+    // Probe database
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      checks.database = 'ok';
+    } catch {
+      checks.database = 'down';
+    }
+
+    // Probe Redis (mock redis always returns OK)
+    try {
+      const redisResult = await redis.set('health:ping', 'pong');
+      checks.redis = redisResult === 'OK' ? 'ok' : 'degraded';
+    } catch {
+      checks.redis = 'down';
+    }
+
+    const allOk = Object.values(checks).every(v => v === 'ok');
+    const anyDown = Object.values(checks).some(v => v === 'down');
+    const overallStatus = allOk ? 'healthy' : anyDown ? 'unhealthy' : 'degraded';
+
+    res.status(overallStatus === 'healthy' ? 200 : overallStatus === 'degraded' ? 200 : 503).json({
+      status: overallStatus,
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       version: process.env.npm_package_version || '1.0.0',
       environment: process.env.NODE_ENV || 'development',
-      features: {
-        graphql: true,
-        websockets: true,
-        redis: true,
-        authentication: true,
-      }
+      checks,
     });
   });
 
@@ -422,6 +470,21 @@ export async function setupApp() {
   // Ads Management & Rotation Agent Routes (DeepSeek R1-powered ad engine)
   app.use('/api/ads', adsRotationRouter);
   startMLRetrainingLoop();
+
+  // Auth routes (email verification, resend verification)
+  app.use('/api/auth', authRouter);
+
+  // Payment webhook callbacks (YellowCard + ChangeNOW) — CRITICAL for deposits/swaps
+  app.use('/api/wallet/callbacks', walletCallbackRouter);
+
+  // Sitemap routes (SEO — Google/Bing indexing)
+  app.use('/api/sitemap', sitemapRouter);
+
+  // Structured Data routes (schema.org markup API)
+  app.use('/api/structured-data', structuredDataRouter);
+
+  // Marquee routes (ticker bar / news flash management)
+  app.use('/api/marquee', marqueeRouter);
 
   // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
   app.use('/', rssFeedRouter);
@@ -592,6 +655,20 @@ async function startServer() {
       startAnalysisScheduler();
       logger.info('🔬 Data Analysis Pipeline Scheduler started (runs Tuesday 10pm)');
     }
+
+    // Schedule daily cleanup of expired tokens, sessions, and verification tokens
+    const { authService: authSvc } = require('./services/authService');
+    const CLEANUP_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+    setInterval(() => {
+      authSvc.cleanupExpiredTokens().catch(e =>
+        logger.error('Token cleanup failed:', e)
+      );
+    }, CLEANUP_INTERVAL);
+    // Also run once at startup
+    authSvc.cleanupExpiredTokens().catch(e =>
+      logger.error('Initial token cleanup failed:', e)
+    );
+    logger.info('🧹 Token cleanup scheduled (every 24h)');
   });
 }
 

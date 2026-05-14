@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Poppins } from 'next/font/google';
+import { Inter, Poppins, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../hooks/useAuth';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import TrafficCopClient from '@/components/security/TrafficCopClient';
+import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
 import AppInstallAndOfflinePrompt from '@/components/pwa/AppInstallAndOfflinePrompt';
 import PostHogProvider from '@/components/providers/PostHogProvider';
 import { GeoProvider } from '@/lib/GeoContext';
@@ -15,10 +16,16 @@ const inter = Inter({
   display: 'swap',
 });
 
-const poppins = Poppins({ 
+const poppins = Poppins({
   weight: ['300', '400', '500', '600', '700'],
   subsets: ['latin'],
   variable: '--font-poppins',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
   display: 'swap',
 });
 
@@ -230,7 +237,7 @@ export default function RootLayout({
         />
       </head>
       <body 
-        className={`${inter.className} font-sans antialiased bg-background text-neutral-900 selection:bg-primary-100 selection:text-primary-800`}
+        className={`${inter.className} ${jetbrainsMono.variable} font-sans antialiased bg-background text-neutral-900 selection:bg-primary-100 selection:text-primary-800`}
         suppressHydrationWarning
       >
         {/* Skip to main content for accessibility */}
@@ -251,6 +258,7 @@ export default function RootLayout({
               </div>
               <AppInstallAndOfflinePrompt />
               <TrafficCopClient />
+              <CookieConsentBanner position="bottom" theme="dark" showDeclineButton={true} />
               </PostHogProvider>
             </AuthProvider>
           </GeoProvider>

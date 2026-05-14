@@ -31,6 +31,7 @@ contract PressDistribution is Ownable {
     // Function to pay multiple press entities in batch (gas efficient)
     function batchPayPress(address[] calldata recipients, uint256[] calldata amounts) external onlyOwner {
         require(recipients.length == amounts.length, "Arrays length mismatch");
+        require(recipients.length <= 200, "Batch too large, max 200 per tx");
         
         uint256 totalAmount = 0;
         for (uint256 i = 0; i < recipients.length; i++) {
@@ -42,13 +43,22 @@ contract PressDistribution is Ownable {
         emit BatchPressPayment(recipients.length, totalAmount);
     }
 
-    // Allow contract to receive tokens
-    function deposit() external payable {
-        // Ether deposit if needed, though mostly we deal with ERC20
-    }
-    
-    // Emergency withdraw
+    // Allow contract to receive JOY tokens (no ETH needed — remove payable to prevent trapping)
+    // To fund the contract, call joyToken.transfer(address(this), amount) directly.
+
+    // Emergency withdraw ERC20 tokens
     function emergencyWithdraw(address _token, uint256 _amount) external onlyOwner {
         IERC20(_token).safeTransfer(msg.sender, _amount);
     }
+
+    // Emergency withdraw any ETH that was accidentally sent
+    function emergencyWithdrawETH() external onlyOwner {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No ETH to withdraw");
+        (bool success, ) = msg.sender.call{value: balance}("");
+        require(success, "ETH transfer failed");
+    }
+
+    // Accept ETH only if accidentally sent — can be recovered via emergencyWithdrawETH
+    receive() external payable {}
 }

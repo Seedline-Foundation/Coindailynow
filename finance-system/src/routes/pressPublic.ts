@@ -35,7 +35,10 @@ function verifyPressSignature(req: Request): boolean {
 
   const payload = timestamp + '.' + JSON.stringify(req.body);
   const expected = crypto.createHmac('sha256', PRESS_HMAC_SECRET).update(payload).digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  const sigBuf = Buffer.from(signature);
+  const expectedBuf = Buffer.from(expected);
+  if (sigBuf.length !== expectedBuf.length) return false;
+  return crypto.timingSafeEqual(sigBuf, expectedBuf);
 }
 
 /**

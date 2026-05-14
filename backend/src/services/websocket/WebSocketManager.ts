@@ -8,10 +8,10 @@
 
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import IORedis, { createRedisClient } from '../../config/ioredis';
 import { logger } from '../../utils/logger';
+import { verifyJWT } from '../../utils/auth';
 import prisma from '../../lib/prisma';
 
 // Check if Redis is enabled
@@ -99,7 +99,7 @@ export class WebSocketManager {
           return next(new Error('Authentication required'));
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'test-secret') as any;
+        const decoded = verifyJWT(token) as any;
         
         // Get user details
         const user = await this.prisma.user.findUnique({
