@@ -26,6 +26,7 @@ import {
 import prisma from '../lib/prisma';
 import { WalletService } from './WalletService';
 import { PermissionService } from './PermissionService';
+import checkoutNodeJssdk from '@paypal/checkout-server-sdk';
 import { ALL_FINANCE_OPERATIONS, requiresOTP, requiresApproval, isHighRisk } from '../constants/financeOperations';
 
 // ============================================================================
@@ -7702,12 +7703,33 @@ export class FinanceService {
         return { success: false, error: 'Invalid wallet' };
       }
 
-      // TODO: Integrate with actual PayPal API
-      // const paypal = require('@paypal/checkout-server-sdk');
-      // Capture order and verify payment
+      // Integrate with actual PayPal API
+      const clientId = process.env.PAYPAL_CLIENT_ID;
+      const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
-      // Simulate PayPal payment
-      const captureId = `CAP_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      if (!clientId || !clientSecret) {
+        throw new Error('PayPal credentials are not configured');
+      }
+
+      const environment = process.env.NODE_ENV === 'production'
+        ? new checkoutNodeJssdk.core.LiveEnvironment(clientId, clientSecret)
+        : new checkoutNodeJssdk.core.SandboxEnvironment(clientId, clientSecret);
+
+      const client = new checkoutNodeJssdk.core.PayPalHttpClient(environment);
+      const request = new checkoutNodeJssdk.orders.OrdersCaptureRequest(orderId);
+      // PayPal SDK automatically sets body to null if not using requestBody()
+      // But if we use requestBody it expects typed request data.
+      // A capture request on an approved order often requires no body or empty body.
+      // If payment_source is not explicitly needed, we can just cast an empty object.
+      request.requestBody({} as any);
+
+      const response = await client.execute(request);
+
+      if (response.result.status !== 'COMPLETED') {
+        throw new Error(`PayPal order capture failed with status: ${response.result.status}`);
+      }
+
+      const captureId = response.result.purchase_units[0].payments.captures[0].id;
 
       // Create transaction record
       const transaction = await prisma.walletTransaction.create({
