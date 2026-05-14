@@ -238,12 +238,11 @@ const STAFF_LIST = [
 /* ─── Role detection helper ──────────────────────────────────────── */
 function detectCurrentRole(): { role: 'ceo' | 'staff'; staffId: string; staffName: string } {
   if (typeof window === 'undefined') return { role: 'ceo', staffId: 'ceo', staffName: 'CEO / Super Admin' };
-  const token = localStorage.getItem('super_admin_token') || '';
-  // CEO tokens start with mock_super_admin_token_ or contain 'ceo' / 'super-admin'
-  const isCeo = token.includes('super_admin') || token.includes('ceo') || token.includes('super-admin');
-  // In production, decode JWT to get staffId. For now, check localStorage for staff info
-  const staffId = localStorage.getItem('staff_id') || (isCeo ? 'ceo' : 'staff-unknown');
-  const staffName = localStorage.getItem('staff_name') || (isCeo ? 'CEO / Super Admin' : 'Staff');
+  // In production, decode JWT claims to determine role. For now, check localStorage for staff info.
+  const staffId = localStorage.getItem('staff_id') || 'ceo';
+  const staffName = localStorage.getItem('staff_name') || 'CEO / Super Admin';
+  // TODO: Replace with proper JWT decode once unified auth is in place
+  const isCeo = !localStorage.getItem('staff_id');
   return { role: isCeo ? 'ceo' : 'staff', staffId, staffName };
 }
 

@@ -598,6 +598,25 @@ model PasswordReset {
   @@index([userId])
 }
 
+model EmailVerification {
+  id          String    @id
+  userId      String
+  token       String    @unique
+  hashedToken String
+  expiresAt   DateTime
+  isUsed      Boolean   @default(false)
+  usedAt      DateTime?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([isUsed])
+  @@index([expiresAt])
+  @@index([token])
+  @@index([userId])
+}
+
 model PaymentWebhook {
   id                    String    @id
   provider              String
@@ -886,6 +905,7 @@ model User {
   BountyClaims                 BountyClaim[]
   BountySubmissions            BountySubmission[]
   InfluencerPartnerProfile     InfluencerPartnerProfile?
+  EmailVerification            EmailVerification[]
 
   @@index([lastLoginAt])
   @@index([emailVerified])

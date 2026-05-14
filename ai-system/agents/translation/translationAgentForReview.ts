@@ -6,6 +6,7 @@
 import { Logger } from 'winston';
 import { TranslationOutcome, ArticleOutcome } from '../../types/admin-types';
 import axios from 'axios';
+import { MODEL_CONFIG } from '../../config/model-config';
 
 export class TranslationAgentForReview {
   // Map of language names to NLLB language codes
@@ -137,7 +138,12 @@ export class TranslationAgentForReview {
     targetLangCode: string,
     preserveTerms: string[]
   ): Promise<string> {
-    const nllbApiUrl = process.env.NLLB_API_URL || 'https://api-inference.huggingface.co/models/facebook/nllb-200-distilled-600M';
+    // Default to self-hosted NLLB on Contabo, not HuggingFace cloud.
+    // NLLB_API_ENDPOINT is the canonical env var (matches model-config.ts).
+    // NLLB_API_URL kept as fallback for legacy compat.
+    const nllbApiUrl = process.env.NLLB_API_ENDPOINT
+      || process.env.NLLB_API_URL
+      || MODEL_CONFIG.translation.apiEndpoint;
     const apiKey = process.env.HUGGINGFACE_API_KEY || '';
 
     try {
@@ -279,6 +285,33 @@ export class TranslationAgentForReview {
       terminology_preserved: this.checkTerminologyPreserved(translation, termsToPreserve),
       tone_consistency_score: this.calculateToneConsistency(article.content, translation)
     };
+  }
+
+  /**
+   * Health check for NLLB translation service
+   * Returns true if self-hosted model responds, false otherwise
+   */
+  async healthCheck(): Promise<boolean> {
+    const nllbApiUrl = process.env.NLLB_API_ENDPOINT
+      || process.env.NLLB_API_URL
+      || MODEL_CONFIG.translation.apiEndpoint;
+
+    try {
+      const response = await axios.get(`${nllbApiUrl}/health`, { timeout: 5000 });
+      return response.status === 200;
+    } catch {
+      // Try a lightweight translation as fallback health probe
+      try {
+        await axios.post(nllbApiUrl, {
+          inputs: 'Hello',
+          parameters: { src_lang: 'eng_Latn', tgt_lang: 'fra_Latn' }
+        }, { timeout: 10000 });
+        return true;
+      } catch {
+        this.logger.warn('[TranslationAgent] NLLB health check failed — self-hosted model may be down');
+        return false;
+      }
+    }
   }
 }
 

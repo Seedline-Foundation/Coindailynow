@@ -58,7 +58,7 @@ export default function BlogManagementPage() {
     setOllamaStatus('checking');
     try {
       const res = await fetch(`${API_URL}/api/ai/registry/health`, {
-        headers: { Authorization: 'Bearer mock_super_admin_token_dev' },
+        headers: { Authorization: `Bearer ${localStorage.getItem('super_admin_token') || ''}` },
       });
       if (res.ok) {
         setOllamaStatus('online');
@@ -80,7 +80,7 @@ export default function BlogManagementPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer mock_super_admin_token_dev',
+          Authorization: `Bearer ${localStorage.getItem('super_admin_token') || ''}`,
         },
         body: JSON.stringify({
           agentId: 'content-gen-agent',
@@ -111,7 +111,7 @@ export default function BlogManagementPage() {
           attempts++;
           try {
             const statusRes = await fetch(`${API_URL}/api/ai/registry/tasks/${taskId}`, {
-              headers: { Authorization: 'Bearer mock_super_admin_token_dev' },
+              headers: { Authorization: `Bearer ${localStorage.getItem('super_admin_token') || ''}` },
             });
             const statusData = await statusRes.json();
             if (statusData.task?.status === 'completed' || statusData.status === 'completed') {

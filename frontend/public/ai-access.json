@@ -2,9 +2,9 @@
   "version": "1.0",
   "name": "CoinDaily Knowledge API",
   "description": "AI-optimized API for cryptocurrency and blockchain news, analysis, and data from Africa's premier crypto news platform",
-  "base_url": "https://coindaily.ai",
-  "api_base": "https://coindaily.ai/api/knowledge-api",
-  "documentation_url": "https://coindaily.ai/docs/api",
+  "base_url": "https://coindaily.online",
+  "api_base": "https://coindaily.online/api/knowledge-api",
+  "documentation_url": "https://coindaily.online/docs/api",
   "api_endpoints": [
     {
       "path": "/api/knowledge-api/manifest",
@@ -150,19 +150,14 @@
   },
   "rate_limits": {
     "free": {
-      "requests_per_hour": 100,
-      "requests_per_day": 1000,
-      "description": "Suitable for personal projects and testing"
-    },
-    "basic": {
-      "requests_per_hour": 1000,
-      "requests_per_day": 10000,
-      "description": "Suitable for small applications"
+      "requests_per_hour": 20,
+      "requests_per_day": 100,
+      "description": "Free tier for personal projects and testing"
     },
     "pro": {
-      "requests_per_hour": 10000,
-      "requests_per_day": 100000,
-      "description": "Suitable for production applications"
+      "requests_per_hour": 500,
+      "requests_per_day": 10000,
+      "description": "Pro tier for investors, traders, and professionals"
     },
     "enterprise": {
       "requests_per_hour": "unlimited",
@@ -178,7 +173,7 @@
         "example": "X-API-Key: cd_your_api_key_here"
       }
     ],
-    "get_api_key": "https://coindaily.ai/contact"
+    "get_api_key": "https://coindaily.online/contact"
   },
   "usage_examples": [
     {
@@ -187,7 +182,7 @@
       "endpoint": "/api/knowledge-api/search",
       "method": "GET",
       "request": {
-        "url": "https://coindaily.ai/api/knowledge-api/search?query=bitcoin&limit=5",
+        "url": "https://coindaily.online/api/knowledge-api/search?query=bitcoin&limit=5",
         "headers": {
           "X-API-Key": "your_api_key"
         }
@@ -213,7 +208,7 @@
       "endpoint": "/api/knowledge-api/crypto-data/latest",
       "method": "GET",
       "request": {
-        "url": "https://coindaily.ai/api/knowledge-api/crypto-data/latest?limit=20",
+        "url": "https://coindaily.online/api/knowledge-api/crypto-data/latest?limit=20",
         "headers": {
           "X-API-Key": "your_api_key"
         }
@@ -225,7 +220,7 @@
       "endpoint": "/api/knowledge-api/feeds/json/:feedId",
       "method": "GET",
       "request": {
-        "url": "https://coindaily.ai/api/knowledge-api/feeds/json/crypto-news-feed"
+        "url": "https://coindaily.online/api/knowledge-api/feeds/json/crypto-news-feed"
       },
       "note": "No authentication required for public feeds"
     }
@@ -280,9 +275,9 @@
     "Subscribe to feeds for real-time updates instead of polling"
   ],
   "support": {
-    "documentation": "https://coindaily.ai/docs/api",
-    "contact": "https://coindaily.ai/contact",
-    "status": "https://status.coindaily.ai"
+    "documentation": "https://coindaily.online/docs/api",
+    "contact": "https://coindaily.online/contact",
+    "status": "https://status.coindaily.online"
   },
-  "last_updated": "2025-10-11T14:00:00Z"
+  "last_updated": "2026-05-13T00:00:00Z"
 }

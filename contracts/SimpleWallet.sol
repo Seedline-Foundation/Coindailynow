@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -10,7 +11,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * Used for: Staking Pool, Liquidity Pool, Development Fund
  */
 contract SimpleWallet is Ownable {
-    
+    using SafeERC20 for IERC20;
+
     event TokensReceived(address indexed token, address indexed from, uint256 amount);
     event TokensWithdrawn(address indexed token, address indexed to, uint256 amount);
     event EtherReceived(address indexed from, uint256 amount);
@@ -36,7 +38,7 @@ contract SimpleWallet is Ownable {
         require(to != address(0), "Invalid recipient");
         require(amount > 0, "Amount must be > 0");
         
-        IERC20(token).transfer(to, amount);
+        IERC20(token).safeTransfer(to, amount);
         emit TokensWithdrawn(token, to, amount);
     }
     
