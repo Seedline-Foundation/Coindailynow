@@ -625,8 +625,7 @@ export const aiModerationResolvers = {
       }
 
       try {
-        // TODO: Implement background monitoring service
-        // await moderationService.startBackgroundMonitoring();
+        await moderationService.startBackgroundMonitoring();
 
         // Log admin action
         await prisma.adminAction.create({
@@ -668,8 +667,7 @@ export const aiModerationResolvers = {
       }
 
       try {
-        // TODO: Implement background monitoring service
-        // await moderationService.stopBackgroundMonitoring();
+        await moderationService.stopBackgroundMonitoring();
 
         // Log admin action
         await prisma.adminAction.create({
@@ -711,10 +709,9 @@ export const aiModerationResolvers = {
       }
 
       try {
-        // TODO: Background monitoring methods not yet implemented in AIModerationService
-        // await moderationService.stopBackgroundMonitoring();
-        // await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-        // await moderationService.startBackgroundMonitoring();
+        await moderationService.stopBackgroundMonitoring();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+        await moderationService.startBackgroundMonitoring();
 
         // Log admin action
         await prisma.adminAction.create({

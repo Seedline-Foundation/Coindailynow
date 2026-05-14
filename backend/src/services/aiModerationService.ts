@@ -77,6 +77,7 @@ export class AIModerationService {
   private prisma: PrismaClient;
   private redis: Redis;
   private perspectiveApiKey: string;
+  private monitoringInterval?: NodeJS.Timeout;
 
   // Religious content patterns (ZERO tolerance)
   private readonly RELIGIOUS_PATTERNS = [
@@ -2060,13 +2061,32 @@ export class AIModerationService {
 
   // Additional methods needed by integrations
   async startBackgroundMonitoring(): Promise<void> {
-    // Stub implementation - background monitoring would go here
+    if (this.monitoringInterval) {
+      console.log('Background monitoring is already running');
+      return;
+    }
+
+    // Run weekly as per processFalsePositiveLearning comment, or daily for more responsiveness
+    // 24 hours = 24 * 60 * 60 * 1000 ms
+    const INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+    this.monitoringInterval = setInterval(() => {
+      this.processFalsePositiveLearning().catch(err => {
+        console.error('Error in background monitoring (processFalsePositiveLearning):', err);
+      });
+    }, INTERVAL_MS);
+
     console.log('Background monitoring started');
   }
 
   async stopBackgroundMonitoring(): Promise<void> {
-    // Stub implementation
-    console.log('Background monitoring stopped');
+    if (this.monitoringInterval) {
+      clearInterval(this.monitoringInterval);
+      this.monitoringInterval = undefined;
+      console.log('Background monitoring stopped');
+    } else {
+      console.log('Background monitoring is not running');
+    }
   }
 
   async initializeUserReputation(userId: string): Promise<any> {
