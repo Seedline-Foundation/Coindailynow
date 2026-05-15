@@ -1,3 +1,5 @@
+const { withSentryConfig } = require('@sentry/nextjs');
+
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
@@ -217,4 +219,16 @@ const nextConfig = {
 
 };
 
-module.exports = withPWA(withBundleAnalyzer(nextConfig));
+const baseConfig = withPWA(withBundleAnalyzer(nextConfig));
+
+// Wrap with Sentry only when DSN is configured (avoids build noise in dev)
+module.exports = process.env.NEXT_PUBLIC_SENTRY_DSN
+  ? withSentryConfig(baseConfig, {
+      // Sentry webpack plugin options
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      silent: true, // Suppress source map upload logs
+      // Don't upload source maps unless SENTRY_AUTH_TOKEN is set
+      ...(process.env.SENTRY_AUTH_TOKEN ? {} : { disableServerWebpackPlugin: true, disableClientWebpackPlugin: true }),
+    })
+  : baseConfig;

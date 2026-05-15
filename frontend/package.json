@@ -93,7 +93,8 @@
     "tailwindcss": "^3.3.6",
     "viem": "^2.37.8",
     "web-vitals": "^3.5.0",
-    "zustand": "^4.4.6"
+    "zustand": "^4.4.6",
+    "@sentry/nextjs": "^9.27.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

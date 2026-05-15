@@ -1,17 +1,54 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import Footer from '@/components/footer/Footer';
+import { Header } from '@/components/landing';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About CoinDaily Africa | Independent Crypto & Finance News',
+  description:
+    'CoinDaily Africa delivers timely, accurate, and actionable cryptocurrency, blockchain, and financial market news to readers across Africa and the global diaspora.',
+  openGraph: {
+    title: 'About CoinDaily Africa',
+    description:
+      'Independent crypto and financial market intelligence for Africa and the diaspora.',
+    type: 'website',
+  },
+};
 
 export default function AboutPage() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'CoinDaily Africa',
+    url: 'https://coindaily.online',
+    description:
+      'Independent cryptocurrency, blockchain, and financial market intelligence for Africa and the global diaspora.',
+    foundingDate: '2025',
+    areaServed: [
+      { '@type': 'Country', name: 'Nigeria' },
+      { '@type': 'Country', name: 'Kenya' },
+      { '@type': 'Country', name: 'South Africa' },
+      { '@type': 'Country', name: 'Ghana' },
+    ],
+    sameAs: [
+      'https://twitter.com/coindailyafrica',
+      'https://t.me/coindailyafrica',
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">About CoinDaily Africa</h1>
           <p className="text-lg text-gray-600 mb-8">
-            Africa's independent source for cryptocurrency, blockchain, and financial market intelligence.
+            Africa&#39;s independent source for cryptocurrency, blockchain, and financial market intelligence.
           </p>
 
           <div className="prose prose-gray max-w-none space-y-6">
@@ -42,15 +79,29 @@ export default function AboutPage() {
                 CoinDaily Africa combines human editorial judgment with AI-assisted content production. Our AI systems accelerate research and drafting, but every piece of market-moving content is reviewed by human editors before publication. We maintain a strict editorial firewall between advertising, sponsored content, and editorial.
               </p>
               <p className="text-gray-600 leading-relaxed mt-3">
-                We do not use hype language. You will not find words like "moon," "rocket," or "crash" in our coverage. Our tone is confident, neutral, and data-driven, modeled on institutional financial news services.
+                We do not use hype language. You will not find sensationalist terms in our coverage. Our tone is confident, neutral, and data-driven, modeled on institutional financial news services.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Markets We Serve</h2>
-              <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa is built for readers in Nigeria, Kenya, South Africa, Ghana, Tanzania, Ethiopia, and across the African continent. We also serve the African diaspora in Europe, North America, the Caribbean, and Latin America.
-              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+                {[
+                  { flag: '🇳🇬', name: 'Nigeria' },
+                  { flag: '🇰🇪', name: 'Kenya' },
+                  { flag: '🇿🇦', name: 'South Africa' },
+                  { flag: '🇬🇭', name: 'Ghana' },
+                  { flag: '🇹🇿', name: 'Tanzania' },
+                  { flag: '🇪🇹', name: 'Ethiopia' },
+                  { flag: '🌍', name: 'Diaspora (EU)' },
+                  { flag: '🌎', name: 'Diaspora (Americas)' },
+                ].map((m) => (
+                  <div key={m.name} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 text-sm text-gray-700">
+                    <span className="text-lg">{m.flag}</span>
+                    {m.name}
+                  </div>
+                ))}
+              </div>
             </section>
 
             <section>

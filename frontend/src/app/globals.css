@@ -511,6 +511,14 @@
   animation-play-state: paused;
 }
 
+/* Bloomberg ticker bar scroll */
+.ticker-scroll {
+  display: flex;
+  width: max-content;
+  animation: marquee linear infinite;
+  will-change: transform;
+}
+
 /* Fade In Animation */
 @keyframes fadeIn {
   from {
