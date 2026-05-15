@@ -1,16 +1,46 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import Footer from '@/components/footer/Footer';
+import { Header } from '@/components/landing';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Editorial Standards | CoinDaily Africa',
+  description:
+    'Our commitment to accuracy, independence, and transparency in cryptocurrency and financial market reporting across Africa.',
+  openGraph: {
+    title: 'Editorial Standards — CoinDaily Africa',
+    description:
+      'How we maintain accuracy, editorial independence, and responsible AI-assisted journalism.',
+    type: 'website',
+  },
+};
 
 export default function EditorialStandardsPage() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Editorial Standards',
+    description:
+      'CoinDaily Africa editorial standards covering accuracy, sourcing, AI transparency, tone policy, and corrections.',
+    publisher: {
+      '@type': 'Organization',
+      name: 'CoinDaily Africa',
+      url: 'https://coindaily.online',
+    },
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Editorial Standards</h1>
-          <p className="text-sm text-gray-500 mb-8">Last updated: May 12, 2026</p>
+          <p className="text-sm text-gray-500 mb-8">Last updated: May 14, 2026</p>
 
           <div className="prose prose-gray max-w-none space-y-6">
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg mb-8">
@@ -55,10 +85,10 @@ export default function EditorialStandardsPage() {
                 CoinDaily Africa follows a strict editorial tone policy. Our content must be confident, neutral, and data-driven. We explicitly prohibit the following language in all editorial content:
               </p>
               <ul className="list-disc pl-6 text-gray-600 space-y-1 mt-3">
-                <li>Hype terms: "moon," "mooning," "rocket," "skyrocket," "gem," "100x"</li>
-                <li>Fear terms: "crash," "plunge," "doom," "bloodbath"</li>
-                <li>Crypto slang: "WAGMI," "NGMI," "diamond hands," "pump," "dump," "shill," "FUD," "hopium"</li>
-                <li>Unsubstantiated claims: "guaranteed returns," "next Bitcoin," "can't lose"</li>
+                <li>Hype terms: &quot;moon,&quot; &quot;mooning,&quot; &quot;rocket,&quot; &quot;skyrocket,&quot; &quot;gem,&quot; &quot;100x&quot;</li>
+                <li>Fear terms: &quot;crash,&quot; &quot;plunge,&quot; &quot;doom,&quot; &quot;bloodbath&quot;</li>
+                <li>Crypto slang: &quot;WAGMI,&quot; &quot;NGMI,&quot; &quot;diamond hands,&quot; &quot;pump,&quot; &quot;dump,&quot; &quot;shill,&quot; &quot;FUD,&quot; &quot;hopium&quot;</li>
+                <li>Unsubstantiated claims: &quot;guaranteed returns,&quot; &quot;next Bitcoin,&quot; &quot;can&#39;t lose&quot;</li>
               </ul>
               <p className="text-gray-600 leading-relaxed mt-3">
                 Our editorial voice is modeled on institutional financial news services. We report facts, cite data, and provide context. We do not tell readers what to buy or sell.

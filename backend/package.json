@@ -54,6 +54,7 @@
     "@graphql-tools/schema": "^10.0.0",
     "@graphql-tools/utils": "^10.0.0",
     "@prisma/client": "^6.19.2",
+    "@sentry/node": "^10.53.1",
     "@types/helmet": "^4.0.0",
     "@types/multer": "^2.0.0",
     "@types/node-cron": "^3.0.11",

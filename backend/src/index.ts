@@ -1,4 +1,9 @@
 import 'dotenv/config';
+import { initSentry, Sentry } from './lib/sentry';
+
+// Initialize Sentry BEFORE other imports for maximum coverage
+initSentry();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -78,6 +83,7 @@ process.on('unhandledRejection', (reason: any) => {
     return;
   }
   console.error('Unhandled Rejection:', reason);
+  Sentry.captureException(reason);
 });
 
 const PORT = process.env.PORT || 4000;
