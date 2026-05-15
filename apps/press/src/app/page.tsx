@@ -174,6 +174,10 @@ export default function PressLandingPage() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
+            <Link href="/wire" className="text-primary-400 hover:text-primary-300 transition-colors font-semibold flex items-center gap-1.5">
+              <Zap className="w-4 h-4" />
+              Wire
+            </Link>
             <a href="#pricing" className="text-dark-300 hover:text-white transition-colors">Pricing</a>
             <a href="#partners" className="text-dark-300 hover:text-white transition-colors">For Partners</a>
             <a href="#case-study" className="text-dark-300 hover:text-white transition-colors">Case Study</a>
