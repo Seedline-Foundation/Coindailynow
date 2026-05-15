@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import Footer from '@/components/footer/Footer';
 import { Header } from '@/components/landing';
 import { factsheets, type EntityType } from '@/data/factsheets';
+import FactsheetControls from './FactsheetControls';
 
 export const metadata: Metadata = {
   title: 'Factsheets — Crypto, Exchanges, Markets & Countries',
@@ -68,6 +69,8 @@ export default function FactsheetsIndex() {
             finance revolution.
           </p>
         </div>
+
+        <FactsheetControls />
 
         {SECTIONS.map((type) => {
           const items = factsheets.filter((f) => f.type === type);

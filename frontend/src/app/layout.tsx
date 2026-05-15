@@ -9,6 +9,7 @@ import AppInstallAndOfflinePrompt from '@/components/pwa/AppInstallAndOfflinePro
 import PostHogProvider from '@/components/providers/PostHogProvider';
 import { GeoProvider } from '@/lib/GeoContext';
 import KeyboardShortcuts from '@/components/shortcuts/KeyboardShortcuts';
+import { DensityProvider } from '@/components/ui/DensityToggle';
 
 // Font configurations
 const inter = Inter({ 
@@ -254,6 +255,7 @@ export default function RootLayout({
           <GeoProvider>
             <AuthProvider>
               <PostHogProvider>
+              <DensityProvider>
               <div id="main-content" className="min-h-screen">
                 {children}
               </div>
@@ -261,6 +263,7 @@ export default function RootLayout({
               <TrafficCopClient />
               <CookieConsentBanner position="bottom" theme="dark" showDeclineButton={true} />
               <KeyboardShortcuts />
+              </DensityProvider>
               </PostHogProvider>
             </AuthProvider>
           </GeoProvider>
