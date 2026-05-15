@@ -1,5 +1,6 @@
 import { Header } from '@/components/landing';
 import MarqueeWrapper from '@/components/landing/MarqueeWrapper';
+import TickerBar from '@/components/landing/TickerBar';
 import Footer from '@/components/footer/Footer';
 import LanguageBanner from '@/components/geo/LanguageBanner';
 import CountrySwitcher from '@/components/news/CountrySwitcher';
@@ -135,14 +136,19 @@ export default async function Home({
       <Header showDateTime={true} />
       <LanguageBanner />
 
-      {/* Marquee Ticker for Trending Tokens */}
-      <MarqueeWrapper 
-        useDynamic={true}
-        position="header"
-        fallbackTokens={mockTrendingTokens} 
-        speed={60} 
-        showVolume={true}
-      />
+      {/* Bloomberg-style 5-strip ticker bar */}
+      <TickerBar />
+
+      {/* Legacy single marquee (hidden — kept for admin-pushed marquees) */}
+      <div className="hidden">
+        <MarqueeWrapper
+          useDynamic={true}
+          position="header"
+          fallbackTokens={mockTrendingTokens}
+          speed={60}
+          showVolume={true}
+        />
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         <CountrySwitcher currentCountryCode={countryCode} />
