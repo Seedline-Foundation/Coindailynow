@@ -56,6 +56,7 @@ import v1PushRouter from './api/routes/v1Push.routes';
 import v1BountyRouter from './api/routes/v1Bounty.routes';
 import v1PressReleaseRouter from './api/routes/v1PressRelease.routes';
 import v1InfluencerRouter from './api/routes/v1Influencer.routes';
+import v1SearchRouter from './api/routes/v1Search.routes';
 import newsAggregationRouter from './routes/news-aggregation.routes';
 import dataAnalysisAdminRouter from './routes/data-analysis-admin.routes';
 import adsRotationRouter from './routes/ads-rotation.routes';
@@ -444,6 +445,7 @@ export async function setupApp() {
   app.use('/api/v1/bounty', v1BountyRouter);
   app.use('/api/v1/press', v1PressReleaseRouter);
   app.use('/api/v1/influencer', v1InfluencerRouter);
+  app.use('/api/v1/search', v1SearchRouter);
   app.use('/api/v1', structuredContentRouter);
 
   // Knowledge API endpoints (manifest/search/feeds for RAG clients)

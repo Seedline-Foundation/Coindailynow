@@ -102,7 +102,7 @@ These block launch. Anything not done here = launch slips or breaks.
 - [x] **Resolve `marquee.ts` vs `marquee-fixed.ts`** in backend routes — deleted `marquee-fixed.ts`, kept `marquee.ts` with real auth (BE-1-5 + BE-3-1).
 - [x] **Register marquee router in `backend/src/index.ts`** — already done in BE-0-4. Mounted at `/api/marquee`.
 - [ ] **Confirm `apps/admin` has roles**: ceo, editor, journalist, contributor. Wire role-gating on publish and on marquee push.
-- [ ] **Wire faceted search** (Bloomberg Backbone §8). Elasticsearch is in the stack — connect it to a fast `/search` page with facets across articles + factsheets + press releases + markets. Bloomberg's search is why people pay; yours just needs to beat Google site search. Estimate: 6h.
+- [x] **Wire faceted search** (Bloomberg Backbone §8). ✅ Built `v1Search.routes.ts` REST API at `/api/v1/search` with ES-first + Prisma fallback. Faceted aggregations for category, country, language. Suggest endpoint at `/api/v1/search/suggest`. Frontend `/search` page with dark terminal UI: search bar, facet sidebar with clickable filters, factsheet in-memory search, article results with highlights, pagination. Wired into Header search bar (already navigates to `/search?q=`). Added `g s` keyboard shortcut.
 
 ### Press app (for funding)
 - [ ] **Decide press app monetization model** before launch: per-release pricing? Subscription for PR agencies? Bundled with crypto-project listings?

@@ -22,6 +22,7 @@ import { useRouter } from 'next/navigation';
 
 const SHORTCUTS: { keys: string; description: string; href: string }[] = [
   { keys: 'g n', description: 'Go to News (Home)', href: '/' },
+  { keys: 'g s', description: 'Go to Search', href: '/search' },
   { keys: 'g f', description: 'Go to Factsheets', href: '/factsheets' },
   { keys: 'g p', description: 'Go to Pricing', href: '/pricing' },
   { keys: 'g a', description: 'Go to About', href: '/about' },
@@ -83,6 +84,7 @@ export default function KeyboardShortcuts() {
         setPendingG(false);
         const mapping: Record<string, string> = {
           n: '/',
+          s: '/search',
           f: '/factsheets',
           p: '/pricing',
           a: '/about',
