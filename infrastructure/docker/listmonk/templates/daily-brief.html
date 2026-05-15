@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoinDaily Africa — Daily Brief</title>
+  <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+</head>
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+
+<!-- Preheader (hidden preview text in inbox) -->
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+  Your morning crypto &amp; finance brief from CoinDaily Africa.
+</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;">
+  <tr>
+    <td align="center" style="padding:24px 16px;">
+
+      <!-- Container -->
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#1a1a2e,#0f3460);padding:24px 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <span style="display:inline-block;width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-size:16px;font-weight:800;line-height:36px;text-align:center;">CD</span>
+                  <span style="color:#ffffff;font-size:20px;font-weight:700;margin-left:10px;vertical-align:middle;">CoinDaily Africa</span>
+                </td>
+                <td align="right">
+                  <span style="color:#94a3b8;font-size:13px;">{{ .Date }}</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Accent bar -->
+        <tr>
+          <td style="height:4px;background:linear-gradient(90deg,#f97316,#eab308,#22c55e);font-size:0;line-height:0;">&nbsp;</td>
+        </tr>
+
+        <!-- Greeting -->
+        <tr>
+          <td style="padding:28px 32px 16px;">
+            <h1 style="margin:0;font-size:22px;font-weight:700;color:#1a1a2e;">Good morning.</h1>
+            <p style="margin:8px 0 0;font-size:14px;color:#64748b;">Here are today's top stories from across African crypto and finance.</p>
+          </td>
+        </tr>
+
+        <!-- Market snapshot -->
+        <tr>
+          <td style="padding:0 32px 20px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <tr>
+                <td style="padding:16px;">
+                  <p style="margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;font-weight:600;">Market Snapshot</p>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="padding:4px 0;font-size:13px;">
+                        <span style="color:#64748b;">BTC</span>
+                        <span style="float:right;font-weight:600;font-family:'Courier New',monospace;color:#1a1a2e;">{{ .BtcPrice }}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:4px 0;font-size:13px;border-top:1px solid #e2e8f0;">
+                        <span style="color:#64748b;">ETH</span>
+                        <span style="float:right;font-weight:600;font-family:'Courier New',monospace;color:#1a1a2e;">{{ .EthPrice }}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:4px 0;font-size:13px;border-top:1px solid #e2e8f0;">
+                        <span style="color:#64748b;">USD/NGN</span>
+                        <span style="float:right;font-weight:600;font-family:'Courier New',monospace;color:#1a1a2e;">{{ .UsdNgn }}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:4px 0;font-size:13px;border-top:1px solid #e2e8f0;">
+                        <span style="color:#64748b;">USD/KES</span>
+                        <span style="float:right;font-weight:600;font-family:'Courier New',monospace;color:#1a1a2e;">{{ .UsdKes }}</span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Articles (repeat block — populate via Listmonk template variables) -->
+        <!-- Article 1 -->
+        <tr>
+          <td style="padding:0 32px 20px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:3px solid #f97316;padding-left:16px;">
+                  <p style="margin:0;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#f97316;font-weight:600;">{{ .Article1Category }}</p>
+                  <h2 style="margin:6px 0 4px;font-size:17px;font-weight:700;color:#1a1a2e;">
+                    <a href="{{ .Article1Url }}" style="color:#1a1a2e;text-decoration:none;">{{ .Article1Title }}</a>
+                  </h2>
+                  <p style="margin:0;font-size:14px;color:#475569;line-height:1.5;">{{ .Article1Summary }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Article 2 -->
+        <tr>
+          <td style="padding:0 32px 20px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:3px solid #eab308;padding-left:16px;">
+                  <p style="margin:0;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#eab308;font-weight:600;">{{ .Article2Category }}</p>
+                  <h2 style="margin:6px 0 4px;font-size:17px;font-weight:700;color:#1a1a2e;">
+                    <a href="{{ .Article2Url }}" style="color:#1a1a2e;text-decoration:none;">{{ .Article2Title }}</a>
+                  </h2>
+                  <p style="margin:0;font-size:14px;color:#475569;line-height:1.5;">{{ .Article2Summary }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Article 3 -->
+        <tr>
+          <td style="padding:0 32px 20px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:3px solid #22c55e;padding-left:16px;">
+                  <p style="margin:0;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#22c55e;font-weight:600;">{{ .Article3Category }}</p>
+                  <h2 style="margin:6px 0 4px;font-size:17px;font-weight:700;color:#1a1a2e;">
+                    <a href="{{ .Article3Url }}" style="color:#1a1a2e;text-decoration:none;">{{ .Article3Title }}</a>
+                  </h2>
+                  <p style="margin:0;font-size:14px;color:#475569;line-height:1.5;">{{ .Article3Summary }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Article 4 -->
+        <tr>
+          <td style="padding:0 32px 20px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:3px solid #3b82f6;padding-left:16px;">
+                  <p style="margin:0;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#3b82f6;font-weight:600;">{{ .Article4Category }}</p>
+                  <h2 style="margin:6px 0 4px;font-size:17px;font-weight:700;color:#1a1a2e;">
+                    <a href="{{ .Article4Url }}" style="color:#1a1a2e;text-decoration:none;">{{ .Article4Title }}</a>
+                  </h2>
+                  <p style="margin:0;font-size:14px;color:#475569;line-height:1.5;">{{ .Article4Summary }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Article 5 -->
+        <tr>
+          <td style="padding:0 32px 20px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:3px solid #8b5cf6;padding-left:16px;">
+                  <p style="margin:0;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#8b5cf6;font-weight:600;">{{ .Article5Category }}</p>
+                  <h2 style="margin:6px 0 4px;font-size:17px;font-weight:700;color:#1a1a2e;">
+                    <a href="{{ .Article5Url }}" style="color:#1a1a2e;text-decoration:none;">{{ .Article5Title }}</a>
+                  </h2>
+                  <p style="margin:0;font-size:14px;color:#475569;line-height:1.5;">{{ .Article5Summary }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:8px 32px 28px;" align="center">
+            <a href="https://coindaily.online/news" style="display:inline-block;background-color:#f97316;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 32px;border-radius:8px;">Read all stories on CoinDaily</a>
+          </td>
+        </tr>
+
+        <!-- Divider -->
+        <tr>
+          <td style="padding:0 32px;">
+            <div style="height:1px;background-color:#e2e8f0;"></div>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding:20px 32px 28px;">
+            <p style="margin:0 0 8px;font-size:12px;color:#94a3b8;text-align:center;">
+              You are receiving this because you subscribed to the CoinDaily Africa Daily Brief.
+            </p>
+            <p style="margin:0;font-size:12px;color:#94a3b8;text-align:center;">
+              <a href="{{ .UnsubscribeURL }}" style="color:#f97316;text-decoration:underline;">Unsubscribe</a> &middot;
+              <a href="https://coindaily.online/privacy" style="color:#94a3b8;text-decoration:underline;">Privacy Policy</a> &middot;
+              <a href="https://coindaily.online/editorial-standards" style="color:#94a3b8;text-decoration:underline;">Editorial Standards</a>
+            </p>
+            <p style="margin:12px 0 0;font-size:11px;color:#cbd5e1;text-align:center;">
+              CoinDaily Africa &middot; Seedline Foundation &middot; coindaily.online
+            </p>
+            <p style="margin:6px 0 0;font-size:10px;color:#cbd5e1;text-align:center;font-style:italic;">
+              This newsletter is not financial advice. See our <a href="https://coindaily.online/disclaimer" style="color:#cbd5e1;">disclaimer</a>.
+            </p>
+          </td>
+        </tr>
+
+      </table>
+      <!-- /Container -->
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

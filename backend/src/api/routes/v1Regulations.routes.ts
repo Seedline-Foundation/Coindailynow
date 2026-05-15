@@ -15,19 +15,141 @@ type CountrySummary = {
 
 // Fallback dataset (keeps frontend working even before DB is migrated/seeded)
 const fallbackCountries: CountrySummary[] = [
-  { code: 'NG', name: 'Nigeria', status: 'Regulated', lastUpdate: '2026-02-10', summary: 'SEC Nigeria requires all VASPs to register. CBN lifted banking ban in 2023. eNaira CBDC in Phase 2.', exchanges: ['Quidax', 'Luno', 'Binance P2P'], keyDocs: ['SEC Digital Assets Framework 2025', 'CBN Circular on VASPs'] },
-  { code: 'KE', name: 'Kenya', status: 'Evolving', lastUpdate: '2026-01-28', summary: 'CMA exploring sandbox for digital assets. CBK cautious but not hostile. M-Pesa crypto integrations underway.', exchanges: ['Binance P2P', 'Luno', 'Yellow Card'], keyDocs: ['CMA Capital Markets Master Plan 2023-2027', 'CBK Emerging Payments Discussion Paper'] },
-  { code: 'ZA', name: 'South Africa', status: 'Regulated', lastUpdate: '2026-02-05', summary: 'FSCA requires crypto asset service providers to obtain licenses. SARB classifies crypto as financial products.', exchanges: ['Luno', 'VALR', 'Ice3X'], keyDocs: ['FSCA CASP Licensing Framework 2024', 'Financial Sector Regulation Act Amendment'] },
-  { code: 'GH', name: 'Ghana', status: 'Cautious', lastUpdate: '2026-01-15', summary: 'SEC Ghana issued warnings but no outright ban. Bank of Ghana developing eCedi CBDC. Sandbox exploration ongoing.', exchanges: ['Binance P2P', 'Yellow Card'], keyDocs: ['SEC Ghana Advisory on Digital Assets', 'Bank of Ghana eCedi White Paper'] },
-  { code: 'UG', name: 'Uganda', status: 'Unregulated', lastUpdate: '2025-12-20', summary: 'No specific crypto regulation. Bank of Uganda has issued general warnings. Growing adoption through P2P.', exchanges: ['Binance P2P', 'Yellow Card', 'Luno'], keyDocs: ['BOU Consumer Advisory 2024'] },
-  { code: 'TZ', name: 'Tanzania', status: 'Cautious', lastUpdate: '2025-11-30', summary: 'Bank of Tanzania banned crypto transactions in 2019, but enforcement is limited. P2P trading continues.', exchanges: ['Binance P2P'], keyDocs: ['BOT Public Notice on Cryptocurrency 2019'] },
-  { code: 'EG', name: 'Egypt', status: 'Restricted', lastUpdate: '2026-01-22', summary: 'CBE prohibits banks from dealing in crypto. However, blockchain technology is encouraged. New fintech law in progress.', exchanges: ['Binance P2P'], keyDocs: ['CBE Circular on Virtual Currencies', 'Draft Fintech Law 2025'] },
-  { code: 'MA', name: 'Morocco', status: 'Evolving', lastUpdate: '2026-02-01', summary: 'Bank Al-Maghrib banned crypto in 2017 but is now exploring CBDC and regulatory framework for digital assets.', exchanges: ['Binance P2P'], keyDocs: ['BAM Digital Currency Study 2025', 'AMMC Securities Regulation Update'] },
-  { code: 'SN', name: 'Senegal', status: 'WAEMU Rules', lastUpdate: '2025-10-15', summary: 'Subject to BCEAO (WAEMU) regulations. Crypto is not legal tender. Growing DeFi interest. eCFA discussions ongoing.', exchanges: ['Binance P2P', 'Yellow Card'], keyDocs: ['BCEAO Instruction on Digital Money Services'] },
-  { code: 'AO', name: 'Angola', status: 'Unregulated', lastUpdate: '2025-09-30', summary: 'No specific cryptocurrency legislation. BNA monitors digital payment developments. Limited exchange access.', exchanges: ['Binance P2P'], keyDocs: ['BNA Financial Stability Report 2025'] },
-  { code: 'MZ', name: 'Mozambique', status: 'Unregulated', lastUpdate: '2025-08-20', summary: 'No crypto-specific regulation. Growing mobile money ecosystem could integrate crypto. P2P adoption increasing.', exchanges: ['Binance P2P'], keyDocs: [] },
-  { code: 'CI', name: "Côte d'Ivoire", status: 'WAEMU Rules', lastUpdate: '2025-11-10', summary: 'BCEAO rules apply. Abidjan becoming West African fintech hub. Orange Money and crypto overlap growing.', exchanges: ['Binance P2P', 'Yellow Card'], keyDocs: ['BCEAO Instruction on Digital Money Services', 'ARTCI Digital Economy Framework'] },
+  {
+    code: 'NG', name: 'Nigeria', status: 'Regulated', lastUpdate: '2026-04-15',
+    summary: 'SEC Nigeria requires all Virtual Asset Service Providers (VASPs) to register under the Accelerated Regulatory Incubation Programme (ARIP). CBN lifted its February 2021 banking ban on crypto in December 2023, allowing banks to service registered VASPs. eNaira CBDC is in Phase 2 with merchant integration. Capital gains tax of 10% applies to crypto disposals above NGN 10M. Nigeria ranks top 5 globally in P2P crypto volume.',
+    exchanges: ['Quidax (SEC-registered)', 'Luno', 'Binance P2P', 'YellowCard', 'Roqqu', 'Patricia'],
+    keyDocs: ['SEC Rules on Digital Assets (June 2022)', 'SEC ARIP Framework (2024)', 'CBN Circular on VASPs (Dec 2023)', 'Finance Act 2023 (crypto tax provisions)', 'eNaira Design Paper'],
+  },
+  {
+    code: 'KE', name: 'Kenya', status: 'Evolving', lastUpdate: '2026-03-20',
+    summary: 'No comprehensive crypto legislation yet. Capital Markets Authority (CMA) exploring a regulatory sandbox for digital assets. Central Bank of Kenya (CBK) cautious but has not banned crypto. The Capital Markets (Amendment) Bill 2024 proposes licensing of digital asset exchanges. M-Pesa crypto integrations (via Binance, YellowCard) are the primary on/off ramp. Kenya Revenue Authority taxes crypto gains under income tax law.',
+    exchanges: ['Binance P2P (M-Pesa)', 'YellowCard (M-Pesa)', 'Luno', 'Paxful P2P'],
+    keyDocs: ['CMA Capital Markets Master Plan 2023-2027', 'CBK Discussion Paper on Digital Currencies (2022)', 'Capital Markets (Amendment) Bill 2024', 'KRA Income Tax Guidelines on Digital Assets'],
+  },
+  {
+    code: 'ZA', name: 'South Africa', status: 'Regulated', lastUpdate: '2026-04-01',
+    summary: 'FSCA licenses Crypto Asset Service Providers (CASPs) under the Financial Advisory and Intermediary Services (FAIS) Act, effective June 2023. Over 60 CASPs licensed. SARB classifies crypto as financial products, not legal tender. SARS taxes crypto gains under capital gains tax (18% effective rate for individuals). South Africa has the most developed institutional crypto market in Africa with regulated custody and exchange services.',
+    exchanges: ['Luno (FSCA-licensed)', 'VALR (FSCA-licensed)', 'AltCoinTrader', 'Ice3X', 'Binance (FSCA-registered)'],
+    keyDocs: ['FSCA CASP Licensing Framework (2023)', 'FAIS Amendment (Declaration of CASPs) 2022', 'SARB Position Paper on Crypto Assets (2019)', 'SARS Crypto Tax Guide (2024)', 'IFWG Position Paper on Crypto Assets'],
+  },
+  {
+    code: 'GH', name: 'Ghana', status: 'Cautious', lastUpdate: '2026-02-28',
+    summary: 'SEC Ghana has issued public advisories warning about risks but has not banned crypto. Bank of Ghana is developing the eCedi CBDC (pilot completed in 2023, Phase 2 merchant rollout in progress). SEC exploring a regulatory sandbox for digital assets. No specific licensing framework yet. Mobile money interoperability (MTN MoMo, Vodafone Cash) is the primary payment rail, and crypto-to-mobile-money bridges operate in a grey area.',
+    exchanges: ['Binance P2P (GHS)', 'YellowCard (mobile money)', 'Quidax'],
+    keyDocs: ['SEC Ghana Advisory on Digital Assets (2022)', 'Bank of Ghana eCedi Design Paper (2022)', 'Payment Systems and Services Act 2019 (PSS Act)', 'BoG Fintech and Innovation Office (FIO) Sandbox Framework'],
+  },
+  {
+    code: 'UG', name: 'Uganda', status: 'Unregulated', lastUpdate: '2025-12-20',
+    summary: 'No specific crypto regulation. Bank of Uganda has issued general warnings but no ban. Growing adoption through P2P and mobile money integration.',
+    exchanges: ['Binance P2P', 'YellowCard', 'Luno'],
+    keyDocs: ['BOU Consumer Advisory 2024'],
+  },
+  {
+    code: 'TZ', name: 'Tanzania', status: 'Cautious', lastUpdate: '2025-11-30',
+    summary: 'Bank of Tanzania banned crypto transactions in 2019, but enforcement is limited. P2P trading continues via mobile money.',
+    exchanges: ['Binance P2P'],
+    keyDocs: ['BOT Public Notice on Cryptocurrency 2019'],
+  },
+  {
+    code: 'EG', name: 'Egypt', status: 'Restricted', lastUpdate: '2026-01-22',
+    summary: 'Central Bank of Egypt prohibits banks from dealing in crypto. Blockchain technology is encouraged. New fintech law in progress may address digital assets.',
+    exchanges: ['Binance P2P'],
+    keyDocs: ['CBE Circular on Virtual Currencies', 'Draft Fintech Law 2025'],
+  },
+  {
+    code: 'MA', name: 'Morocco', status: 'Evolving', lastUpdate: '2026-02-01',
+    summary: 'Bank Al-Maghrib banned crypto in 2017 but is now exploring CBDC and a regulatory framework for digital assets under AMMC oversight.',
+    exchanges: ['Binance P2P'],
+    keyDocs: ['BAM Digital Currency Study 2025', 'AMMC Securities Regulation Update'],
+  },
+  {
+    code: 'SN', name: 'Senegal', status: 'WAEMU Rules', lastUpdate: '2025-10-15',
+    summary: 'Subject to BCEAO (WAEMU) regulations. Crypto is not legal tender. Growing DeFi interest. eCFA CBDC discussions ongoing.',
+    exchanges: ['Binance P2P', 'YellowCard'],
+    keyDocs: ['BCEAO Instruction on Digital Money Services'],
+  },
+  {
+    code: 'AO', name: 'Angola', status: 'Unregulated', lastUpdate: '2025-09-30',
+    summary: 'No specific cryptocurrency legislation. BNA monitors digital payment developments. Limited exchange access.',
+    exchanges: ['Binance P2P'],
+    keyDocs: ['BNA Financial Stability Report 2025'],
+  },
+  {
+    code: 'MZ', name: 'Mozambique', status: 'Unregulated', lastUpdate: '2025-08-20',
+    summary: 'No crypto-specific regulation. Growing mobile money ecosystem could integrate crypto. P2P adoption increasing.',
+    exchanges: ['Binance P2P'],
+    keyDocs: [],
+  },
+  {
+    code: 'CI', name: "Côte d'Ivoire", status: 'WAEMU Rules', lastUpdate: '2025-11-10',
+    summary: 'BCEAO rules apply. Abidjan is becoming a West African fintech hub. Orange Money and crypto overlap growing.',
+    exchanges: ['Binance P2P', 'YellowCard'],
+    keyDocs: ['BCEAO Instruction on Digital Money Services', 'ARTCI Digital Economy Framework'],
+  },
 ];
+
+type FallbackDetail = CountrySummary & {
+  events: Array<{ id: string; title: string; eventDate: string; eventType: string; impactScore: number; details: string }>;
+  requirements: Array<{ id: string; licenseType: string; authority: string; minCapital: number; fees: number; processingDays: number; notes: string }>;
+};
+
+const fallbackDetails: Record<string, FallbackDetail> = {
+  NG: {
+    ...fallbackCountries[0],
+    events: [
+      { id: 'ng-1', title: 'SEC Nigeria opens ARIP registration window for VASPs', eventDate: '2024-08-01', eventType: 'licensing', impactScore: 9, details: 'SEC begins accepting applications from Virtual Asset Service Providers under the Accelerated Regulatory Incubation Programme. Exchanges must register within 6 months.' },
+      { id: 'ng-2', title: 'CBN lifts banking ban on cryptocurrency transactions', eventDate: '2023-12-22', eventType: 'policy_change', impactScore: 10, details: 'Central Bank of Nigeria reverses its February 2021 directive that prohibited banks from servicing crypto-related accounts. Banks may now process transactions for SEC-registered VASPs.' },
+      { id: 'ng-3', title: 'Finance Act 2023 introduces 10% capital gains tax on crypto', eventDate: '2023-09-01', eventType: 'taxation', impactScore: 7, details: 'Capital gains from disposal of digital assets above NGN 10 million are now subject to 10% tax. Applies to both individuals and corporates.' },
+      { id: 'ng-4', title: 'eNaira Phase 2 launches with merchant integration', eventDate: '2023-10-01', eventType: 'cbdc', impactScore: 6, details: 'CBN expands eNaira CBDC to merchant payments. Over 13 million wallets created but adoption remains low relative to population.' },
+      { id: 'ng-5', title: 'SEC issues Rules on Issuance, Offering Platforms and Custody of Digital Assets', eventDate: '2022-06-11', eventType: 'regulation', impactScore: 9, details: 'Comprehensive framework covering token issuance, exchange licensing, custody requirements, and investor protection for digital assets in Nigeria.' },
+    ],
+    requirements: [
+      { id: 'ng-r1', licenseType: 'Digital Asset Exchange', authority: 'SEC Nigeria (ARIP)', minCapital: 500000000, fees: 30000000, processingDays: 120, notes: 'Capital in NGN. Requires local incorporation, AML/CFT compliance officer, audited financials, cybersecurity assessment.' },
+      { id: 'ng-r2', licenseType: 'Digital Asset Offering Platform', authority: 'SEC Nigeria', minCapital: 200000000, fees: 20000000, processingDays: 90, notes: 'For token issuance and IEO platforms. Requires whitepaper review by SEC.' },
+      { id: 'ng-r3', licenseType: 'Digital Asset Custodian', authority: 'SEC Nigeria', minCapital: 1000000000, fees: 50000000, processingDays: 180, notes: 'Highest capital requirement. Must demonstrate cold storage infrastructure and insurance coverage.' },
+    ],
+  },
+  KE: {
+    ...fallbackCountries[1],
+    events: [
+      { id: 'ke-1', title: 'Capital Markets (Amendment) Bill 2024 tabled in Parliament', eventDate: '2024-11-15', eventType: 'legislation', impactScore: 8, details: 'Bill proposes licensing framework for digital asset exchanges, custodians, and advisors under CMA oversight. Expected to pass in 2025.' },
+      { id: 'ke-2', title: 'KRA issues guidance on taxation of digital assets', eventDate: '2024-06-01', eventType: 'taxation', impactScore: 7, details: 'Kenya Revenue Authority confirms crypto gains are taxable under existing income tax law. Mining income classified as business income.' },
+      { id: 'ke-3', title: 'CBK launches consultation on digital currency regulation', eventDate: '2022-02-01', eventType: 'consultation', impactScore: 6, details: 'Central Bank of Kenya publishes discussion paper exploring benefits and risks of crypto assets. No ban recommended.' },
+      { id: 'ke-4', title: 'Binance launches M-Pesa deposit integration', eventDate: '2023-03-15', eventType: 'market', impactScore: 8, details: 'Binance P2P integrates M-Pesa for instant KES deposits and withdrawals, becoming the dominant on-ramp for Kenyan crypto users.' },
+    ],
+    requirements: [
+      { id: 'ke-r1', licenseType: 'Digital Asset Exchange (proposed)', authority: 'CMA Kenya (pending legislation)', minCapital: 50000000, fees: 5000000, processingDays: 180, notes: 'Capital in KES. Based on 2024 Bill draft. Not yet enforceable. Expected to include AML compliance and consumer protection requirements.' },
+    ],
+  },
+  ZA: {
+    ...fallbackCountries[2],
+    events: [
+      { id: 'za-1', title: 'FSCA begins licensing CASPs under FAIS Act', eventDate: '2023-06-01', eventType: 'licensing', impactScore: 10, details: 'Financial Sector Conduct Authority formally requires all Crypto Asset Service Providers to obtain a Financial Services Provider (FSP) license. Grace period for existing operators.' },
+      { id: 'za-2', title: 'SARS publishes updated Crypto Assets Tax Guide', eventDate: '2024-04-01', eventType: 'taxation', impactScore: 7, details: 'South African Revenue Service clarifies capital gains tax treatment: crypto-to-crypto swaps are taxable events, mining is income, staking rewards are income.' },
+      { id: 'za-3', title: 'Over 60 CASPs receive FSCA licenses', eventDate: '2025-03-01', eventType: 'licensing', impactScore: 8, details: 'FSCA confirms 60+ entities have been licensed. Unlicensed operators face enforcement action. South Africa becomes the most regulated crypto market in Africa.' },
+      { id: 'za-4', title: 'IFWG publishes Position Paper on Crypto Assets', eventDate: '2021-06-01', eventType: 'policy_change', impactScore: 9, details: 'Intergovernmental Fintech Working Group recommends declaring crypto assets as financial products under FAIS Act, setting the foundation for CASP licensing.' },
+      { id: 'za-5', title: 'SARB announces digital Rand pilot (Project Khokha 2)', eventDate: '2022-04-01', eventType: 'cbdc', impactScore: 5, details: 'SARB explores wholesale CBDC for interbank settlement. Retail CBDC remains under study.' },
+    ],
+    requirements: [
+      { id: 'za-r1', licenseType: 'Crypto Asset Service Provider (CASP) — Category I', authority: 'FSCA', minCapital: 1500000, fees: 350000, processingDays: 90, notes: 'Capital in ZAR. Category I covers intermediary services (exchange, brokerage). Requires fit-and-proper assessment, compliance officer, PI insurance.' },
+      { id: 'za-r2', licenseType: 'Crypto Asset Service Provider (CASP) — Category II', authority: 'FSCA', minCapital: 5000000, fees: 500000, processingDays: 120, notes: 'Capital in ZAR. Category II covers discretionary and advisory services. Higher capital and compliance requirements.' },
+    ],
+  },
+  GH: {
+    ...fallbackCountries[3],
+    events: [
+      { id: 'gh-1', title: 'Bank of Ghana completes eCedi CBDC pilot', eventDate: '2023-12-01', eventType: 'cbdc', impactScore: 7, details: 'BoG completes sandbox pilot of eCedi with Giesecke+Devrient technology partner. Phase 2 merchant rollout planned for 2024-2025.' },
+      { id: 'gh-2', title: 'SEC Ghana issues advisory on digital assets', eventDate: '2022-09-15', eventType: 'advisory', impactScore: 6, details: 'Securities and Exchange Commission warns public about risks of investing in crypto assets. Clarifies that no entity is licensed to operate a crypto exchange in Ghana.' },
+      { id: 'gh-3', title: 'BoG launches Fintech and Innovation Office', eventDate: '2023-05-01', eventType: 'institutional', impactScore: 5, details: 'Bank of Ghana establishes dedicated FIO to oversee fintech sandbox applications. Crypto-related businesses expected to be eligible for sandbox participation.' },
+      { id: 'gh-4', title: 'Payment Systems and Services Act 2019 enacted', eventDate: '2019-06-01', eventType: 'legislation', impactScore: 8, details: 'PSS Act establishes licensing for payment service providers and electronic money issuers. Crypto exchanges may fall under "electronic payment services" definition.' },
+    ],
+    requirements: [
+      { id: 'gh-r1', licenseType: 'Electronic Money Issuer (EMI)', authority: 'Bank of Ghana', minCapital: 5000000, fees: 200000, processingDays: 120, notes: 'Capital in GHS. Under PSS Act 2019. Crypto exchanges may require EMI license for fiat on/off ramp. Requirements include local incorporation and BoG approval.' },
+      { id: 'gh-r2', licenseType: 'Payment Service Provider (PSP)', authority: 'Bank of Ghana', minCapital: 2000000, fees: 100000, processingDays: 90, notes: 'Capital in GHS. Lower tier for payment aggregation. May apply to crypto-to-mobile-money bridge services.' },
+    ],
+  },
+};
 
 function getPrisma(req: Request): any {
   return (req.app as any).locals.prisma;
@@ -140,6 +262,7 @@ router.get('/:countryCode', async (req: Request, res: Response) => {
   }, null as any);
 
   if (!record) {
+    if (code in fallbackDetails) return res.json({ data: fallbackDetails[code] });
     const fallback = fallbackCountries.find(c => c.code === code);
     if (!fallback) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Country not found' } });
     return res.json({ data: fallback });
@@ -161,9 +284,13 @@ router.get('/:countryCode/events', async (req: Request, res: Response) => {
       orderBy: { eventDate: 'desc' },
       take: 200,
     });
-  }, [] as any[]);
+  }, null as any);
 
-  return res.json({ data: events });
+  if (!events && code in fallbackDetails) {
+    return res.json({ data: fallbackDetails[code].events });
+  }
+
+  return res.json({ data: events || [] });
 });
 
 /**
@@ -181,7 +308,7 @@ router.get('/:countryCode/licensing/calculate', async (req: Request, res: Respon
       orderBy: [{ processingDays: 'asc' }, { minCapital: 'asc' }],
       take: 20,
     });
-  }, [] as any[]);
+  }, null as any) || (code in fallbackDetails ? fallbackDetails[code].requirements : []);
 
   const filtered = requirements.filter((r: any) => {
     const licenseType = String(r.licenseType || '').toLowerCase();

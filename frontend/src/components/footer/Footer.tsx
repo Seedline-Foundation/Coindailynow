@@ -117,6 +117,7 @@ const Footer: React.FC = () => {
       title: t('learn'),
       links: [
         { label: t('cryptoBasics'), href: '/crypto-basics' },
+        { label: 'Factsheets', href: '/factsheets' },
       ]
     },
     {
