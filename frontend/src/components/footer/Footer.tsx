@@ -138,6 +138,7 @@ const Footer: React.FC = () => {
       links: [
         { label: t('about'), href: '/about' },
         { label: 'Editorial Standards', href: '/editorial-standards' },
+        { label: 'FAQ', href: '/faq' },
         { label: 'Jobs', href: '/jobs' },
         { label: 'Blog', href: '/blog' },
         { label: t('privacy'), href: '/privacy' },
