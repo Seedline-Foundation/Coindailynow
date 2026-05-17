@@ -122,9 +122,11 @@ const MarqueeWrapper: React.FC<MarqueeWrapperProps> = ({
 
   // Loading fallback component
   const LoadingFallback = () => (
-    <div className={`h-12 bg-gray-900 ${className}`}>
-      <div className="h-full bg-gradient-to-r from-gray-800 to-gray-700 animate-pulse rounded"></div>
-    </div>
+    <div
+      className={`h-12 skeleton-shimmer rounded ${className}`}
+      role="status"
+      aria-label="Loading ticker"
+    />
   );
 
   // Don't render anything on server side to avoid hydration mismatch

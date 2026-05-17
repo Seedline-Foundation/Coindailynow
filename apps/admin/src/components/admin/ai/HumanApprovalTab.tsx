@@ -6,8 +6,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Users, CheckCircle, XCircle, Clock, AlertCircle, Eye, Loader2 } from 'lucide-react';
+import { Users, CheckCircle, XCircle, Clock, AlertCircle, Eye, Loader2, ShieldOff } from 'lucide-react';
 import { aiManagementService, ContentWorkflow } from '@/services/aiManagementService';
+import { emergencyUnpublishArticle } from '@/lib/api';
 import { aiWebSocketService } from '@/services/aiWebSocketService';
 
 export default function HumanApprovalTab() {
@@ -63,6 +64,23 @@ export default function HumanApprovalTab() {
       await loadApprovalQueue();
     } catch (error) {
       console.error('[HumanApprovalTab] Error rejecting:', error);
+    }
+  };
+
+  const handleEmergencyUnpublish = async () => {
+    if (!selectedWorkflow?.articleId) {
+      alert('No linked article for this workflow');
+      return;
+    }
+    if (!confirm('Emergency unpublish this article from the live site?')) return;
+    try {
+      await emergencyUnpublishArticle(selectedWorkflow.articleId, reviewNotes || 'AI queue emergency unpublish');
+      setSelectedWorkflow(null);
+      setReviewNotes('');
+      await loadApprovalQueue();
+    } catch (error) {
+      console.error('[HumanApprovalTab] Emergency unpublish:', error);
+      alert(error instanceof Error ? error.message : 'Emergency unpublish failed');
     }
   };
 
@@ -208,7 +226,16 @@ export default function HumanApprovalTab() {
                 >
                   Cancel
                 </button>
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap justify-end">
+                  {selectedWorkflow.articleId && (
+                    <button
+                      onClick={handleEmergencyUnpublish}
+                      className="px-6 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 flex items-center gap-2"
+                    >
+                      <ShieldOff className="h-4 w-4" />
+                      Emergency Unpublish
+                    </button>
+                  )}
                   <button
                     onClick={handleReject}
                     className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"

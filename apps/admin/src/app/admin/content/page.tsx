@@ -20,11 +20,12 @@ import {
   Loader2,
   RefreshCw,
   AlertCircle,
+  ShieldOff,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
-import { fetchArticles, fetchPlatformStats, updateArticle } from '@/lib/api';
+import { fetchArticles, fetchPlatformStats, updateArticle, emergencyUnpublishArticle } from '@/lib/api';
 
 interface Article {
   id: string;
@@ -87,6 +88,16 @@ export default function AdminContentPage() {
       loadData();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update article');
+    }
+  };
+
+  const handleEmergencyUnpublish = async (id: string, title: string) => {
+    if (!confirm(`Emergency unpublish "${title}"? This removes it from the live site immediately.`)) return;
+    try {
+      await emergencyUnpublishArticle(id);
+      loadData();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Emergency unpublish failed');
     }
   };
 
@@ -219,6 +230,15 @@ export default function AdminContentPage() {
                           <button onClick={() => handlePublish(article.id)}
                             className="p-2 text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded-lg" title="Publish">
                             <CheckCircle className="w-4 h-4" />
+                          </button>
+                        )}
+                        {article.status === 'published' && (
+                          <button
+                            onClick={() => handleEmergencyUnpublish(article.id, article.title)}
+                            className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg"
+                            title="Emergency unpublish"
+                          >
+                            <ShieldOff className="w-4 h-4" />
                           </button>
                         )}
                         <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg" title="Edit">

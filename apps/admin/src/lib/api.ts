@@ -3,6 +3,8 @@
  * Connects to the CoinDaily backend for real-time data
  */
 
+import { getAccessToken } from './auth';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 interface FetchOptions {
@@ -12,7 +14,7 @@ interface FetchOptions {
 }
 
 async function apiRequest<T = any>(endpoint: string, options: FetchOptions = {}): Promise<T> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_access_token') : null;
+  const token = typeof window !== 'undefined' ? getAccessToken() : null;
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -36,7 +38,7 @@ async function apiRequest<T = any>(endpoint: string, options: FetchOptions = {})
 
 // GraphQL helper
 async function graphqlRequest<T = any>(query: string, variables?: Record<string, any>): Promise<T> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_access_token') : null;
+  const token = typeof window !== 'undefined' ? getAccessToken() : null;
   
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -191,4 +193,11 @@ export async function loginAdmin(email: string, password: string) {
 
 export async function verifyAdmin() {
   return apiRequest('/api/auth/admin/verify');
+}
+
+export async function emergencyUnpublishArticle(articleId: string, reason?: string) {
+  return apiRequest(`/api/super-admin/articles/${articleId}/emergency-unpublish`, {
+    method: 'POST',
+    body: { reason: reason || 'Emergency moderation unpublish' },
+  });
 }

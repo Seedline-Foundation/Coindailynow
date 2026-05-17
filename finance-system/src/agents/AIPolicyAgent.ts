@@ -29,12 +29,20 @@ export class AIPolicyAgent {
     }
 
     async suggestPricingAdjustment(currentMetrics: any): Promise<any> {
-        console.log("Analyzing subscription churn and conversion rates...");
-        // Call OpenAI to suggest pricing strategy
+        const prompt = `As CFIS financial policy advisor, analyze subscription metrics and suggest one pricing action.
+Metrics: ${JSON.stringify(currentMetrics || {})}
+Return JSON only: {"recommendation":"...","confidence":0-1,"reasoning":"..."}`;
+        const raw = await this.queryDeepSeek(prompt);
+        if (raw) {
+            try {
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) return JSON.parse(m[0]);
+            } catch { /* fallback */ }
+        }
         return {
-            recommendation: "Hold prices steady",
+            recommendation: 'Hold prices steady',
             confidence: 0.85,
-            reasoning: "Churn is stable while conversion metrics are slightly up."
+            reasoning: 'Churn is stable while conversion metrics are slightly up.',
         };
     }
 

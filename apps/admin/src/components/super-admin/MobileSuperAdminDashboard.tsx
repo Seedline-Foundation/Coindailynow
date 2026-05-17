@@ -440,7 +440,7 @@ export default function MobileSuperAdminDashboard() {
                         {alert.message}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {alert.component} • {alert.timestamp.toLocaleTimeString()}
+                        {alert.component} • {new Date(alert.timestamp).toLocaleTimeString()}
                       </p>
                     </div>
                   </div>

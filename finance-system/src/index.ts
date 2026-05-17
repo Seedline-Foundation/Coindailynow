@@ -19,6 +19,11 @@ import transactionRoutes from './routes/transactions';
 import paymentRoutes from './routes/payments';
 import pressRoutes from './routes/press';
 import pressPublicRoutes from './routes/pressPublic';
+import subscriptionsWebhookRoutes from './routes/subscriptionsWebhook';
+import internalEventsRoutes from './routes/internalEvents';
+import taxReportsRoutes from './routes/taxReports';
+import pointsBridgeRoutes from './routes/pointsBridge';
+import { blockchainListener } from './services/BlockchainListenerService';
 import payrollRoutes from './routes/payroll';
 import partnershipRoutes from './routes/partnerships';
 import airdropRoutes from './routes/airdrops';
@@ -146,6 +151,10 @@ app.post('/api/internal/receive', verifyInternalHMAC, async (req, res) => {
 // Users place PR orders via press.coindaily.online → SENDPRESS calls these endpoints
 // → CFIS creates escrow → Super Admin sees it in dashboard immediately
 app.use('/api/press-orders', pressOrderLimiter, pressPublicRoutes);
+app.use('/api/subscriptions', pressOrderLimiter, subscriptionsWebhookRoutes);
+app.use('/api/internal', pressOrderLimiter, internalEventsRoutes);
+app.use('/api/tax', apiLimiter, taxReportsRoutes);
+app.use('/api/points-bridge', pressOrderLimiter, pointsBridgeRoutes);
 
 // ─── Authenticated API Routes (rate-limited: 30 req/min) ────────────
 app.use('/api/dashboard', requireSuperAdmin, apiLimiter, dashboardRoutes);
@@ -169,6 +178,8 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 });
 
 // ─── Start Server ────────────────────────────────────────────────────
+blockchainListener.start();
+
 app.listen(port, () => {
   console.log('');
   console.log('╔══════════════════════════════════════════════════════════════╗');

@@ -47,7 +47,7 @@ export default function CompletedTasksTab() {
         limit: 25,
       });
       setTasks(data.tasks);
-      setTotalPages(data.totalPages);
+      setTotalPages(data.totalPages ?? 1);
       setTotalTasks(data.total);
     } catch (error) {
       console.error('[CompletedTasksTab] Error:', error);
@@ -331,7 +331,7 @@ export default function CompletedTasksTab() {
               </div>
 
               {/* Metrics */}
-              {selectedTask.metrics && (
+              {selectedTask.metrics != null ? (
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-semibold text-gray-900 mb-2">Metrics</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -343,21 +343,21 @@ export default function CompletedTasksTab() {
                       <span className="text-gray-500">Cost</span>
                       <p className="font-medium">${selectedTask.metrics.cost?.toFixed(4)}</p>
                     </div>
-                    {selectedTask.metrics.tokensUsed && (
+                    {selectedTask.metrics.tokensUsed != null ? (
                       <div>
                         <span className="text-gray-500">Tokens Used</span>
                         <p className="font-medium">{selectedTask.metrics.tokensUsed.toLocaleString()}</p>
                       </div>
-                    )}
-                    {selectedTask.metrics.qualityScore && (
+                    ) : null}
+                    {selectedTask.metrics.qualityScore != null ? (
                       <div>
                         <span className="text-gray-500">Quality Score</span>
                         <p className="font-medium">{(selectedTask.metrics.qualityScore * 100).toFixed(0)}%</p>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 </div>
-              )}
+              ) : null}
 
               {/* Input */}
               <div>
@@ -368,14 +368,14 @@ export default function CompletedTasksTab() {
               </div>
 
               {/* Output */}
-              {selectedTask.outputData && (
+              {selectedTask.outputData != null ? (
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Output Data</h3>
                   <pre className="bg-green-50 p-4 rounded-lg text-sm overflow-auto max-h-48">
                     {JSON.stringify(selectedTask.outputData, null, 2)}
                   </pre>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

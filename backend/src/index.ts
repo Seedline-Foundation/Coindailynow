@@ -66,6 +66,10 @@ import structuredContentRouter from './routes/structured-content.routes';
 import knowledgeApiRouter from './api/routes/knowledgeApi.routes';
 import authRouter from './routes/auth.routes';
 import walletCallbackRouter from './routes/walletCallbackRoutes';
+import subscriptionRouter from './routes/subscription.routes';
+import adminEditorialQueueRouter from './api/admin/adminQueueRoutes';
+import mediaRouter from './routes/media.routes';
+import moderationScanRouter from './routes/moderationScan.routes';
 import sitemapRouter from './routes/sitemap.routes';
 import structuredDataRouter from './routes/structured-data.routes';
 import marqueeRouter from './routes/marquee';
@@ -485,6 +489,18 @@ export async function setupApp() {
   // Payment webhook callbacks (YellowCard + ChangeNOW) — CRITICAL for deposits/swaps
   app.use('/api/wallet/callbacks', walletCallbackRouter);
 
+  // Subscription checkout, trial, paywall (YellowCard / ChangeNOW + CFIS handshake)
+  app.use('/api/subscriptions', subscriptionRouter);
+
+  // AI editorial Redis queue (ai-system → admin approval)
+  app.use('/api/admin/editorial-queue', adminEditorialQueueRouter);
+
+  // Media upload (B2 → CDN)
+  app.use('/api/media', mediaRouter);
+
+  // Moderation scan (ai-system ContentModerationAgent)
+  app.use('/api/moderation', moderationScanRouter);
+
   // Sitemap routes (SEO — Google/Bing indexing)
   app.use('/api/sitemap', sitemapRouter);
 
@@ -637,7 +653,22 @@ export async function setupApp() {
 }
 
 async function startServer() {
-  const { httpServer } = await setupApp();
+  const { app, httpServer } = await setupApp();
+
+  if (process.env.ENABLE_MODERATION !== 'false') {
+    try {
+      const { setupModeration } = await import('./moderation');
+      const moderation = setupModeration(app, httpServer, {
+        perspectiveApiKey: process.env.PERSPECTIVE_API_KEY,
+        verbose: process.env.NODE_ENV === 'development',
+      });
+      await moderation.start();
+      logger.info('🛡️ AI Moderation system started (REST + WebSocket + background worker)');
+    } catch (err: any) {
+      logger.warn('Moderation system failed to start (non-fatal)', { error: err.message });
+    }
+  }
+
   httpServer.listen(PORT, () => {
     logger.info(`🚀 Server ready at http://localhost:${PORT}`);
     logger.info(`🚀 GraphQL endpoint at http://localhost:${PORT}${GRAPHQL_PATH}`);

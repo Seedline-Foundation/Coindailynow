@@ -3,6 +3,8 @@
 
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useState, useEffect } from 'react';
 import {
   TrendingUp,
@@ -42,7 +44,7 @@ export default function OptimizationWidget() {
 
       const response = await fetch('/api/optimization/user-stats', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${getAccessToken()}`,
         },
       });
 

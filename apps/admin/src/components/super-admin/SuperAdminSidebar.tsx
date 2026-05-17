@@ -5,6 +5,8 @@
 
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -74,7 +76,7 @@ const ALWAYS_ACCESSIBLE_MENUS = [
 /* ─── Role detection ─── */
 function detectSidebarRole(): { isCeo: boolean; staffId: string; assignedMenus: string[] } {
   if (typeof window === 'undefined') return { isCeo: true, staffId: 'ceo', assignedMenus: [] };
-  const token = localStorage.getItem('super_admin_token') || '';
+  const token = getAccessToken() || '';
   const isCeo = token.includes('super_admin') || token.includes('ceo') || token.includes('super-admin');
   const staffId = localStorage.getItem('staff_id') || (isCeo ? 'ceo' : 'staff-unknown');
   // Staff menu assignments stored by CEO (JSON array of menu IDs)
@@ -113,6 +115,12 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       label: 'Overview',
       icon: LayoutDashboard,
       href: '/super-admin/dashboard',
+    },
+    {
+      id: 'cfis-finance',
+      label: 'CFIS Finance',
+      icon: DollarSign,
+      href: '/admin/finance',
     },
     {
       id: 'today-todo',

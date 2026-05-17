@@ -29,6 +29,9 @@ import {
   createDistribution,
 } from '@/lib/api';
 import type { PressSite } from '@/lib/supabase';
+import { PRESS_MONETIZATION, estimateDistributionCost } from '@/config/monetization';
+import { createYellowCardCheckout, openYellowCardCheckout } from '@/lib/yellowcardCheckout';
+import { notifyCfisPressOrder } from '@/lib/cfisPressOrder';
 
 /**
  * Distribution Wizard — /dashboard/distribute
@@ -658,8 +661,7 @@ export default function DistributePage() {
                     media_meta: featuredImage ? { featured_image: featuredImage } : {},
                   });
 
-                  // Create distribution
-                  await createDistribution({
+                  const dist = await createDistribution({
                     pr_id: release.id,
                     publisher_id: publisherId,
                     target_sites: selected,
@@ -667,6 +669,32 @@ export default function DistributePage() {
                     credits_locked: totalCost + Math.ceil(totalCost * 0.05),
                     status: 'pending',
                   });
+
+                  const orderId = dist?.id || release.id;
+                  const cost = estimateDistributionCost(selected.length);
+
+                  if (PRESS_MONETIZATION.cfisEscrowEnabled) {
+                    await notifyCfisPressOrder({
+                      orderId,
+                      publisherId,
+                      publisherEmail: user?.email,
+                      publisherWallet: user?.wallet_address,
+                      amount: cost.total,
+                      prTitle: title,
+                      targetSites: selected,
+                      tier: 'bronze',
+                    });
+                  }
+
+                  if (PRESS_MONETIZATION.yellowCardEnabled) {
+                    const checkout = await createYellowCardCheckout({
+                      orderId,
+                      publisherId,
+                      amountUsd: cost.total,
+                      email: user?.email,
+                    });
+                    openYellowCardCheckout(checkout.checkoutUrl);
+                  }
 
                   window.location.href = '/dashboard/campaigns';
                 } catch (err: any) {
@@ -676,6 +704,7 @@ export default function DistributePage() {
                 }
               }}
               className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-dark-950 font-bold rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="press-launch-campaign"
             >
               {launching ? (
                 <><Loader2 className="w-5 h-5 animate-spin" /> Launching…</>

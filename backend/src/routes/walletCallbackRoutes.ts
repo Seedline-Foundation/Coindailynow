@@ -17,6 +17,7 @@ import { TransactionType, TransactionStatus } from '@prisma/client';
 import prisma from '../lib/prisma';
 import crypto from 'crypto';
 import { Redis } from 'ioredis';
+import { subscriptionService } from '../services/subscriptionService';
 
 const router = express.Router();
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
@@ -419,6 +420,36 @@ router.post('/swap/callback', async (req: Request, res: Response) => {
       error: 'Failed to process swap',
       details: error.message,
     });
+  }
+});
+
+// ============================================================================
+// SUBSCRIPTION PAYMENT CALLBACK (YellowCard metadata)
+// ============================================================================
+
+router.post('/subscription/callback', async (req: Request, res: Response) => {
+  try {
+    const { userId, planId, gatewayTxId, amount, status } = req.body;
+    if (status && status !== 'completed' && status !== 'COMPLETED') {
+      return res.status(200).json({ success: true, message: 'Ignored non-complete status' });
+    }
+    if (!userId || !planId || !gatewayTxId) {
+      return res.status(400).json({ error: 'userId, planId, gatewayTxId required' });
+    }
+
+    const result = await subscriptionService.confirmPayment({
+      userId,
+      planId,
+      gatewayTxId,
+      amount: Number(amount) || 0,
+      paymentMethod: 'CARD',
+      paymentGateway: 'YELLOWCARD',
+    });
+
+    return res.status(200).json({ success: true, data: result });
+  } catch (error: any) {
+    console.error('Subscription callback error:', error);
+    return res.status(500).json({ error: error.message });
   }
 });
 

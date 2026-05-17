@@ -26,6 +26,8 @@ import ResearchAgent from '../research/researchAgent';
 import WriterAgent from '../content/writerAgent';
 import ImageAgent from '../image/imageAgent';
 import TranslationAgentForReview from '../translation/translationAgentForReview';
+import { runSelfHostedEditorialReview } from './selfHostedEditorialReview';
+import { editorialPolicy } from '../../config/editorialPolicy';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -562,6 +564,23 @@ export class AIReviewAgent {
    */
   async queueForAdminApproval(bundle: ArticleBundle): Promise<AdminQueueItem> {
     console.log(`[Review Agent] Queuing article bundle for admin approval`);
+
+    // Mandatory self-hosted quality pass before human/admin queue (Ollama / DeepSeek R1)
+    if (editorialPolicy.requireEditorialReview) {
+      const review = await runSelfHostedEditorialReview({
+        title: bundle.english.title,
+        content: bundle.english.content,
+        language: 'en',
+      });
+      if (!review.passed) {
+        throw new Error(
+          `Editorial review failed (score ${review.score}/100): ${review.issues.join('; ') || review.summary}`,
+        );
+      }
+      console.log(
+        `[Review Agent] ✅ Editorial pass via ${review.provider} (score: ${review.score}/100)`,
+      );
+    }
 
     const queueItem: AdminQueueItem = {
       id: `queue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

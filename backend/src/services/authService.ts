@@ -4,6 +4,12 @@ import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
 import prisma from '../lib/prisma';
 import { logger } from '../utils/logger';
+import {
+  revokeAccessTokenJti,
+  isAccessTokenJtiRevoked,
+  revokeAllAccessTokensForUser,
+  isUserAccessTokenRevoked,
+} from './tokenRevocationService';
 
 export interface LoginCredentials {
   email: string;
@@ -316,7 +322,7 @@ export class AuthService {
       userAgent?: string;
     }
   ): Promise<TokenPair> {
-    // Generate access token
+    const jti = crypto.randomUUID();
     const accessToken = jwt.sign(
       {
         sub: user.id,
@@ -325,7 +331,8 @@ export class AuthService {
         subscriptionTier: user.subscriptionTier,
         status: user.status,
         emailVerified: user.emailVerified,
-        type: 'access'
+        type: 'access',
+        jti,
       },
       process.env.JWT_SECRET!,
       { 
@@ -394,8 +401,19 @@ export class AuthService {
   /**
    * Logout user and revoke tokens
    */
-  async logout(userId: string, refreshToken?: string): Promise<void> {
+  async logout(userId: string, refreshToken?: string, accessToken?: string): Promise<void> {
     try {
+      if (accessToken) {
+        try {
+          const decoded = jwt.decode(accessToken) as { jti?: string } | null;
+          if (decoded?.jti) await revokeAccessTokenJti(decoded.jti);
+        } catch {
+          /* ignore decode errors */
+        }
+      } else {
+        await revokeAllAccessTokensForUser(userId);
+      }
+
       if (refreshToken) {
         // Revoke specific refresh token
         await this.prisma.refreshToken.updateMany({
@@ -437,6 +455,7 @@ export class AuthService {
    * Revoke all tokens for a user
    */
   async revokeAllUserTokens(userId: string): Promise<void> {
+    await revokeAllAccessTokensForUser(userId);
     await this.prisma.refreshToken.updateMany({
       where: {
         userId,
@@ -667,6 +686,15 @@ export class AuthService {
   async verifyAccessToken(token: string): Promise<AuthenticatedUser> {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+      if (decoded.jti && (await isAccessTokenJtiRevoked(decoded.jti))) {
+        throw new Error('Token has been revoked');
+      }
+
+      const issuedAtSec = decoded.iat ?? 0;
+      if (decoded.sub && (await isUserAccessTokenRevoked(decoded.sub, issuedAtSec))) {
+        throw new Error('Token has been revoked');
+      }
       
       // Get fresh user data
       const user = await this.prisma.user.findUnique({

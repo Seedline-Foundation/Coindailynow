@@ -158,7 +158,7 @@ export default function SuperAdminHeader({ sidebarOpen, setSidebarOpen }: SuperA
                                 {alert.message}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {alert.component} • {alert.timestamp.toLocaleTimeString()}
+                                {alert.component} • {new Date(alert.timestamp).toLocaleTimeString()}
                               </p>
                             </div>
                           </div>
@@ -195,7 +195,7 @@ export default function SuperAdminHeader({ sidebarOpen, setSidebarOpen }: SuperA
               <User className="w-5 h-5" />
               {user && (
                 <span className="hidden md:inline text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {user.username}
+                  {user.name || user.email}
                 </span>
               )}
             </button>
@@ -204,7 +204,7 @@ export default function SuperAdminHeader({ sidebarOpen, setSidebarOpen }: SuperA
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
                 <div className="p-3 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {user?.username}
+                    {user?.name || user?.email}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {user?.email}

@@ -26,7 +26,7 @@ import {
   GET_TOP_EARNERS,
   GENERATE_SYSTEM_REPORT,
   RUN_LOAD_TEST,
-} from '../../graphql/analytics';
+} from '@/graphql/analytics';
 
 interface AnalyticsDashboardProps {
   dateRange: {

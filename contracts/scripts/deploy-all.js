@@ -8,7 +8,7 @@ async function main() {
   // ── 1. Deploy JoyToken ─────────────────────────────────────────
   console.log('\n--- Deploying JoyToken ---');
   const JoyToken = await hre.ethers.getContractFactory('JoyToken');
-  const joyToken = await JoyToken.deploy(deployer.address);
+  const joyToken = await JoyToken.deploy();
   await joyToken.waitForDeployment();
   const joyAddr = await joyToken.getAddress();
   console.log('JoyToken deployed to:', joyAddr);

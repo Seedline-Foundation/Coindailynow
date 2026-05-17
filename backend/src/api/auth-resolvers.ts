@@ -202,7 +202,12 @@ export const authResolvers = {
           throw new Error('Authentication required');
         }
 
-        await authService.logout(context.user.id, args.refreshToken);
+        const bearer = context.req?.headers?.authorization;
+        const accessToken =
+          typeof bearer === 'string' && bearer.startsWith('Bearer ')
+            ? bearer.slice(7)
+            : undefined;
+        await authService.logout(context.user.id, args.refreshToken, accessToken);
 
         return {
           success: true,

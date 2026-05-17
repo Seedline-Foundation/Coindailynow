@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { marqueeApi } from '@/lib/marqueeApi';
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -147,17 +148,15 @@ const MarqueeAdmin: React.FC = () => {
   const loadMarquees = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/admin/marquees');
-      const result = await response.json();
-      
+      const result = await marqueeApi.list();
       if (result.success) {
-        setMarquees(result.data);
+        setMarquees(result.data as MarqueeData[]);
         setError(null);
       } else {
-        setError(result.error || 'Failed to load marquees');
+        setError('Failed to load marquees');
       }
     } catch (err) {
-      setError('Network error loading marquees');
+      setError(err instanceof Error ? err.message : 'Network error loading marquees');
     } finally {
       setIsLoading(false);
     }
@@ -166,20 +165,10 @@ const MarqueeAdmin: React.FC = () => {
   // Save marquee
   const saveMarquee = async () => {
     try {
-      const url = selectedMarquee 
-        ? `/api/admin/marquees/${selectedMarquee.id}`
-        : '/api/admin/marquees';
-      
-      const method = selectedMarquee ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      
-      const result = await response.json();
-      
+      const result = selectedMarquee
+        ? await marqueeApi.update(selectedMarquee.id, formData)
+        : await marqueeApi.create(formData);
+
       if (result.success) {
         setSuccess(selectedMarquee ? 'Marquee updated successfully' : 'Marquee created successfully');
         setShowEditor(false);
@@ -199,12 +188,8 @@ const MarqueeAdmin: React.FC = () => {
     if (!confirm('Are you sure you want to delete this marquee?')) return;
     
     try {
-      const response = await fetch(`/api/admin/marquees/${id}`, {
-        method: 'DELETE',
-      });
-      
-      const result = await response.json();
-      
+      const result = await marqueeApi.remove(id);
+
       if (result.success) {
         setSuccess('Marquee deleted successfully');
         loadMarquees();
@@ -222,24 +207,18 @@ const MarqueeAdmin: React.FC = () => {
       const marquee = marquees.find(m => m.id === id);
       if (!marquee) return;
       
-      const response = await fetch(`/api/admin/marquees/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...marquee,
-          [field]: !marquee[field],
-        }),
+      const result = await marqueeApi.update(id, {
+        ...marquee,
+        [field]: !marquee[field],
       });
-      
-      const result = await response.json();
-      
+
       if (result.success) {
         loadMarquees();
       } else {
-        setError(result.error || `Failed to toggle ${field}`);
+        setError(`Failed to toggle ${field}`);
       }
     } catch (err) {
-      setError(`Network error toggling ${field}`);
+      setError(err instanceof Error ? err.message : `Network error toggling ${field}`);
     }
   };
 
@@ -251,24 +230,18 @@ const MarqueeAdmin: React.FC = () => {
       
       const newPriority = direction === 'up' ? marquee.priority - 1 : marquee.priority + 1;
       
-      const response = await fetch(`/api/admin/marquees/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...marquee,
-          priority: Math.max(1, newPriority),
-        }),
+      const result = await marqueeApi.update(id, {
+        ...marquee,
+        priority: Math.max(1, newPriority),
       });
-      
-      const result = await response.json();
-      
+
       if (result.success) {
         loadMarquees();
       } else {
-        setError(result.error || 'Failed to update priority');
+        setError('Failed to update priority');
       }
     } catch (err) {
-      setError('Network error updating priority');
+      setError(err instanceof Error ? err.message : 'Network error updating priority');
     }
   };
 
@@ -286,13 +259,7 @@ const MarqueeAdmin: React.FC = () => {
         priority: Math.max(...marquees.map(m => m.priority)) + 1,
       };
       
-      const response = await fetch('/api/admin/marquees', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(duplicatedData),
-      });
-      
-      const result = await response.json();
+      const result = await marqueeApi.create(duplicatedData);
       
       if (result.success) {
         setSuccess('Marquee duplicated successfully');

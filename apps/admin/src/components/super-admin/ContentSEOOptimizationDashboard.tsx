@@ -1,3 +1,4 @@
+import { getAccessToken, clearSession } from '@/lib/auth';
 /**
  * Content SEO Optimization Dashboard - Super Admin
  * Comprehensive dashboard for managing content SEO optimization
@@ -74,7 +75,7 @@ export const ContentSEOOptimizationDashboard: React.FC = () => {
       // Load dashboard stats
       const statsResponse = await fetch('/api/content-seo/dashboard-stats', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${getAccessToken()}`,
         },
       });
       const statsData = await statsResponse.json();
@@ -90,7 +91,7 @@ export const ContentSEOOptimizationDashboard: React.FC = () => {
         `/api/content-seo/all?${minScore !== undefined ? `minScore=${minScore}` : ''}`,
         {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Authorization': `Bearer ${getAccessToken()}`,
           },
         }
       );

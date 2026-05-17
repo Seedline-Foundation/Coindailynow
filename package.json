@@ -32,12 +32,18 @@
     "start:backend": "cd backend && npm run start",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "clean": "turbo run clean && rimraf node_modules"
+    "clean": "turbo run clean && rimraf node_modules",
+    "contracts:clean": "npm --prefix contracts run clean",
+    "contracts:compile": "npm --prefix contracts run compile",
+    "contracts:test": "npm --prefix contracts run test",
+    "contracts:typechain": "npm --prefix contracts run typechain",
+    "contracts:export-abis": "npm --prefix contracts run export-abis",
+    "contracts:artifacts": "npm --prefix contracts run artifacts"
   },
   "devDependencies": {
-    "turbo": "^1.11.0",
+    "husky": "^8.0.0",
     "rimraf": "^5.0.5",
-    "husky": "^8.0.0"
+    "turbo": "^1.11.0"
   },
   "engines": {
     "node": ">=18.0.0"

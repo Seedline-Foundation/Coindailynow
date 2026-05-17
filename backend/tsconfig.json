@@ -5,6 +5,11 @@
     "module": "commonjs",
     "lib": ["ES2022"],
     "types": ["node", "jest"],
+    "baseUrl": ".",
+    "paths": {
+      "@prisma/client": ["node_modules/@prisma/client"],
+      "@prisma/client/*": ["node_modules/@prisma/client/*"]
+    },
     "rootDir": "..",
     "outDir": "./dist",
     "strict": false,
@@ -33,7 +38,8 @@
     "node_modules",
     "dist",
     "prisma/**/*",
-    "tests/**/*"
+    "tests/**/*",
+    "src/services/finance/FinanceService.monolith.backup.ts"
   ]
 }
 

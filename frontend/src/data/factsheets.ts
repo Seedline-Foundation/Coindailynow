@@ -99,6 +99,26 @@ export const factsheets: FactsheetEntity[] = [
       'Solana Pay is being piloted by African fintech startups for point-of-sale crypto payments. Low fees make it attractive for micro-transaction use cases in mobile money markets.',
     relatedSlugs: ['bitcoin', 'ethereum', 'bnb'],
   },
+  {
+    slug: 'usdt',
+    name: 'Tether (USDT)',
+    type: 'cryptocurrency',
+    ticker: 'USDT',
+    tagline: 'Dominant dollar-pegged stablecoin for African remittances and P2P',
+    overview:
+      'USDT is the most widely used stablecoin globally and the primary settlement asset on African P2P desks. It maintains a soft peg to the US dollar and runs on multiple chains including Ethereum, Tron, and BNB Chain.',
+    founded: '2014',
+    website: 'https://tether.to',
+    keyStats: [
+      { label: 'Peg', value: '1 USD (target)' },
+      { label: 'Primary chains', value: 'Tron, Ethereum, BNB' },
+      { label: 'Use case', value: 'Remittance, trading, treasury' },
+      { label: 'Issuer', value: 'Tether Limited' },
+    ],
+    africanRelevance:
+      'USDT/NGN and USDT/KES pairs are the highest-volume crypto markets in Africa. YellowCard, Binance P2P, and Quidax rely on USDT as the bridge between local fiat and global liquidity.',
+    relatedSlugs: ['bitcoin', 'yellowcard', 'binance', 'nigeria', 'kenya'],
+  },
 
   // --- Exchanges ---
   {
@@ -141,7 +161,27 @@ export const factsheets: FactsheetEntity[] = [
     africanRelevance:
       'Luno was the first major exchange to offer ZAR and NGN fiat pairs with instant bank deposits, making it a gateway for millions of first-time African crypto buyers.',
     regulatoryStatus: 'Registered with FSCA in South Africa. Operating under interim framework in Nigeria.',
-    relatedSlugs: ['bitcoin', 'ethereum', 'south-africa', 'nigeria'],
+    relatedSlugs: ['bitcoin', 'ethereum', 'south-africa', 'nigeria', 'valr'],
+  },
+  {
+    slug: 'valr',
+    name: 'VALR',
+    type: 'exchange',
+    tagline: 'South African crypto exchange with institutional-grade infrastructure',
+    overview:
+      'VALR is a Cape Town-based cryptocurrency exchange serving retail and institutional clients across Africa. It offers spot trading, earn products, and API access with FSCA-aligned compliance positioning.',
+    founded: '2018',
+    headquarters: 'Cape Town, South Africa',
+    website: 'https://www.valr.com',
+    keyStats: [
+      { label: 'HQ', value: 'Cape Town, ZA' },
+      { label: 'Regulatory context', value: 'FSCA CASP ecosystem' },
+      { label: 'Products', value: 'Spot, Earn, API' },
+      { label: 'Markets', value: 'ZAR, BTC, ETH, USDT' },
+    ],
+    africanRelevance:
+      'VALR is among the largest exchanges in Southern Africa and a key ZAR liquidity venue for regional market coverage.',
+    relatedSlugs: ['luno', 'south-africa', 'bitcoin', 'usdt'],
   },
   {
     slug: 'quidax',
@@ -352,6 +392,46 @@ export const factsheets: FactsheetEntity[] = [
       "Ghana's e-Cedi CBDC pilot is one of Africa's most advanced. Mobile money interoperability and strong P2P crypto trading volumes make it a key market for pan-African exchanges like YellowCard.",
     regulatoryStatus: 'SEC Ghana and Bank of Ghana are developing a regulatory framework. No ban on crypto. e-Cedi CBDC pilot ongoing.',
     relatedSlugs: ['mtn', 'yellowcard', 'nigeria', 'bitcoin'],
+  },
+  {
+    slug: 'tanzania',
+    name: 'Tanzania',
+    type: 'country',
+    tagline: 'East African market with growing mobile-money and crypto adoption',
+    overview:
+      'Tanzania is an East African economy with rising fintech adoption and increasing retail interest in stablecoins for savings and cross-border transfers. Regulatory clarity is still evolving compared to Kenya and South Africa.',
+    headquarters: 'Dodoma (capital)',
+    keyStats: [
+      { label: 'Population', value: '67M+' },
+      { label: 'GDP', value: '$85B+' },
+      { label: 'Currency', value: 'Tanzanian Shilling (TZS)' },
+      { label: 'Mobile money', value: 'M-Pesa, Tigo Pesa, Airtel Money' },
+      { label: 'Internet penetration', value: '~32%' },
+    ],
+    africanRelevance:
+      'Tanzania is part of the East African Community corridor alongside Kenya and Uganda. P2P USDT demand and mobile-money interoperability make it a strategic market for pan-African exchanges.',
+    regulatoryStatus: 'Bank of Tanzania has cautioned on crypto; formal CASP licensing framework still developing.',
+    relatedSlugs: ['kenya', 'yellowcard', 'usdt', 'safaricom'],
+  },
+  {
+    slug: 'ripple',
+    name: 'Ripple (XRP)',
+    type: 'cryptocurrency',
+    ticker: 'XRP',
+    tagline: 'Payments-focused digital asset used in cross-border settlement pilots',
+    overview:
+      'XRP is the native asset of the XRP Ledger, designed for fast, low-cost cross-border payments. RippleNet partners include financial institutions exploring remittance corridors relevant to African markets.',
+    founded: '2012',
+    website: 'https://ripple.com',
+    keyStats: [
+      { label: 'Ledger', value: 'XRP Ledger' },
+      { label: 'Settlement time', value: '~3–5 seconds' },
+      { label: 'Use case', value: 'Cross-border payments' },
+      { label: 'Supply model', value: 'Fixed max supply' },
+    ],
+    africanRelevance:
+      'Ripple has announced CBDC and cross-border settlement pilots with African central banks (e.g. Rwanda). XRP is watched as infrastructure for remittance cost reduction across EAC corridors.',
+    relatedSlugs: ['bitcoin', 'kenya', 'tanzania', 'yellowcard'],
   },
 ];
 

@@ -32,80 +32,83 @@ export class ResearchAgent {
    * Returns research outcome ready for Review Agent validation
    */
   async fetchTrendingTopics(): Promise<ResearchOutcome> {
-    this.logger.info('[ResearchAgent] Fetching trending topics...');
+    this.logger.info('[ResearchAgent] Fetching trending topics from news API...');
 
-    // TODO: Integrate with existing NewsAggregationAgent, TrendAnalysisAgent
-    // For now, returning mock data structure
-    
-    const topic = "Bitcoin adoption accelerates in Nigeria as CBN announces new crypto framework";
-    
-    const sources: Source[] = [
-      {
-        url: 'https://techpoint.africa/2026/01/31/nigeria-cbn-crypto-framework',
-        title: 'CBN Announces New Cryptocurrency Regulatory Framework',
-        published_at: new Date('2026-01-31T08:00:00Z'),
-        credibility_score: 92,
-        domain: 'techpoint.africa'
-      },
-      {
-        url: 'https://bitcoinmagazine.com/markets/bitcoin-nigeria-adoption-2026',
-        title: 'Bitcoin Sees 300% Surge in Nigerian Trading Volume',
-        published_at: new Date('2026-01-31T07:30:00Z'),
-        credibility_score: 88,
-        domain: 'bitcoinmagazine.com'
-      },
-      {
-        url: 'https://coindesk.com/policy/nigeria-crypto-regulation',
-        title: 'Nigeria\'s Central Bank Softens Stance on Cryptocurrency',
-        published_at: new Date('2026-01-31T06:15:00Z'),
-        credibility_score: 95,
-        domain: 'coindesk.com'
-      },
-      {
-        url: 'https://reuters.com/markets/africa/nigeria-bitcoin-regulation',
-        title: 'Nigerian Crypto Market Responds to Regulatory Clarity',
-        published_at: new Date('2026-01-31T05:00:00Z'),
-        credibility_score: 98,
-        domain: 'reuters.com'
+    const apiBase = process.env.BACKEND_API_URL || process.env.API_URL || 'http://localhost:4000';
+
+    try {
+      const res = await fetch(`${apiBase}/api/news?limit=8&region=africa`);
+      if (res.ok) {
+        const json = (await res.json()) as { articles?: any[]; data?: any[] };
+        const articles = json.articles || json.data || [];
+        if (articles.length > 0) {
+          const top = articles[0];
+          const sources: Source[] = articles.slice(0, 6).map((a: any) => ({
+            url: a.url || a.link || `https://coindaily.online/news/${a.id || 'item'}`,
+            title: a.title || 'Untitled',
+            published_at: new Date(a.publishedAt || a.published_at || Date.now()),
+            credibility_score: Math.min(99, 70 + (a.sourceCredibility || 0) * 30),
+            domain: (a.source || a.sourceName || 'coindaily').toString(),
+          }));
+
+          const topic = top.title || 'African crypto markets update';
+          const facts = articles.slice(0, 5).map(
+            (a: any) => `${a.source || 'Source'}: ${(a.summary || a.title || '').slice(0, 200)}`,
+          );
+          const coreMessage =
+            top.summary ||
+            top.description ||
+            `Breaking coverage: ${topic}`;
+
+          return {
+            id: `research_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+            topic,
+            sources,
+            facts,
+            core_message: coreMessage,
+            word_count: 1200,
+            sentiment: 'neutral',
+            urgency: top.urgency === 'breaking' ? 'breaking' : 'high',
+            trending_score: Math.min(99, 60 + articles.length * 4),
+            timestamp: new Date(),
+            raw_data: { source: 'backend_news_api', article_count: articles.length },
+          };
+        }
       }
-    ];
+    } catch (err: any) {
+      this.logger.warn('[ResearchAgent] News API fallback', { error: err.message });
+    }
 
-    const facts = [
-      "Central Bank of Nigeria (CBN) announced new cryptocurrency regulatory framework on January 31, 2026",
-      "Bitcoin trading volume in Nigeria increased by 300% in past 24 hours",
-      "New framework allows licensed exchanges to operate under CBN oversight",
-      "Nigeria is now the 4th largest cryptocurrency market in Africa by trading volume",
-      "Framework includes KYC requirements and transaction limits for consumer protection"
-    ];
+    const { NewsAggregationAgent } = await import('./NewsAggregationAgent');
+    const aggregator = new NewsAggregationAgent();
+    const aggTask = await aggregator.execute(
+      { taskType: 'aggregate', region: 'africa', limit: 8 },
+      'normal',
+    );
 
-    const coreMessage = "Nigeria's Central Bank has introduced a comprehensive cryptocurrency regulatory framework, signaling a major shift from previous restrictive policies. This landmark decision is expected to legitimize crypto trading and boost Bitcoin adoption across West Africa, with immediate impact seen in a 300% surge in trading volumes on Nigerian exchanges.";
+    const feedArticles = (aggTask as any)?.output?.feed?.articles || [];
+    const topic = feedArticles[0]?.title || 'African crypto market developments';
+    const sources: Source[] = feedArticles.slice(0, 5).map((a: any) => ({
+      url: a.url || '#',
+      title: a.title,
+      published_at: new Date(a.publishedAt || Date.now()),
+      credibility_score: Math.round((a.sourceCredibility || 0.8) * 100),
+      domain: a.source || 'aggregated',
+    }));
 
-    const research: ResearchOutcome = {
-      id: `research_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    return {
+      id: `research_${Date.now()}`,
       topic,
       sources,
-      facts,
-      core_message: coreMessage,
-      word_count: 1200, // Target word count for article
-      sentiment: 'positive',
-      urgency: 'breaking',
-      trending_score: 94, // High newsworthiness
+      facts: feedArticles.slice(0, 4).map((a: any) => a.summary || a.title),
+      core_message: feedArticles[0]?.summary || topic,
+      word_count: 1200,
+      sentiment: 'neutral',
+      urgency: 'medium',
+      trending_score: 75,
       timestamp: new Date(),
-      raw_data: {
-        twitter_mentions: 15420,
-        reddit_upvotes: 3200,
-        news_coverage: sources.length,
-        google_trends_score: 89
-      }
+      raw_data: { source: 'news_aggregation_agent' },
     };
-
-    this.logger.info('[ResearchAgent] Research complete', {
-      topic: research.topic,
-      trending_score: research.trending_score,
-      sources_count: research.sources.length
-    });
-
-    return research;
   }
 
   /**

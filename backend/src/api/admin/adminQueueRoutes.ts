@@ -10,13 +10,26 @@
  */
 
 import { Router, Request, Response } from 'express';
-import Redis from 'ioredis';
+import { authMiddleware } from '../../middleware/auth';
+import { getRedis } from '../../lib/redis';
+import prisma from '../../lib/prisma';
+import { logger } from '../../utils/logger';
 import { AIReviewAgent } from '../../agents/review/aiReviewAgent';
+import { runEditorialPipelineJob } from '../../services/aiEditorialPipelineService';
+import AIModerationService from '../../services/aiModerationService';
+import ContentModerationAgent from '../../agents/moderation/contentModerationAgent';
 import { AdminQueueItem, EditRequest } from '../../types/admin-types';
 
 const router = Router();
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-const reviewAgent = new AIReviewAgent(redis);
+router.use(authMiddleware as any);
+const redis = getRedis();
+const reviewAgent = new AIReviewAgent(redis, logger, prisma as any);
+const moderationAgent = new ContentModerationAgent();
+const perspectiveModeration = new AIModerationService(
+  prisma,
+  redis,
+  process.env.PERSPECTIVE_API_KEY || process.env.GOOGLE_PERSPECTIVE_API_KEY || '',
+);
 
 // ============================================================================
 // GET /api/admin/queue - Get all pending articles
@@ -122,6 +135,38 @@ router.post('/queue/:id/approve', async (req: Request, res: Response) => {
     }
 
     const item: AdminQueueItem = JSON.parse(itemData);
+
+    const articleText = [
+      item.articles?.english?.title,
+      item.articles?.english?.content,
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+
+    if (articleText) {
+      const agentTask = await moderationAgent.execute(
+        { text: articleText, contentId: item.article_id },
+        'high',
+      );
+      const agentOut = (agentTask as { output?: { allowed?: boolean; score?: number } }).output;
+      const perspective = await perspectiveModeration.moderateContent({
+        contentId: item.article_id,
+        contentType: 'article',
+        text: articleText,
+        userId: admin_id || 'admin',
+      } as any);
+      const allowed =
+        agentOut?.allowed !== false &&
+        Number(agentOut?.score ?? 0) < 0.85 &&
+        (perspective as { allowed?: boolean }).allowed !== false;
+      if (!allowed) {
+        return res.status(422).json({
+          success: false,
+          error: 'Content failed moderation — cannot approve for publication',
+          moderation: { agent: agentOut, perspective },
+        });
+      }
+    }
 
     // Update status to approved
     item.status = 'approved';
@@ -340,6 +385,23 @@ router.post('/queue/:id/publish', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: 'Failed to publish article'
+    });
+  }
+});
+
+// ============================================================================
+// POST /api/admin/editorial-queue/run — trigger ai-system pipeline
+// ============================================================================
+
+router.post('/run', async (req: Request, res: Response) => {
+  try {
+    const result = await runEditorialPipelineJob();
+    res.json({ success: true, data: result });
+  } catch (error: any) {
+    console.error('[Admin Queue API] Pipeline run failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error?.message || 'Editorial pipeline failed',
     });
   }
 });

@@ -35,7 +35,8 @@
     "db:studio": "prisma studio",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "type-check:ci": "node scripts/typecheck-ci.cjs"
   },
   "keywords": [
     "cryptocurrency",

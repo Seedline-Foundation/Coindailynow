@@ -25,6 +25,7 @@ export { CryptoResearchAgent } from './research/CryptoResearchAgent';
 export { NewsCuratorAgent } from './content/NewsCuratorAgent';
 export { SocialMediaAgent } from './content/SocialMediaAgent';
 export { ResearchWriterAgent } from './content/ResearchWriterAgent';
+export { default as ContentModerationAgent } from './moderation/ContentModerationAgent';
 
 // Engineering Agents
 export { CodeReviewAgent } from './engineering/CodeReviewAgent';
@@ -65,6 +66,7 @@ import { CryptoResearchAgent } from './research/CryptoResearchAgent';
 import { NewsCuratorAgent } from './content/NewsCuratorAgent';
 import { SocialMediaAgent } from './content/SocialMediaAgent';
 import { ResearchWriterAgent } from './content/ResearchWriterAgent';
+import ContentModerationAgent from './moderation/ContentModerationAgent';
 import { CodeReviewAgent } from './engineering/CodeReviewAgent';
 import { DevOpsAgent } from './engineering/DevOpsAgent';
 import { TestAgent } from './engineering/TestAgent';
@@ -117,6 +119,7 @@ class AgentRegistry {
       NewsCuratorAgent,
       SocialMediaAgent,
       ResearchWriterAgent,
+      ContentModerationAgent,
       // Engineering
       CodeReviewAgent,
       DevOpsAgent,

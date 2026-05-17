@@ -185,7 +185,7 @@ async function prismaSearch(
   }
 
   // Run count and find in parallel
-  const [total, articles, categoryAgg, countryAgg, langAgg] = await Promise.all([
+  const [total, articles, categoryAgg, langAgg] = await Promise.all([
     prisma.article.count({ where }),
     prisma.article.findMany({
       where,
@@ -194,11 +194,11 @@ async function prismaSearch(
         title: true,
         excerpt: true,
         slug: true,
-        countryCode: true,
+        territory: true,
         language: true,
         publishedAt: true,
         featuredImageUrl: true,
-        category: { select: { name: true, slug: true } },
+        Category: { select: { name: true, slug: true } },
       },
       orderBy: [{ publishedAt: 'desc' }],
       skip: offset,
@@ -207,12 +207,6 @@ async function prismaSearch(
     // Category facet
     prisma.article.groupBy({
       by: ['categoryId'],
-      where: { status: 'PUBLISHED', OR: where.OR },
-      _count: true,
-    }),
-    // Country facet
-    prisma.article.groupBy({
-      by: ['countryCode'],
       where: { status: 'PUBLISHED', OR: where.OR },
       _count: true,
     }),
@@ -237,9 +231,9 @@ async function prismaSearch(
     title: a.title,
     excerpt: a.excerpt,
     slug: a.slug,
-    category: a.category?.name || null,
-    categorySlug: a.category?.slug || null,
-    country: a.countryCode,
+    category: a.Category?.name || null,
+    categorySlug: a.Category?.slug || null,
+    country: Array.isArray(a.territory) && a.territory.length > 0 ? a.territory[0] : a.language,
     language: a.language,
     publishedAt: a.publishedAt?.toISOString() || null,
     featuredImageUrl: a.featuredImageUrl,
@@ -262,9 +256,9 @@ async function prismaSearch(
           key: catMap.get(c.categoryId)?.slug || c.categoryId,
           count: c._count,
         })),
-      countries: countryAgg
-        .filter((c: any) => c.countryCode)
-        .map((c: any) => ({ key: c.countryCode, count: c._count })),
+      countries: langAgg
+        .filter((l: any) => l.language)
+        .map((l: any) => ({ key: l.language, count: l._count })),
       languages: langAgg
         .filter((l: any) => l.language)
         .map((l: any) => ({ key: l.language, count: l._count })),

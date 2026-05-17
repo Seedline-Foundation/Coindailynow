@@ -36,6 +36,7 @@ mkdir -p /var/www/coindaily
 mkdir -p /var/www/coindaily-admin
 mkdir -p /var/www/coindaily-press
 mkdir -p /var/www/coindaily-ai
+mkdir -p /var/www/coindaily-ai-system
 mkdir -p /var/www/coindaily-token
 mkdir -p /var/log/coindaily
 chmod 755 /var/log/coindaily
@@ -65,13 +66,12 @@ echo -e "${GREEN}✓ News Frontend synced${NC}"
 
 # Sync Admin Portal
 echo -e "${YELLOW}[5/10] Deploying Admin Portal...${NC}"
-# Admin uses same codebase but different build
 rsync -avz --delete \
     --exclude 'node_modules' \
     --exclude '.git' \
     --exclude '.next/cache' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/frontend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-admin/
+    ${LOCAL_DIR}/apps/admin/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-admin/
 echo -e "${GREEN}✓ Admin Portal synced${NC}"
 
 # Sync PR System
@@ -81,17 +81,23 @@ rsync -avz --delete \
     --exclude '.git' \
     --exclude '.next/cache' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/frontend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-press/
+    ${LOCAL_DIR}/apps/press/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-press/
 echo -e "${GREEN}✓ PR System synced${NC}"
 
-# Sync AI System
-echo -e "${YELLOW}[7/10] Deploying AI System...${NC}"
+# Sync AI Dashboard (Next.js) + AI Pipeline (orchestrator)
+echo -e "${YELLOW}[7/10] Deploying AI Dashboard + Pipeline...${NC}"
+rsync -avz --delete \
+    --exclude 'node_modules' \
+    --exclude '.git' \
+    --exclude '.next/cache' \
+    --exclude '*.log' \
+    ${LOCAL_DIR}/apps/ai/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-ai/
 rsync -avz --delete \
     --exclude 'node_modules' \
     --exclude '.git' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/ai-system/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-ai/
-echo -e "${GREEN}✓ AI System synced${NC}"
+    ${LOCAL_DIR}/ai-system/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-ai-system/
+echo -e "${GREEN}✓ AI Dashboard + Pipeline synced${NC}"
 
 # Sync Infrastructure configs
 echo -e "${YELLOW}[8/10] Deploying Nginx configs...${NC}"
@@ -136,9 +142,13 @@ cd coindaily-admin && npm ci --production && cd ..
 echo "Installing PR system dependencies..."
 cd coindaily-press && npm ci --production && cd ..
 
-# AI System
-echo "Installing AI system dependencies..."
+# AI Dashboard
+echo "Installing AI dashboard dependencies..."
 cd coindaily-ai && npm ci --production && cd ..
+
+# AI Pipeline
+echo "Installing AI pipeline dependencies..."
+cd coindaily-ai-system && npm ci --production && cd ..
 
 # Start/Restart PM2
 echo "Starting PM2 services..."

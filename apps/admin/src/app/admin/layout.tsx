@@ -10,6 +10,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 import SessionTimeoutWarning from '@/components/SessionTimeoutWarning';
+import { useAuth } from '@/contexts/AuthContext';
+import { getAccessToken, clearSession } from '@/lib/auth';
 import {
   LayoutDashboard,
   Users,
@@ -48,6 +50,7 @@ const navItems: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/users', label: 'User Management', icon: Users, requiredRoles: ['SUPER_ADMIN', 'ADMIN'] },
   { href: '/admin/content', label: 'Content', icon: FileText, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'] },
+  { href: '/admin/marquees', label: 'Marquee', icon: Monitor, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'] },
   { href: '/admin/ai', label: 'AI Management', icon: Brain, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN', 'CONTENT_ADMIN'] },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'] },
   { href: '/admin/monetization', label: 'Monetization', icon: DollarSign, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'MARKETING_ADMIN'] },
@@ -60,6 +63,8 @@ const navItems: NavItem[] = [
   { href: '/admin/audit', label: 'Audit Logs', icon: Eye, requiredRoles: ['SUPER_ADMIN', 'ADMIN'] },
   { href: '/admin/system', label: 'System Health', icon: Monitor, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'] },
   { href: '/admin/settings', label: 'Settings', icon: Settings, requiredRoles: ['SUPER_ADMIN', 'ADMIN'] },
+  { href: '/admin/finance', label: 'CFIS Finance', icon: DollarSign, requiredRoles: ['SUPER_ADMIN', 'ADMIN'] },
+  { href: '/admin/fraud-alerts', label: 'Fraud Alerts', icon: Shield, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'] },
 ];
 
 /** Filter nav items based on user role */
@@ -83,6 +88,7 @@ export default function AdminSectionLayout({
   const [admin, setAdmin] = useState<{ name: string; email: string; role: string } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const { logout: authLogout } = useAuth();
   const isAdminLoginRoute = pathname === '/admin/login' || pathname === '/admin/login/';
 
   useEffect(() => {
@@ -95,7 +101,7 @@ export default function AdminSectionLayout({
       }
 
       try {
-        const token = localStorage.getItem('admin_access_token');
+        const token = getAccessToken();
         if (!token) {
           router.push('/login');
           return;
@@ -121,24 +127,28 @@ export default function AdminSectionLayout({
               setAdmin({ name: user.email, email: user.email, role: user.role });
               setIsAuthenticated(true);
             } else {
-              localStorage.removeItem('admin_access_token');
+              clearSession();
+              authLogout();
               router.push('/login');
             }
           } else {
-            localStorage.removeItem('admin_access_token');
+            clearSession();
+            authLogout();
             router.push('/login');
           }
         } catch (fetchErr) {
           clearTimeout(timer);
           // Backend unreachable — deny access, never auto-grant
           console.error('Auth verification failed: backend unreachable');
-          localStorage.removeItem('admin_access_token');
+          clearSession();
+          authLogout();
           router.push('/login');
         }
       } catch (error) {
         // Auth check failed — deny access
         console.error('Auth check error:', error);
-        localStorage.removeItem('admin_access_token');
+        clearSession();
+        authLogout();
         router.push('/login');
       } finally {
         setLoading(false);
@@ -148,12 +158,10 @@ export default function AdminSectionLayout({
   }, [router, pathname, isAdminLoginRoute]);
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem('admin_access_token');
-    localStorage.removeItem('admin_refresh_token');
-    localStorage.removeItem('admin_user');
-    // CEO tokens removed — CEO now uses super-admin auth
+    clearSession();
+    authLogout();
     router.push('/login');
-  }, [router]);
+  }, [router, authLogout]);
 
   // Session timeout warning (SPEC-ADM-2) + auto-refresh on 401 (SPEC-ADM-1)
   const { showWarning, secondsRemaining, extendSession, isRefreshing } = useSessionTimeout({

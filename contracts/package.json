@@ -1,0 +1,23 @@
+{
+  "name": "@coindaily/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "clean": "hardhat clean",
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "typechain": "hardhat typechain",
+    "export-abis": "node scripts/export-abis.js",
+    "artifacts": "npm run compile && npm run typechain && npm run export-abis"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "hardhat": "^2.22.19",
+    "typechain": "^8.3.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2"
+  }
+}

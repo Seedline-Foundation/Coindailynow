@@ -27,7 +27,7 @@ import {
   Save,
   Trash2
 } from 'lucide-react';
-import { RewardPointsConfig } from '../../types/content-sections';
+import { RewardPointsConfig } from '@/types/content-sections';
 
 // Types for admin interface
 interface ContentItem {

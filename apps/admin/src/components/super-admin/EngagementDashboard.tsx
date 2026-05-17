@@ -3,6 +3,8 @@
 
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useState, useEffect } from 'react';
 import {
   Users,
@@ -86,7 +88,7 @@ export default function EngagementDashboard() {
         `/api/engagement/analytics?from=${from.toISOString()}&to=${to.toISOString()}`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${getAccessToken()}`,
           },
         }
       );

@@ -123,19 +123,37 @@ Include: Bitcoin/cryptocurrency symbols, charts, graphs, Nigerian/African flag c
    */
   async uploadToCDN(imageUrl: string): Promise<string> {
     try {
-      // TODO: Implement actual CDN upload
-      // For now, return the image URL as-is
-      
-      // Placeholder implementation:
-      // 1. If base64, decode to buffer
-      // 2. Upload to Backblaze B2
-      // 3. Get Cloudflare CDN URL
-      // 4. Return permanent URL
-      
       this.logger.info('[ImageAgent] Uploading image to CDN');
-      
-      return imageUrl; // Temporary - would return CDN URL
-      
+      const apiBase = process.env.BACKEND_API_URL || process.env.API_URL || 'http://localhost:4000';
+      const token = process.env.AI_PIPELINE_SERVICE_TOKEN;
+
+      const res = await fetch(`${apiBase}/api/media/upload`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ image: imageUrl, prefix: 'ai-images' }),
+      });
+
+      if (res.ok) {
+        const json = (await res.json()) as { url?: string };
+        if (json.url) {
+          let url = json.url;
+          const pub = process.env.CFIS_PUBLIC_MEDIA_BASE?.replace(/\/$/, '');
+          if (pub) {
+            try {
+              const pathOnly = new URL(url).pathname;
+              url = `${pub}${pathOnly}`;
+            } catch {
+              /* keep original */
+            }
+          }
+          return url;
+        }
+      }
+
+      return imageUrl;
     } catch (error: any) {
       this.logger.error('[ImageAgent] CDN upload failed:', error);
       return imageUrl; // Fallback to original

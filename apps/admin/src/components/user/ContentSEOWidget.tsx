@@ -1,3 +1,4 @@
+import { getAccessToken, clearSession } from '@/lib/auth';
 /**
  * Content SEO Widget - User Dashboard
  * Simplified SEO optimization widget for regular users
@@ -31,7 +32,7 @@ export const ContentSEOWidget: React.FC<{ userId: string }> = ({ userId }) => {
       // In a real implementation, this would filter by user's content
       const response = await fetch('/api/content-seo/all', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${getAccessToken()}`,
         },
       });
       const data = await response.json();

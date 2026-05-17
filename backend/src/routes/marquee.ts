@@ -31,7 +31,7 @@ const requireRole = (role: string) => (req: Request, res: Response, next: NextFu
     res.status(401).json({ success: false, error: 'Authentication required' });
     return;
   }
-  const allowedRoles = ['ADMIN', 'SUPER_ADMIN'];
+  const allowedRoles = ['ADMIN', 'SUPER_ADMIN', 'CONTENT_ADMIN'];
   if (role === 'admin' && !allowedRoles.includes(user.role)) {
     res.status(403).json({ success: false, error: 'Admin access required' });
     return;
@@ -158,8 +158,8 @@ router.post('/admin',
   async (req: Request, res: Response) => {
     try {
       const marqueeData: MarqueeData = req.body;
-      // For demo purposes, use a default user ID
-      const createdBy = 'demo-admin';
+      const user = (req as any).user;
+      const createdBy = user?.id || user?.email || 'system';
       const marquee = await marqueeService.createMarquee(marqueeData, createdBy);
       
       return res.status(201).json({

@@ -40,6 +40,8 @@ const getCEOIPs = (): Set<string> => {
 // Routes that DON'T require authentication (public pages)
 const PUBLIC_ROUTES = ['/login', '/admin/login'];
 
+const PROTECTED_PREFIXES = ['/admin', '/super-admin'];
+
 // CEO-only routes — require SUPER_ADMIN role
 const CEO_ONLY_ROUTES = ['/admin/CEO', '/admin/funds', '/admin/contracts'];
 
@@ -62,6 +64,12 @@ const ROLE_ROUTE_GUARDS: Record<string, string[]> = {
   '/admin/analytics':   ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'],
   '/admin/ai':          ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN', 'CONTENT_ADMIN'],
   '/admin/content':     ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'],
+  '/admin/marquees':    ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'],
+  '/admin/finance':     ['SUPER_ADMIN', 'ADMIN'],
+  '/admin/fraud-alerts':['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'],
+  '/authors':           ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'],
+  '/automations':       ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'],
+  '/super-admin':       ['SUPER_ADMIN', 'ADMIN'],
   '/admin/community':   ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'],
   // /admin (dashboard) is accessible to all authenticated admin roles
 };
@@ -101,8 +109,29 @@ function isRoleAllowed(pathname: string, role: string | undefined): boolean {
   return true;
 }
 
+const FRONTEND_USER_BASE =
+  process.env.NEXT_PUBLIC_FRONTEND_URL?.replace(/\/$/, '') || 'https://coindaily.online';
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // S1-1 / S1-5: subscriber dashboard lives on public frontend, not jet admin
+  if (pathname === '/user' || pathname.startsWith('/user/')) {
+    const dest = `${FRONTEND_USER_BASE}${pathname}${request.nextUrl.search}`;
+    return NextResponse.redirect(dest);
+  }
+
+  // S1-1: legacy duplicate route trees → canonical src/app paths
+  if (pathname.startsWith('/admin/admin/')) {
+    const canonical = pathname.replace(/^\/admin\/admin/, '/admin');
+    return NextResponse.redirect(new URL(`${canonical}${request.nextUrl.search}`, request.url));
+  }
+  if (pathname === '/admin/withdrawals' || pathname.startsWith('/admin/withdrawals/')) {
+    return NextResponse.redirect(new URL('/admin/finance', request.url));
+  }
+  if (pathname === '/admin/traffic-cop' || pathname.startsWith('/admin/traffic-cop/')) {
+    return NextResponse.redirect(new URL('/admin/fraud-alerts', request.url));
+  }
 
   // Get client IP
   const forwardedFor = request.headers.get('x-forwarded-for');
@@ -139,7 +168,10 @@ export function middleware(request: NextRequest) {
   // ---- JWT validation (S1-6) ----
   // Skip JWT check for public routes (login pages)
   const isPublicRoute = PUBLIC_ROUTES.some(r => pathname === r || pathname === r + '/');
-  if (!isPublicRoute && pathname.startsWith('/admin')) {
+  const isProtected =
+    !isPublicRoute && PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
+
+  if (isProtected) {
     // Read token from cookie or authorization header
     // In Next.js, cookies are the primary mechanism for middleware
     const token = request.cookies.get('admin_access_token')?.value;

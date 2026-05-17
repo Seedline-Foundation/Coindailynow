@@ -7,7 +7,7 @@ set -e
 
 ENVIRONMENT=${1:-production}
 APP_NAME="coindaily-backend"
-APP_DIR="/var/www/coindaily-backend"
+APP_DIR="/var/www/coindaily-app"
 SOURCE_DIR="backend"
 
 echo "[BACKEND] Starting deployment..."

@@ -79,25 +79,28 @@
 These block launch. Anything not done here = launch slips or breaks.
 
 ### Infrastructure & reliability
-- [ ] **Verify `.env` does not contain any `CHANGE_ME` or example values.** See [SECRETS_ROTATION.md](SECRETS_ROTATION.md). Owner: founder. Time: 1h.
-- [ ] **Rotate JWT_SECRET and JWT_REFRESH_SECRET on the production server** using `openssl rand -base64 64`. Plan a 5-minute maintenance window — rotating invalidates active sessions.
-- [ ] **Confirm `infrastructure/ecosystem.production.config.js` paths match the deployed directory layout** on Contabo (`/var/www/coindaily-app`, `/var/www/coindaily`, etc. must actually exist).
-- [ ] **Run the PM2 smoke-test script** ([../guides/PM2_SMOKE_TEST.md](../guides/PM2_SMOKE_TEST.md)) on a fresh `pm2 kill` → reboot cycle. All 6 processes must come up green within 90s.
+
+**Runbook:** [../guides/PRELAUNCH_INFRA_RUNBOOK.md](../guides/PRELAUNCH_INFRA_RUNBOOK.md) · Scripts: `infrastructure/scripts/prelaunch/`
+
+- [ ] **Verify `.env` does not contain any `CHANGE_ME` or example values.** Run `verify-env.sh` on server `.env` files. See [SECRETS_ROTATION.md](SECRETS_ROTATION.md). Owner: founder. Time: 1h.
+- [ ] **Rotate JWT_SECRET and JWT_REFRESH_SECRET on the production server** — run `rotate-jwt.sh`, paste into `/var/www/coindaily-app/.env`, `pm2 restart coindaily-backend --update-env`. Plan a 5-minute maintenance window.
+- [ ] **Confirm `infrastructure/ecosystem.production.config.js` paths match Contabo** — run `verify-production-paths.sh` (manifest: `production-paths.manifest`). Fixed deploy-all paths 2026-05-15 (`coindaily-ai` + `coindaily-ai-system` split).
+- [ ] **Run the PM2 smoke-test script** — [../guides/PM2_SMOKE_TEST.md](../guides/PM2_SMOKE_TEST.md) · `pm2-smoke-test.sh --restart`. All **7** processes online within 90s.
 - [x] **Wire Sentry** (free tier: 5k errors/month) ✅ Added `@sentry/node` v9 to backend with `lib/sentry.ts` init module (loaded before all other imports in `index.ts`), wired into `errorHandler.ts` middleware (captures 5xx only) and `unhandledRejection` handler. Added `@sentry/nextjs` v9 to frontend with `sentry.client.config.ts` (10% trace sampling, 1% replay, 100% on-error replay), `sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation.ts`, `global-error.tsx`. Wrapped `next.config.js` with `withSentryConfig`. Privacy: strips auth/cookie headers, filters bots, no PII. Env vars already in `.env.production.example`.
 - [x] **Wire UptimeRobot** (free tier: 50 monitors at 5-min interval) ✅ Created `infrastructure/monitoring/UPTIMEROBOT_SETUP.md` with 5-monitor config (frontend, API health, admin, press, AI), alert channels (email + Telegram + SMS), status page setup, and API health keyword monitoring. Manual 5-min setup task for founder. Complements existing Upptime GitHub-hosted status page.
-- [ ] **Verify CDN cache rules at Cloudflare** for static assets + article pages. Confirm CORS headers match `nginx-app.coindaily.online.conf`.
-- [x] **Set up nightly Postgres backup** — Created `infrastructure/db/scripts/backup-nightly.sh`: pg_dump → gzip → B2 upload → prune old backups. Supports Docker and direct Postgres. Cron line included in script header. Failure alerts via webhook. TODO (founder): add B2 credentials to .env, install b2 CLI, add crontab entry, test restore once.
-- [ ] **Load-test the news app** with k6 or hey: 500 concurrent users hitting article list + article detail + market data endpoints. Target: P95 < 800ms. (You're claiming Africa-wide readiness — prove the box can take it.)
+- [ ] **Verify CDN cache rules at Cloudflare** — checklist in `verify-nginx-cors.sh` output + [PRELAUNCH_INFRA_RUNBOOK.md](../guides/PRELAUNCH_INFRA_RUNBOOK.md). Nginx must NOT set CORS on API (`app.coindaily.online.conf` — Express only).
+- [x] **Set up nightly Postgres backup** — `infrastructure/db/scripts/backup-nightly.sh`. **Founder:** B2 creds in `.env`, `b2` CLI, crontab `0 2 * * *`, test restore once (see runbook §5).
+- [ ] **Load-test the news app** — `run-load-test.sh` or `k6 run infrastructure/load-tests/k6-launch.js`. Target: 500 VUs, P95 < 800ms.
 - [x] **Document one fixed deploy script** — `infrastructure/scripts/deploy-all.sh` exists: 10-step rsync-based deployment covering backend, 3 frontends, AI system, nginx configs, PM2 ecosystem. Also `deploy.sh` for single-service deploys. Both under 15 minutes.
 
 ### AI content & translation quality
 - [ ] **Sample 30 AI-generated articles across en/ha/yo/sw/zu** (English + Hausa + Yoruba + Swahili + Zulu) and have a native speaker grade them on accuracy, tone, and Bloomberg-tier feel. Cost: ~$200 for grading via Upwork. Blocker: bad translations are brand-destroying.
-- [ ] **Lock the AI editorial review workflow**: Gemini quality-review pass is mandatory before any GPT-4-generated article publishes. Verify in `ai-system/orchestrator/`.
+- [x] **Lock the AI editorial review workflow**: Self-hosted Ollama/DeepSeek pass in `queueForAdminApproval()` via `runSelfHostedEditorialReview()` (`EDITORIAL_REVIEW_MODEL`, default `deepseek-r1:8b`); Gemini off unless `REQUIRE_GEMINI_EDITORIAL_REVIEW=true`. Pipeline: `POST /api/admin/editorial-queue/run` + `POST /api/super-admin/ai/editorial-pipeline/run`. 2026-05-16.
 - [ ] **Set a content moderation bypass switch** — if the AI pipeline produces something dangerous (hate speech, financial misinformation), human editors must be able to unpublish in <2 clicks from `apps/admin`.
 - [ ] **Seed the launch queue**: 30+ launch-day articles + 1/day queued for the first 14 days. Mix of crypto market analysis, African regulatory news, traditional finance crossover.
 
 ### Editorial / CMS
-- [ ] **`apps/admin/admin/marquees/page.tsx` — finish the dynamic marquee feature.** See spec: [MARQUEE_FEATURE.md](MARQUEE_FEATURE.md). Admin pushes news flash / crypto prices / headline news without coding. Backend route exists but uses `'demo-admin'` placeholder — wire real JWT auth.
+- [ ] **`apps/admin/admin/marquees/page.tsx` — finish the dynamic marquee feature.** See spec: [MARQUEE_FEATURE.md](MARQUEE_FEATURE.md). Admin pushes news flash / crypto prices / headline news without coding. **Progress (2026-05-15):** `marqueeApi.ts` wired to backend `/api/marquee/admin*` with JWT; `createdBy` uses authenticated user id. **Remaining:** integrate page into main admin layout shell; role-gate marquee push for editor+ roles.
 - [x] **Terminal-quality ticker bar — 5 concurrent marquee strips** (Bloomberg Backbone §1). ✅ Built `TickerBar.tsx` with 5 strips: Crypto (10 tokens), African Equities (8 items incl. NGX ASI, JSE ALSI, NSE 20, GSE-CI), FX Rates (8 pairs incl. USD/NGN, BTC/NGN P2P), Global Indices (7 items), Breaking News (5 headlines). Live fetch from `/api/v1/prices/batch` with 60s refresh + seed-data fallback. Dark terminal aesthetic, pause-on-hover, hide toggle. Replaces single MarqueeWrapper on homepage.
 - [x] **Resolve `marquee.ts` vs `marquee-fixed.ts`** in backend routes — deleted `marquee-fixed.ts`, kept `marquee.ts` with real auth (BE-1-5 + BE-3-1).
 - [x] **Register marquee router in `backend/src/index.ts`** — already done in BE-0-4. Mounted at `/api/marquee`.
@@ -108,7 +111,7 @@ These block launch. Anything not done here = launch slips or breaks.
 - [ ] **Decide press app monetization model** before launch: per-release pricing? Subscription for PR agencies? Bundled with crypto-project listings?
 - [ ] **Wire payment provider on press app**: YellowCard (Africa) is in `.env.example` — actually integrate the SDK on the press checkout flow.
 - [ ] **Smoke test press release end-to-end**: agency signs up → submits release → pays → editor approves → published to coindaily.online + distributed via RSS.
-- [ ] **Press wire UX polish** (Bloomberg Backbone §6) — make `apps/press` feel like a real wire service, not a CMS: ① time-stamped feed of releases (newest first, like Reuters/Bloomberg wire), ② filter by industry, country, asset class, ③ one-click "alert me when X publishes" (subscriber feature). This is the funding pitch: "We're the BusinessWire of African crypto." Estimate: 4h.
+- [~] **Press wire UX polish (MVP shipped 2026-05-15)** — `/wire` on apps/press: timestamped feed, industry/country/asset-class filters, publisher alerts (localStorage). Live data via `GET /api/v1/press/wire` (Prisma) with Supabase fallback; mock data removed. **Remaining before [x]:** email/Telegram alert delivery; E2E submit→pay→publish→wire with production releases.
 
 ### SEO surface (launch-essential only)
 - [x] **Keep these 3 routes wired and tested**: `sitemap.routes.ts`, `structured-data.routes.ts`, `indexnow.routes.ts` — all three imported and mounted in `backend/src/index.ts` at `/api/sitemap`, `/api/structured-data`, and their respective paths.
@@ -140,11 +143,11 @@ These block launch. Anything not done here = launch slips or breaks.
 - [x] **S0-4: Remove mock token acceptance** — `super-admin/layout.tsx` now verifies JWT server-side via GraphQL + enforces SUPER_ADMIN role. Also fixed `blog/page.tsx` hardcoded mock tokens.
 
 **Sev-1 — structural fixes (~12-15h total):**
-- [ ] **S1-1: Consolidate route trees** — two parallel route hierarchies (root-level + `src/app/`). Move all routes into `src/app/` using Next.js route groups `(auth)`, `(staff)`, `(super-admin)`. 3-4h.
-- [ ] **S1-2: Single login page** — five login pages, three auth mechanisms, three token keys. Merge to one `/login` page with role-based redirect. 1.5h.
+- [x] **S1-1: Consolidate route trees** — Removed orphan `apps/admin/admin/*` and `apps/admin/user/*`; canonical routes under `src/app/`; `next.config.js` + middleware redirects for legacy paths (`/admin/admin/*`, withdrawals, traffic-cop); `/user/*` → public frontend. 2026-05-16.
+- [x] **S1-2: Single login page** — `/login` is canonical; `/admin/login` and `/super-admin/login` redirect to `/login?role=super`. 2026-05-16.
 - [x] **S1-3: Role-based route guards** — Added `requiredRoles` to all 15 nav items in admin layout. `getVisibleNavItems()` filters sidebar by user role. CEO Portal link restricted to SUPER_ADMIN. Middleware has `ROLE_ROUTE_GUARDS` map enforcing role checks before page rendering.
-- [ ] **S1-4: Unified auth state** — 5+ localStorage token keys, no shared context. Create single `AuthContext` with one token key. 2h.
-- [ ] **S1-5: Extract user dashboard** — `user/` directory (15+ pages) doesn't belong in admin app. Move to `apps/frontend`. 2-3h.
+- [x] **S1-4: Unified auth state** — `AuthContext` + `AuthProvider` on root layout; `lib/auth.ts` single keys (`admin_access_token`); `migrateLegacySession()` + `getAuthHeaders()`; layouts and 33+ call sites use `getAccessToken()`. 2026-05-16.
+- [x] **S1-5: Extract user dashboard** — Orphan `user/` tree removed; `/user/*` middleware redirect to `NEXT_PUBLIC_FRONTEND_URL`; catch-all `src/app/user/[[...path]]`. 2026-05-16.
 - [x] **S1-6: JWT validation in middleware** — Edge middleware now decodes JWT (base64url, no crypto dep), checks expiry, and redirects to `/login` for missing/malformed/expired tokens. Full server-side verification still happens in layout GraphQL call.
 
 ### Finance system (CFIS) security (from [FINANCE_SYSTEM_AUDIT.md](FINANCE_SYSTEM_AUDIT.md))
@@ -187,7 +190,7 @@ These block launch. Anything not done here = launch slips or breaks.
 **Sev-1 — pre-launch if AI content is active at launch:**
 - [ ] **AI-1-2: Image CDN upload** — `uploadToCDN()` is a TODO stub returning base64 data URLs (~1-2MB). Upload to Backblaze B2 → Cloudflare CDN. 2-3h.
 - [x] **AI-1-3: Translation self-hosted default** — Fixed `translationAgentForReview.ts` to use `NLLB_API_ENDPOINT` env var / MODEL_CONFIG (localhost:8080) instead of HuggingFace cloud. Added `healthCheck()` method.
-- [ ] **AI-1-4: Content moderation agent** — `AgentType.MODERATION` defined in orchestrator config but no implementation exists. Required before AI content auto-publishes. 4-6h.
+- [x] **AI-1-4: Content moderation agent** — `ContentModerationAgent` in ai-system registry; `/api/moderation/scan` combines agent + Perspective; admin queue **approve** blocked on moderation failure. 2026-05-16.
 
 ### Admin stability (from [SPEC_VERIFICATION.md](SPEC_VERIFICATION.md) — ADMIN_IMPROVEMENT_CHECKLIST.md)
 
@@ -219,8 +222,8 @@ These block launch. Anything not done here = launch slips or breaks.
 - [ ] **BE-3-3: Verify test suite** — 44 test files exist but unknown pass rate. Fix all failures, add coverage gate for auth/payments. 8-12h.
 
 **Sev-2 — cleanup:**
-- [ ] **BE-1-1: Split super-admin monolith** — 2908-line single file. Split into auth/users/content/finance modules. 3h.
-- [ ] **BE-1-2: Split FinanceService god object** — 9568 lines, 82 operations. Split into domain services. 8h.
+- [x] **BE-1-1: Split super-admin monolith** — Composed routers under `backend/src/api/routes/super-admin/`; thin re-export in `super-admin.ts`. 2026-05-16.
+- [x] **BE-1-2: Split FinanceService god object** — Facade + category modules under `backend/src/services/finance/`. 2026-05-16.
 - [x] **BE-1-3: Remove frontend deps from backend** — Removed `@emotion/react`, `@emotion/styled`, `@mui/icons-material`, `@mui/material` from backend package.json. No backend code imports them.
 - [x] **BE-3-1: Delete duplicate/backup files** — Deleted `marquee-fixed.ts`, `workflowResolvers-backup.ts`, 3 `-fixed` security files, `moderation.ts.broken`, `demonstrate-modular-marquee-fixed.ts`, + 2 orphaned validation scripts.
 - [x] **BE-3-4: Clean up root test files** — Deleted 7 ad-hoc test/verify files from backend root (`test-audit-event.ts`, `test-prisma-*`, `test-task67-*`, `verify-task-*`).
@@ -265,7 +268,7 @@ These block launch. Anything not done here = launch slips or breaks.
 - [x] **Google News Publisher Center application** — ✅ Created `GOOGLE_NEWS_APPLICATION.md` checklist with prerequisites (all met: sitemap, JSON-LD, editorial standards, about page, privacy policy), step-by-step application flow, visual branding specs, expected timeline, and rejection avoidance guide. Manual 15-min task for founder on Day 1.
 - [x] **FAQ sections on AI-generated articles** — FAQ STEP already existed in prompts; enhanced to output `FAQPage` JSON-LD structured data block alongside human-readable FAQ. Applied to both article and SEO prompt builders.
 - [x] **Standalone FAQ page** — Created `/faq` page with 14 Q&As across 4 categories (Platform, Content & Editorial, Markets & Data, Press & Business). Full `FAQPage` JSON-LD schema for Google rich results. Category anchor nav, SEO metadata, Header/Footer. Added FAQ link to footer.
-- [x] **Factsheet pages for top 20 entities** — Created `/factsheets` index page + `/factsheets/[slug]` dynamic route with 16 entities: BTC, ETH, BNB, SOL + Binance, Luno, Quidax, YellowCard + MTN, Safaricom, Standard Bank, Naspers + NG, KE, ZA, GH. Seed data in `frontend/src/data/factsheets.ts`. JSON-LD structured data, related entities sidebar, key stats, African relevance section, Pro CTA. Added to footer navigation.
+- [x] **Factsheet pages for top 20 entities** — Created `/factsheets` index + `/factsheets/[slug]` with **20 seed entities**: BTC, ETH, BNB, SOL, USDT + Binance, Luno, Quidax, YellowCard, VALR + MTN, Safaricom, Standard Bank, Naspers + NG, KE, ZA, GH, Tanzania + Ripple (XRP). Seed data in `frontend/src/data/factsheets.ts`. JSON-LD, related entities, African relevance, Pro CTA. Footer link added.
 - [x] **About / Editorial Standards / Masthead page** — Created `/about` page (mission, coverage areas, approach, markets served, contact) and `/editorial-standards` page (editorial independence, sourcing, AI disclosure, tone policy, corrections policy, COI disclosure, translation quality). Added "Editorial Standards" link to Footer.
 - [x] **Financial disclaimer on every page** — Footer banner added to `Footer.tsx` with "Not financial advice" text + link to `/disclaimer` page. Dedicated disclaimer page created at `frontend/src/app/disclaimer/page.tsx`.
 - [x] **WhatsApp-optimized OG social cards** — Created branded SVG template (`frontend/public/og-image.svg`) with CoinDaily branding, market tags (Nigeria, Kenya, South Africa, Ghana, Diaspora), and dark gradient background. Generated PNG versions via sharp (`og-image.png`, `twitter-image.png`, 1200x630, 118KB). Layout.tsx updated to reference PNGs. Regenerate script at `frontend/scripts/generate-og-images.mjs`.
@@ -509,7 +512,7 @@ These are cheap, mostly-CSS, brand-defining changes. Do them in parallel with fe
 - [x] **Dark mode default for finance pages, light mode for news** — ✅ Converted `/factsheets` index and `/factsheets/[slug]` detail pages to dark terminal aesthetic (bg-[#0d1117], bg-[#161b22] cards, monospace fonts, colored accent borders/badges per entity type). News articles remain light. Added Header component to both pages. Ticker bar already dark. Markets dashboard (when built) will follow same dark palette.
 - [x] **Keyboard shortcuts in markets dashboard** — ✅ Built `KeyboardShortcuts.tsx` component (zero-dependency, no external lib needed). Single keys: `/` focus search, `?` show help modal, `Esc` close/blur. Two-key sequences (`g` + key within 1s): `g n` news, `g f` factsheets, `g p` pricing, `g a` about, `g r` regulations, `g q` FAQ. Dark modal help overlay. Skips when user is in input/textarea. Added to root layout.
 - [x] **Density toggle** — ✅ Built `DensityToggle.tsx` with `DensityProvider` context, `useDensity()` hook, `useDensityClasses()` utility. "Comfortable" vs "Compact" pill-switch toggle stored in localStorage. Wired into factsheets index page. Provider added to root layout so all data pages can use it. Zero external dependencies.
-- [ ] **Loading time obsession** — Bloomberg feels fast because nothing shows a spinner > 200ms. Audit every page: use Next.js streaming SSR + Cloudflare Edge cache + Redis for API responses. Target: zero visible spinners on any data page. Estimate: ongoing.
+- [~] **Loading time obsession** — Homepage `Suspense` + shimmer skeletons; `loading.tsx` on `/`, `/news`, `/search`, `/factsheets`, `/pricing`, `/about`, `/[country]/news`; `PageLoadingShell` component. **Still open:** full audit of remaining routes + edge cache. 2026-05-16.
 - [x] **Africa-first framing in every story** — Baked into `ImoPromptAgent.EDITORIAL_TONE_CONSTRAINT`: "Frame EVERY story through an Africa-first lens — what does this mean for Lagos, Nairobi, Joburg, Accra? Even global news must be reframed for African readers." Applied across all article/SEO/research prompts.
 
 ---
@@ -530,32 +533,32 @@ These are cheap, mostly-CSS, brand-defining changes. Do them in parallel with fe
 
 ## 📊 Strategy alignment score
 
-**Current: 55%** (as of 2026-05-11, per [STRATEGY_GAP_ANALYSIS.md](STRATEGY_GAP_ANALYSIS.md))
+**Current: ~63%** (as of 2026-05-15; was 55% on 2026-05-11 per [STRATEGY_GAP_ANALYSIS.md](STRATEGY_GAP_ANALYSIS.md))
 
 | Area | Status | Target by launch |
 |---|---|---|
-| AI Agent Pipeline (16 agents) | 10/16 exist, 3 disconnected architectures, research hardcoded | Consolidate architectures, fix compilation, wire backend (see AI_SYSTEM_AUDIT.md) |
+| AI Agent Pipeline (16 agents) | 10/16 exist, 3 disconnected architectures, research hardcoded; moderation monitoring partial | Consolidate architectures, fix compilation, wire backend (see AI_SYSTEM_AUDIT.md) |
 | Free "Trojan Horse" Tools | 8/8 ✅ | 8/8 |
 | Native Ad Engine | ✅ production-ready | ✅ |
-| SEO/GEO/LLM Infrastructure | 7/11 features | 9/11 (add FAQ, Google News app) |
-| Market Data + Bloomberg DNA | ✅ aggregator + exchanges | Add factsheets + 5-strip ticker bar |
-| Search | Elasticsearch in stack, not wired | Faceted search across all content |
-| Subscription Tiers | Schema only | Add pricing page + Pro checkout |
-| Press Distribution | App exists, CMS-like | Wire service UX + filters + alerts |
+| SEO/GEO/LLM Infrastructure | 9/11 ✅ (FAQ page, Google News checklist done) | 9/11 |
+| Market Data + Bloomberg DNA | ✅ factsheets (20) + 5-strip ticker bar | ✅ |
+| Search | ✅ Faceted search wired (ES + Prisma fallback) | ✅ |
+| Subscription Tiers | Pricing page ✅; checkout E2E open | Pro checkout live in NG/KE/ZA/GH |
+| Press Distribution | Wire MVP UI ✅; E2E + alert delivery open | Wire service UX + filters + alerts |
 | Creator Economy | Contracts + marketplace frontend (mock data) | Wave 1 marketplace, Wave 3 full creator economy |
 | Events Intelligence | 0% | Wave 1 minimal page |
 | Video Generation | 0% | Wave 2 (post-launch) |
-| WhatsApp Distribution | 0% | Add share buttons pre-launch |
-| Newsletter System | 0% | Listmonk pre-launch, operational Wave 1 |
-| Regulatory Intelligence | UI tool exists | Seed data for 4 countries pre-launch |
+| WhatsApp Distribution | ✅ Share buttons on articles | ✅ |
+| Newsletter System | Listmonk Docker ✅; operational Wave 1 | Listmonk boot on Contabo |
+| Regulatory Intelligence | ✅ Seed data for NG, KE, ZA, GH | ✅ |
 | Dashboard System (V3) | Super Admin strong | Add staff views post-launch |
-| Backend Security | ✅ All 6 SEV-0 fixed (JWT, roles, GraphQL auth, routes, CSRF, email verify) + 4 SEV-1s fixed | Remaining: Redis centralization, uploads auth, input validation |
+| Backend Security | ✅ All 6 SEV-0 fixed (JWT, roles, GraphQL auth, routes, CSRF, email verify) + 4 SEV-1s fixed | Remaining: Redis centralization, input validation |
 | RBAC (12 roles) | ✅ 6/12 roles, role escalation fixed (DB-only) | 6/12 sufficient for solo founder |
 | Data Moat / Indices | Collecting data, no indices | Wave 2–3 |
-| Bloomberg UX Polish | Hype ban only | Add monospace fonts, dark mode, shortcuts |
+| Bloomberg UX Polish | ✅ Monospace, dark factsheets, shortcuts, density toggle | ✅ |
 | Portfolio Tracker | 0% | Wave 1 (read-only, never move money) |
 | Licensable Data Asset | Collecting since Day 1 | Package + sell after 6–12 months |
-| Admin Panel Stability | No token refresh, no session warning, no real-time | Fix token refresh + session timeout pre-launch; WebSocket Wave 1 |
+| Admin Panel Stability | ✅ Token refresh + session timeout | WebSocket Wave 1 |
 | Ads System | AdsRotationAgent built (900+ lines), internal ads work | Wave 2: external ad networks (GAM, Prebid) |
 | SEO/RAO Pipeline | Tasks 1-8 services built, Tasks 9-15 not started | Wave 2: vector embeddings, RAO tracking, n8n automation |
 | On-ramp/Remittance Tools | Routes registered, return fallback data | Wave 1: wire live provider APIs (YellowCard SDK, Binance P2P) |
@@ -563,7 +566,7 @@ These are cheap, mostly-CSS, brand-defining changes. Do them in parallel with fe
 | Tax Calculator | Core engine + frontend exist | ✅ Functional |
 | News Widget (embed) | 0% | Wave 1: embeddable widget for third-party sites |
 
-**Target by launch: ~68%** (from 55% → gain from pricing page, factsheets, 5-strip ticker, faceted search, press wire polish, WhatsApp buttons, newsletter setup, regulatory seeding, editorial standards, citations, FAQ schema, Africa-first framing)
+**Target by launch: ~68%** — on track; remaining gap is mostly revenue E2E (paywall, YellowCard), AI pipeline consolidation, contracts testnet, and founder ops (secrets, load test, launch content queue).
 
 ---
 

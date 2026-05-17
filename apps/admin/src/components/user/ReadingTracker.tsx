@@ -3,6 +3,8 @@
 
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useEffect, useRef, useState } from 'react';
 
 interface ReadingTrackerProps {
@@ -81,7 +83,7 @@ export default function ReadingTracker({
     const completed = scrolled >= 75; // Consider completed if scrolled 75%+
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getAccessToken();
       if (!token) return; // Don't track anonymous users
 
       const response = await fetch('/api/engagement/track-reading', {

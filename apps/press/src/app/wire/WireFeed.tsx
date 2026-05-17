@@ -17,23 +17,8 @@ import {
   Megaphone,
   RefreshCw,
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-
-/* ── Types ── */
-
-interface WireItem {
-  id: string;
-  title: string;
-  summary: string | null;
-  source: string;
-  publishedAt: string;
-  url: string | null;
-  tags: string[];
-  industry: string;
-  country: string;
-  assetClass: string;
-  status: string;
-}
+import { fetchWireReleases, type WireItem } from '@/lib/wireApi';
+import { subscribeWireAlerts } from '@/lib/wireAlerts';
 
 /* ── Filter options ── */
 
@@ -66,155 +51,6 @@ const COUNTRY_LABELS: Record<string, string> = {
 };
 
 const ASSET_CLASSES = ['All', 'Token', 'Protocol', 'Fund', 'Company', 'DAO', 'Infrastructure'];
-
-/* ── Realistic mock data for pre-launch ── */
-
-const MOCK_WIRE: WireItem[] = [
-  {
-    id: 'w-001',
-    title: 'Luno Nigeria Launches Instant USDT-Naira Ramp With Zero Fees Until Q3',
-    summary: 'Luno exchange rolls out a zero-fee USDT/NGN corridor targeting the 14M unbanked diaspora remittance market across West Africa.',
-    source: 'Luno Exchange',
-    publishedAt: new Date(Date.now() - 12 * 60000).toISOString(),
-    url: null,
-    tags: ['usdt', 'naira', 'remittance', 'luno'],
-    industry: 'Exchange',
-    country: 'NG',
-    assetClass: 'Company',
-  },
-  {
-    id: 'w-002',
-    title: 'Kenya Central Bank Publishes Draft Framework for Stablecoin Licensing',
-    summary: 'The CBK issues a 48-page consultation paper outlining capital requirements and consumer protections for stablecoin issuers operating in Kenya.',
-    source: 'Central Bank of Kenya',
-    publishedAt: new Date(Date.now() - 38 * 60000).toISOString(),
-    url: null,
-    tags: ['regulation', 'stablecoin', 'cbk', 'licensing'],
-    industry: 'Regulation',
-    country: 'KE',
-    assetClass: 'Infrastructure',
-  },
-  {
-    id: 'w-003',
-    title: 'Valr Raises $55M Series B to Expand Across 12 African Markets',
-    summary: 'South African crypto exchange Valr closes Series B led by Pantera Capital with participation from Coinbase Ventures and Alameda Research successor fund.',
-    source: 'Valr',
-    publishedAt: new Date(Date.now() - 74 * 60000).toISOString(),
-    url: null,
-    tags: ['fundraise', 'series-b', 'valr', 'expansion'],
-    industry: 'Exchange',
-    country: 'ZA',
-    assetClass: 'Company',
-  },
-  {
-    id: 'w-004',
-    title: 'Flutterwave Integrates Bitcoin Lightning for Merchant Settlements in Ghana',
-    summary: 'Fintech giant Flutterwave adds Lightning Network support, enabling Ghanaian merchants to receive BTC settlements in under 3 seconds.',
-    source: 'Flutterwave',
-    publishedAt: new Date(Date.now() - 2.1 * 3600000).toISOString(),
-    url: null,
-    tags: ['lightning', 'payments', 'ghana', 'flutterwave'],
-    industry: 'Payments',
-    country: 'GH',
-    assetClass: 'Company',
-  },
-  {
-    id: 'w-005',
-    title: 'Africa DeFi Alliance Launches $20M Grant Program for Layer 2 Builders',
-    summary: 'The newly formed Africa DeFi Alliance allocates $20M in grants to developers building L2 infrastructure for African DeFi protocols.',
-    source: 'Africa DeFi Alliance',
-    publishedAt: new Date(Date.now() - 3.5 * 3600000).toISOString(),
-    url: null,
-    tags: ['grants', 'defi', 'layer2', 'builders'],
-    industry: 'DeFi',
-    country: 'KE',
-    assetClass: 'DAO',
-  },
-  {
-    id: 'w-006',
-    title: 'Nigerian SEC Approves First Tokenized Real Estate Fund on Polygon',
-    summary: 'Securities and Exchange Commission Nigeria greenlights a $10M tokenized real estate fund, the first regulated RWA product in West Africa.',
-    source: 'SEC Nigeria',
-    publishedAt: new Date(Date.now() - 4.8 * 3600000).toISOString(),
-    url: null,
-    tags: ['rwa', 'real-estate', 'tokenization', 'sec'],
-    industry: 'Regulation',
-    country: 'NG',
-    assetClass: 'Fund',
-  },
-  {
-    id: 'w-007',
-    title: 'Celo Foundation Announces Migration to Ethereum L2 With Africa-First Sequencer',
-    summary: 'Celo completes its transition to an Ethereum Layer 2 with a geographically distributed sequencer prioritizing low-latency access from African nodes.',
-    source: 'Celo Foundation',
-    publishedAt: new Date(Date.now() - 6.2 * 3600000).toISOString(),
-    url: null,
-    tags: ['celo', 'ethereum', 'layer2', 'migration'],
-    industry: 'Layer 2',
-    country: 'US',
-    assetClass: 'Protocol',
-  },
-  {
-    id: 'w-008',
-    title: 'Quidax Launches AI-Powered Trading Bot Targeting Nigerian Retail Investors',
-    summary: 'Nigerian exchange Quidax releases an AI trading assistant that auto-rebalances portfolios based on macro signals from African markets.',
-    source: 'Quidax',
-    publishedAt: new Date(Date.now() - 8.5 * 3600000).toISOString(),
-    url: null,
-    tags: ['ai', 'trading', 'quidax', 'retail'],
-    industry: 'Exchange',
-    country: 'NG',
-    assetClass: 'Company',
-  },
-  {
-    id: 'w-009',
-    title: 'Rwanda Partners With Ripple for Cross-Border CBDC Settlement Pilot',
-    summary: 'National Bank of Rwanda selects Ripple as technology partner for a 6-month CBDC cross-border settlement pilot with Kenya and Uganda.',
-    source: 'National Bank of Rwanda',
-    publishedAt: new Date(Date.now() - 11 * 3600000).toISOString(),
-    url: null,
-    tags: ['cbdc', 'ripple', 'cross-border', 'pilot'],
-    industry: 'Payments',
-    country: 'RW',
-    assetClass: 'Infrastructure',
-  },
-  {
-    id: 'w-010',
-    title: 'Yellow Card Surpasses 2M Users Across 20 African Countries',
-    summary: 'Pan-African crypto on-ramp Yellow Card crosses the 2M user milestone, reporting 340% YoY growth driven by P2P stablecoin demand in Nigeria and Ghana.',
-    source: 'Yellow Card',
-    publishedAt: new Date(Date.now() - 14 * 3600000).toISOString(),
-    url: null,
-    tags: ['milestone', 'growth', 'p2p', 'stablecoin'],
-    industry: 'Exchange',
-    country: 'NG',
-    assetClass: 'Company',
-  },
-  {
-    id: 'w-011',
-    title: 'Binance Africa Fund Invests in 6 Early-Stage GameFi Studios From Lagos and Nairobi',
-    summary: 'Binance Labs Africa vertical deploys $4.2M seed capital into 6 GameFi startups building play-to-earn titles for mobile-first African audiences.',
-    source: 'Binance Labs',
-    publishedAt: new Date(Date.now() - 18 * 3600000).toISOString(),
-    url: null,
-    tags: ['gamefi', 'investment', 'seed', 'binance'],
-    industry: 'GameFi',
-    country: 'NG',
-    assetClass: 'Fund',
-  },
-  {
-    id: 'w-012',
-    title: 'South Africa FSCA Issues Warning on 14 Unlicensed Crypto Platforms',
-    summary: 'The Financial Sector Conduct Authority adds 14 crypto platforms to its public warning list, citing unlicensed FAIS activities and missing disclosures.',
-    source: 'FSCA',
-    publishedAt: new Date(Date.now() - 22 * 3600000).toISOString(),
-    url: null,
-    tags: ['warning', 'fsca', 'compliance', 'unlicensed'],
-    industry: 'Regulation',
-    country: 'ZA',
-    assetClass: 'Infrastructure',
-  },
-];
 
 /* ── Time formatting ── */
 
@@ -265,8 +101,10 @@ function toggleAlert(source: string): string[] {
 /* ── Component ── */
 
 export default function WireFeed() {
-  const [items, setItems] = useState<WireItem[]>(MOCK_WIRE);
-  const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState<WireItem[]>([]);
+  const [dataSource, setDataSource] = useState<'database' | 'supabase' | 'empty'>('empty');
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [industry, setIndustry] = useState('All');
   const [country, setCountry] = useState('All');
@@ -281,36 +119,17 @@ export default function WireFeed() {
     setAlerts(getAlerts());
   }, []);
 
-  // Try to fetch real data from Supabase
   const fetchReleases = useCallback(async () => {
     setLoading(true);
+    setFetchError(null);
     try {
-      const { data, error } = await supabase
-        .from('press_releases')
-        .select('*, publisher:press_publishers(company_name)')
-        .in('status', ['approved', 'distributed'])
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (!error && data && data.length > 0) {
-        const mapped: WireItem[] = data.map((r: any) => ({
-          id: r.id,
-          title: r.title,
-          summary: r.summary,
-          source: r.publisher?.company_name || 'SENDPRESS',
-          publishedAt: r.created_at,
-          url: r.url,
-          tags: r.media_meta?.tags || [],
-          industry: r.media_meta?.industry || 'DeFi',
-          country: r.media_meta?.country || 'NG',
-          assetClass: r.media_meta?.assetClass || 'Token',
-          status: r.status,
-        }));
-        setItems(mapped);
-      }
-      // If no data or error, keep mock data
-    } catch {
-      // Supabase unavailable — keep mock data
+      const { items: liveItems, source } = await fetchWireReleases();
+      setItems(liveItems);
+      setDataSource(source);
+    } catch (err) {
+      setFetchError(err instanceof Error ? err.message : 'Failed to load wire feed');
+      setItems([]);
+      setDataSource('empty');
     }
     setLoading(false);
     setLastRefresh(Date.now());
@@ -358,9 +177,23 @@ export default function WireFeed() {
 
   const activeFilterCount = [industry, country, assetClass].filter((f) => f !== 'All').length;
 
-  const handleAlert = (source: string) => {
+  const handleAlert = async (source: string) => {
     const updated = toggleAlert(source);
     setAlerts(updated);
+    const enabling = updated.includes(source);
+    if (enabling) {
+      const email =
+        typeof window !== 'undefined'
+          ? window.prompt('Email for wire alerts (optional — leave blank to skip remote delivery)')
+          : null;
+      if (email) {
+        try {
+          await subscribeWireAlerts({ email, sources: updated });
+        } catch (err) {
+          console.warn('[WireFeed] Remote alert subscribe failed:', err);
+        }
+      }
+    }
   };
 
   return (
@@ -561,16 +394,39 @@ export default function WireFeed() {
         </div>
 
         {/* Feed */}
-        {Object.keys(grouped).length === 0 ? (
+        {loading && items.length === 0 ? (
+          <div className="text-center py-20">
+            <RefreshCw className="w-10 h-10 text-dark-600 mx-auto mb-4 animate-spin" />
+            <p className="text-dark-500 text-sm font-mono">Loading wire feed…</p>
+          </div>
+        ) : Object.keys(grouped).length === 0 ? (
           <div className="text-center py-20">
             <Globe className="w-12 h-12 text-dark-700 mx-auto mb-4" />
-            <p className="text-dark-500 text-sm font-mono">No releases match your filters.</p>
-            <button
-              onClick={() => { setSearchQuery(''); setIndustry('All'); setCountry('All'); setAssetClass('All'); }}
-              className="mt-3 text-xs text-primary-400 hover:text-primary-300 font-mono"
-            >
-              Clear filters
-            </button>
+            {items.length === 0 ? (
+              <>
+                <p className="text-dark-400 text-sm font-mono mb-1">No published releases on the wire yet.</p>
+                <p className="text-dark-600 text-xs font-mono max-w-md mx-auto">
+                  Approved releases from CoinDaily API or SENDPRESS Supabase appear here automatically.
+                  {fetchError ? ` (${fetchError})` : ''}
+                </p>
+                <Link
+                  href="/dashboard/distribute"
+                  className="inline-block mt-4 text-xs text-primary-400 hover:text-primary-300 font-mono"
+                >
+                  Submit a press release →
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="text-dark-500 text-sm font-mono">No releases match your filters.</p>
+                <button
+                  onClick={() => { setSearchQuery(''); setIndustry('All'); setCountry('All'); setAssetClass('All'); }}
+                  className="mt-3 text-xs text-primary-400 hover:text-primary-300 font-mono"
+                >
+                  Clear filters
+                </button>
+              </>
+            )}
           </div>
         ) : (
           Object.entries(grouped).map(([date, dateItems]) => (

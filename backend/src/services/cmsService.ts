@@ -375,6 +375,72 @@ export class CMSService {
   }
 
   /**
+   * Emergency unpublish — immediately removes live article (moderation / launch policy).
+   */
+  async emergencyUnpublish(
+    articleId: string,
+    actorId: string,
+    reason: string,
+  ): Promise<Article> {
+    this.logger.warn('Emergency unpublish', { articleId, actorId, reason });
+
+    const article = await this.prisma.article.findUnique({ where: { id: articleId } });
+    if (!article) {
+      throw new Error('Article not found');
+    }
+
+    if (!['PUBLISHED', 'APPROVED'].includes(article.status)) {
+      throw new Error('Only published or approved articles can be emergency-unpublished');
+    }
+
+    try {
+      const updated = await this.prisma.$transaction(async (tx) => {
+        const unpublished = await tx.article.update({
+          where: { id: articleId },
+          data: {
+            status: 'DRAFT',
+            publishedAt: null,
+            updatedAt: new Date(),
+            metadata: JSON.stringify({
+              emergencyUnpublish: true,
+              reason,
+              actorId,
+              at: new Date().toISOString(),
+            }),
+          },
+        });
+
+        await tx.contentWorkflow.updateMany({
+          where: { articleId },
+          data: {
+            currentState: 'MODERATION_HOLD',
+            previousState: article.status,
+            updatedAt: new Date(),
+          },
+        });
+
+        await this.createRevision(
+          tx,
+          articleId,
+          unpublished,
+          'EMERGENCY_UNPUBLISH',
+          reason || 'Emergency unpublish',
+        );
+
+        return unpublished;
+      });
+
+      return updated;
+    } catch (error) {
+      this.logger.error('Emergency unpublish failed', {
+        error: (error as Error).message,
+        articleId,
+      });
+      throw new Error(`Emergency unpublish failed: ${(error as Error).message}`);
+    }
+  }
+
+  /**
    * Publish approved article
    */
   async publishArticle(articleId: string, publisherId: string): Promise<Article> {
@@ -613,7 +679,7 @@ export class CMSService {
     tx: any,
     articleId: string,
     article: any,
-    changeType: 'CREATED' | 'UPDATED' | 'PUBLISHED' | 'ARCHIVED',
+    changeType: 'CREATED' | 'UPDATED' | 'PUBLISHED' | 'ARCHIVED' | 'EMERGENCY_UNPUBLISH',
     changeNotes: string
   ): Promise<void> {
     // This would create a record in ContentRevision table
