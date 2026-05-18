@@ -8614,6 +8614,9 @@ model PlatformSettings {
   platformUrl     String?
   maintenanceMode Boolean @default(false)
 
+  // AI Content Pipeline Kill-Switch
+  aiContentPipelineEnabled Boolean @default(true)
+
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
