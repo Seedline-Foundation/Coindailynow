@@ -7,10 +7,10 @@ module.exports = {
   ci: {
     collect: {
       url: [
-        'http://localhost:3000',
-        'http://localhost:3000/dashboard',
-        'http://localhost:3000/articles',
-        'http://localhost:3000/market',
+        'http://localhost:3001',
+        'http://localhost:3001/dashboard',
+        'http://localhost:3001/articles',
+        'http://localhost:3001/market',
       ],
       numberOfRuns: 3,
       settings: {

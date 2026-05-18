@@ -7,6 +7,7 @@ import TrafficCopClient from '@/components/security/TrafficCopClient';
 import AppInstallAndOfflinePrompt from '@/components/pwa/AppInstallAndOfflinePrompt';
 import PostHogProvider from '@/components/providers/PostHogProvider';
 import { GeoProvider } from '@/lib/GeoContext';
+import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
 
 // Font configurations
 const inter = Inter({ 
@@ -251,6 +252,7 @@ export default function RootLayout({
               </div>
               <AppInstallAndOfflinePrompt />
               <TrafficCopClient />
+              <CookieConsentBanner position="bottom" theme="light" />
               </PostHogProvider>
             </AuthProvider>
           </GeoProvider>
