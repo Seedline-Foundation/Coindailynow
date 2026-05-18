@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import axios from 'axios';
 import { authMiddleware } from '../../middleware/auth';
 import {
   calculateTax,
@@ -8,6 +9,7 @@ import {
   type TaxTransactionInput,
   type TaxTxType,
 } from '../../services/tax/taxEngine';
+import { logger } from '../../utils/logger';
 
 const router = Router();
 
@@ -257,6 +259,60 @@ router.post('/reports', authMiddleware, async (req: Request, res: Response) => {
   }
 
   return res.status(201).json({ data: created });
+});
+
+// ── W3: CFIS Tax Report Proxy Endpoints ──────────────────────────────
+
+const CFIS_BASE = () => process.env.CFIS_API_URL || process.env.FINANCE_SYSTEM_URL || 'http://localhost:3005';
+
+/**
+ * GET /api/v1/tax/cfis-report/:userId?year=2026&format=tokentax
+ * Proxies to CFIS: GET /api/tax/report/:userId
+ */
+router.get('/cfis-report/:userId', authMiddleware, async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const year = req.query.year || new Date().getFullYear();
+  const format = req.query.format || 'csv';
+
+  try {
+    const response = await axios.get(`${CFIS_BASE()}/api/tax/report/${userId}`, {
+      params: { year, format },
+      timeout: 30000,
+      responseType: 'text',
+    });
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', response.headers['content-disposition'] || `attachment; filename="tax-report-${userId}-${year}.csv"`);
+    return res.send(response.data);
+  } catch (e: any) {
+    logger.warn('[Tax] CFIS report proxy failed', { error: e.message });
+    return res.status(502).json({
+      error: { code: 'CFIS_UNAVAILABLE', message: 'Tax report service unavailable' },
+    });
+  }
+});
+
+/**
+ * GET /api/v1/tax/cfis-summary/:userId?year=2026
+ * Proxies to CFIS: GET /api/tax/summary/:userId
+ */
+router.get('/cfis-summary/:userId', authMiddleware, async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const year = req.query.year || new Date().getFullYear();
+
+  try {
+    const response = await axios.get(`${CFIS_BASE()}/api/tax/summary/${userId}`, {
+      params: { year },
+      timeout: 30000,
+    });
+
+    return res.json(response.data);
+  } catch (e: any) {
+    logger.warn('[Tax] CFIS summary proxy failed', { error: e.message });
+    return res.status(502).json({
+      error: { code: 'CFIS_UNAVAILABLE', message: 'Tax summary service unavailable' },
+    });
+  }
 });
 
 export default router;
