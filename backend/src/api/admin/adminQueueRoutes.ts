@@ -195,12 +195,98 @@ router.post('/queue/:id/approve', async (req: Request, res: Response) => {
     // Add to approved queue
     await redis.lpush('admin_queue:approved', JSON.stringify(item));
 
-    // TODO: Trigger publication workflow
-    // - Save to database (Prisma)
-    // - Upload image to CDN
-    // - Generate URLs for all 16 articles
-    // - Update Elasticsearch index
-    // - Clear caches
+    // ── Sync approved article to the CMS Article table via Prisma ──
+    try {
+      const english = item.articles?.english;
+      const research = item.articles?.research;
+      const image = item.articles?.image;
+
+      if (english) {
+        const slug = english.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '')
+          .substring(0, 200);
+
+        const readingTime = Math.max(1, Math.ceil((english.word_count || 200) / 200));
+
+        // Resolve a default "AI" author and "Crypto" category, or use the first available rows.
+        const defaultAuthor = await prisma.user.findFirst({ select: { id: true } });
+        const defaultCategory = await prisma.category.findFirst({ select: { id: true } });
+
+        if (defaultAuthor && defaultCategory) {
+          await prisma.article.upsert({
+            where: { id: item.article_id },
+            update: {
+              title: english.title,
+              content: english.content,
+              excerpt: english.content.substring(0, 300),
+              status: 'APPROVED',
+              seoKeywords: (english.keywords || []).join(', '),
+              featuredImageUrl: image?.url || null,
+              aiGenerated: true,
+              updatedAt: new Date(),
+            },
+            create: {
+              id: item.article_id,
+              title: english.title,
+              slug: `${slug}-${item.article_id.substring(0, 6)}`,
+              content: english.content,
+              excerpt: english.content.substring(0, 300),
+              authorId: defaultAuthor.id,
+              categoryId: defaultCategory.id,
+              readingTimeMinutes: readingTime,
+              status: 'APPROVED',
+              seoKeywords: (english.keywords || []).join(', '),
+              featuredImageUrl: image?.url || null,
+              aiGenerated: true,
+              updatedAt: new Date(),
+            },
+          });
+
+          // Sync translations
+          if (item.articles?.translations?.length) {
+            for (const t of item.articles.translations) {
+              await prisma.articleTranslation.upsert({
+                where: {
+                  articleId_languageCode: {
+                    articleId: item.article_id,
+                    languageCode: t.language_code,
+                  },
+                },
+                update: {
+                  title: t.title,
+                  content: t.content,
+                  excerpt: t.content.substring(0, 300),
+                  translationStatus: 'COMPLETED',
+                  aiGenerated: true,
+                  updatedAt: new Date(),
+                },
+                create: {
+                  id: `${item.article_id}_${t.language_code}`,
+                  articleId: item.article_id,
+                  languageCode: t.language_code,
+                  title: t.title,
+                  content: t.content,
+                  excerpt: t.content.substring(0, 300),
+                  translationStatus: 'COMPLETED',
+                  aiGenerated: true,
+                  updatedAt: new Date(),
+                },
+              });
+            }
+          }
+
+          logger.info(`[Admin Queue API] Article synced to CMS: ${item.article_id}`);
+        } else {
+          logger.warn('[Admin Queue API] Skipped CMS sync — no default author or category found');
+        }
+      }
+    } catch (syncError) {
+      logger.error('[Admin Queue API] CMS sync failed (article still approved in queue)', {
+        error: syncError instanceof Error ? syncError.message : String(syncError),
+      });
+    }
 
     console.log(`[Admin Queue API] ✅ Approved article: ${item.article_id} by admin: ${admin_id}`);
 
