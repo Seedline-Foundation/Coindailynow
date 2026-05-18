@@ -170,7 +170,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* @ts-expect-error Async Server Component */}
         <CriticalCSS pagePath="/" />
         {/* Preconnect to important domains for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
