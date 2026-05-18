@@ -22,7 +22,9 @@
     "agents/**/*.ts",
     "orchestrator/**/*.ts",
     "types/**/*.ts",
-    "config/**/*.ts"
+    "config/**/*.ts",
+    "src/**/*.ts",
+    "pipeline/**/*.ts"
   ],
   "exclude": [
     "node_modules",
