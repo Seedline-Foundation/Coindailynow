@@ -4,6 +4,20 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Cookie Policy',
   description: 'CoinDaily Africa Cookie Policy - How we use cookies and similar technologies.',
+  alternates: { canonical: '/cookies' },
+  openGraph: {
+    title: 'Cookie Policy | CoinDaily Africa',
+    description: 'How we use cookies and similar technologies.',
+    url: '/cookies',
+    siteName: 'CoinDaily Africa',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Cookie Policy | CoinDaily Africa',
+    description: 'How we use cookies and similar technologies.',
+    site: '@coindailyafrica',
+  },
 };
 
 export default function CookiePolicyPage() {

@@ -4,6 +4,20 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'CoinDaily Africa Privacy Policy - How we collect, use, and protect your data.',
+  alternates: { canonical: '/privacy' },
+  openGraph: {
+    title: 'Privacy Policy | CoinDaily Africa',
+    description: 'How we collect, use, and protect your data.',
+    url: '/privacy',
+    siteName: 'CoinDaily Africa',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Privacy Policy | CoinDaily Africa',
+    description: 'How we collect, use, and protect your data.',
+    site: '@coindailyafrica',
+  },
 };
 
 export default function PrivacyPolicyPage() {

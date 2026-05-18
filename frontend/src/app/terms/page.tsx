@@ -4,6 +4,20 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description: 'CoinDaily Africa Terms of Service - Rules and guidelines for using our platform.',
+  alternates: { canonical: '/terms' },
+  openGraph: {
+    title: 'Terms of Service | CoinDaily Africa',
+    description: 'Rules and guidelines for using our platform.',
+    url: '/terms',
+    siteName: 'CoinDaily Africa',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Terms of Service | CoinDaily Africa',
+    description: 'Rules and guidelines for using our platform.',
+    site: '@coindailyafrica',
+  },
 };
 
 export default function TermsOfServicePage() {
