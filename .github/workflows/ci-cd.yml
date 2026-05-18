@@ -66,7 +66,11 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npx prisma generate 2>/dev/null || true
-          npm test -- --passWithNoTests --forceExit 2>/dev/null || echo "Tests completed"
+          npm test -- --passWithNoTests --forceExit
+
+      - name: Security audit
+        working-directory: ./backend
+        run: npm audit --audit-level=high || true
 
   # ── Frontend Tests ────────────────────────────────────────────
   test-frontend:
@@ -84,7 +88,11 @@ jobs:
         working-directory: ./frontend
         run: |
           npm ci --ignore-scripts
-          npm test -- --passWithNoTests --forceExit 2>/dev/null || echo "Tests completed"
+          npm test -- --passWithNoTests --forceExit
+
+      - name: Security audit
+        working-directory: ./frontend
+        run: npm audit --audit-level=high || true
 
   # ── Build Docker Images ───────────────────────────────────────
   build-images:
