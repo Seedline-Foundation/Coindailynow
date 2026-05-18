@@ -25,6 +25,7 @@ export interface GraphQLContext {
 import { CMSService } from '../services/cmsService';
 import { AuthenticationError, ForbiddenError, UserInputError } from 'apollo-server-express';
 import { logger } from '../utils/logger';
+import { canPublishContent } from '../lib/editorialRoles';
 
 // Initialize CMS Service
 const cmsService = new CMSService(
@@ -335,7 +336,7 @@ export const cmsResolvers: IResolvers<any, GraphQLContext> = {
       return article;
     },
 
-    // Approve article (editor/admin only)
+    // Approve article — requires editorial publish permission
     approveArticle: async (
       _: any,
       { articleId, notes }: { articleId: string; notes?: string },
@@ -345,8 +346,8 @@ export const cmsResolvers: IResolvers<any, GraphQLContext> = {
         throw new AuthenticationError('Authentication required');
       }
 
-      if (!['EDITOR', 'ADMIN'].includes(context.user.role || '')) {
-        throw new ForbiddenError('Editor role required');
+      if (!canPublishContent(context.user.role)) {
+        throw new ForbiddenError('Content publishing role required');
       }
 
       const cmsService = new CMSService(context.prisma, logger);
@@ -385,7 +386,7 @@ export const cmsResolvers: IResolvers<any, GraphQLContext> = {
       return article;
     },
 
-    // Publish approved article (editor/admin only)
+    // Publish approved article — requires editorial publish permission
     publishArticle: async (
       _: any,
       { articleId }: { articleId: string },
@@ -395,8 +396,8 @@ export const cmsResolvers: IResolvers<any, GraphQLContext> = {
         throw new AuthenticationError('Authentication required');
       }
 
-      if (!['EDITOR', 'ADMIN'].includes(context.user.role || '')) {
-        throw new ForbiddenError('Editor role required');
+      if (!canPublishContent(context.user.role)) {
+        throw new ForbiddenError('Content publishing role required');
       }
 
       const cmsService = new CMSService(context.prisma, logger);
@@ -588,6 +589,10 @@ export const cmsResolvers: IResolvers<any, GraphQLContext> = {
       const validStatuses = ['DRAFT', 'PENDING_REVIEW', 'APPROVED', 'PUBLISHED', 'ARCHIVED', 'REJECTED'];
       if (!validStatuses.includes(status)) {
         throw new UserInputError('Invalid status');
+      }
+
+      if (status === 'PUBLISHED' && !canPublishContent(context.user.role)) {
+        throw new ForbiddenError('Content publishing role required');
       }
 
       const updatedArticles = await context.prisma.article.updateMany({

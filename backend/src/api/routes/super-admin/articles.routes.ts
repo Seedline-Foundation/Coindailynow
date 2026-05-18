@@ -15,6 +15,7 @@ import {
   ALL_PERMISSIONS,
   getPermissionCategories,
 } from './shared';
+import { canPublishContent } from '../../../lib/editorialRoles';
 import { validateBody } from '../../../middleware/validate';
 import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
@@ -113,6 +114,15 @@ router.patch('/articles/:id', authMiddleware, async (req: Request, res: Response
 
     const { id } = req.params;
     const { status } = req.body;
+
+    if (status && status.toUpperCase() === 'PUBLISHED' && !canPublishContent(req.user?.role)) {
+      res.status(403).json({
+        success: false,
+        error: 'Forbidden',
+        message: 'Content publishing role required',
+      });
+      return;
+    }
 
     const updateData: any = {};
     if (status) {

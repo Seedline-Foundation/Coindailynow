@@ -19,6 +19,7 @@ import { runEditorialPipelineJob } from '../../services/aiEditorialPipelineServi
 import AIModerationService from '../../services/aiModerationService';
 import ContentModerationAgent from '../../agents/moderation/contentModerationAgent';
 import { AdminQueueItem, EditRequest } from '../../types/admin-types';
+import { canPublishContent } from '../../lib/editorialRoles';
 
 const router = Router();
 router.use(authMiddleware as any);
@@ -123,6 +124,14 @@ router.get('/queue/:id', async (req: Request, res: Response) => {
 
 router.post('/queue/:id/approve', async (req: Request, res: Response) => {
   try {
+    if (!canPublishContent(req.user?.role)) {
+      return res.status(403).json({
+        success: false,
+        error: 'Forbidden',
+        message: 'Content publishing role required',
+      });
+    }
+
     const { id } = req.params;
     const { admin_id, admin_notes } = req.body;
 
@@ -327,6 +336,14 @@ router.get('/stats', async (req: Request, res: Response) => {
 
 router.post('/queue/:id/publish', async (req: Request, res: Response) => {
   try {
+    if (!canPublishContent(req.user?.role)) {
+      return res.status(403).json({
+        success: false,
+        error: 'Forbidden',
+        message: 'Content publishing role required',
+      });
+    }
+
     const { id } = req.params;
 
     const itemData = await redis.get(`admin_queue:item:${id}`);

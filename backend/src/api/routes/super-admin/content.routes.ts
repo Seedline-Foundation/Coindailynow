@@ -15,6 +15,7 @@ import {
   ALL_PERMISSIONS,
   getPermissionCategories,
 } from './shared';
+import { canPublishContent } from '../../../lib/editorialRoles';
 import { validateBody } from '../../../middleware/validate';
 import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
@@ -264,6 +265,15 @@ router.post('/content/moderation/review', authMiddleware, async (req: Request, r
 
     if (!itemId || !action) {
       res.status(400).json({ success: false, error: 'articleId and action are required' });
+      return;
+    }
+
+    if (action === 'APPROVED' && !canPublishContent(req.user?.role)) {
+      res.status(403).json({
+        success: false,
+        error: 'Forbidden',
+        message: 'Content publishing role required',
+      });
       return;
     }
 
