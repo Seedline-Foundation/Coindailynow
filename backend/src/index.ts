@@ -73,6 +73,7 @@ import moderationScanRouter from './routes/moderationScan.routes';
 import sitemapRouter from './routes/sitemap.routes';
 import structuredDataRouter from './routes/structured-data.routes';
 import marqueeRouter from './routes/marquee';
+import pointsRouter from './routes/points.routes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
@@ -451,6 +452,9 @@ export async function setupApp() {
   app.use('/api/v1/influencer', v1InfluencerRouter);
   app.use('/api/v1/search', v1SearchRouter);
   app.use('/api/v1', structuredContentRouter);
+
+  // Points-to-Token Bridge (W5: CDP → JOY conversion)
+  app.use('/api/v1/points', pointsRouter);
 
   // Knowledge API endpoints (manifest/search/feeds for RAG clients)
   app.use('/api/knowledge-api', knowledgeApiRouter);

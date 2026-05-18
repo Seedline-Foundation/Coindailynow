@@ -184,6 +184,44 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'An internal error occurred' } });
 });
 
+// ─── AI Policy Agent dashboard route ─────────────────────────────────
+app.get('/api/ai-policy/analyses', requireSuperAdmin, apiLimiter, async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 24, 100);
+    const analyses = await aiPolicyAgentService.getLatestAnalyses(limit);
+    res.json({ success: true, data: analyses });
+  } catch (e: any) {
+    res.status(500).json({ error: { code: 'ANALYSIS_FETCH_ERROR', message: e.message } });
+  }
+});
+
+app.post('/api/ai-policy/run', requireSuperAdmin, apiLimiter, async (_req, res) => {
+  try {
+    const result = await aiPolicyAgentService.runHourlyAnalysis();
+    res.json({ success: true, data: result });
+  } catch (e: any) {
+    res.status(500).json({ error: { code: 'ANALYSIS_RUN_ERROR', message: e.message } });
+  }
+});
+
+// ─── AI Policy Agent scheduled task (hourly, opt-in) ─────────────────
+if (process.env.ENABLE_AI_POLICY_AGENT === 'true') {
+  const AI_POLICY_INTERVAL_MS = parseInt(process.env.AI_POLICY_INTERVAL_MS || '3600000', 10);
+  console.log(`[AIPolicyAgent] Enabled — running every ${AI_POLICY_INTERVAL_MS / 1000}s`);
+
+  aiPolicyAgentService.runHourlyAnalysis().catch(err =>
+    console.error('[AIPolicyAgent] Initial run failed:', err.message),
+  );
+
+  setInterval(() => {
+    aiPolicyAgentService.runHourlyAnalysis().catch(err =>
+      console.error('[AIPolicyAgent] Scheduled run failed:', err.message),
+    );
+  }, AI_POLICY_INTERVAL_MS);
+} else {
+  console.log('[AIPolicyAgent] Disabled — set ENABLE_AI_POLICY_AGENT=true to enable');
+}
+
 // ─── Start Server ────────────────────────────────────────────────────
 blockchainListener.start();
 
