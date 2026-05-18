@@ -6,6 +6,7 @@
 import { Logger } from 'winston';
 import { ImageOutcome, ArticleOutcome } from '../../types/admin-types';
 import { MODEL_CONFIG } from '../../config/model-config';
+import { uploadToCDN as cdnUpload } from '../../config/cdn-upload';
 
 export class ImageAgent {
   private apiEndpoint: string;
@@ -177,24 +178,20 @@ export class ImageAgent {
   }
 
   /**
-   * Upload image to CDN (Backblaze B2 + Cloudflare)
+   * Upload image to CDN (Backblaze B2 via S3-compatible API → Cloudflare)
+   * Falls back to local uploads/ directory when B2 credentials are absent.
    */
   private async uploadToCDN(imageBase64: string, articleId: string): Promise<string> {
-    // TODO: Implement Backblaze B2 upload with Cloudflare CDN
-    
-    this.logger.debug('[ImageAgent] Uploading to CDN (placeholder implementation)');
-
-    // For now, save locally or return data URL
-    const filename = `article_${articleId}_${Date.now()}.png`;
-    
-    // In development, return local path
-    if (process.env.NODE_ENV === 'development') {
-      // Could save to local file system here
-      return `/images/${filename}`;
+    this.logger.info('[ImageAgent] Uploading image to CDN');
+    const filename = `article_${articleId}`;
+    try {
+      return await cdnUpload(imageBase64, filename, 'image/png');
+    } catch (err: any) {
+      this.logger.error('[ImageAgent] CDN upload failed, returning data URL fallback', {
+        error: err.message,
+      });
+      return `data:image/png;base64,${imageBase64}`;
     }
-
-    // Placeholder CDN URL
-    return `https://cdn.coindaily.africa/images/${filename}`;
   }
 
   /**
