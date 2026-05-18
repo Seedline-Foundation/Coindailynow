@@ -33,7 +33,7 @@ Docker is installed but **cgroup v2 prevents container startup** in the Cloud Ag
 ### Known gotchas
 - **No ESLint config**: The repo has no `.eslintrc.*` files. `npm run lint` in backend fails; `next lint` in frontend hangs waiting for first-time setup. Lint is effectively unconfigured.
 - **Prisma migration lock mismatch**: `migration_lock.toml` says `sqlite` but the schema uses `postgresql`. Use `npx prisma db push` instead of `npx prisma migrate dev`.
-- **Backend tests OOM**: The full backend test suite (`npm test`) runs out of memory. Run subsets: `npm run test:api`, or use `NODE_OPTIONS="--max-old-space-size=4096" npx jest --maxWorkers=1`.
+- **Backend tests OOM**: The full backend test suite needs extra memory. Run with: `NODE_OPTIONS="--max-old-space-size=6144" npx jest --forceExit --maxWorkers=2 --testTimeout=30000`. Using 4096 MB causes OOM for `contentRecommendationService.test.ts`; 6144 MB works reliably.
 - **Frontend tests**: `npm test` in `frontend/` runs Jest; 62/74 tests pass. Some fail due to missing runtime dependencies or unimplemented features.
 - **ENABLE_CRON_JOBS**: Set to `false` in dev `.env` to avoid background RSS/API fetchers from spamming logs and consuming resources on startup.
 
