@@ -3,6 +3,7 @@ import { authMiddleware } from '../../middleware/auth';
 import axios from 'axios';
 import { getRedis } from '../../lib/redis';
 import { notifyWireSubscribers, registerWireAlertKey, unregisterWireAlertKey } from '../../lib/wireAlertDispatcher';
+import { subscribe as wireSubscribe, unsubscribe as wireUnsubscribe, notifySubscribers as wireNotifySubscribers } from '../../services/wireAlertService';
 
 const router = Router();
 const wireAlertRedis = getRedis();
@@ -404,6 +405,16 @@ router.patch('/releases/:id/review', authMiddleware as any, async (req: Request,
         category: (updated as any).category || 'general',
         region: (updated as any).region || 'africa',
       });
+      void wireNotifySubscribers(prisma, {
+        id: updated.id,
+        title: updated.title,
+        summary: (updated as any).summary || '',
+        slug: (updated as any).slug,
+        category: (updated as any).category || 'general',
+        region: (updated as any).region || 'africa',
+        company,
+        publishedAt: pub,
+      });
     }
     return res.json({ data: updated });
   } catch (err: any) {
@@ -493,6 +504,44 @@ router.delete('/wire/alerts', async (req: Request, res: Response) => {
     await wireAlertRedis.del(k);
   }
   return res.json({ success: true });
+});
+
+// ─── Persistent subscribe / unsubscribe (Prisma-backed) ─────
+
+router.post('/wire/alerts/subscribe', async (req: Request, res: Response) => {
+  const prisma = getPrisma(req);
+  const { email, telegramChatId, filters } = req.body as {
+    email?: string;
+    telegramChatId?: string;
+    filters?: string[];
+  };
+
+  if (!email) {
+    return res.status(400).json({ error: { code: 'MISSING_EMAIL', message: 'email is required' } });
+  }
+
+  try {
+    const result = await wireSubscribe(prisma, { email, telegramChatId, filters });
+    return res.status(201).json({ data: result });
+  } catch (err: any) {
+    return res.status(500).json({ error: { code: 'INTERNAL', message: err.message } });
+  }
+});
+
+router.delete('/wire/alerts/unsubscribe', async (req: Request, res: Response) => {
+  const prisma = getPrisma(req);
+  const { email } = req.body as { email?: string };
+
+  if (!email) {
+    return res.status(400).json({ error: { code: 'MISSING_EMAIL', message: 'email is required' } });
+  }
+
+  try {
+    await wireUnsubscribe(prisma, email);
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: { code: 'INTERNAL', message: err.message } });
+  }
 });
 
 export default router;
