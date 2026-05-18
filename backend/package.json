@@ -58,6 +58,7 @@
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
     "@prisma/client": "^6.19.2",
+    "@sentry/node": "^10.53.1",
     "@types/helmet": "^4.0.0",
     "@types/multer": "^2.0.0",
     "@types/node-cron": "^3.0.11",
