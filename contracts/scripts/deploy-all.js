@@ -53,17 +53,32 @@ async function main() {
   const airdropAddr = await airdrop.getAddress();
   console.log('Airdrop deployed to:', airdropAddr);
 
+  // ── 7. Deploy TimelockGovernance ──────────────────────────────
+  console.log('\n--- Deploying TimelockGovernance ---');
+  const MIN_DELAY = 24 * 60 * 60; // 24 hours
+  const TimelockGovernance = await hre.ethers.getContractFactory('TimelockGovernance');
+  const timelock = await TimelockGovernance.deploy(
+    MIN_DELAY,
+    [deployer.address], // proposers (replace with multisig in production)
+    [deployer.address], // executors (replace with multisig in production)
+    deployer.address,   // admin
+  );
+  await timelock.waitForDeployment();
+  const timelockAddr = await timelock.getAddress();
+  console.log('TimelockGovernance deployed to:', timelockAddr);
+
   // ── Summary ────────────────────────────────────────────────────
   console.log('\n========================================');
   console.log('DEPLOYMENT SUMMARY');
   console.log('========================================');
-  console.log(`Network:           ${hre.network.name}`);
-  console.log(`JoyToken:          ${joyAddr}`);
-  console.log(`CDPPoints:         ${cdpAddr}`);
-  console.log(`ReputationSBT:     ${repAddr}`);
-  console.log(`StakingVault:      ${stakeAddr}`);
-  console.log(`PressDistribution: ${pressAddr}`);
-  console.log(`Airdrop:           ${airdropAddr}`);
+  console.log(`Network:              ${hre.network.name}`);
+  console.log(`JoyToken:             ${joyAddr}`);
+  console.log(`CDPPoints:            ${cdpAddr}`);
+  console.log(`ReputationSBT:        ${repAddr}`);
+  console.log(`StakingVault:         ${stakeAddr}`);
+  console.log(`PressDistribution:    ${pressAddr}`);
+  console.log(`Airdrop:              ${airdropAddr}`);
+  console.log(`TimelockGovernance:   ${timelockAddr}`);
   console.log('========================================');
 
   // ── Save addresses to file ─────────────────────────────────────
@@ -80,6 +95,7 @@ async function main() {
       StakingVault: stakeAddr,
       PressDistribution: pressAddr,
       Airdrop: airdropAddr,
+      TimelockGovernance: timelockAddr,
     },
   };
   const outPath = `./contracts/deployments/${hre.network.name}.json`;
@@ -97,6 +113,7 @@ async function main() {
       { address: stakeAddr, args: [joyAddr] },
       { address: pressAddr, args: [joyAddr] },
       { address: airdropAddr, args: [joyAddr] },
+      { address: timelockAddr, args: [MIN_DELAY, [deployer.address], [deployer.address], deployer.address] },
     ];
     for (const c of contracts) {
       try {
