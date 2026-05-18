@@ -16,7 +16,7 @@ import {
   getPermissionCategories,
 } from './shared';
 import { validateBody } from '../../../middleware/validate';
-import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
+import { aiPipelineToggleSchema } from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { runEditorialPipelineJob } from '../../../services/aiEditorialPipelineService';
@@ -142,15 +142,11 @@ router.get('/ai-tasks', authMiddleware, async (req: Request, res: Response) => {
  * POST /api/super-admin/ai/pipeline/toggle
  * Toggle the AI content pipeline kill-switch on/off.
  */
-router.post('/ai/pipeline/toggle', authMiddleware, async (req: Request, res: Response) => {
+router.post('/ai/pipeline/toggle', authMiddleware, validateBody(aiPipelineToggleSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
-    const { enabled } = req.body as { enabled?: boolean };
-    if (typeof enabled !== 'boolean') {
-      res.status(400).json({ success: false, error: '`enabled` (boolean) is required' });
-      return;
-    }
+    const { enabled } = req.body as { enabled: boolean };
 
     const settings = await prisma.platformSettings.findFirst();
     if (settings) {

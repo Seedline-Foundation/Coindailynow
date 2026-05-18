@@ -17,7 +17,10 @@ import {
 } from './shared';
 import { canPublishContent } from '../../../lib/editorialRoles';
 import { validateBody } from '../../../middleware/validate';
-import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
+import {
+  emergencyUnpublishSchema,
+  patchArticleSchema,
+} from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
@@ -108,7 +111,7 @@ router.get('/articles', authMiddleware, async (req: Request, res: Response) => {
  * Get AI agent status from database
  */
 
-router.patch('/articles/:id', authMiddleware, async (req: Request, res: Response) => {
+router.patch('/articles/:id', authMiddleware, validateBody(patchArticleSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
