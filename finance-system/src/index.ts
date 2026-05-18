@@ -4,6 +4,11 @@
 // Super Admin is UPDATED — CFIS executes ALL payments.
 // AI Agent ARIA verifies every outbound transaction.
 // ─────────────────────────────────────────────────────────────────────
+// N11: CFIS currently connects to Supabase (managed Postgres). A migration
+// to the self-hosted Contabo Postgres instance is planned so the entire
+// platform shares a single database host. See DATABASE_MIGRATION.md for
+// the full migration plan, env-var changes, and backup procedures.
+// ─────────────────────────────────────────────────────────────────────
 
 import express from 'express';
 import path from 'path';
