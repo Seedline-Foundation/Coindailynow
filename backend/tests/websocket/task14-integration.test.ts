@@ -14,7 +14,7 @@ import { createServer } from 'http';
 
 // Mock Redis to avoid connection issues in tests
 jest.mock('ioredis', () => {
-  return jest.fn().mockImplementation(() => ({
+  const mockRedisFactory = () => ({
     quit: jest.fn(),
     pipeline: jest.fn(() => ({
       sadd: jest.fn(),
@@ -22,8 +22,9 @@ jest.mock('ioredis', () => {
       exec: jest.fn().mockResolvedValue([])
     })),
     smembers: jest.fn().mockResolvedValue([]),
-    get: jest.fn(),
-    setex: jest.fn(),
+    get: jest.fn().mockResolvedValue(null),
+    set: jest.fn().mockResolvedValue('OK'),
+    setex: jest.fn().mockResolvedValue('OK'),
     incr: jest.fn().mockResolvedValue(1),
     expire: jest.fn(),
     flushdb: jest.fn(),
@@ -33,8 +34,18 @@ jest.mock('ioredis', () => {
     llen: jest.fn().mockResolvedValue(0),
     lpush: jest.fn().mockResolvedValue(1),
     rpop: jest.fn().mockResolvedValue(null),
-    lrange: jest.fn().mockResolvedValue([])
-  }));
+    lrange: jest.fn().mockResolvedValue([]),
+    on: jest.fn().mockReturnThis(),
+    connect: jest.fn().mockResolvedValue(undefined),
+    disconnect: jest.fn(),
+    del: jest.fn(),
+    subscribe: jest.fn(),
+    publish: jest.fn(),
+    duplicate: jest.fn(),
+  });
+  const MockRedis: any = jest.fn().mockImplementation(mockRedisFactory);
+  MockRedis.default = MockRedis;
+  return MockRedis;
 });
 
 // Mock Prisma to avoid database connections in tests

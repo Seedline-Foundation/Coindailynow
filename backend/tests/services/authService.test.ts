@@ -8,6 +8,12 @@ jest.mock('@prisma/client');
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 jest.mock('../../src/utils/logger');
+jest.mock('../../src/services/tokenRevocationService', () => ({
+  isAccessTokenJtiRevoked: jest.fn().mockResolvedValue(false),
+  isUserAccessTokenRevoked: jest.fn().mockResolvedValue(false),
+  revokeAccessTokenJti: jest.fn().mockResolvedValue(undefined),
+  revokeAllAccessTokensForUser: jest.fn().mockResolvedValue(undefined),
+}));
 
 const mockPrisma = {
   user: {
