@@ -1,0 +1,18 @@
+version: '3.8'
+
+# Uptime / health-check prober — lightweight alternative to full uptime-kuma
+# Runs as a cron inside the Prometheus stack.
+# Prometheus already scrapes these targets; this file provides an external
+# HTTP prober that can run in CI or as a standalone container.
+
+services:
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: coindaily-blackbox
+    ports:
+      - "127.0.0.1:9115:9115"
+    volumes:
+      - ./blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    networks:
+      - coindaily-network
+    restart: unless-stopped

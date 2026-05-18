@@ -52,3 +52,20 @@ scrape_configs:
       - targets: ['host.docker.internal:9187']
         labels:
           service: 'postgres'
+
+  # ── Blackbox HTTP probes ───────────────────────────────
+  - job_name: 'blackbox-http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - http://localhost:4000/health
+          - http://localhost:3001
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: coindaily-blackbox:9115
