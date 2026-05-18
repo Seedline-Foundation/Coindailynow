@@ -2,8 +2,8 @@
 // Task 70: Continuous Learning & Optimization Cycle Service
 
 import prisma from '../lib/prisma';
-import { Redis } from 'ioredis';
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+import { getRedis } from '../lib/redis';
+const redis = getRedis();
 
 const CACHE_TTL = 300; // 5 minutes
 

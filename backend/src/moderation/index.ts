@@ -3,6 +3,8 @@ import { Server as HTTPServer } from 'http';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import prismaClient from '../lib/prisma';
+import { getRedis } from '../lib/redis';
+import { createRedisClient } from '../config/ioredis';
 import AIModerationService from '../services/aiModerationService';
 import { createModerationWebSocketServer } from '../websocket/moderationWebSocket';
 import { moderationWorker } from '../workers/moderationWorker';
@@ -83,8 +85,8 @@ export class AIModerationSystem {
     // Initialize core dependencies
     this.prisma = this.config.prisma || prismaClient;
     this.redis = typeof this.config.redis === 'string' 
-      ? new Redis(this.config.redis)
-      : this.config.redis || new Redis();
+      ? createRedisClient() as any
+      : this.config.redis || getRedis() as any;
       
     this.moderationService = new AIModerationService(
       this.prisma,

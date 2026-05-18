@@ -4,14 +4,12 @@
  */
 
 import prisma from '../../lib/prisma';
-import Redis from 'ioredis';
+import { getRedis } from '../../lib/redis';
 import { logger } from '../../utils/logger';
+const redis = getRedis();
 import { LegalComplianceOrchestrator } from '../../services/legal/LegalComplianceOrchestrator';
 import { CookieConsentManager } from '../../services/legal/CookieConsentManager';
 import { DataRetentionService } from '../../services/legal/DataRetentionService';
-
-// Initialize services
-const redis = new Redis(process.env.REDIS_URL!);
 const legalOrchestrator = new LegalComplianceOrchestrator(prisma, redis);
 const cookieManager = new CookieConsentManager(prisma, redis);
 const retentionService = new DataRetentionService(prisma, redis);

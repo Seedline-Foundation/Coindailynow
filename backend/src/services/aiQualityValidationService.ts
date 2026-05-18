@@ -12,15 +12,8 @@
  */
 
 import prisma from '../lib/prisma';
-import Redis from 'ioredis';
-const redisConfig: any = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-};
-if (process.env.REDIS_PASSWORD) {
-  redisConfig.password = process.env.REDIS_PASSWORD;
-}
-const redis = new Redis(redisConfig);
+import { getRedis } from '../lib/redis';
+const redis = getRedis();
 
 // ============================================================================
 // TYPES & INTERFACES

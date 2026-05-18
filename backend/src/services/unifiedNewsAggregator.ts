@@ -13,22 +13,12 @@
  * - Real-time and batch fetching modes
  */
 
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
 import { fetchAllFeeds, fetchFeedsByRegion, FeedItem } from './rssFeedAggregator';
 import { fetchAllApiSources, fetchApiSourcesByRegion, fetchFinancialData, ApiDataItem } from './apiDataFetcher';
 import { getSourcesByCategory, getSourcesByCountry, ALL_NEWS_SOURCES } from '../config/newsSources';
 
-// Optional Redis - only connect if enabled
-const isRedisEnabled = process.env.REDIS_ENABLED !== 'false';
-let redis: Redis | null = null;
-if (isRedisEnabled) {
-  redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: 3,
-    lazyConnect: true,
-    retryStrategy: (times) => times > 3 ? null : Math.min(times * 100, 3000),
-  });
-  redis.on('error', (err) => console.warn('[UnifiedNewsAggregator] Redis error:', err.message));
-}
+const redis = getRedis();
 
 // ============================================================================
 // TYPES

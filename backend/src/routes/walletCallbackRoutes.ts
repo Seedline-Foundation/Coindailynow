@@ -16,11 +16,11 @@ import express, { Request, Response } from 'express';
 import { TransactionType, TransactionStatus } from '@prisma/client';
 import prisma from '../lib/prisma';
 import crypto from 'crypto';
-import { Redis } from 'ioredis';
+import { getRedis } from '../lib/redis';
 import { subscriptionService } from '../services/subscriptionService';
 
 const router = express.Router();
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = getRedis();
 
 // ============================================================================
 // HELPER FUNCTIONS

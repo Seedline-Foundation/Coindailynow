@@ -1,10 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import Redis from 'ioredis';
 import cron from 'node-cron';
 import AIModerationService from '../services/aiModerationService';
 import { pubsub, SUBSCRIPTION_EVENTS } from '../config/pubsub';
 import WebSocket from 'ws';
 import prisma from '../lib/prisma';
+import { getRedis } from '../lib/redis';
+const redis = getRedis();
 
 /**
  * Background Monitoring Worker for AI Content Moderation
@@ -19,7 +20,7 @@ import prisma from '../lib/prisma';
  */
 export class ModerationBackgroundWorker {
   private prisma: PrismaClient;
-  private redis: Redis;
+  private redis: ReturnType<typeof getRedis>;
   private moderationService: AIModerationService;
   private isRunning: boolean = false;
   private processedCount: number = 0;
@@ -28,10 +29,10 @@ export class ModerationBackgroundWorker {
   
   constructor() {
     this.prisma = prisma;
-    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    this.redis = redis;
     this.moderationService = new AIModerationService(
       this.prisma,
-      this.redis,
+      this.redis as any,
       process.env.PERSPECTIVE_API_KEY || ''
     );
   }

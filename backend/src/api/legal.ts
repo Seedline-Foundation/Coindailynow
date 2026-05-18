@@ -7,7 +7,8 @@
 
 import { Router, Request, Response } from 'express';
 import prisma from '../lib/prisma';
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
+const redis = getRedis();
 
 // Simple logger implementation
 const logger = {
@@ -38,9 +39,6 @@ const requireRole = (role: string) => (req: Request, res: Response, next: any) =
 const validateRequest = (req: Request, res: Response, next: any) => next();
 
 const router = Router();
-
-// Initialize services
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const legalOrchestrator = new LegalComplianceOrchestrator(prisma, redis);
 const cookieManager = new CookieConsentManager(prisma, redis);
 const retentionService = new DataRetentionService(prisma, redis);
