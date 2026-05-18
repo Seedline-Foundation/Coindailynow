@@ -6,6 +6,7 @@ import Footer from '@/components/footer/Footer';
 
 interface PricingTier {
   name: string;
+  tier: 'FREE' | 'PREMIUM' | 'ENTERPRISE';
   slug: string;
   price: string;
   priceNote: string;
@@ -20,6 +21,7 @@ interface PricingTier {
 const tiers: PricingTier[] = [
   {
     name: 'Free',
+    tier: 'FREE',
     slug: 'free',
     price: '$0',
     priceNote: 'forever',
@@ -41,6 +43,7 @@ const tiers: PricingTier[] = [
   },
   {
     name: 'Pro',
+    tier: 'PREMIUM',
     slug: 'pro',
     price: '$29',
     priceNote: '/month',
@@ -66,6 +69,7 @@ const tiers: PricingTier[] = [
   },
   {
     name: 'Enterprise',
+    tier: 'ENTERPRISE',
     slug: 'enterprise',
     price: 'Custom',
     priceNote: 'contact us',

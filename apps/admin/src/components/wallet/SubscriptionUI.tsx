@@ -58,27 +58,10 @@ export const SubscriptionUI: React.FC<SubscriptionUIProps> = ({
   // Available subscription plans
   const subscriptionPlans: SubscriptionPlan[] = [
     {
-      id: 'basic',
-      name: 'Apostle',
-      tier: 'basic' as SubscriptionTier,
-      price: 50,
-      duration: 30,
-      color: 'from-gray-400 to-gray-600',
-      icon: '⭐',
-      description: 'Perfect for crypto beginners',
-      features: [
-        'Basic market data access',
-        'Weekly newsletter',
-        'Community forum access',
-        'Mobile app access',
-        'Email support'
-      ]
-    },
-    {
       id: 'premium',
-      name: 'Evangelist',
-      tier: 'premium' as SubscriptionTier,
-      price: 150,
+      name: 'Pro',
+      tier: SubscriptionTier.PREMIUM,
+      price: 50,
       duration: 30,
       color: 'from-blue-500 to-blue-700',
       icon: '🚀',
@@ -96,15 +79,15 @@ export const SubscriptionUI: React.FC<SubscriptionUIProps> = ({
     },
     {
       id: 'enterprise',
-      name: 'Prophet',
-      tier: 'enterprise' as SubscriptionTier,
+      name: 'Enterprise',
+      tier: SubscriptionTier.ENTERPRISE,
       price: 300,
       duration: 30,
       color: 'from-purple-500 to-purple-700',
       icon: '👑',
       description: 'Full access for crypto professionals',
       features: [
-        'All Premium features',
+        'All Pro features',
         'Institutional data',
         'Custom analytics',
         'Dedicated support',

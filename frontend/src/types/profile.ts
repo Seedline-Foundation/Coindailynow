@@ -274,9 +274,8 @@ export interface SubscriptionSettings {
 
 export enum SubscriptionTier {
   FREE = 'FREE',
-  BASIC = 'BASIC',
   PREMIUM = 'PREMIUM',
-  VIP = 'VIP'
+  ENTERPRISE = 'ENTERPRISE'
 }
 
 export enum BillingCycle {

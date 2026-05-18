@@ -1588,19 +1588,13 @@ export class AIModerationService {
       let priorityScore = 70;
       let visibilityBoost = 20;
 
-      // Premium tiers: PLATINUM > GOLD > SILVER > BRONZE
-      if (subscriptionTier === 'PLATINUM') {
+      // Subscription tiers: ENTERPRISE > PREMIUM
+      if (subscriptionTier === 'ENTERPRISE') {
         priorityScore = 80;
         visibilityBoost = 25;
-      } else if (subscriptionTier === 'GOLD') {
-        priorityScore = 75;
-        visibilityBoost = 22;
-      } else if (subscriptionTier === 'SILVER') {
+      } else if (subscriptionTier === 'PREMIUM') {
         priorityScore = 70;
-        visibilityBoost = 18;
-      } else if (subscriptionTier === 'BRONZE') {
-        priorityScore = 65;
-        visibilityBoost = 15;
+        visibilityBoost = 20;
       }
 
       return {

@@ -13,7 +13,7 @@ export interface User {
   username: string;
   firstName?: string;
   lastName?: string;
-  subscriptionTier: 'FREE' | 'BASIC' | 'PREMIUM' | 'VIP';
+  subscriptionTier: 'FREE' | 'PREMIUM' | 'ENTERPRISE';
   emailVerified: boolean;
   status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'PENDING_VERIFICATION';
   walletConnected: boolean;

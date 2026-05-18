@@ -50,7 +50,7 @@ export default function PremiumUsersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [stats, setStats] = useState({
     total: 0,
-    basic: 0,
+    free: 0,
     premium: 0,
     enterprise: 0,
     monthlyRevenue: 0,
@@ -95,7 +95,7 @@ export default function PremiumUsersPage() {
 
   const getTierColor = (tier: string) => {
     switch (tier) {
-      case 'BASIC':
+      case 'FREE':
         return 'bg-blue-500/20 text-blue-400 border-blue-500';
       case 'PREMIUM':
         return 'bg-purple-500/20 text-purple-400 border-purple-500';
@@ -214,7 +214,7 @@ export default function PremiumUsersPage() {
             className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
           >
             <option value="all">All Tiers</option>
-            <option value="BASIC">Basic</option>
+            <option value="FREE">Free</option>
             <option value="PREMIUM">Premium</option>
             <option value="ENTERPRISE">Enterprise</option>
           </select>
