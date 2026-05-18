@@ -45,6 +45,14 @@ async function main() {
   const pressAddr = await pressDist.getAddress();
   console.log('PressDistribution deployed to:', pressAddr);
 
+  // ── 6. Deploy Airdrop ─────────────────────────────────────────
+  console.log('\n--- Deploying Airdrop ---');
+  const Airdrop = await hre.ethers.getContractFactory('Airdrop');
+  const airdrop = await Airdrop.deploy(joyAddr);
+  await airdrop.waitForDeployment();
+  const airdropAddr = await airdrop.getAddress();
+  console.log('Airdrop deployed to:', airdropAddr);
+
   // ── Summary ────────────────────────────────────────────────────
   console.log('\n========================================');
   console.log('DEPLOYMENT SUMMARY');
@@ -55,6 +63,7 @@ async function main() {
   console.log(`ReputationSBT:     ${repAddr}`);
   console.log(`StakingVault:      ${stakeAddr}`);
   console.log(`PressDistribution: ${pressAddr}`);
+  console.log(`Airdrop:           ${airdropAddr}`);
   console.log('========================================');
 
   // ── Save addresses to file ─────────────────────────────────────
@@ -70,6 +79,7 @@ async function main() {
       ReputationSBT: repAddr,
       StakingVault: stakeAddr,
       PressDistribution: pressAddr,
+      Airdrop: airdropAddr,
     },
   };
   const outPath = `./contracts/deployments/${hre.network.name}.json`;
@@ -86,6 +96,7 @@ async function main() {
       { address: repAddr, args: [] },
       { address: stakeAddr, args: [joyAddr] },
       { address: pressAddr, args: [joyAddr] },
+      { address: airdropAddr, args: [joyAddr] },
     ];
     for (const c of contracts) {
       try {
