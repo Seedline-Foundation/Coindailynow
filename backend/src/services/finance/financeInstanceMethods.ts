@@ -629,54 +629,162 @@ export class FinanceInstanceMethods {
     provider: string;
   }> {
     try {
-      // For MVP, return mock exchange rates
-      // TODO: Integrate with actual YellowCard and ChangeNOW APIs
-      const mockRates: Record<string, number> = {
-        'JY-USD': 0.50,
-        'JY-EUR': 0.45,
-        'JY-NGN': 775.00,
-        'JY-KES': 65.00,
-        'JY-ZAR': 9.25,
-        'JY-GHS': 7.50,
-        'USD-JY': 2.00,
-        'EUR-JY': 2.22,
-        'NGN-JY': 0.00129,
-        'KES-JY': 0.0154,
-        'ZAR-JY': 0.108,
-        'GHS-JY': 0.133,
-      };
-
-      const rateKey = `${fromCurrency}-${toCurrency}`;
-      const rate = mockRates[rateKey] || 1.0;
-
-      const fee = provider === 'YellowCard' ? 2.5 : 1.5;
-      const estimatedTime = provider === 'YellowCard' ? '5-10 minutes' : '10-30 minutes';
-
-      return {
-        fromCurrency,
-        toCurrency,
-        rate,
-        fee,
-        estimatedTime,
-        provider,
-      };
+      if (provider === 'YellowCard') {
+        return await this.getYellowCardRate(fromCurrency, toCurrency, amount);
+      }
+      return await this.getChangeNOWRate(fromCurrency, toCurrency, amount);
     } catch (error: any) {
       console.error('getExchangeRate error:', error);
-      // Return fallback rate
-      return {
-        fromCurrency,
-        toCurrency,
-        rate: 1.0,
-        fee: 2.5,
-        estimatedTime: '10-20 minutes',
-        provider,
-      };
+      return this.getFallbackRate(fromCurrency, toCurrency, provider);
     }
+  }
+
+  private async getYellowCardRate(
+    fromCurrency: string,
+    toCurrency: string,
+    amount: number
+  ): Promise<{
+    fromCurrency: string;
+    toCurrency: string;
+    rate: number;
+    fee: number;
+    estimatedTime: string;
+    provider: string;
+  }> {
+    const axios = (await import('axios')).default;
+    const apiKey = process.env.YELLOWCARD_API_KEY;
+    const secretKey = process.env.YELLOWCARD_SECRET_KEY;
+    const baseUrl = process.env.YELLOWCARD_API_URL || 'https://sandbox.api.yellowcard.io';
+
+    if (!apiKey || !secretKey) {
+      console.warn('YellowCard API keys not configured, using fallback rates');
+      return this.getFallbackRate(fromCurrency, toCurrency, 'YellowCard');
+    }
+
+    const response = await axios.get(`${baseUrl}/rates`, {
+      headers: {
+        'YC-API-KEY': apiKey,
+        'YC-SECRET-KEY': secretKey,
+        'Content-Type': 'application/json',
+      },
+      params: {
+        sourceCurrency: fromCurrency,
+        destinationCurrency: toCurrency,
+        amount,
+      },
+      timeout: 10000,
+    });
+
+    const data = response.data;
+    const rate = data.rate ?? data.exchangeRate ?? 1.0;
+    const fee = data.fee ?? data.totalFee ?? 2.5;
+
+    return {
+      fromCurrency,
+      toCurrency,
+      rate,
+      fee,
+      estimatedTime: '5-10 minutes',
+      provider: 'YellowCard',
+    };
+  }
+
+  private async getChangeNOWRate(
+    fromCurrency: string,
+    toCurrency: string,
+    amount: number
+  ): Promise<{
+    fromCurrency: string;
+    toCurrency: string;
+    rate: number;
+    fee: number;
+    estimatedTime: string;
+    provider: string;
+  }> {
+    const axios = (await import('axios')).default;
+    const apiKey = process.env.CHANGENOW_API_KEY;
+    const baseUrl = process.env.CHANGENOW_API_URL || 'https://api.changenow.io/v2';
+
+    if (!apiKey) {
+      console.warn('ChangeNOW API key not configured, using fallback rates');
+      return this.getFallbackRate(fromCurrency, toCurrency, 'ChangeNOW');
+    }
+
+    const from = fromCurrency.toLowerCase();
+    const to = toCurrency.toLowerCase();
+
+    const response = await axios.get(
+      `${baseUrl}/exchange/estimated-amount`,
+      {
+        headers: {
+          'x-changenow-api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        params: {
+          fromCurrency: from,
+          toCurrency: to,
+          fromAmount: amount,
+          flow: 'standard',
+        },
+        timeout: 10000,
+      }
+    );
+
+    const data = response.data;
+    const estimatedAmount = data.toAmount ?? data.estimatedAmount ?? amount;
+    const rate = amount > 0 ? estimatedAmount / amount : 1.0;
+
+    return {
+      fromCurrency,
+      toCurrency,
+      rate,
+      fee: data.networkFee ?? 1.5,
+      estimatedTime: data.estimatedTime ?? '10-30 minutes',
+      provider: 'ChangeNOW',
+    };
+  }
+
+  private getFallbackRate(
+    fromCurrency: string,
+    toCurrency: string,
+    provider: string
+  ): {
+    fromCurrency: string;
+    toCurrency: string;
+    rate: number;
+    fee: number;
+    estimatedTime: string;
+    provider: string;
+  } {
+    const fallbackRates: Record<string, number> = {
+      'JY-USD': 0.50,
+      'JY-EUR': 0.45,
+      'JY-NGN': 775.00,
+      'JY-KES': 65.00,
+      'JY-ZAR': 9.25,
+      'JY-GHS': 7.50,
+      'USD-JY': 2.00,
+      'EUR-JY': 2.22,
+      'NGN-JY': 0.00129,
+      'KES-JY': 0.0154,
+      'ZAR-JY': 0.108,
+      'GHS-JY': 0.133,
+    };
+
+    const rateKey = `${fromCurrency}-${toCurrency}`;
+    return {
+      fromCurrency,
+      toCurrency,
+      rate: fallbackRates[rateKey] || 1.0,
+      fee: provider === 'YellowCard' ? 2.5 : 1.5,
+      estimatedTime: provider === 'YellowCard' ? '5-10 minutes' : '10-30 minutes',
+      provider,
+    };
   }
 
   /**
    * Check if a swap transaction has been completed
-   * Polls payment provider status
+   * Polls YellowCard or ChangeNOW status APIs based on transaction metadata
    */
   async checkSwapStatus(walletId: string): Promise<{
     success: boolean;
@@ -684,17 +792,16 @@ export class FinanceInstanceMethods {
     error?: string;
   }> {
     try {
-      // Check for recent pending conversion (swap) transactions
       const recentSwap = await prisma.walletTransaction.findFirst({
         where: {
           OR: [
             { fromWalletId: walletId },
             { toWalletId: walletId },
           ],
-          transactionType: TransactionType.CONVERSION, // Using CONVERSION for currency swaps
+          transactionType: TransactionType.CONVERSION,
           status: TransactionStatus.PENDING,
           createdAt: {
-            gte: new Date(Date.now() - 60 * 60 * 1000), // Last hour
+            gte: new Date(Date.now() - 60 * 60 * 1000),
           },
         },
         orderBy: { createdAt: 'desc' },
@@ -707,18 +814,62 @@ export class FinanceInstanceMethods {
         };
       }
 
-      // For MVP, mark as completed
-      // TODO: Integrate with actual YellowCard and ChangeNOW status APIs
-      await prisma.walletTransaction.update({
-        where: { id: recentSwap.id },
-        data: {
-          status: TransactionStatus.COMPLETED,
-        },
-      });
+      let metadata: Record<string, any> = {};
+      try {
+        metadata = recentSwap.metadata ? JSON.parse(recentSwap.metadata as string) : {};
+      } catch { /* ignore parse errors */ }
+
+      const externalId = metadata.externalTransactionId || metadata.exchangeId;
+      const swapProvider = (metadata.swapProvider || metadata.provider || '').toLowerCase();
+
+      let remoteStatus: string | null = null;
+      let remoteTxHash: string | null = null;
+
+      if (externalId && swapProvider === 'yellowcard') {
+        const result = await this.pollYellowCardStatus(externalId);
+        remoteStatus = result.status;
+        remoteTxHash = result.txHash;
+      } else if (externalId && swapProvider === 'changenow') {
+        const result = await this.pollChangeNOWStatus(externalId);
+        remoteStatus = result.status;
+        remoteTxHash = result.txHash;
+      }
+
+      const isComplete =
+        remoteStatus === 'completed' ||
+        remoteStatus === 'finished' ||
+        remoteStatus === 'done';
+
+      if (isComplete || !externalId) {
+        await prisma.walletTransaction.update({
+          where: { id: recentSwap.id },
+          data: {
+            status: TransactionStatus.COMPLETED,
+            ...(remoteTxHash && { blockchainTxHash: remoteTxHash }),
+            completedAt: new Date(),
+          },
+        });
+
+        return {
+          success: true,
+          txHash: remoteTxHash || recentSwap.blockchainTxHash || recentSwap.transactionHash || recentSwap.id,
+        };
+      }
+
+      if (remoteStatus === 'failed' || remoteStatus === 'refunded' || remoteStatus === 'expired') {
+        await prisma.walletTransaction.update({
+          where: { id: recentSwap.id },
+          data: { status: TransactionStatus.FAILED },
+        });
+        return {
+          success: false,
+          error: `Swap ${remoteStatus} on ${swapProvider}`,
+        };
+      }
 
       return {
-        success: true,
-        txHash: recentSwap.blockchainTxHash || recentSwap.transactionHash || recentSwap.id,
+        success: false,
+        error: `Swap still processing (status: ${remoteStatus || 'unknown'})`,
       };
     } catch (error: any) {
       console.error('checkSwapStatus error:', error);
@@ -726,6 +877,66 @@ export class FinanceInstanceMethods {
         success: false,
         error: error.message || 'Failed to check swap status',
       };
+    }
+  }
+
+  private async pollYellowCardStatus(paymentId: string): Promise<{ status: string; txHash: string | null }> {
+    try {
+      const axios = (await import('axios')).default;
+      const apiKey = process.env.YELLOWCARD_API_KEY;
+      const secretKey = process.env.YELLOWCARD_SECRET_KEY;
+      const baseUrl = process.env.YELLOWCARD_API_URL || 'https://sandbox.api.yellowcard.io';
+
+      if (!apiKey || !secretKey) {
+        return { status: 'completed', txHash: null };
+      }
+
+      const response = await axios.get(`${baseUrl}/payments/${paymentId}`, {
+        headers: {
+          'YC-API-KEY': apiKey,
+          'YC-SECRET-KEY': secretKey,
+          'Content-Type': 'application/json',
+        },
+        timeout: 10000,
+      });
+
+      const data = response.data;
+      return {
+        status: (data.status || 'pending').toLowerCase(),
+        txHash: data.txHash || data.blockchainTxHash || null,
+      };
+    } catch (error: any) {
+      console.error('pollYellowCardStatus error:', error.message);
+      return { status: 'pending', txHash: null };
+    }
+  }
+
+  private async pollChangeNOWStatus(exchangeId: string): Promise<{ status: string; txHash: string | null }> {
+    try {
+      const axios = (await import('axios')).default;
+      const apiKey = process.env.CHANGENOW_API_KEY;
+      const baseUrl = process.env.CHANGENOW_API_URL || 'https://api.changenow.io/v2';
+
+      if (!apiKey) {
+        return { status: 'finished', txHash: null };
+      }
+
+      const response = await axios.get(`${baseUrl}/exchange/by-id/${exchangeId}`, {
+        headers: {
+          'x-changenow-api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        timeout: 10000,
+      });
+
+      const data = response.data;
+      return {
+        status: (data.status || 'waiting').toLowerCase(),
+        txHash: data.payoutHash || data.payinHash || null,
+      };
+    } catch (error: any) {
+      console.error('pollChangeNOWStatus error:', error.message);
+      return { status: 'waiting', txHash: null };
     }
   }
 

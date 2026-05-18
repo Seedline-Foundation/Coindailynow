@@ -432,7 +432,41 @@ router.post('/checkout/yellowcard', async (req: Request, res: Response) => {
 
   const reference = `press_${orderId}`;
   const amount = Number(amountUsd).toFixed(2);
-  const baseUrl = process.env.YELLOWCARD_API_URL || 'https://api.yellowcard.io';
+  const apiKey = process.env.YELLOWCARD_API_KEY;
+  const secretKey = process.env.YELLOWCARD_SECRET_KEY;
+  const baseUrl = process.env.YELLOWCARD_API_URL || 'https://sandbox.api.yellowcard.io';
+
+  if (apiKey && secretKey) {
+    try {
+      const response = await axios.post(
+        `${baseUrl}/payments`,
+        {
+          amount: parseFloat(amount),
+          currency: 'USD',
+          reason: `CoinDaily Press distribution: order ${orderId}`,
+          metadata: { publisherId, orderId, reference },
+        },
+        {
+          headers: {
+            'YC-API-KEY': apiKey,
+            'YC-SECRET-KEY': secretKey,
+            'Content-Type': 'application/json',
+          },
+          timeout: 15000,
+        }
+      );
+
+      const data = response.data;
+      return res.json({
+        checkoutUrl: data.redirectUrl || data.checkoutUrl || data.url || `${baseUrl}/checkout?ref=${reference}`,
+        reference,
+        paymentId: data.id || data.paymentId,
+      });
+    } catch (error: any) {
+      console.error('YellowCard press checkout error:', error.response?.data || error.message);
+    }
+  }
+
   const checkoutUrl =
     process.env.YELLOWCARD_CHECKOUT_URL ||
     `${baseUrl}/checkout?amount=${amount}&currency=USD&ref=${reference}&metadata=${encodeURIComponent(
