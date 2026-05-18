@@ -37,9 +37,18 @@ Docker is installed but **cgroup v2 prevents container startup** in the Cloud Ag
 - **Frontend tests**: `npm test` in `frontend/` runs Jest; 62/74 tests pass. Some fail due to missing runtime dependencies or unimplemented features.
 - **ENABLE_CRON_JOBS**: Set to `false` in dev `.env` to avoid background RSS/API fetchers from spamming logs and consuming resources on startup.
 
+### Contracts (`contracts/`)
+Solidity smart contracts compiled with Hardhat. Config is `hardhat.config.cjs`, sources in `sol/`, tests in `test/`.
+- **Compile**: `cd contracts && npx hardhat compile`
+- **Test**: `cd contracts && npx hardhat test` (120 tests across 8 test files)
+- **Deploy (local)**: `cd contracts && npx hardhat run scripts/deploy-all.js`
+- The Hardhat config uses `require()` (CommonJS `.cjs`), Solidity 0.8.20 with Paris EVM target.
+- `TimelockGovernance.sol` and `CoinDailyTimelock` (in `TimelockController.sol`) both wrap OZ `TimelockController`; the former is the N16 governance timelock.
+
 ### Useful commands
 See `package.json` scripts at root, `backend/package.json`, and `frontend/package.json` for the full list. Key commands:
 - `npm run dev:backend` / `npm run dev:frontend` — start individual services from root
 - `cd backend && npm run db:generate` — regenerate Prisma client after schema changes
 - `cd backend && npm run db:push` — sync schema to database
 - `cd frontend && npm test` — run frontend unit tests
+- `cd contracts && npx hardhat test` — run contract test suite
