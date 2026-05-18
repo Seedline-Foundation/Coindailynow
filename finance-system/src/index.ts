@@ -29,6 +29,7 @@ import internalEventsRoutes from './routes/internalEvents';
 import taxReportsRoutes from './routes/taxReports';
 import pointsBridgeRoutes from './routes/pointsBridge';
 import { blockchainListener } from './services/BlockchainListenerService';
+import { aiPolicyAgentService } from './services/AIPolicyAgentService';
 import payrollRoutes from './routes/payroll';
 import partnershipRoutes from './routes/partnerships';
 import airdropRoutes from './routes/airdrops';
@@ -129,7 +130,8 @@ app.get('/health', (req, res) => {
     system: 'CFIS',
     version: '2.0.0',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    blockchainListener: blockchainListener.getHealth(),
   });
 });
 
