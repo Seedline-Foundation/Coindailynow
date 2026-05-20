@@ -73,6 +73,7 @@ import moderationScanRouter from './routes/moderationScan.routes';
 import sitemapRouter from './routes/sitemap.routes';
 import structuredDataRouter from './routes/structured-data.routes';
 import marqueeRouter from './routes/marquee';
+import v1ChangenowRouter from './api/routes/v1Changenow.routes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
@@ -509,6 +510,9 @@ export async function setupApp() {
 
   // Marquee routes (ticker bar / news flash management)
   app.use('/api/marquee', marqueeRouter);
+
+  // ChangeNOW diaspora swap surface (estimate + create + status + callback)
+  app.use('/api/v1/changenow', v1ChangenowRouter);
 
   // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
   app.use('/', rssFeedRouter);
