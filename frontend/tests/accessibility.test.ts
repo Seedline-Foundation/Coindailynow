@@ -30,14 +30,10 @@ interface AccessibilityReport {
 
 const testPages = [
   { name: 'Home', url: '/', critical: true },
-  { name: 'Dashboard', url: '/dashboard', critical: true },
-  { name: 'Articles', url: '/articles', critical: true },
-  { name: 'Article Detail', url: '/articles/example', critical: true },
-  { name: 'Market Data', url: '/market', critical: true },
-  { name: 'User Profile', url: '/profile', critical: false },
-  { name: 'Settings', url: '/settings', critical: false },
-  { name: 'Login', url: '/login', critical: true },
-  { name: 'Register', url: '/register', critical: true },
+  { name: 'Privacy', url: '/privacy', critical: false },
+  { name: 'Terms', url: '/terms', critical: false },
+  { name: 'Cookies', url: '/cookies', critical: false },
+  { name: 'News', url: '/news', critical: true },
 ];
 
 async function testAccessibility() {

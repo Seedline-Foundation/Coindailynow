@@ -8,6 +8,8 @@ import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
 import AppInstallAndOfflinePrompt from '@/components/pwa/AppInstallAndOfflinePrompt';
 import PostHogProvider from '@/components/providers/PostHogProvider';
 import { GeoProvider } from '@/lib/GeoContext';
+import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
+import CriticalCSS from '@/components/performance/CriticalCSS';
 import KeyboardShortcuts from '@/components/shortcuts/KeyboardShortcuts';
 import { DensityProvider } from '@/components/ui/DensityToggle';
 
@@ -33,6 +35,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 // SEO and PWA Metadata
 export const metadata: Metadata = {
+  metadataBase: new URL('https://coindaily.online'),
   title: {
     default: 'CoinDaily Africa - Premier Cryptocurrency News Platform',
     template: '%s | CoinDaily Africa'
@@ -91,6 +94,10 @@ export const metadata: Metadata = {
     title: 'CoinDaily Africa - Premier Cryptocurrency News Platform',
     description: 'Africa\'s premier cryptocurrency news platform with real-time market data and AI-driven content',
     images: ['/twitter-image.png'],
+  },
+  
+  alternates: {
+    canonical: '/',
   },
   
   // PWA Configuration
@@ -172,6 +179,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <CriticalCSS pagePath="/" />
         {/* Preconnect to important domains for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -256,7 +264,7 @@ export default function RootLayout({
             <AuthProvider>
               <PostHogProvider>
               <DensityProvider>
-              <div id="main-content" className="min-h-screen">
+              <div id="main-content" role="main" className="min-h-screen">
                 {children}
               </div>
               <AppInstallAndOfflinePrompt />

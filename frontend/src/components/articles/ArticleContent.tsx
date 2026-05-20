@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useRef, useCallback } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import { SUPPORTED_LANGUAGES } from '../../types/article';
 
 interface ArticleContentProps {
@@ -38,16 +39,12 @@ export const ArticleContent: React.FC<ArticleContentProps> = ({
     large: 'text-lg leading-relaxed'
   };
 
-  // Basic HTML sanitization (in production, use DOMPurify)
-  const sanitizeHTML = (html: string): string => {
-    // Remove script tags and event handlers
-    return html
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/on\w+="[^"]*"/gi, '')
-      .replace(/javascript:/gi, '');
-  };
-
-  const sanitizedContent = sanitizeHTML(content);
+  const sanitizedContent = DOMPurify.sanitize(content, {
+    ADD_TAGS: ['iframe'],
+    ADD_ATTR: ['target', 'rel', 'loading'],
+    FORBID_TAGS: ['script', 'style'],
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
+  });
 
   // Setup reading progress tracking
   const setupProgressTracking = useCallback(() => {

@@ -221,19 +221,41 @@ export const CDNImage: React.FC<CDNImageProps> = ({
     return <LoadingPlaceholder />;
   }
 
-  // Render optimized responsive image
+  // Render optimized responsive image with <picture> element fallback
   if (responsive && optimizedData) {
+    const fallbackFormat = format === 'webp' || format === 'avif' ? 'jpeg' : format;
+    const fallbackSrc = getOptimizedUrl(src, { width, height, quality, format: fallbackFormat, progressive });
+
     return (
       <div ref={imgRef} className={className}>
-        {/* Progressive enhancement with picture element */}
-        <div
-          dangerouslySetInnerHTML={{ 
-            __html: optimizedData.pictureElement.replace(
-              '<img',
-              `<img class="${className}" loading="${lazy ? 'lazy' : 'eager'}" decoding="async"`
-            )
-          }}
-        />
+        <picture>
+          {/* WebP source for modern browsers */}
+          <source
+            type="image/webp"
+            srcSet={generateSrcSet()}
+            sizes={sizes}
+          />
+          {/* Fallback JPEG/PNG source for older browsers */}
+          <source
+            type={`image/${fallbackFormat}`}
+            srcSet={
+              [320, 640, 768, 1024, 1280, 1600]
+                .map(w => `${getOptimizedUrl(src, { width: w, quality, format: fallbackFormat, progressive })} ${w}w`)
+                .join(', ')
+            }
+            sizes={sizes}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={fallbackSrc}
+            alt={alt || ''}
+            width={width}
+            height={height}
+            loading={lazy ? 'lazy' : 'eager'}
+            decoding="async"
+            className={className}
+          />
+        </picture>
         
         {/* Fallback to Next.js Image component */}
         <noscript>
@@ -257,15 +279,16 @@ export const CDNImage: React.FC<CDNImageProps> = ({
     <div ref={imgRef}>
       <Image
         src={getOptimizedUrl(src, { width, height, quality, format, progressive })}
-        alt={alt}
+        alt={alt || ''}
         width={width}
         height={height}
         quality={africanOptimization ? Math.min(quality, 75) : quality}
+        loading={priority ? undefined : 'lazy'}
         priority={priority}
         sizes={sizes}
         className={className}
         onLoad={onLoad}
-        onError={(error) => onError?.(new Error('Image load failed'))}
+        onError={() => onError?.(new Error('Image load failed'))}
         placeholder={optimizedData?.placeholder ? 'blur' : 'empty'}
         blurDataURL={optimizedData?.placeholder}
       />

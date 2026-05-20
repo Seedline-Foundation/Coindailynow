@@ -173,11 +173,11 @@ Proprietary - All rights reserved by Seedline Foundation
 
 - **Website**: Coming soon
 - **Twitter**: [@Coindaily001](https://twitter.com/Coindaily001)
-- **Telegram**: [CoindailyNewz](https://t.me/CoindailyNewz)
+- **Telegram**: [CoinDaily](https://t.me/coindaily)
 
 ## 📞 Contact
 
-For inquiries: contact@coindaily.com
+For inquiries: support@coindaily.online
 
 ---
 

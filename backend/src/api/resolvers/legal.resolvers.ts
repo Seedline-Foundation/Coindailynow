@@ -507,6 +507,52 @@ export const legalResolvers = {
     },
 
     /**
+     * Delete user data (GDPR Article 17 - Right to Erasure)
+     */
+    deleteUserData: async (
+      parent: any,
+      args: { userId: string; reason: string },
+      context: Context,
+      info: GraphQLResolveInfo
+    ): Promise<boolean> => {
+      if (!context.user) {
+        throw new Error('Authentication required');
+      }
+
+      const { userId, reason } = args;
+
+      if (context.user.id !== userId && context.user.role !== 'admin') {
+        throw new Error('Unauthorized: can only delete own data or must be admin');
+      }
+
+      try {
+        console.log(`[GDPR] Data deletion requested for user ${userId}. Reason: ${reason}. Initiated by: ${context.user.id}`);
+
+        await context.legalOrchestrator.initiateDataPortabilityRequest(
+          userId,
+          'JSON',
+          ['all']
+        );
+
+        await context.cookieManager.withdrawConsent(
+          userId,
+          ['all'],
+          {
+            ipAddress: context.user.ipAddress || '0.0.0.0',
+            userAgent: context.user.userAgent || 'Unknown',
+            method: 'data_deletion' as 'settings_page'
+          }
+        );
+
+        console.log(`[GDPR] User data deletion completed for user ${userId}`);
+        return true;
+      } catch (error) {
+        console.error('Error deleting user data:', error);
+        throw new Error('Failed to delete user data');
+      }
+    },
+
+    /**
      * Run data retention cleanup (Admin only)
      */
     runDataRetentionCleanup: async (

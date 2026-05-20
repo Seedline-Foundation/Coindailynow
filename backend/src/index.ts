@@ -3,7 +3,6 @@ import { initSentry, Sentry } from './lib/sentry';
 
 // Initialize Sentry BEFORE other imports for maximum coverage
 initSentry();
-
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -67,6 +66,7 @@ import dataAnalysisAdminRouter from './routes/data-analysis-admin.routes';
 import adsRotationRouter from './routes/ads-rotation.routes';
 import rssFeedRouter from './routes/rss-feed.routes';
 import indexNowRouter from './routes/indexnow.routes';
+import legalRouter from './api/legal-routes';
 import structuredContentRouter from './routes/structured-content.routes';
 import knowledgeApiRouter from './api/routes/knowledgeApi.routes';
 import authRouter from './routes/auth.routes';
@@ -560,6 +560,9 @@ export async function setupApp() {
 
   // IndexNow & Instant Indexing Routes (Bing, Google, Yandex notification)
   app.use('/', indexNowRouter);
+
+  // Legal & GDPR Compliance Routes (Task 30)
+  app.use('/api/legal', legalRouter);
 
   // Start Security Monitoring Agent in background
   const securityAgent = getSecurityMonitoringAgent(prisma);

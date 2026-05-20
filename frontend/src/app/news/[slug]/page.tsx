@@ -113,9 +113,33 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
     };
   }
 
+  const siteUrl = 'https://coindaily.online';
+  const articleUrl = `${siteUrl}/news/${params.slug}`;
+
   return {
     title: `${article.title} | CoinDaily Africa`,
     description: article.excerpt,
+    alternates: {
+      canonical: articleUrl,
+    },
+    openGraph: {
+      type: 'article',
+      title: article.title,
+      description: article.excerpt,
+      url: articleUrl,
+      siteName: 'CoinDaily Africa',
+      images: article.featuredImageUrl ? [{ url: article.featuredImageUrl, alt: article.title }] : [],
+      publishedTime: article.publishedAt || undefined,
+      modifiedTime: article.updatedAt || undefined,
+      authors: article.author ? [`${article.author.firstName || ''} ${article.author.lastName || ''}`.trim() || article.author.username || undefined] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.excerpt,
+      images: article.featuredImageUrl ? [article.featuredImageUrl] : [],
+      site: '@coindailyafrica',
+    },
   };
 }
 

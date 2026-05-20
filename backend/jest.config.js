@@ -20,6 +20,14 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  coverageThreshold: {
+    global: {
+      branches: 60,
+      functions: 60,
+      lines: 60,
+      statements: 60,
+    },
+  },
   globals: {
     'ts-jest': {
       tsconfig: 'tsconfig.test.json'

@@ -758,14 +758,15 @@
   display: none;
 }
 
+/* WCAG touch targets - minimum 44x44px for all interactive elements */
+button, a, [role="button"], [role="tab"], [role="menuitem"],
+input[type="checkbox"], input[type="radio"], select, summary {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 /* ====== Mobile Touch Optimizations ====== */
 @media (max-width: 768px) {
-  /* Larger touch targets on mobile */
-  button, a, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
   /* Prevent text size adjustment on iOS */
   html {
     -webkit-text-size-adjust: 100%;
@@ -783,6 +784,15 @@
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
   }
+}
+
+/* High contrast text utilities for accessibility */
+.text-accessible-gray {
+  color: #595959; /* 7:1 contrast on white - exceeds WCAG AA */
+}
+
+.text-accessible-gray-light {
+  color: #767676; /* 4.54:1 contrast on white - meets WCAG AA */
 }
 
 /* ====== Small xs breakpoint (needed for Header) ====== */
