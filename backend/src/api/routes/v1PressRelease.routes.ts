@@ -495,4 +495,40 @@ router.delete('/wire/alerts', async (req: Request, res: Response) => {
   return res.json({ success: true });
 });
 
+// ─── Admin: replay a wire alert dispatch for a past release ────────
+import { requireCapability } from '../../middleware/auth';
+
+router.post(
+  '/wire/replay/:releaseId',
+  authMiddleware,
+  requireCapability('ARTICLE_PUBLISH'),
+  async (req: Request, res: Response) => {
+    const releaseId = String(req.params.releaseId || '');
+    if (!releaseId) return res.status(400).json({ error: 'releaseId required' });
+    try {
+      const prisma = getPrisma(req);
+      const pr = await prisma.pressRelease?.findUnique({
+        where: { id: releaseId },
+        include: { user: { select: { firstName: true, lastName: true, username: true } } },
+      });
+      if (!pr) return res.status(404).json({ error: 'release not found' });
+      const company =
+        [pr.user?.firstName, pr.user?.lastName].filter(Boolean).join(' ') ||
+        pr.user?.username ||
+        'Press';
+      await notifyWireSubscribers({
+        id: pr.id,
+        headline: pr.title,
+        company,
+        publishedAt: new Date(pr.publishedAt || pr.createdAt || Date.now()).toISOString(),
+        category: (pr as any).category || 'general',
+        region: (pr as any).region || 'africa',
+      });
+      return res.json({ success: true, replayed: pr.id });
+    } catch (e: any) {
+      return res.status(500).json({ error: e.message });
+    }
+  },
+);
+
 export default router;
