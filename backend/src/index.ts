@@ -76,6 +76,8 @@ import marqueeRouter from './routes/marquee';
 import v1ChangenowRouter from './api/routes/v1Changenow.routes';
 import financeEventsRouter from './routes/financeEvents.routes';
 import adminAiTasksRouter from './api/admin/aiTasksRoutes';
+import adminFinanceApprovalsRouter from './api/admin/financialApprovalsRoutes';
+import adminIpWhitelistRouter from './api/admin/ipWhitelistRoutes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
@@ -524,6 +526,12 @@ export async function setupApp() {
 
   // Admin AI task management (SPEC-ADM-4) — list/trigger/cancel.
   app.use('/api/admin/ai-tasks', adminAiTasksRouter);
+
+  // Admin financial approval workflow (SPEC-ADM-5) — two-step + audit.
+  app.use('/api/admin/finance-approvals', adminFinanceApprovalsRouter);
+
+  // Admin IP whitelist management (SPEC-ADM-6) — runtime allow-list.
+  app.use('/api/admin/ip-whitelist', adminIpWhitelistRouter);
 
   // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
   app.use('/', rssFeedRouter);
