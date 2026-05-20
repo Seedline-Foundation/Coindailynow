@@ -12,12 +12,11 @@
  * - 10-second timeout per feed
  */
 
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
 import prisma from '../lib/prisma';
 import { ALL_NEWS_SOURCES, NewsSource, getAllRSSFeedUrls } from '../config/newsSources';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-
+const redis = getRedis();
 // ============================================================================
 // TYPES
 // ============================================================================
