@@ -74,6 +74,7 @@ import sitemapRouter from './routes/sitemap.routes';
 import structuredDataRouter from './routes/structured-data.routes';
 import marqueeRouter from './routes/marquee';
 import v1ChangenowRouter from './api/routes/v1Changenow.routes';
+import financeEventsRouter from './routes/financeEvents.routes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
@@ -390,6 +391,8 @@ export async function setupApp() {
       // Webhook callbacks (external services, use HMAC signature verification instead)
       '/api/wallet/callbacks',
       '/api/v1/traffic',
+      '/api/v1/changenow/callback',
+      '/api/finance-events',
       // Health/metrics (read-only, no state changes)
       '/health',
       '/metrics',
@@ -513,6 +516,10 @@ export async function setupApp() {
 
   // ChangeNOW diaspora swap surface (estimate + create + status + callback)
   app.use('/api/v1/changenow', v1ChangenowRouter);
+
+  // CFIS → backend reverse webhook leg (HMAC-signed). Used by finance-system
+  // to trigger receipt issuance + reconcile subscription / wallet records.
+  app.use('/api/finance-events', financeEventsRouter);
 
   // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
   app.use('/', rssFeedRouter);

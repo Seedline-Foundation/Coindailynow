@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
 import { auditService } from '../services/AuditService';
 import { notificationService } from '../services/NotificationService';
+import { backendNotifier } from '../services/BackendNotifier';
 
 const router = Router();
 const SECRET = process.env.CFIS_HMAC_SECRET || process.env.PRESS_HMAC_SECRET || '';
@@ -51,6 +52,20 @@ router.post('/webhook', async (req: Request, res: Response) => {
     entity_id: subscriptionId,
     metadata: { amount, invoiceNumber, currency },
   });
+
+  // Reverse leg: tell backend the payment is confirmed in CFIS so it can
+  // issue + email the receipt PDF and update its own subscription record.
+  await backendNotifier.emit(
+    'PAYMENT_CONFIRMED',
+    subscriptionId,
+    {
+      amount,
+      currency: currency || 'USD',
+      invoiceNumber: invoiceNumber || `INV-${subscriptionId}`,
+      kind: 'SUBSCRIPTION',
+    },
+    { userId, backendReferenceId: subscriptionId },
+  );
 
   res.json({ success: true, received: true });
 });
