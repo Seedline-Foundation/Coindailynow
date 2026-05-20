@@ -206,58 +206,78 @@ export const socketAuthMiddleware = async (socket: any, next: any) => {
 };
 
 // Role-based access control middleware
+// Accepts an array of role names. The user's `role` (loaded from DB by
+// authMiddleware → AuthService.verifyAccessToken) is matched case-insensitively
+// against the allowed list. SUPER_ADMIN always passes.
+import { type Role, type Capability, can as roleCan, hasAnyRole } from '../lib/roles';
+
 export const requireRole = (roles: string[]) => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({
         error: {
           code: 'AUTHENTICATION_REQUIRED',
           message: 'Authentication required',
-        }
+        },
       });
       return;
     }
 
-    try {
-      // Get user with additional role information
-      const userWithRoles = await prisma.user.findUnique({
-        where: { id: req.user.id },
-        select: {
-          id: true,
-          status: true,
-          // Note: Add role relations when implemented
-        }
-      });
+    const userRole = (req.user.role || '').toUpperCase();
+    const allowed = roles.map((r) => r.toUpperCase());
 
-      // For now, check if user is admin based on email domain or specific IDs
-      const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
-      const isAdmin = adminEmails.includes(req.user.email);
-
-      const hasRequiredRole = roles.includes('admin') ? isAdmin : true;
-
-      if (!hasRequiredRole) {
-        res.status(403).json({
-          error: {
-            code: 'INSUFFICIENT_PERMISSIONS',
-            message: 'Insufficient permissions',
-            details: {
-              requiredRoles: roles
-            }
-          }
-        });
-        return;
-      }
-
+    if (userRole === 'SUPER_ADMIN' || hasAnyRole(userRole, allowed as Role[])) {
       next();
-    } catch (error) {
-      logger.error('Role check failed:', error);
-      res.status(500).json({
-        error: {
-          code: 'AUTHORIZATION_ERROR',
-          message: 'Authorization check failed',
-        }
-      });
+      return;
     }
+
+    logger.warn('requireRole denied', {
+      userId: req.user.id,
+      userRole,
+      requiredRoles: allowed,
+      path: req.originalUrl,
+    });
+
+    res.status(403).json({
+      error: {
+        code: 'INSUFFICIENT_PERMISSIONS',
+        message: 'Insufficient permissions',
+        details: { requiredRoles: allowed, userRole },
+      },
+    });
+  };
+};
+
+/**
+ * Capability-based gate. Use this in preference to requireRole for
+ * editorial/finance routes — capabilities are listed in `lib/roles.ts`.
+ */
+export const requireCapability = (capability: Capability) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({
+        error: { code: 'AUTHENTICATION_REQUIRED', message: 'Authentication required' },
+      });
+      return;
+    }
+    const role = (req.user.role || '').toUpperCase();
+    if (role === 'SUPER_ADMIN' || roleCan(role, capability)) {
+      next();
+      return;
+    }
+    logger.warn('requireCapability denied', {
+      userId: req.user.id,
+      userRole: role,
+      capability,
+      path: req.originalUrl,
+    });
+    res.status(403).json({
+      error: {
+        code: 'INSUFFICIENT_PERMISSIONS',
+        message: `Missing capability: ${capability}`,
+        details: { capability, userRole: role },
+      },
+    });
   };
 };
 

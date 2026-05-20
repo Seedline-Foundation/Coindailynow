@@ -823,7 +823,13 @@ model Token {
 
 enum UserRole {
   USER
-  ADMIN // Platform managers
+  // Editorial taxonomy (V1 RBAC, per launch spec)
+  CONTRIBUTOR // Outside contributors / freelance writers; submit only
+  JOURNALIST // Staff writers; can publish own articles, push marquee items
+  EDITOR // Approve/reject queue; manage marquee + categories + journalists
+  CEO // Founder / chief editor; everything ADMIN does + finance read
+  // Platform admins
+  ADMIN
   CONTENT_ADMIN
   MARKETING_ADMIN
   TECH_ADMIN

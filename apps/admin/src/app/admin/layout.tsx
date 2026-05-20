@@ -46,25 +46,32 @@ interface NavItem {
   requiredRoles?: string[];
 }
 
+// Role groupings — kept here so the admin shell mirrors backend/src/lib/roles.ts.
+const EDITORIAL_ROLES = ['CONTRIBUTOR', 'JOURNALIST', 'EDITOR', 'CEO'] as const;
+const PLATFORM_ADMINS = ['ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN', 'TECH_ADMIN', 'SUPER_ADMIN'] as const;
+const CONTENT_ROLES = ['JOURNALIST', 'EDITOR', 'CEO', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'];
+const MARKETING_ROLES = ['EDITOR', 'CEO', 'MARKETING_ADMIN', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'];
+const TECH_ROLES = ['TECH_ADMIN', 'ADMIN', 'SUPER_ADMIN', 'CEO'];
+
 const navItems: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/users', label: 'User Management', icon: Users, requiredRoles: ['SUPER_ADMIN', 'ADMIN'] },
-  { href: '/admin/content', label: 'Content', icon: FileText, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'] },
-  { href: '/admin/marquees', label: 'Marquee', icon: Monitor, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'] },
-  { href: '/admin/ai', label: 'AI Management', icon: Brain, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN', 'CONTENT_ADMIN'] },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'] },
-  { href: '/admin/monetization', label: 'Monetization', icon: DollarSign, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'MARKETING_ADMIN'] },
-  { href: '/admin/community', label: 'Community', icon: MessageSquare, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'] },
-  { href: '/admin/seo', label: 'SEO', icon: Search, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'] },
-  { href: '/admin/distribution', label: 'Distribution', icon: Send, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'] },
-  { href: '/admin/ecommerce', label: 'E-commerce', icon: ShoppingCart, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'MARKETING_ADMIN'] },
-  { href: '/admin/compliance', label: 'Compliance', icon: Shield, requiredRoles: ['SUPER_ADMIN', 'ADMIN'] },
-  { href: '/admin/security', label: 'Security', icon: Lock, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'] },
-  { href: '/admin/audit', label: 'Audit Logs', icon: Eye, requiredRoles: ['SUPER_ADMIN', 'ADMIN'] },
-  { href: '/admin/system', label: 'System Health', icon: Monitor, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'] },
-  { href: '/admin/settings', label: 'Settings', icon: Settings, requiredRoles: ['SUPER_ADMIN', 'ADMIN'] },
-  { href: '/admin/finance', label: 'CFIS Finance', icon: DollarSign, requiredRoles: ['SUPER_ADMIN', 'ADMIN'] },
-  { href: '/admin/fraud-alerts', label: 'Fraud Alerts', icon: Shield, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'] },
+  { href: '/admin/users', label: 'User Management', icon: Users, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/content', label: 'Content', icon: FileText, requiredRoles: CONTENT_ROLES },
+  { href: '/admin/marquees', label: 'Marquee', icon: Monitor, requiredRoles: CONTENT_ROLES },
+  { href: '/admin/ai', label: 'AI Management', icon: Brain, requiredRoles: [...CONTENT_ROLES, 'TECH_ADMIN'] },
+  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3, requiredRoles: [...CONTENT_ROLES, 'MARKETING_ADMIN'] },
+  { href: '/admin/monetization', label: 'Monetization', icon: DollarSign, requiredRoles: ['CEO', ...MARKETING_ROLES] },
+  { href: '/admin/community', label: 'Community', icon: MessageSquare, requiredRoles: MARKETING_ROLES },
+  { href: '/admin/seo', label: 'SEO', icon: Search, requiredRoles: MARKETING_ROLES },
+  { href: '/admin/distribution', label: 'Distribution', icon: Send, requiredRoles: MARKETING_ROLES },
+  { href: '/admin/ecommerce', label: 'E-commerce', icon: ShoppingCart, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO', 'MARKETING_ADMIN'] },
+  { href: '/admin/compliance', label: 'Compliance', icon: Shield, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/security', label: 'Security', icon: Lock, requiredRoles: TECH_ROLES },
+  { href: '/admin/audit', label: 'Audit Logs', icon: Eye, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/system', label: 'System Health', icon: Monitor, requiredRoles: TECH_ROLES },
+  { href: '/admin/settings', label: 'Settings', icon: Settings, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/finance', label: 'CFIS Finance', icon: DollarSign, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/fraud-alerts', label: 'Fraud Alerts', icon: Shield, requiredRoles: TECH_ROLES },
 ];
 
 /** Filter nav items based on user role */
