@@ -188,6 +188,39 @@ module.exports = {
     },
 
     // ============================================
+    // IENGINE — AI VISUAL JOURNALISM WORKERS
+    // GPU workers, upscale, thumbnail, delivery
+    // ============================================
+    {
+      name: 'coindaily-iengine',
+      cwd: '.',
+      script: 'dist/Iengine/index.js',
+      args: '--workers',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        COMFYUI_URL: 'http://localhost:8188',
+        REDIS_HOST: 'localhost',
+        REDIS_PORT: 6379,
+        IENGINE_REDIS_DB: 2,
+        IENGINE_GPU_COUNT: 1,
+        IENGINE_CONCURRENCY_PER_GPU: 1,
+        BACKEND_API_URL: 'http://localhost:4000'
+      },
+      error_file: './logs/iengine-error.log',
+      out_file: './logs/iengine-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      max_memory_restart: '1G',
+      autorestart: true,
+      watch: false,
+      max_restarts: 5,
+      min_uptime: '30s',
+      restart_delay: 5000
+    },
+
+    // ============================================
     // TRANSLATION SERVICE (Python)
     // ============================================
     {

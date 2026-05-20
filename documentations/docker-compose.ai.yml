@@ -166,6 +166,35 @@ services:
       - ai-network
 
   # ============================================================================
+  # COMFYUI - Advanced Image Generation (Iengine Backend)
+  # ============================================================================
+  comfyui:
+    image: ghcr.io/ai-dock/comfyui:latest
+    container_name: coindaily-comfyui
+    restart: unless-stopped
+    ports:
+      - "8188:8188"
+    volumes:
+      - comfyui-models:/workspace/ComfyUI/models
+      - comfyui-outputs:/workspace/ComfyUI/output
+      - comfyui-input:/workspace/ComfyUI/input
+    environment:
+      - CLI_ARGS=--listen 0.0.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 16G
+        reservations:
+          memory: 10G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8188/system_stats"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+    networks:
+      - ai-network
+
+  # ============================================================================
   # Monitoring - Prometheus
   # ============================================================================
   prometheus:
@@ -256,6 +285,12 @@ volumes:
   grafana-data:
     driver: local
   redis-data:
+    driver: local
+  comfyui-models:
+    driver: local
+  comfyui-outputs:
+    driver: local
+  comfyui-input:
     driver: local
 
   # ============================================================================

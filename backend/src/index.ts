@@ -75,6 +75,7 @@ import structuredDataRouter from './routes/structured-data.routes';
 import marqueeRouter from './routes/marquee';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
+import { integrateIengineRoutes } from './integrations/iengineIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
 import { startPipelineScheduler as startAnalysisScheduler } from './services/dataAnalysisPipeline';
 import { MarketDataAggregator } from './services/marketDataAggregator';
@@ -478,6 +479,9 @@ export async function setupApp() {
 
   // AI Agent Registry Routes (26 self-hosted agents: DeepSeek R1 + Llama 3.1)
   integrateAIRegistryRoutes(app);
+
+  // Iengine — AI Visual Journalism Intelligence Engine
+  integrateIengineRoutes(app);
 
   // Ads Management & Rotation Agent Routes (DeepSeek R1-powered ad engine)
   app.use('/api/ads', adsRotationRouter);

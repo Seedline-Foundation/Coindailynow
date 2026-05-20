@@ -1,0 +1,23 @@
+{
+  "name": "AI Intelligence",
+  "description": "Synthetic cognition, machine transcendence, neural aesthetics",
+  "palette": ["chrome blue", "white", "holographic gradient", "soft violet"],
+  "camera": ["centered focal intelligence", "abstract geometry", "layered depth"],
+  "lighting": ["white-blue diffusion", "chrome reflections", "synthetic ambient glow"],
+  "environments": [
+    "neural processing chamber",
+    "abstract cognitive space",
+    "data center cathedral",
+    "quantum computing environment"
+  ],
+  "symbols": [
+    "neural lattices",
+    "synthetic eyes",
+    "intelligence spheres",
+    "quantum processing cores",
+    "algorithmic patterns"
+  ],
+  "motion": "neural signal propagation through cognitive lattices",
+  "composition": "radial intelligence emanation from central core",
+  "negative": ["organic naturalism", "rustic environments", "low-tech"]
+}
