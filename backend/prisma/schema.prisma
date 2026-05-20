@@ -912,6 +912,10 @@ model User {
   BountySubmissions            BountySubmission[]
   InfluencerPartnerProfile     InfluencerPartnerProfile?
   EmailVerification            EmailVerification[]
+  // Marketplace (Wave 1, MKT-0-1)
+  SellerProfile                SellerProfile?             @relation("SellerUser")
+  MarketplaceOrders            MarketplaceOrder[]         @relation("BuyerUser")
+  MarketplaceReviews           MarketplaceReview[]        @relation("ReviewerUser")
 
   @@index([lastLoginAt])
   @@index([emailVerified])
@@ -9881,4 +9885,143 @@ model DatasourceStat {
   @@index([period])
   @@index([periodStart])
   @@map("datasource_stats")
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Marketplace — Creator Economy Digital Products (Wave 1, MKT-0-1)
+// Off-chain MVP: products + orders + reviews + seller payouts.
+// On-chain JOY escrow comes in Wave 2 (MKT-1-1).
+// ═══════════════════════════════════════════════════════════════════════
+
+enum MarketplaceProductKind {
+  ARTICLE_BUNDLE
+  COURSE
+  TEMPLATE
+  REPORT
+  DATASET
+  WEBINAR
+  OTHER
+}
+
+enum MarketplaceProductStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  PAUSED
+  ARCHIVED
+}
+
+enum MarketplaceOrderStatus {
+  PENDING_PAYMENT
+  PAID
+  DELIVERED
+  REFUNDED
+  CANCELLED
+  DISPUTED
+}
+
+model SellerProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation("SellerUser", fields: [userId], references: [id], onDelete: Cascade)
+  displayName   String
+  slug          String   @unique
+  bio           String?  @db.Text
+  avatarUrl     String?
+  payoutAddress String?
+  payoutMethod  String?  @default("OFF_CHAIN") // OFF_CHAIN | ON_CHAIN_JOY
+  approved      Boolean  @default(false)
+  approvedAt    DateTime?
+  approvedBy    String?
+  ratingAvg     Float    @default(0)
+  ratingCount   Int      @default(0)
+  totalSales    Int      @default(0)
+  totalRevenue  Decimal  @default(0) @db.Decimal(20, 6)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  products MarketplaceProduct[]
+
+  @@map("marketplace_seller_profiles")
+}
+
+model MarketplaceProduct {
+  id           String                   @id @default(cuid())
+  sellerId     String
+  seller       SellerProfile            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  kind         MarketplaceProductKind
+  title        String
+  slug         String                   @unique
+  shortPitch   String                   @db.VarChar(280)
+  description  String                   @db.Text
+  priceJoy     Decimal                  @db.Decimal(20, 6)
+  priceUsd     Decimal?                 @db.Decimal(12, 2)
+  currency     String                   @default("JOY")
+  coverImage   String?
+  galleryJson  String?                  @db.Text // JSON array of image URLs
+  contentRefs  String?                  @db.Text // JSON: download keys / streaming refs
+  status       MarketplaceProductStatus @default(DRAFT)
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  rejectedReason String?
+  ratingAvg    Float                    @default(0)
+  ratingCount  Int                      @default(0)
+  salesCount   Int                      @default(0)
+  boostBudget  Decimal                  @default(0) @db.Decimal(20, 6)
+  boostSpent   Decimal                  @default(0) @db.Decimal(20, 6)
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  orders   MarketplaceOrder[]
+  reviews  MarketplaceReview[]
+
+  @@index([status])
+  @@index([sellerId])
+  @@index([kind])
+  @@map("marketplace_products")
+}
+
+model MarketplaceOrder {
+  id              String                @id @default(cuid())
+  productId       String
+  product         MarketplaceProduct    @relation(fields: [productId], references: [id], onDelete: Restrict)
+  buyerId         String
+  buyer           User                  @relation("BuyerUser", fields: [buyerId], references: [id], onDelete: Restrict)
+  unitPriceJoy    Decimal               @db.Decimal(20, 6)
+  platformFeeBps  Int                   @default(1000) // 10% (basis points)
+  platformFeeJoy  Decimal               @db.Decimal(20, 6)
+  sellerNetJoy    Decimal               @db.Decimal(20, 6)
+  status          MarketplaceOrderStatus @default(PENDING_PAYMENT)
+  txReference     String?               @unique // wallet tx ref or payment intent id
+  paidAt          DateTime?
+  deliveredAt     DateTime?
+  refundedAt      DateTime?
+  refundReason    String?
+  /// Time-limited download URL key list (signed JSON).
+  deliveryRefs    String?               @db.Text
+  buyerNotes      String?               @db.Text
+  sellerNotes     String?               @db.Text
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([buyerId])
+  @@index([productId])
+  @@index([status])
+  @@map("marketplace_orders")
+}
+
+model MarketplaceReview {
+  id        String             @id @default(cuid())
+  productId String
+  product   MarketplaceProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  buyerId   String
+  buyer     User               @relation("ReviewerUser", fields: [buyerId], references: [id], onDelete: Cascade)
+  rating    Int                // 1-5
+  title     String?            @db.VarChar(200)
+  body      String?            @db.Text
+  createdAt DateTime           @default(now())
+
+  @@unique([productId, buyerId])
+  @@index([productId])
+  @@map("marketplace_reviews")
 }

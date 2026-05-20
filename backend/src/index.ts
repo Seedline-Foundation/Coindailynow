@@ -78,6 +78,7 @@ import financeEventsRouter from './routes/financeEvents.routes';
 import adminAiTasksRouter from './api/admin/aiTasksRoutes';
 import adminFinanceApprovalsRouter from './api/admin/financialApprovalsRoutes';
 import adminIpWhitelistRouter from './api/admin/ipWhitelistRoutes';
+import v1MarketplaceRouter from './api/routes/v1Marketplace.routes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
@@ -532,6 +533,9 @@ export async function setupApp() {
 
   // Admin IP whitelist management (SPEC-ADM-6) — runtime allow-list.
   app.use('/api/admin/ip-whitelist', adminIpWhitelistRouter);
+
+  // Marketplace (creator economy digital products, MKT-0-2 / MKT-2-5).
+  app.use('/api/v1/marketplace', v1MarketplaceRouter);
 
   // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
   app.use('/', rssFeedRouter);
