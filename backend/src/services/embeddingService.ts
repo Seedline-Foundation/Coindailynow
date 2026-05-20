@@ -12,7 +12,6 @@ import prisma from '../lib/prisma';
 import { getRedis } from '../lib/redis';
 import { generateEmbeddings, complete, AI_MODELS, AI_ENDPOINTS } from './aiClient';
 const redis = getRedis();
-
 const CACHE_TTL = 600; // 10 minutes
 const EMBEDDING_MODEL = 'BAAI/bge-small-en-v1.5'; // Local BGE model
 const EMBEDDING_DIMENSION = 384; // BGE-small dimension

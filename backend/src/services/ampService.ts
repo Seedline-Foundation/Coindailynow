@@ -13,7 +13,6 @@
 import prisma from '../lib/prisma';
 import { getRedis } from '../lib/redis';
 const redis = getRedis();
-
 export interface AMPPageData {
   id: string;
   articleId: string;

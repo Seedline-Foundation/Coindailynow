@@ -6,7 +6,6 @@
 import { Logger } from 'winston';
 import { ImageOutcome, ArticleOutcome } from '../../types/admin-types';
 import { MODEL_CONFIG } from '../../config/model-config';
-import { uploadToCDN as cdnUpload } from '../../config/cdn-upload';
 
 export class ImageAgent {
   private apiEndpoint: string;
@@ -178,19 +177,63 @@ export class ImageAgent {
   }
 
   /**
-   * Upload image to CDN (Backblaze B2 via S3-compatible API → Cloudflare)
-   * Falls back to local uploads/ directory when B2 credentials are absent.
+   * Upload image to CDN (Backblaze B2 + Cloudflare).
+   *
+   * Posts to backend `/api/media/upload`, which writes to Backblaze B2 via the
+   * configured B2 client and returns the public Cloudflare-fronted URL. If
+   * `CFIS_PUBLIC_MEDIA_BASE` is set, rewrites the host so the same image is
+   * served from the canonical media domain.
+   *
+   * Falls back to a `data:` URL only when the upload genuinely fails — this is
+   * the AI-1-2 safety contract: never silently succeed with a 1-2 MB base64
+   * blob masquerading as a CDN URL.
    */
   private async uploadToCDN(imageBase64: string, articleId: string): Promise<string> {
-    this.logger.info('[ImageAgent] Uploading image to CDN');
-    const filename = `article_${articleId}`;
+    const apiBase = process.env.BACKEND_API_URL || process.env.API_URL || 'http://localhost:4000';
+    const token = process.env.AI_PIPELINE_SERVICE_TOKEN;
+    const dataUrl = `data:image/png;base64,${imageBase64}`;
+
     try {
-      return await cdnUpload(imageBase64, filename, 'image/png');
-    } catch (err: any) {
-      this.logger.error('[ImageAgent] CDN upload failed, returning data URL fallback', {
-        error: err.message,
+      this.logger.info('[ImageAgent] Uploading SDXL image to CDN', { articleId });
+
+      const res = await fetch(`${apiBase}/api/media/upload`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          image: dataUrl,
+          prefix: 'ai-images/articles',
+          filename: `article_${articleId}_${Date.now()}.png`,
+        }),
       });
-      return `data:image/png;base64,${imageBase64}`;
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`media/upload ${res.status}: ${text.slice(0, 200)}`);
+      }
+
+      const json = (await res.json()) as { url?: string };
+      if (!json.url) throw new Error('media/upload returned no url');
+
+      let url = json.url;
+      const pub = process.env.CFIS_PUBLIC_MEDIA_BASE?.replace(/\/$/, '');
+      if (pub) {
+        try {
+          url = `${pub}${new URL(url).pathname}`;
+        } catch {
+          // keep original on parse failure
+        }
+      }
+      this.logger.info('[ImageAgent] CDN upload OK', { articleId, url });
+      return url;
+    } catch (error: any) {
+      this.logger.error('[ImageAgent] CDN upload failed, falling back to data URL', {
+        articleId,
+        error: error?.message,
+      });
+      return dataUrl;
     }
   }
 

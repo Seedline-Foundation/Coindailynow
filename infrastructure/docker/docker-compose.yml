@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-coindaily_dev}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      # Used by initdb/04-create-cfis-role.sh on first boot.
+      CFIS_DB_PASSWORD: ${CFIS_DB_PASSWORD:-cfis_dev_password_change_me}
     ports:
       - "127.0.0.1:5432:5432"
     volumes:

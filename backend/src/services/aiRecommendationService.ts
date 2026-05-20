@@ -16,7 +16,6 @@
 import prisma from '../lib/prisma';
 import { getRedis } from '../lib/redis';
 const redis = getRedis();
-
 // Cache TTLs
 const CACHE_TTL = {
   RECOMMENDATIONS: 300, // 5 minutes

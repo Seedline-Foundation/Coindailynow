@@ -1,0 +1,23 @@
+{
+  "name": "Cybercrime Dark",
+  "description": "Dark infiltration aesthetics, surveillance noir",
+  "palette": ["red alert", "terminal green", "deep black", "electric blue"],
+  "camera": ["tight surveillance", "dutch angle", "fragmented perspective"],
+  "lighting": ["red alert glow", "dark server contrast", "monitor illumination", "green terminal glow"],
+  "environments": [
+    "dark server room",
+    "surveillance center",
+    "compromised network",
+    "underground digital bazaar"
+  ],
+  "symbols": [
+    "corrupted interfaces",
+    "glitch artifacts",
+    "surveillance terminals",
+    "dark web portals",
+    "hacked data streams"
+  ],
+  "motion": "glitch distortion with data breach cascades",
+  "composition": "fractured surveillance framing with tight crop",
+  "negative": ["bright cheerful", "optimistic framing", "warm tones"]
+}

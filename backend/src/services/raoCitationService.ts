@@ -23,7 +23,7 @@ const prisma = prismaBase as PrismaClient & {
   trustSignal: any;
   rAOCitationMetrics: any;
 };
-
+const redis = getRedis();
 const CACHE_TTL = 300; // 5 minutes
 
 // Types

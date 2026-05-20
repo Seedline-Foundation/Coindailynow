@@ -10,6 +10,7 @@ import Parser from 'rss-parser';
 import { getRedis } from '../lib/redis';
 import nllbClient from './nllbTranslationClient';
 import { chatComplete } from './aiClient';
+
 const redis = getRedis();
 const rssParser = new Parser();
 

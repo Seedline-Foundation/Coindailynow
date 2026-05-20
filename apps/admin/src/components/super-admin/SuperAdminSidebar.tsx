@@ -49,6 +49,7 @@ import {
   Award,
   Megaphone,
   ClipboardList,
+  Calendar,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -273,6 +274,66 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       href: '/super-admin/expert-program',
       badge: 'NEW',
       badgeColor: 'bg-amber-500 text-white',
+    },
+    {
+      id: 'events-intelligence',
+      label: 'Events Intelligence',
+      icon: Calendar,
+      children: [
+        { id: 'events-calendar', label: 'Events Calendar', icon: Calendar, href: '/super-admin/events' },
+        { id: 'events-submissions', label: 'Submissions Queue', icon: FileText, href: '/super-admin/events/submissions' },
+        { id: 'speaker-bureau', label: 'Speaker Bureau', icon: Users, href: '/super-admin/events/speakers' },
+        { id: 'event-promotions', label: 'Promotions', icon: Megaphone, href: '/super-admin/events/promotions' },
+      ],
+    },
+    {
+      id: 'chima-index',
+      label: 'CHIMA Index Products',
+      icon: BarChart3,
+      children: [
+        { id: 'chima-overview', label: 'Index Overview', icon: TrendingUp, href: '/super-admin/chima-index' },
+        { id: 'chima-emai', label: 'EMAI (Adoption)', icon: BarChart3, href: '/super-admin/chima-index/emai' },
+        { id: 'chima-adai', label: 'ADAI (DeFi)', icon: BarChart3, href: '/super-admin/chima-index/adai' },
+        { id: 'chima-rrs', label: 'RRS (Regulatory Risk)', icon: Shield, href: '/super-admin/chima-index/rrs' },
+        { id: 'chima-cri', label: 'CRI (Remittance)', icon: DollarSign, href: '/super-admin/chima-index/cri' },
+      ],
+    },
+    {
+      id: 'hr-hiring',
+      label: 'HR & Hiring',
+      icon: Users,
+      children: [
+        { id: 'hr-dashboard', label: 'HR Dashboard', icon: BarChart3, href: '/super-admin/hr' },
+        { id: 'job-vacancies', label: 'Job Vacancies', icon: FileText, href: '/super-admin/hr/vacancies' },
+        { id: 'applications', label: 'Applications (ATS)', icon: Users, href: '/super-admin/hr/applications' },
+        { id: 'onboarding', label: 'Staff Onboarding', icon: Award, href: '/super-admin/hr/onboarding' },
+      ],
+    },
+    {
+      id: 'ai-cost-tracking',
+      label: 'AI Cost Tracking',
+      icon: DollarSign,
+      href: '/super-admin/ai-costs',
+      badge: 'NEW',
+      badgeColor: 'bg-purple-500 text-white',
+    },
+    {
+      id: 'regulatory-intel',
+      label: 'Regulatory Intel HQ',
+      icon: Shield,
+      children: [
+        { id: 'reg-overview', label: 'Country Database', icon: Globe, href: '/super-admin/regulatory' },
+        { id: 'reg-changes', label: 'Change Detection', icon: AlertTriangle, href: '/super-admin/regulatory/changes' },
+        { id: 'reg-risk-scores', label: 'Risk Scores', icon: BarChart3, href: '/super-admin/regulatory/risk-scores' },
+      ],
+    },
+    {
+      id: 'video-pipeline',
+      label: 'Vengine (Video)',
+      icon: Eye,
+      href: '/super-admin/vengine',
+      badge: 'NEW',
+      badgeColor: 'bg-indigo-500 text-white',
     },
     {
       id: 'compliance',

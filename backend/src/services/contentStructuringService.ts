@@ -9,7 +9,6 @@
 import prisma from '../lib/prisma';
 import { getRedis } from '../lib/redis';
 const redis = getRedis();
-
 const CACHE_TTL = 600; // 10 minutes
 
 // Types

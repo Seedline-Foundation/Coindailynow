@@ -49,6 +49,7 @@
   "author": "CoinDaily Team",
   "license": "MIT",
   "dependencies": {
+    "coindaily-ai-system": "*",
     "@apollo/server": "^4.9.0",
     "@elastic/elasticsearch": "^8.10.0",
     "@google-cloud/vertexai": "^1.10.0",

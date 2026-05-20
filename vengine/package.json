@@ -1,0 +1,22 @@
+{
+  "name": "vengine",
+  "version": "1.0.0",
+  "description": "Video Generation Engine - AI-powered video pipeline for CoinDaily",
+  "main": "pipeline/index.ts",
+  "scripts": {
+    "dev": "tsx watch pipeline/index.ts",
+    "build": "tsc",
+    "start": "node dist/pipeline/index.js",
+    "generate": "tsx pipeline/generate.ts"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "bullmq": "^5.0.0",
+    "ioredis": "^5.4.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0",
+    "@types/node": "^20.0.0"
+  }
+}

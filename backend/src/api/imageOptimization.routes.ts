@@ -8,10 +8,8 @@ import prisma from '../lib/prisma';
 import multer from 'multer';
 import { createImageOptimizationService } from '../services/imageOptimizationService';
 import { getRedis } from '../lib/redis';
-const redis = getRedis();
-
 const router = Router();
-
+const redis = getRedis();
 const imageService = createImageOptimizationService(redis);
 
 // Configure multer for file uploads

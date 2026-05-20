@@ -15,8 +15,8 @@
 import prisma from '../lib/prisma';
 import { getRedis } from '../lib/redis';
 import { ALL_NEWS_SOURCES, NewsSource, getAllRSSFeedUrls } from '../config/newsSources';
-const redis = getRedis();
 
+const redis = getRedis();
 // ============================================================================
 // TYPES
 // ============================================================================

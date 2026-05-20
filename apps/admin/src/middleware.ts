@@ -45,33 +45,38 @@ const PROTECTED_PREFIXES = ['/admin', '/super-admin'];
 // CEO-only routes — require SUPER_ADMIN role
 const CEO_ONLY_ROUTES = ['/admin/CEO', '/admin/funds', '/admin/contracts'];
 
-// Role-based route guards (S1-3)
-// Maps route prefixes to the roles allowed to access them
+// Role-based route guards (S1-3) — kept in sync with backend/src/lib/roles.ts
+// and apps/admin/src/app/admin/layout.tsx navItems.
+const CONTENT = ['JOURNALIST', 'EDITOR', 'CEO', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'];
+const MARKETING = ['EDITOR', 'CEO', 'MARKETING_ADMIN', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'];
+const TECH = ['TECH_ADMIN', 'ADMIN', 'SUPER_ADMIN', 'CEO'];
+const PLATFORM_OPS = ['SUPER_ADMIN', 'ADMIN', 'CEO'];
+
 const ROLE_ROUTE_GUARDS: Record<string, string[]> = {
-  '/admin/CEO':         ['SUPER_ADMIN'],
-  '/admin/funds':       ['SUPER_ADMIN'],
-  '/admin/contracts':   ['SUPER_ADMIN'],
-  '/admin/security':    ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'],
-  '/admin/audit':       ['SUPER_ADMIN', 'ADMIN'],
-  '/admin/system':      ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'],
-  '/admin/settings':    ['SUPER_ADMIN', 'ADMIN'],
-  '/admin/monetization':['SUPER_ADMIN', 'ADMIN', 'MARKETING_ADMIN'],
-  '/admin/users':       ['SUPER_ADMIN', 'ADMIN'],
-  '/admin/compliance':  ['SUPER_ADMIN', 'ADMIN'],
-  '/admin/ecommerce':   ['SUPER_ADMIN', 'ADMIN', 'MARKETING_ADMIN'],
-  '/admin/distribution':['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'],
-  '/admin/seo':         ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'],
-  '/admin/analytics':   ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'],
-  '/admin/ai':          ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN', 'CONTENT_ADMIN'],
-  '/admin/content':     ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'],
-  '/admin/marquees':    ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'],
-  '/admin/finance':     ['SUPER_ADMIN', 'ADMIN'],
-  '/admin/fraud-alerts':['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'],
-  '/authors':           ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN'],
-  '/automations':       ['SUPER_ADMIN', 'ADMIN', 'TECH_ADMIN'],
-  '/super-admin':       ['SUPER_ADMIN', 'ADMIN'],
-  '/admin/community':   ['SUPER_ADMIN', 'ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN'],
-  // /admin (dashboard) is accessible to all authenticated admin roles
+  '/admin/CEO':         ['SUPER_ADMIN', 'CEO'],
+  '/admin/funds':       ['SUPER_ADMIN', 'CEO'],
+  '/admin/contracts':   ['SUPER_ADMIN', 'CEO'],
+  '/admin/security':    TECH,
+  '/admin/audit':       PLATFORM_OPS,
+  '/admin/system':      TECH,
+  '/admin/settings':    PLATFORM_OPS,
+  '/admin/monetization':['SUPER_ADMIN', 'ADMIN', 'CEO', 'MARKETING_ADMIN'],
+  '/admin/users':       PLATFORM_OPS,
+  '/admin/compliance':  PLATFORM_OPS,
+  '/admin/ecommerce':   ['SUPER_ADMIN', 'ADMIN', 'CEO', 'MARKETING_ADMIN'],
+  '/admin/distribution':MARKETING,
+  '/admin/seo':         MARKETING,
+  '/admin/analytics':   [...CONTENT, 'MARKETING_ADMIN'],
+  '/admin/ai':          [...CONTENT, 'TECH_ADMIN'],
+  '/admin/content':     CONTENT,
+  '/admin/marquees':    CONTENT,
+  '/admin/finance':     PLATFORM_OPS,
+  '/admin/fraud-alerts':TECH,
+  '/authors':           CONTENT,
+  '/automations':       TECH,
+  '/super-admin':       PLATFORM_OPS,
+  '/admin/community':   MARKETING,
+  // /admin (dashboard) is accessible to all authenticated editorial+admin roles
 };
 
 /**
