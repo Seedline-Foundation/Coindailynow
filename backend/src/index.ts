@@ -78,6 +78,7 @@ import moderationScanRouter from './routes/moderationScan.routes';
 import sitemapRouter from './routes/sitemap.routes';
 import structuredDataRouter from './routes/structured-data.routes';
 import marqueeRouter from './routes/marquee';
+import pointsRouter from './routes/points.routes';
 import v1ChangenowRouter from './api/routes/v1Changenow.routes';
 import financeEventsRouter from './routes/financeEvents.routes';
 import adminAiTasksRouter from './api/admin/aiTasksRoutes';
@@ -470,6 +471,9 @@ export async function setupApp() {
   app.use('/api/v1/chima-index', v1ChimaIndexRouter);
   app.use('/api/v1/hr', v1HRRouter);
   app.use('/api/v1/ai-cost', v1AICostRouter);
+
+  // Points-to-Token Bridge (W5: CDP → JOY conversion)
+  app.use('/api/v1/points', pointsRouter);
 
   // Knowledge API endpoints (manifest/search/feeds for RAG clients)
   app.use('/api/knowledge-api', knowledgeApiRouter);

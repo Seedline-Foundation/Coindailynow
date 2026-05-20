@@ -118,7 +118,7 @@ export const translationResolvers = {
         successRate: metrics.successRate,
         averageQualityScore: metrics.averageQualityScore,
         averageProcessingTime: Math.round(metrics.averageProcessingTime),
-        languagePerformance: Object.entries(analytics.languageStats).map(([code, stats]) => ({
+        languagePerformance: Object.entries(analytics.languageStats).map(([code, stats]: [string, any]) => ({
           languageCode: code,
           languageName: context.translationService.getLanguageInfo(code as SupportedLanguage)?.name || code,
           totalTranslations: stats.totalTranslations,

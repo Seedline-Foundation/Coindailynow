@@ -1,219 +1,287 @@
 /**
- * GAP-1-1: Real on-chain event listener for JOY/Staking/Subscription contracts.
+ * CFIS Blockchain Listener — WebSocket-based on-chain event listener for Polygon.
  *
- * Subscribes via WebSocket to:
- *   - JoyToken `Transfer(from, to, amount)` events involving treasury / known wallets
- *   - StakingVault `Staked(user, amount, tierId, lockupEnd)` and
- *     `Unstaked(user, amount, rewards)` events
- *   - Subscription `Subscribed(user, planId, expiry)` events
+ * Connects to a Polygon RPC WebSocket endpoint and subscribes to events emitted by:
+ *   - StakingVault  (Staked, Unstaked, RewardClaimed, RewardPoolFunded)
+ *   - JoyToken      (Transfer)
+ *   - Subscription   (Subscribed)
  *
- * Each event is forwarded to backend via BackendNotifier so the backend
- * can update its projection (subscription record, wallet balance,
- * receipt issuance) and refresh its WebSocket-connected admin sessions.
+ * Each captured event is forwarded to EventProcessorService for recording in the
+ * CFIS database and wallet balance adjustments.
  *
- * Falls back to polling (HTTPS RPC) when only HTTP RPC is configured.
- *
- * Env:
- *   CFIS_CHAIN_RPC_URL or CFIS_CHAIN_WS_URL — RPC endpoint
- *   JOY_TOKEN_ADDRESS — JoyToken address
- *   STAKING_VAULT_ADDRESS — StakingVault address (optional)
- *   SUBSCRIPTION_ADDRESS — Subscription address (optional)
- *   CFIS_BLOCKCHAIN_LISTENER_ENABLED=false to disable
+ * Env vars:
+ *   POLYGON_WS_RPC_URL          — WebSocket RPC endpoint (wss://…)
+ *   STAKING_VAULT_ADDRESS       — Deployed StakingVault contract address
+ *   JOY_TOKEN_ADDRESS           — Deployed JoyToken contract address
+ *   SUBSCRIPTION_ADDRESS        — Deployed Subscription contract address
+ *   ENABLE_BLOCKCHAIN_LISTENER  — "true" to start the listener (default: disabled)
  */
 
 import { ethers } from 'ethers';
-import { backendNotifier } from './BackendNotifier';
+import { eventProcessor, BlockchainEvent } from './EventProcessorService';
 
-const ERC20_ABI_FRAGMENTS = [
-  'event Transfer(address indexed from, address indexed to, uint256 value)',
-];
-const STAKING_ABI_FRAGMENTS = [
+// ── ABI fragments (event signatures only) ───────────────────────────
+
+const STAKING_VAULT_ABI = [
   'event Staked(address indexed user, uint256 amount, uint256 tierId, uint256 lockupEnd)',
   'event Unstaked(address indexed user, uint256 amount, uint256 rewards)',
+  'event RewardClaimed(address indexed user, uint256 amount)',
+  'event RewardPoolFunded(address indexed funder, uint256 amount)',
 ];
-const SUBSCRIPTION_ABI_FRAGMENTS = [
+
+const JOY_TOKEN_ABI = [
+  'event Transfer(address indexed from, address indexed to, uint256 value)',
+];
+
+const SUBSCRIPTION_ABI = [
   'event Subscribed(address indexed user, uint256 planId, uint256 expiry)',
 ];
 
+// ── Service ─────────────────────────────────────────────────────────
+
 export class BlockchainListenerService {
-  private running = false;
-  private provider: ethers.JsonRpcProvider | ethers.WebSocketProvider | null = null;
+  private provider: ethers.WebSocketProvider | null = null;
   private contracts: ethers.Contract[] = [];
-  private timer: NodeJS.Timeout | null = null;
+  private running = false;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectAttempts = 0;
+  private lastBlockSeen = 0;
+  private eventsProcessed = 0;
+  private startedAt: Date | null = null;
 
-  async start(): Promise<void> {
-    if (this.running || process.env.CFIS_BLOCKCHAIN_LISTENER_ENABLED === 'false') return;
-    this.running = true;
+  private static readonly MAX_RECONNECT_DELAY_MS = 60_000;
+  private static readonly BASE_RECONNECT_DELAY_MS = 1_000;
 
-    const wsRpc = process.env.CFIS_CHAIN_WS_URL;
-    const httpRpc =
-      process.env.CFIS_CHAIN_RPC_URL ||
-      process.env.POLYGON_RPC_URL ||
-      process.env.AMOY_RPC_URL ||
-      '';
-    const joy = process.env.JOY_TOKEN_ADDRESS || '';
-    const staking = process.env.STAKING_VAULT_ADDRESS || '';
-    const subscription = process.env.SUBSCRIPTION_ADDRESS || '';
+  // ── Lifecycle ──────────────────────────────────────────────────────
 
-    if (!joy || !ethers.isAddress(joy)) {
-      console.log('[BlockchainListener] No JOY_TOKEN_ADDRESS — heartbeat-only mode');
-      this.timer = setInterval(() => this.heartbeat(), 60_000);
+  start(): void {
+    if (this.running) return;
+
+    const enabled =
+      process.env.ENABLE_BLOCKCHAIN_LISTENER === 'true' ||
+      process.env.CFIS_BLOCKCHAIN_LISTENER_ENABLED === 'true';
+
+    if (!enabled) {
+      console.log('[BlockchainListener] Disabled — set ENABLE_BLOCKCHAIN_LISTENER=true to activate');
       return;
     }
 
-    try {
-      if (wsRpc) {
-        this.provider = new ethers.WebSocketProvider(wsRpc);
-        console.log(`[BlockchainListener] WS connected: ${wsRpc}`);
-      } else if (httpRpc) {
-        this.provider = new ethers.JsonRpcProvider(httpRpc);
-        console.log(`[BlockchainListener] HTTP RPC: ${httpRpc} (poll-mode)`);
-      } else {
-        console.warn('[BlockchainListener] No RPC URL configured');
-        return;
-      }
+    const wsUrl = process.env.POLYGON_WS_RPC_URL;
+    if (!wsUrl) {
+      console.warn('[BlockchainListener] POLYGON_WS_RPC_URL not set — cannot start');
+      return;
+    }
 
-      const joyContract = new ethers.Contract(joy, ERC20_ABI_FRAGMENTS, this.provider);
-      this.contracts.push(joyContract);
-      joyContract.on('Transfer', (from: string, to: string, value: bigint, ev: any) => {
-        void this.handleTransfer(from, to, value, ev?.log?.transactionHash);
+    this.running = true;
+    this.startedAt = new Date();
+    this.connect(wsUrl);
+  }
+
+  stop(): void {
+    this.running = false;
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    this.teardownProvider();
+    console.log('[BlockchainListener] Stopped');
+  }
+
+  // ── Health ─────────────────────────────────────────────────────────
+
+  getHealth(): {
+    running: boolean;
+    connected: boolean;
+    lastBlockSeen: number;
+    eventsProcessed: number;
+    reconnectAttempts: number;
+    uptimeMs: number;
+  } {
+    return {
+      running: this.running,
+      connected: this.provider !== null,
+      lastBlockSeen: this.lastBlockSeen,
+      eventsProcessed: this.eventsProcessed,
+      reconnectAttempts: this.reconnectAttempts,
+      uptimeMs: this.startedAt ? Date.now() - this.startedAt.getTime() : 0,
+    };
+  }
+
+  // ── Connection ────────────────────────────────────────────────────
+
+  private connect(wsUrl: string): void {
+    try {
+      console.log(`[BlockchainListener] Connecting to ${wsUrl.replace(/\/[^/]{10,}$/, '/***')}…`);
+      this.provider = new ethers.WebSocketProvider(wsUrl);
+
+      this.provider.on('block', (blockNumber: number) => {
+        this.lastBlockSeen = blockNumber;
+        this.reconnectAttempts = 0;
       });
 
-      if (staking && ethers.isAddress(staking)) {
-        const stakingContract = new ethers.Contract(staking, STAKING_ABI_FRAGMENTS, this.provider);
-        this.contracts.push(stakingContract);
-        stakingContract.on(
-          'Staked',
-          (user: string, amount: bigint, tierId: bigint, lockupEnd: bigint, ev: any) => {
-            void this.handleStaked(user, amount, tierId, lockupEnd, ev?.log?.transactionHash);
-          },
-        );
-        stakingContract.on(
-          'Unstaked',
-          (user: string, amount: bigint, rewards: bigint, ev: any) => {
-            void this.handleUnstaked(user, amount, rewards, ev?.log?.transactionHash);
-          },
-        );
+      this.provider.on('error', (err: Error) => {
+        console.error('[BlockchainListener] Provider error:', err.message);
+        this.scheduleReconnect(wsUrl);
+      });
+
+      const ws = (this.provider as any).websocket ?? (this.provider as any)._websocket;
+      if (ws && typeof ws.on === 'function') {
+        ws.on('close', () => {
+          console.warn('[BlockchainListener] WebSocket closed');
+          this.scheduleReconnect(wsUrl);
+        });
       }
 
-      if (subscription && ethers.isAddress(subscription)) {
-        const subContract = new ethers.Contract(
-          subscription,
-          SUBSCRIPTION_ABI_FRAGMENTS,
-          this.provider,
-        );
-        this.contracts.push(subContract);
-        subContract.on(
-          'Subscribed',
-          (user: string, planId: bigint, expiry: bigint, ev: any) => {
-            void this.handleSubscribed(user, planId, expiry, ev?.log?.transactionHash);
-          },
-        );
-      }
+      this.subscribeToEvents();
 
-      console.log(`[BlockchainListener] Subscribed to ${this.contracts.length} contract(s)`);
-    } catch (e: any) {
-      console.error('[BlockchainListener] start failed', { error: e?.message });
-      this.running = false;
+      console.log('[BlockchainListener] Connected — listening for on-chain events');
+    } catch (err: any) {
+      console.error('[BlockchainListener] Connection failed:', err.message);
+      this.scheduleReconnect(wsUrl);
     }
   }
 
-  private async handleTransfer(from: string, to: string, value: bigint, txHash?: string) {
-    const treasury = process.env.JOY_TREASURY_ADDRESS?.toLowerCase();
-    if (!treasury) return; // we only forward when we know whose wallet to credit
-
-    const isInbound = to.toLowerCase() === treasury;
-    const isOutbound = from.toLowerCase() === treasury;
-    if (!isInbound && !isOutbound) return;
-
-    await backendNotifier.emit(
-      isInbound ? 'WALLET_DEPOSIT_CONFIRMED' : 'WALLET_WITHDRAWAL_COMPLETED',
-      txHash || `transfer_${Date.now()}`,
-      {
-        from,
-        to,
-        value: value.toString(),
-        currency: 'JOY',
-        txHash,
-      },
-    );
-  }
-
-  private async handleStaked(
-    user: string,
-    amount: bigint,
-    tierId: bigint,
-    lockupEnd: bigint,
-    txHash?: string,
-  ) {
-    await backendNotifier.emit(
-      'WALLET_DEPOSIT_CONFIRMED',
-      txHash || `stake_${Date.now()}`,
-      {
-        kind: 'STAKE',
-        user,
-        amount: amount.toString(),
-        tierId: tierId.toString(),
-        lockupEnd: lockupEnd.toString(),
-        currency: 'JOY',
-      },
-    );
-  }
-
-  private async handleUnstaked(user: string, amount: bigint, rewards: bigint, txHash?: string) {
-    await backendNotifier.emit(
-      'WALLET_WITHDRAWAL_COMPLETED',
-      txHash || `unstake_${Date.now()}`,
-      {
-        kind: 'UNSTAKE',
-        user,
-        amount: amount.toString(),
-        rewards: rewards.toString(),
-        currency: 'JOY',
-      },
-    );
-  }
-
-  private async handleSubscribed(user: string, planId: bigint, expiry: bigint, txHash?: string) {
-    await backendNotifier.emit(
-      'PAYMENT_CONFIRMED',
-      txHash || `sub_${Date.now()}`,
-      {
-        kind: 'ON_CHAIN_SUBSCRIPTION',
-        user,
-        planId: planId.toString(),
-        expiry: expiry.toString(),
-        currency: 'JOY',
-      },
-    );
-  }
-
-  private async heartbeat(): Promise<void> {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug('[BlockchainListener] heartbeat');
-    }
-  }
-
-  async stop(): Promise<void> {
-    if (this.timer) clearInterval(this.timer);
-    this.timer = null;
-    for (const c of this.contracts) {
-      try {
-        c.removeAllListeners();
-      } catch {
-        /* noop */
-      }
+  private teardownProvider(): void {
+    if (this.provider) {
+      this.provider.removeAllListeners();
+      this.provider.destroy().catch(() => {});
+      this.provider = null;
     }
     this.contracts = [];
-    if (this.provider && 'destroy' in this.provider) {
-      try {
-        await (this.provider as any).destroy();
-      } catch {
-        /* noop */
-      }
+  }
+
+  private scheduleReconnect(wsUrl: string): void {
+    if (!this.running) return;
+
+    this.teardownProvider();
+    this.reconnectAttempts++;
+
+    const delay = Math.min(
+      BlockchainListenerService.BASE_RECONNECT_DELAY_MS * 2 ** (this.reconnectAttempts - 1),
+      BlockchainListenerService.MAX_RECONNECT_DELAY_MS,
+    );
+
+    console.log(`[BlockchainListener] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})…`);
+    this.reconnectTimer = setTimeout(() => this.connect(wsUrl), delay);
+  }
+
+  // ── Event subscriptions ───────────────────────────────────────────
+
+  private subscribeToEvents(): void {
+    if (!this.provider) return;
+
+    const stakingAddr = process.env.STAKING_VAULT_ADDRESS;
+    const joyAddr = process.env.JOY_TOKEN_ADDRESS;
+    const subAddr = process.env.SUBSCRIPTION_ADDRESS;
+
+    if (stakingAddr && ethers.isAddress(stakingAddr)) {
+      const staking = new ethers.Contract(stakingAddr, STAKING_VAULT_ABI, this.provider);
+      this.contracts.push(staking);
+
+      staking.on('Staked', (user: string, amount: bigint, tierId: bigint, lockupEnd: bigint, event: ethers.ContractEventPayload) => {
+        this.handleEvent({
+          eventName: 'Staked',
+          contractName: 'StakingVault',
+          contractAddress: stakingAddr,
+          args: { user, amount: amount.toString(), tierId: tierId.toString(), lockupEnd: lockupEnd.toString() },
+          txHash: event.log.transactionHash,
+          blockNumber: event.log.blockNumber,
+          logIndex: event.log.index,
+        });
+      });
+
+      staking.on('Unstaked', (user: string, amount: bigint, rewards: bigint, event: ethers.ContractEventPayload) => {
+        this.handleEvent({
+          eventName: 'Unstaked',
+          contractName: 'StakingVault',
+          contractAddress: stakingAddr,
+          args: { user, amount: amount.toString(), rewards: rewards.toString() },
+          txHash: event.log.transactionHash,
+          blockNumber: event.log.blockNumber,
+          logIndex: event.log.index,
+        });
+      });
+
+      staking.on('RewardClaimed', (user: string, amount: bigint, event: ethers.ContractEventPayload) => {
+        this.handleEvent({
+          eventName: 'RewardClaimed',
+          contractName: 'StakingVault',
+          contractAddress: stakingAddr,
+          args: { user, amount: amount.toString() },
+          txHash: event.log.transactionHash,
+          blockNumber: event.log.blockNumber,
+          logIndex: event.log.index,
+        });
+      });
+
+      staking.on('RewardPoolFunded', (funder: string, amount: bigint, event: ethers.ContractEventPayload) => {
+        this.handleEvent({
+          eventName: 'RewardPoolFunded',
+          contractName: 'StakingVault',
+          contractAddress: stakingAddr,
+          args: { funder, amount: amount.toString() },
+          txHash: event.log.transactionHash,
+          blockNumber: event.log.blockNumber,
+          logIndex: event.log.index,
+        });
+      });
+
+      console.log(`[BlockchainListener] Subscribed to StakingVault events at ${stakingAddr}`);
     }
-    this.provider = null;
-    this.running = false;
+
+    if (joyAddr && ethers.isAddress(joyAddr)) {
+      const joy = new ethers.Contract(joyAddr, JOY_TOKEN_ABI, this.provider);
+      this.contracts.push(joy);
+
+      joy.on('Transfer', (from: string, to: string, value: bigint, event: ethers.ContractEventPayload) => {
+        this.handleEvent({
+          eventName: 'Transfer',
+          contractName: 'JoyToken',
+          contractAddress: joyAddr,
+          args: { from, to, value: value.toString() },
+          txHash: event.log.transactionHash,
+          blockNumber: event.log.blockNumber,
+          logIndex: event.log.index,
+        });
+      });
+
+      console.log(`[BlockchainListener] Subscribed to JoyToken Transfer events at ${joyAddr}`);
+    }
+
+    if (subAddr && ethers.isAddress(subAddr)) {
+      const sub = new ethers.Contract(subAddr, SUBSCRIPTION_ABI, this.provider);
+      this.contracts.push(sub);
+
+      sub.on('Subscribed', (user: string, planId: bigint, expiry: bigint, event: ethers.ContractEventPayload) => {
+        this.handleEvent({
+          eventName: 'Subscribed',
+          contractName: 'Subscription',
+          contractAddress: subAddr,
+          args: { user, planId: planId.toString(), expiry: expiry.toString() },
+          txHash: event.log.transactionHash,
+          blockNumber: event.log.blockNumber,
+          logIndex: event.log.index,
+        });
+      });
+
+      console.log(`[BlockchainListener] Subscribed to Subscription events at ${subAddr}`);
+    }
+
+    if (!stakingAddr && !joyAddr && !subAddr) {
+      console.warn('[BlockchainListener] No contract addresses configured — listening for blocks only');
+    }
+  }
+
+  // ── Event handling ────────────────────────────────────────────────
+
+  private handleEvent(evt: BlockchainEvent): void {
+    this.eventsProcessed++;
+    console.log(
+      `[BlockchainListener] ${evt.contractName}.${evt.eventName} block=${evt.blockNumber} tx=${evt.txHash}`,
+    );
+    eventProcessor.process(evt).catch((err) => {
+      console.error(`[BlockchainListener] EventProcessor error for ${evt.eventName}:`, err.message);
+    });
   }
 }
 

@@ -15,9 +15,10 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import Redis from 'ioredis';
 import { logger } from '../utils/logger';
 import prisma from '../lib/prisma';
+import { getRedis } from '../lib/redis';
+const redisClient = getRedis();
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
@@ -105,21 +106,11 @@ const endpointLimits: Record<string, RateLimitConfig> = {
 };
 
 class RateLimiter {
-  private redis: Redis;
+  private redis: ReturnType<typeof getRedis>;
   private prefix = 'ratelimit:';
 
   constructor() {
-    const redisConfig: any = {
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      db: parseInt(process.env.REDIS_DB || '0')
-    };
-    
-    if (process.env.REDIS_PASSWORD) {
-      redisConfig.password = process.env.REDIS_PASSWORD;
-    }
-    
-    this.redis = new Redis(redisConfig);
+    this.redis = redisClient;
   }
 
   /**

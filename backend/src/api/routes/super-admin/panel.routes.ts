@@ -16,7 +16,10 @@ import {
   getPermissionCategories,
 } from './shared';
 import { validateBody } from '../../../middleware/validate';
-import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
+import {
+  patchPanelSettingsSchema,
+  putPlatformConfigSchema,
+} from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
@@ -443,7 +446,7 @@ const SETTINGS_FIELD_MAP: Record<SettingsPage, string[]> = {
   localization: ['defaultLanguage', 'timezone', 'dateFormat', 'currency'],
 };
 
-router.patch('/panel-settings/:page', authMiddleware, async (req: any, res: any) => {
+router.patch('/panel-settings/:page', authMiddleware, validateBody(patchPanelSettingsSchema), async (req: any, res: any) => {
   try {
     const page = req.params.page as SettingsPage;
 
@@ -550,7 +553,7 @@ router.get('/config', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // ─── PUT /config — save platform-wide system configuration ─────────────────────
-router.put('/config', authMiddleware, async (req: Request, res: Response) => {
+router.put('/config', authMiddleware, validateBody(putPlatformConfigSchema), async (req: Request, res: Response) => {
   try {
     const body = req.body || {};
     const now = new Date();

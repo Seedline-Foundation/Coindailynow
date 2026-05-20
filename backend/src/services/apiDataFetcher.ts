@@ -14,20 +14,10 @@
  * - Structured output compatible with RSS aggregator
  */
 
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
 import { API_DATA_SOURCES, NewsSource } from '../config/newsSources';
 
-// Optional Redis - only connect if enabled
-const isRedisEnabled = process.env.REDIS_ENABLED !== 'false';
-let redis: Redis | null = null;
-if (isRedisEnabled) {
-  redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: 3,
-    lazyConnect: true,
-    retryStrategy: (times) => times > 3 ? null : Math.min(times * 100, 3000),
-  });
-  redis.on('error', (err) => console.warn('[ApiDataFetcher] Redis error:', err.message));
-}
+const redis = getRedis();
 
 // Memory fallbacks when Redis is not available
 const memoryCache: Map<string, { value: string; expiresAt: number }> = new Map();

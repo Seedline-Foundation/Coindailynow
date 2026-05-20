@@ -13,6 +13,7 @@
 import { PrismaClient } from '@prisma/client';
 import { getRedis } from '../lib/redis';
 import prismaBase from '../lib/prisma';
+const redis = getRedis();
 
 // Extend Prisma types to include Task 74 models (VS Code cache workaround)
 const prisma = prismaBase as PrismaClient & {

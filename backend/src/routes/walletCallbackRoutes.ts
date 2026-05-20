@@ -16,32 +16,11 @@ import express, { Request, Response } from 'express';
 import { TransactionType, TransactionStatus } from '@prisma/client';
 import prisma from '../lib/prisma';
 import crypto from 'crypto';
-import { z } from 'zod';
 import { getRedis } from '../lib/redis';
 import { subscriptionService } from '../services/subscriptionService';
 
 const router = express.Router();
 const redis = getRedis();
-
-// BE-2-4: Zod schemas for the public webhook payloads. We accept unknown
-// keys (passthrough) because providers occasionally extend their schemas.
-const yellowCardWebhookSchema = z
-  .object({
-    transactionId: z.string().min(4),
-    status: z.string().min(2),
-    amount: z.coerce.number().nonnegative(),
-    currency: z.string().min(2).max(8),
-    metadata: z.record(z.any()).optional(),
-  })
-  .passthrough();
-
-const changeNowWebhookSchema = z
-  .object({
-    id: z.string().min(4),
-    status: z.string().min(2),
-    payload: z.record(z.any()).optional(),
-  })
-  .passthrough();
 
 // ============================================================================
 // HELPER FUNCTIONS

@@ -15,8 +15,14 @@ import {
   ALL_PERMISSIONS,
   getPermissionCategories,
 } from './shared';
+import { canPublishContent } from '../../../lib/editorialRoles';
 import { validateBody } from '../../../middleware/validate';
-import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
+import {
+  createCategorySchema,
+  updateCategorySchema,
+  moderationReviewSchema,
+  aiGenerateContentSchema,
+} from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
@@ -77,7 +83,7 @@ router.get('/content/categories', authMiddleware, async (req: Request, res: Resp
  * POST /api/super-admin/content/categories
  * Create a new category
  */
-router.post('/content/categories', authMiddleware, async (req: Request, res: Response) => {
+router.post('/content/categories', authMiddleware, validateBody(createCategorySchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -123,7 +129,7 @@ router.post('/content/categories', authMiddleware, async (req: Request, res: Res
  * PUT /api/super-admin/content/categories/:id
  * Update a category
  */
-router.put('/content/categories/:id', authMiddleware, async (req: Request, res: Response) => {
+router.put('/content/categories/:id', authMiddleware, validateBody(updateCategorySchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -256,7 +262,7 @@ router.get('/content/moderation', authMiddleware, async (req: Request, res: Resp
  * POST /api/super-admin/content/moderation/review
  * Approve or reject content - publishes to frontend when approved
  */
-router.post('/content/moderation/review', authMiddleware, async (req: Request, res: Response) => {
+router.post('/content/moderation/review', authMiddleware, validateBody(moderationReviewSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
@@ -264,6 +270,15 @@ router.post('/content/moderation/review', authMiddleware, async (req: Request, r
 
     if (!itemId || !action) {
       res.status(400).json({ success: false, error: 'articleId and action are required' });
+      return;
+    }
+
+    if (action === 'APPROVED' && !canPublishContent(req.user?.role)) {
+      res.status(403).json({
+        success: false,
+        error: 'Forbidden',
+        message: 'Content publishing role required',
+      });
       return;
     }
 
@@ -372,7 +387,7 @@ router.get('/content/ai', authMiddleware, async (req: Request, res: Response) =>
  * POST /api/super-admin/content/ai/generate
  * Generate a new AI article
  */
-router.post('/content/ai/generate', authMiddleware, async (req: Request, res: Response) => {
+router.post('/content/ai/generate', authMiddleware, validateBody(aiGenerateContentSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 

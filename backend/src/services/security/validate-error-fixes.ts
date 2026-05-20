@@ -38,19 +38,14 @@ import { SecurityAuditService } from './SecurityAuditService';
 import { IdentityAccessManagement } from './IdentityAccessManagement';
 import { DataLossPrevention } from './DataLossPrevention';
 import { PrismaClient } from '@prisma/client';
-import Redis from 'ioredis';
+import { getRedis } from '../../lib/redis';
+const redis = getRedis();
 
 async function validateSecurityServicesFixes() {
   console.log('🔒 CoinDaily Security Services - Error Fix Validation');
   console.log('================================================================');
   
   const prisma = (await import('../../lib/prisma')).default;
-  const redis = new Redis({
-    host: 'localhost',
-    port: 6379,
-    maxRetriesPerRequest: 3,
-    lazyConnect: true
-  });
 
   try {
     // Test 1: SecurityAuditService

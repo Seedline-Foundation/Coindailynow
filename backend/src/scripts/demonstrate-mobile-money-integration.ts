@@ -6,8 +6,9 @@
  */
 
 import prisma from '../lib/prisma';
-import { Redis } from 'ioredis';
+import { getRedis } from '../lib/redis';
 import { createLogger } from 'winston';
+const redis = getRedis();
 import { MobileMoneyService } from '../services/mobileMoneyService';
 import { FraudDetectionService } from '../services/fraud-detection.service';
 import { ComplianceService } from '../services/compliance.service';
@@ -17,9 +18,6 @@ import {
   TransactionType,
   PaymentStatus
 } from '../types/mobile-money';
-
-// Initialize services
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const logger = createLogger({
   level: 'info',
   format: require('winston').format.json(),

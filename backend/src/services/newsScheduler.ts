@@ -16,23 +16,13 @@
  * - Metrics and logging
  */
 
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
 import { fetchAllNews, fetchFinancialNews, getAggregatorStats, UnifiedNewsItem } from './unifiedNewsAggregator';
 import { fetchAllFeeds } from './rssFeedAggregator';
 import { fetchAllApiSources } from './apiDataFetcher';
 import { storeOverflowItems } from './dataSourceCenter';
 
-// Optional Redis - only connect if enabled
-const isRedisEnabled = process.env.REDIS_ENABLED !== 'false';
-let redis: Redis | null = null;
-if (isRedisEnabled) {
-  redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: 3,
-    lazyConnect: true,
-    retryStrategy: (times) => times > 3 ? null : Math.min(times * 100, 3000),
-  });
-  redis.on('error', (err) => console.warn('[NewsScheduler] Redis error:', err.message));
-}
+const redis = getRedis();
 
 // Maximum items to send to AI pipeline per batch
 const AI_PIPELINE_BATCH_SIZE = parseInt(process.env.AI_PIPELINE_BATCH_SIZE || '10');

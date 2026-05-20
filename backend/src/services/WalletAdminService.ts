@@ -631,8 +631,7 @@ export async function exportTransactionReport(
   } else if (format === 'JSON') {
     return JSON.stringify(transactions, null, 2);
   } else {
-    // PDF generation would go here
-    return 'PDF export not yet implemented';
+    return await formatTransactionsAsPDF(transactions, filters);
   }
 }
 
@@ -682,6 +681,205 @@ function formatTransactionsAsCSV(transactions: any[]): string {
   );
 
   return [headers, ...rows].join('\n');
+}
+
+/**
+ * Format transactions as a PDF report using pdf-lib.
+ * Returns a base64-encoded PDF string.
+ */
+async function formatTransactionsAsPDF(
+  transactions: any[],
+  filters: TransactionSearchFilters
+): Promise<string> {
+  const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
+
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
+
+  const pageWidth = 842; // A4 landscape
+  const pageHeight = 595;
+  const margin = 40;
+  const rowHeight = 18;
+
+  const brandColor = rgb(0.13, 0.59, 0.95); // CoinDaily blue
+
+  const colWidths = [130, 80, 80, 70, 90, 110];
+  const colHeaders = ['Address', 'Type', 'Amount', 'Currency', 'Status', 'Date'];
+  const tableWidth = colWidths.reduce((s, w) => s + w, 0);
+
+  let totalAmount = 0;
+  let completedCount = 0;
+  let pendingCount = 0;
+  let failedCount = 0;
+
+  for (const tx of transactions) {
+    totalAmount += tx.amount || 0;
+    const st = (tx.status || '').toUpperCase();
+    if (st === 'COMPLETED') completedCount++;
+    else if (st === 'PENDING') pendingCount++;
+    else if (st === 'FAILED') failedCount++;
+  }
+
+  const dateFrom = filters.dateFrom
+    ? new Date(filters.dateFrom).toLocaleDateString()
+    : 'All time';
+  const dateTo = filters.dateTo
+    ? new Date(filters.dateTo).toLocaleDateString()
+    : 'Present';
+
+  let page = doc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - margin;
+
+  const addNewPage = () => {
+    page = doc.addPage([pageWidth, pageHeight]);
+    y = pageHeight - margin;
+  };
+
+  const drawText = (
+    text: string,
+    x: number,
+    yPos: number,
+    size: number,
+    f = font,
+    color = rgb(0, 0, 0)
+  ) => {
+    page.drawText(text, { x, y: yPos, size, font: f, color });
+  };
+
+  // --- Branding header ---
+  page.drawRectangle({
+    x: 0,
+    y: pageHeight - 60,
+    width: pageWidth,
+    height: 60,
+    color: brandColor,
+  });
+  drawText('CoinDaily', margin, pageHeight - 40, 20, boldFont, rgb(1, 1, 1));
+  drawText(
+    'Wallet Transaction Report',
+    margin,
+    pageHeight - 55,
+    11,
+    font,
+    rgb(1, 1, 1)
+  );
+
+  const generatedAt = new Date().toLocaleString();
+  drawText(
+    `Generated: ${generatedAt}`,
+    pageWidth - 250,
+    pageHeight - 40,
+    9,
+    font,
+    rgb(1, 1, 1)
+  );
+
+  y = pageHeight - 80;
+
+  // --- Report meta ---
+  drawText('Report Period:', margin, y, 10, boldFont);
+  drawText(`${dateFrom}  —  ${dateTo}`, margin + 90, y, 10);
+  y -= 16;
+  drawText(`Total Transactions: ${transactions.length}`, margin, y, 10);
+  y -= 24;
+
+  // --- Table header ---
+  page.drawRectangle({
+    x: margin,
+    y: y - 4,
+    width: tableWidth,
+    height: rowHeight,
+    color: rgb(0.92, 0.92, 0.92),
+  });
+
+  let xOffset = margin;
+  for (let i = 0; i < colHeaders.length; i++) {
+    drawText(colHeaders[i], xOffset + 4, y, 9, boldFont);
+    xOffset += colWidths[i];
+  }
+  y -= rowHeight;
+
+  // --- Table rows ---
+  for (let idx = 0; idx < transactions.length; idx++) {
+    if (y < margin + 60) {
+      addNewPage();
+      // Re-draw table header on new page
+      page.drawRectangle({
+        x: margin,
+        y: y - 4,
+        width: tableWidth,
+        height: rowHeight,
+        color: rgb(0.92, 0.92, 0.92),
+      });
+      xOffset = margin;
+      for (let i = 0; i < colHeaders.length; i++) {
+        drawText(colHeaders[i], xOffset + 4, y, 9, boldFont);
+        xOffset += colWidths[i];
+      }
+      y -= rowHeight;
+    }
+
+    const tx = transactions[idx];
+    const address =
+      tx.fromWallet?.walletAddress || tx.toWallet?.walletAddress || 'N/A';
+    const truncAddr =
+      address.length > 20 ? address.slice(0, 18) + '…' : address;
+    const txType = tx.transactionType || 'N/A';
+    const amount = (tx.amount ?? 0).toFixed(2);
+    const currency = tx.currency || '';
+    const status = tx.status || 'N/A';
+    const date = tx.createdAt
+      ? new Date(tx.createdAt).toLocaleDateString()
+      : '';
+
+    if (idx % 2 === 0) {
+      page.drawRectangle({
+        x: margin,
+        y: y - 4,
+        width: tableWidth,
+        height: rowHeight,
+        color: rgb(0.97, 0.97, 0.97),
+      });
+    }
+
+    const rowValues = [truncAddr, txType, amount, currency, status, date];
+    xOffset = margin;
+    for (let i = 0; i < rowValues.length; i++) {
+      drawText(rowValues[i], xOffset + 4, y, 8);
+      xOffset += colWidths[i];
+    }
+    y -= rowHeight;
+  }
+
+  // --- Summary section ---
+  if (y < margin + 80) {
+    addNewPage();
+  }
+  y -= 12;
+  page.drawLine({
+    start: { x: margin, y },
+    end: { x: margin + tableWidth, y },
+    thickness: 1,
+    color: rgb(0.7, 0.7, 0.7),
+  });
+  y -= 18;
+
+  drawText('Summary', margin, y, 12, boldFont, brandColor);
+  y -= 18;
+  drawText(`Total Transactions: ${transactions.length}`, margin, y, 10);
+  y -= 14;
+  drawText(`Total Amount: ${totalAmount.toFixed(2)}`, margin, y, 10);
+  y -= 14;
+  drawText(
+    `Completed: ${completedCount}   |   Pending: ${pendingCount}   |   Failed: ${failedCount}`,
+    margin,
+    y,
+    10
+  );
+
+  const pdfBytes = await doc.save();
+  return Buffer.from(pdfBytes).toString('base64');
 }
 
 // ============================================================================

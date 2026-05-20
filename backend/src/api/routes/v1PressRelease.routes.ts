@@ -3,6 +3,7 @@ import { authMiddleware } from '../../middleware/auth';
 import axios from 'axios';
 import { getRedis } from '../../lib/redis';
 import { notifyWireSubscribers, registerWireAlertKey, unregisterWireAlertKey } from '../../lib/wireAlertDispatcher';
+import { subscribe as wireSubscribe, unsubscribe as wireUnsubscribe, notifySubscribers as wireNotifySubscribers } from '../../services/wireAlertService';
 
 const router = Router();
 const wireAlertRedis = getRedis();
@@ -404,6 +405,16 @@ router.patch('/releases/:id/review', authMiddleware as any, async (req: Request,
         category: (updated as any).category || 'general',
         region: (updated as any).region || 'africa',
       });
+      void wireNotifySubscribers(prisma, {
+        id: updated.id,
+        title: updated.title,
+        summary: (updated as any).summary || '',
+        slug: (updated as any).slug,
+        category: (updated as any).category || 'general',
+        region: (updated as any).region || 'africa',
+        company,
+        publishedAt: pub,
+      });
     }
     return res.json({ data: updated });
   } catch (err: any) {
@@ -421,7 +432,41 @@ router.post('/checkout/yellowcard', async (req: Request, res: Response) => {
 
   const reference = `press_${orderId}`;
   const amount = Number(amountUsd).toFixed(2);
-  const baseUrl = process.env.YELLOWCARD_API_URL || 'https://api.yellowcard.io';
+  const apiKey = process.env.YELLOWCARD_API_KEY;
+  const secretKey = process.env.YELLOWCARD_SECRET_KEY;
+  const baseUrl = process.env.YELLOWCARD_API_URL || 'https://sandbox.api.yellowcard.io';
+
+  if (apiKey && secretKey) {
+    try {
+      const response = await axios.post(
+        `${baseUrl}/payments`,
+        {
+          amount: parseFloat(amount),
+          currency: 'USD',
+          reason: `CoinDaily Press distribution: order ${orderId}`,
+          metadata: { publisherId, orderId, reference },
+        },
+        {
+          headers: {
+            'YC-API-KEY': apiKey,
+            'YC-SECRET-KEY': secretKey,
+            'Content-Type': 'application/json',
+          },
+          timeout: 15000,
+        }
+      );
+
+      const data = response.data;
+      return res.json({
+        checkoutUrl: data.redirectUrl || data.checkoutUrl || data.url || `${baseUrl}/checkout?ref=${reference}`,
+        reference,
+        paymentId: data.id || data.paymentId,
+      });
+    } catch (error: any) {
+      console.error('YellowCard press checkout error:', error.response?.data || error.message);
+    }
+  }
+
   const checkoutUrl =
     process.env.YELLOWCARD_CHECKOUT_URL ||
     `${baseUrl}/checkout?amount=${amount}&currency=USD&ref=${reference}&metadata=${encodeURIComponent(
@@ -495,40 +540,42 @@ router.delete('/wire/alerts', async (req: Request, res: Response) => {
   return res.json({ success: true });
 });
 
-// ─── Admin: replay a wire alert dispatch for a past release ────────
-import { requireCapability } from '../../middleware/auth';
+// ─── Persistent subscribe / unsubscribe (Prisma-backed) ─────
 
-router.post(
-  '/wire/replay/:releaseId',
-  authMiddleware,
-  requireCapability('ARTICLE_PUBLISH'),
-  async (req: Request, res: Response) => {
-    const releaseId = String(req.params.releaseId || '');
-    if (!releaseId) return res.status(400).json({ error: 'releaseId required' });
-    try {
-      const prisma = getPrisma(req);
-      const pr = await prisma.pressRelease?.findUnique({
-        where: { id: releaseId },
-        include: { user: { select: { firstName: true, lastName: true, username: true } } },
-      });
-      if (!pr) return res.status(404).json({ error: 'release not found' });
-      const company =
-        [pr.user?.firstName, pr.user?.lastName].filter(Boolean).join(' ') ||
-        pr.user?.username ||
-        'Press';
-      await notifyWireSubscribers({
-        id: pr.id,
-        headline: pr.title,
-        company,
-        publishedAt: new Date(pr.publishedAt || pr.createdAt || Date.now()).toISOString(),
-        category: (pr as any).category || 'general',
-        region: (pr as any).region || 'africa',
-      });
-      return res.json({ success: true, replayed: pr.id });
-    } catch (e: any) {
-      return res.status(500).json({ error: e.message });
-    }
-  },
-);
+router.post('/wire/alerts/subscribe', async (req: Request, res: Response) => {
+  const prisma = getPrisma(req);
+  const { email, telegramChatId, filters } = req.body as {
+    email?: string;
+    telegramChatId?: string;
+    filters?: string[];
+  };
+
+  if (!email) {
+    return res.status(400).json({ error: { code: 'MISSING_EMAIL', message: 'email is required' } });
+  }
+
+  try {
+    const result = await wireSubscribe(prisma, { email, telegramChatId, filters });
+    return res.status(201).json({ data: result });
+  } catch (err: any) {
+    return res.status(500).json({ error: { code: 'INTERNAL', message: err.message } });
+  }
+});
+
+router.delete('/wire/alerts/unsubscribe', async (req: Request, res: Response) => {
+  const prisma = getPrisma(req);
+  const { email } = req.body as { email?: string };
+
+  if (!email) {
+    return res.status(400).json({ error: { code: 'MISSING_EMAIL', message: 'email is required' } });
+  }
+
+  try {
+    await wireUnsubscribe(prisma, email);
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: { code: 'INTERNAL', message: err.message } });
+  }
+});
 
 export default router;

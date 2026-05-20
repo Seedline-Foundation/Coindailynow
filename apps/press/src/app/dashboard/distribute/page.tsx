@@ -677,8 +677,8 @@ export default function DistributePage() {
                     await notifyCfisPressOrder({
                       orderId,
                       publisherId,
-                      publisherEmail: user?.email,
-                      publisherWallet: user?.wallet_address,
+                      publisherEmail: user?.email ?? undefined,
+                      publisherWallet: user?.wallet_address ?? undefined,
                       amount: cost.total,
                       prTitle: title,
                       targetSites: selected,
@@ -691,12 +691,14 @@ export default function DistributePage() {
                       orderId,
                       publisherId,
                       amountUsd: cost.total,
-                      email: user?.email,
+                      email: user?.email ?? undefined,
                     });
                     openYellowCardCheckout(checkout.checkoutUrl);
+                    window.location.href = `/dashboard/checkout/${orderId}`;
+                    return;
                   }
 
-                  window.location.href = '/dashboard/campaigns';
+                  window.location.href = '/dashboard/status';
                 } catch (err: any) {
                   console.error('Launch failed:', err);
                   setLaunchError(err.message || 'Failed to launch campaign. Please try again.');

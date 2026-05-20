@@ -34,9 +34,13 @@ contract StakingVault is Ownable, ReentrancyGuard {
     // Total staked amount
     uint256 public totalStaked;
 
+    // Dedicated reward pool funded by the owner; rewards are paid from here, never minted.
+    uint256 private _rewardPool;
+
     event Staked(address indexed user, uint256 amount, uint256 tierId, uint256 lockupEnd);
     event Unstaked(address indexed user, uint256 amount, uint256 rewards);
     event RewardClaimed(address indexed user, uint256 amount);
+    event RewardPoolFunded(address indexed funder, uint256 amount);
 
     constructor(address _joyToken) Ownable(msg.sender) {
         joyToken = IERC20(_joyToken);
@@ -81,14 +85,11 @@ contract StakingVault is Ownable, ReentrancyGuard {
         uint256 reward = calculateReward(s);
         uint256 totalReturn = s.amount + reward;
         
+        require(_rewardPool >= reward, "Insufficient reward pool");
+
         s.claimed = true;
         totalStaked -= s.amount;
-
-        // In a real automated yield system, rewards come from a RewardDistributor.
-        // For simplicity here, assuming this contract holds enough reward tokens
-        // or mints them (if it had minting rights, which it doesn't).
-        // This usually requires a "Reward Pool" balance check.
-        require(joyToken.balanceOf(address(this)) >= totalReturn, "Insufficient contract balance");
+        _rewardPool -= reward;
 
         joyToken.safeTransfer(msg.sender, totalReturn);
 
@@ -108,13 +109,22 @@ contract StakingVault is Ownable, ReentrancyGuard {
         return (_stake.amount * multiplier) / 10000; 
     }
 
-    /** C-2-4: Fund reward pool (treasury transfers JOY for staking payouts). */
-    function fundRewards(uint256 _amount) external onlyOwner {
-        joyToken.safeTransferFrom(msg.sender, address(this), _amount);
+    /**
+     * @dev Fund the reward pool. Only callable by the contract owner.
+     *      Transfers JOY from the caller into this contract's dedicated reward pool.
+     *      Rewards are distributed from this pool — never minted.
+     * @param amount The number of JOY base-units (12 decimals) to add.
+     */
+    function fundRewardPool(uint256 amount) external onlyOwner {
+        require(amount > 0, "Amount must be > 0");
+        joyToken.safeTransferFrom(msg.sender, address(this), amount);
+        _rewardPool += amount;
+        emit RewardPoolFunded(msg.sender, amount);
     }
 
+    /// @dev Returns the current reward pool balance (excludes staked principal).
     function rewardPoolBalance() external view returns (uint256) {
-        return joyToken.balanceOf(address(this));
+        return _rewardPool;
     }
 
     // Admin function to withdraw tokens in case of emergency or migration

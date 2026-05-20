@@ -8,7 +8,9 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import { PrismaClient } from '@prisma/client';
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
+import { getRedis } from '../lib/redis';
+const redis = getRedis();
 
 // Extend Request interface to include user property
 interface AuthenticatedRequest extends Request {
@@ -55,7 +57,6 @@ const validateRequest = (req: AuthenticatedRequest, res: Response, next: any) =>
 const router = Router();
 
 // Initialize services
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const legalOrchestrator = new LegalComplianceOrchestrator(prisma, redis);
 const cookieManager = new CookieConsentManager(prisma, redis);
 const retentionService = new DataRetentionService(prisma, redis);

@@ -49,8 +49,10 @@ import {
 
 const NAVIGATION_ITEMS = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Submit PR', href: '/dashboard/submit', icon: FileText },
   { name: 'Distribute', href: '/dashboard/distribute', icon: Send },
   { name: 'Campaigns', href: '/dashboard/campaigns', icon: FileText },
+  { name: 'Status', href: '/dashboard/status', icon: Eye },
   { name: 'Network', href: '/dashboard/network', icon: Globe },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Payments', href: '/dashboard/payments', icon: Wallet },

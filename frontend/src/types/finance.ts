@@ -104,9 +104,9 @@ export enum EscrowStatus {
 }
 
 export enum SubscriptionTier {
-  APOSTLE = 'APOSTLE',
-  EVANGELIST = 'EVANGELIST',
-  PROPHET = 'PROPHET'
+  FREE = 'FREE',
+  PREMIUM = 'PREMIUM',
+  ENTERPRISE = 'ENTERPRISE'
 }
 
 export enum SubscriptionStatus {

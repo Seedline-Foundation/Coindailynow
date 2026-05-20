@@ -8,6 +8,7 @@
 
 import prisma from '../lib/prisma';
 import { getRedis } from '../lib/redis';
+const redis = getRedis();
 import { PubSub } from 'graphql-subscriptions';
 import AISearchService, {
   SearchQuery,
@@ -18,8 +19,6 @@ import AISearchService, {
 // ============================================================================
 // Initialize Services
 // ============================================================================
-
-const redis = getRedis();
 const pubsub = new PubSub();
 const aiSearchService = new AISearchService(prisma, redis);
 

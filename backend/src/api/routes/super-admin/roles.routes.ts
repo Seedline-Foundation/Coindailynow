@@ -16,7 +16,10 @@ import {
   getPermissionCategories,
 } from './shared';
 import { validateBody } from '../../../middleware/validate';
-import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
+import {
+  createRoleSchema,
+  updateRoleSchema,
+} from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
@@ -65,20 +68,11 @@ router.get('/roles', authMiddleware, async (req: Request, res: Response) => {
  * POST /api/super-admin/roles
  * Create a new admin role with granular permissions
  */
-router.post('/roles', authMiddleware, async (req: Request, res: Response) => {
+router.post('/roles', authMiddleware, validateBody(createRoleSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 
     const { name, displayName, description, permissions } = req.body;
-
-    if (!name || !description) {
-      res.status(400).json({
-        success: false,
-        error: 'Bad Request',
-        message: 'Name and description are required'
-      });
-      return;
-    }
 
     const permArray = Array.isArray(permissions) ? permissions : [];
     
@@ -141,7 +135,7 @@ router.post('/roles', authMiddleware, async (req: Request, res: Response) => {
  * PUT /api/super-admin/roles/:id
  * Update an existing admin role
  */
-router.put('/roles/:id', authMiddleware, async (req: Request, res: Response) => {
+router.put('/roles/:id', authMiddleware, validateBody(updateRoleSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 

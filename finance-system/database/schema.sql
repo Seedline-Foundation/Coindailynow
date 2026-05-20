@@ -5,6 +5,12 @@
 -- This file defines the complete schema for the dedicated CFIS database.
 -- It is SEPARATE from the main app database.
 -- ============================================================
+--
+-- DECIMAL STANDARD:
+--   JOY token (JY) columns use NUMERIC(20,12) — 12 decimal places
+--   to match the on-chain JoyToken ERC-20 decimals (12).
+--   USD columns use NUMERIC(20,2).  Points columns use NUMERIC(20,6).
+-- ============================================================
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -63,7 +69,7 @@ CREATE TABLE wallets (
     owner_id VARCHAR(200) NOT NULL,            -- user ID, staff ID, etc.
     wallet_address VARCHAR(100),               -- On-chain wallet address (0x...)
     balance_points NUMERIC(20,6) DEFAULT 0,
-    balance_jy NUMERIC(20,6) DEFAULT 0,
+    balance_jy NUMERIC(20,12) DEFAULT 0,       -- 12 decimals to match JOY on-chain precision
     balance_usd NUMERIC(20,2) DEFAULT 0,
     is_active BOOLEAN DEFAULT true,
     is_verified BOOLEAN DEFAULT false,

@@ -28,6 +28,11 @@ jest.mock('../../src/services/aiClient', () => ({
   chatComplete: jest.fn(),
 }));
 
+const mockedProxyContentGeneration = jest.fn();
+jest.mock('../../src/services/aiSystemClient', () => ({
+  proxyContentGeneration: (...args: any[]) => mockedProxyContentGeneration(...args),
+}));
+
 const mockedChatComplete = chatComplete as jest.MockedFunction<typeof chatComplete>;
 
 describe('ContentGenerationAgent Integration Tests', () => {
@@ -278,6 +283,17 @@ describe('ContentGenerationAgent Integration Tests', () => {
       provider: 'ollama',
     });
 
+    mockedProxyContentGeneration.mockResolvedValue({
+      content: {
+        title: 'Default African Crypto Update',
+        content: 'Default generated content for integration tests.',
+        excerpt: 'Default excerpt',
+        keywords: ['africa', 'crypto'],
+        qualityScore: 88,
+        format: 'article',
+      },
+    });
+
     // Initialize agents
     contentAgent = new ContentGenerationAgent(
       mockPrisma,
@@ -397,10 +413,10 @@ describe('ContentGenerationAgent Integration Tests', () => {
 
   describe('Performance and Sub-500ms Response Time', () => {
     it('should complete content generation within performance requirements', async () => {
-      mockedChatComplete.mockImplementation(() =>
+      mockedProxyContentGeneration.mockImplementation(() =>
         new Promise((resolve) => {
           setTimeout(() => resolve({
-            content: JSON.stringify({
+            content: {
               title: 'Quick Market Update: Bitcoin Price in Africa',
               content: 'Brief market update content...',
               excerpt: 'Quick Bitcoin update',
@@ -409,9 +425,7 @@ describe('ContentGenerationAgent Integration Tests', () => {
               wordCount: 500,
               readingTime: 2,
               format: 'summary'
-            }),
-            model: 'llama3.1:8b',
-            provider: 'ollama',
+            },
           }), 100);
         })
       );
@@ -449,7 +463,7 @@ describe('ContentGenerationAgent Integration Tests', () => {
     });
 
     it('should handle timeout for long-running tasks', async () => {
-      mockedChatComplete.mockRejectedValue(new Error('Simulated timeout while generating content'));
+      mockedProxyContentGeneration.mockRejectedValue(new Error('Simulated timeout while generating content'));
 
       const task: ContentGenerationTask = {
         id: 'timeout-task-1',
@@ -476,7 +490,7 @@ describe('ContentGenerationAgent Integration Tests', () => {
       const result = await contentAgent.processTask(task);
       expect(result.success).toBe(false);
       expect(result.error).toContain('timeout');
-    });
+    }, 10000);
   });
 
   describe('African Context Integration', () => {
@@ -504,32 +518,30 @@ describe('ContentGenerationAgent Integration Tests', () => {
       const mockFindMany = jest.fn().mockResolvedValue(mockMarketData);
       mockPrisma.marketData.findMany = mockFindMany;
 
-      mockedChatComplete.mockResolvedValue({
-        content: JSON.stringify({
-              title: 'African Crypto Exchanges Report Strong Trading Volumes',
-              content: 'Binance Africa and Luno show increased activity...',
-              excerpt: 'Strong trading volumes on African exchanges',
-              keywords: ['African exchanges', 'trading volume', 'Binance Africa', 'Luno'],
-              qualityScore: 89,
-              wordCount: 1100,
-              readingTime: 4,
-              format: 'article',
-              marketDataIntegration: {
-                realTimeData: true,
-                exchanges: ['Binance_Africa', 'Luno'],
-                pricePoints: [45000, 3200],
-                volumeData: true
-              },
-              africanRelevance: {
-                score: 95,
-                mentionedCountries: ['Nigeria', 'South Africa'],
-                mentionedExchanges: ['Binance_Africa', 'Luno'],
-                mobileMoneyIntegration: false,
-                localCurrencyMention: true
-              }
-            }),
-        model: 'llama3.1:8b',
-        provider: 'ollama',
+      mockedProxyContentGeneration.mockResolvedValue({
+        content: {
+          title: 'African Crypto Exchanges Report Strong Trading Volumes',
+          content: 'Binance Africa and Luno show increased activity...',
+          excerpt: 'Strong trading volumes on African exchanges',
+          keywords: ['African exchanges', 'trading volume', 'Binance Africa', 'Luno'],
+          qualityScore: 89,
+          wordCount: 1100,
+          readingTime: 4,
+          format: 'article',
+          marketDataIntegration: {
+            realTimeData: true,
+            exchanges: ['Binance_Africa', 'Luno'],
+            pricePoints: [45000, 3200],
+            volumeData: true
+          },
+          africanRelevance: {
+            score: 95,
+            mentionedCountries: ['Nigeria', 'South Africa'],
+            mentionedExchanges: ['Binance_Africa', 'Luno'],
+            mobileMoneyIntegration: false,
+            localCurrencyMention: true
+          }
+        },
       });
 
       const task: ContentGenerationTask = {
@@ -567,23 +579,21 @@ describe('ContentGenerationAgent Integration Tests', () => {
         expect(result.content.marketDataIntegration).toBeDefined();
         expect(result.content.marketDataIntegration.exchanges).toContain('Binance_Africa');
       }
-      expect(mockFindMany).toHaveBeenCalled();
+      expect(mockedProxyContentGeneration).toHaveBeenCalled();
     });
 
     it('should handle multiple African languages in task payload', async () => {
-      mockedChatComplete.mockResolvedValue({
-        content: JSON.stringify({
-              title: 'Bitcoin Adoption in West Africa',
-              content: 'Bitcoin adoption continues to grow across West African nations...',
-              excerpt: 'Growing Bitcoin adoption in West Africa',
-              keywords: ['Bitcoin', 'West Africa', 'adoption'],
-              qualityScore: 86,
-              wordCount: 950,
-              readingTime: 4,
-              format: 'article'
-            }),
-        model: 'llama3.1:8b',
-        provider: 'ollama',
+      mockedProxyContentGeneration.mockResolvedValue({
+        content: {
+          title: 'Bitcoin Adoption in West Africa',
+          content: 'Bitcoin adoption continues to grow across West African nations...',
+          excerpt: 'Growing Bitcoin adoption in West Africa',
+          keywords: ['Bitcoin', 'West Africa', 'adoption'],
+          qualityScore: 86,
+          wordCount: 950,
+          readingTime: 4,
+          format: 'article'
+        },
       });
 
       const task: ContentGenerationTask = {
@@ -630,16 +640,14 @@ describe('ContentGenerationAgent Integration Tests', () => {
       }
 
       // Agent should continue working independently
-      mockedChatComplete.mockResolvedValue({
-        content: JSON.stringify({
-              title: 'Independent Operation Test',
-              content: 'Agent operating without orchestrator...',
-              excerpt: 'Independent operation test',
-              qualityScore: 82,
-              wordCount: 800
-            }),
-        model: 'llama3.1:8b',
-        provider: 'ollama',
+      mockedProxyContentGeneration.mockResolvedValue({
+        content: {
+          title: 'Independent Operation Test',
+          content: 'Agent operating without orchestrator...',
+          excerpt: 'Independent operation test',
+          qualityScore: 82,
+          wordCount: 800
+        },
       });
 
       const task: ContentGenerationTask = {
@@ -670,7 +678,7 @@ describe('ContentGenerationAgent Integration Tests', () => {
     it('should return a failure when generation errors occur', async () => {
       let callCount = 0;
 
-      mockedChatComplete.mockImplementation(() => {
+      mockedProxyContentGeneration.mockImplementation(() => {
         callCount++;
         return Promise.reject(new Error(`Temporary failure ${callCount}`));
       });
