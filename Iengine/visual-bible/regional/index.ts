@@ -1,6 +1,7 @@
 /**
  * Visual Bible — Regional Visual Identities
- * Defines location-specific visual languages, especially African Futurism.
+ * Defines location-specific visual languages for CoinDaily's coverage regions:
+ * Africa, Latin America, Caribbean, and global markets.
  */
 
 import { RegionalProfile, ColorPalette } from '../../types';
@@ -101,6 +102,168 @@ export const regionalProfiles: Record<string, RegionalStyleProfile> = {
       'Johannesburg blockchain campus',
     ],
   },
+  'latam-brazil': {
+    id: 'latam-brazil',
+    name: 'Brazilian Digital Fronteira',
+    palette: ['tropical green', 'canary yellow', 'ocean blue', 'sunset orange', 'favela neon pink'],
+    mood: [
+      'carnival energy meets fintech',
+      'tropical innovation',
+      'democratic finance revolution',
+      'emerging superpower ambition',
+      'street-level digital transformation',
+    ],
+    architecture: [
+      'São Paulo Faria Lima fintech corridor',
+      'Rio de Janeiro tech waterfront with Cristo Redentor silhouette',
+      'Florianópolis startup island',
+      'Brasília modernist government tech district',
+      'Recife Porto Digital innovation hub',
+      'Belo Horizonte blockchain campus',
+    ],
+    lighting: [
+      'tropical golden hour with digital overlay',
+      'carnival neon against warm twilight',
+      'Atlantic coast light with holographic reflections',
+      'lush green ambient with tech glow',
+      'favela neon nightscape',
+    ],
+    symbols: [
+      'PIX instant payment holograms',
+      'Real digital currency tokens',
+      'Nubank purple fintech interfaces',
+      'agricultural commodities tokenization',
+      'Amazon rainforest data centers',
+      'crypto mining in renewable energy zones',
+      'street vendor mobile payment terminals',
+      'samba-rhythm data flow patterns',
+    ],
+    camera_notes: [
+      'wide panoramic establishing shots of São Paulo skyline',
+      'street-level favela tech innovation',
+      'aerial drone perspectives of coastal cities',
+      'dynamic carnival-energy movement',
+      'human-centric entrepreneurship framing',
+    ],
+    environments: [
+      'São Paulo Faria Lima fintech towers at golden hour',
+      'Rio de Janeiro waterfront with holographic skyline',
+      'Florianópolis island tech campus',
+      'Recife Porto Digital innovation district',
+      'Brazilian agritech data farm in cerrado landscape',
+      'favela rooftop with São Paulo skyline backdrop',
+    ],
+  },
+  'latam-spanish': {
+    id: 'latam-spanish',
+    name: 'Latin American Crypto Frontier',
+    palette: ['Aztec gold', 'volcanic red', 'Pacific blue', 'jungle emerald', 'desert terracotta'],
+    mood: [
+      'remittance revolution',
+      'inflation-hedge urgency',
+      'cross-border innovation',
+      'grassroots crypto adoption',
+      'El Salvador Bitcoin nation energy',
+      'peso-to-crypto liberation',
+    ],
+    architecture: [
+      'Mexico City CDMX fintech district',
+      'Buenos Aires Puerto Madero tech hub',
+      'Bogotá Rappi-era startup corridor',
+      'El Salvador Bitcoin Beach infrastructure',
+      'Santiago Chile financial center',
+      'Medellín innovation valley (Ruta N)',
+    ],
+    lighting: [
+      'Andean golden altitude light',
+      'volcanic sunset dramatic glow',
+      'Mexico City smog-filtered neon',
+      'Argentine pampas golden hour',
+      'Colombian tropical highland clarity',
+    ],
+    symbols: [
+      'Bitcoin ATMs in street markets',
+      'remittance corridor holographic bridges',
+      'peso/bolivar hyperinflation charts dissolving into crypto',
+      'El Salvador Chivo wallet kiosks',
+      'Mercado Libre crypto integration',
+      'cross-border payment streams',
+      'stablecoin lifeline networks',
+      'Argentine peso crisis → Bitcoin adoption flow',
+      'Venezuelan diaspora crypto remittance paths',
+    ],
+    camera_notes: [
+      'street-level adoption documentation',
+      'contrasting old economy vs crypto future',
+      'grassroots movement energy',
+      'human stories of financial freedom',
+      'dramatic altitude and landscape perspectives',
+    ],
+    environments: [
+      'Mexico City CDMX Bitcoin meetup district',
+      'El Salvador Bitcoin Beach at sunset',
+      'Buenos Aires Puerto Madero fintech towers',
+      'Bogotá startup corridor with Andes backdrop',
+      'Medellín Ruta N innovation campus',
+      'Santiago financial district with Andes mountains',
+      'Lima crypto exchange district',
+    ],
+  },
+  caribbean: {
+    id: 'caribbean',
+    name: 'Caribbean Digital Islands',
+    palette: ['turquoise sea', 'coral pink', 'palm green', 'sunset gold', 'volcanic black'],
+    mood: [
+      'offshore digital innovation',
+      'island-tech paradise',
+      'regulatory haven energy',
+      'tourism-to-crypto bridge',
+      'small-nation big-vision ambition',
+      'hurricane-resilient digital infrastructure',
+    ],
+    architecture: [
+      'Bahamas SAND dollar digital currency centers',
+      'Cayman Islands crypto fund headquarters',
+      'Barbados fintech beach offices',
+      'Jamaica digital exchange plazas',
+      'Puerto Rico crypto hub (Condado corridor)',
+      'Trinidad energy-to-crypto facilities',
+    ],
+    lighting: [
+      'Caribbean turquoise water reflections',
+      'tropical sunset with digital particle overlay',
+      'palm-shadow dappled tech glow',
+      'coral reef bioluminescent data aesthetics',
+      'hurricane-eye dramatic lighting',
+    ],
+    symbols: [
+      'CBDC sand dollar tokens',
+      'island-to-island crypto bridges',
+      'offshore digital vaults',
+      'coral reef-shaped blockchain networks',
+      'palm-tree satellite uplink stations',
+      'beach-side crypto ATMs',
+      'hurricane-proof data centers',
+      'reggae-rhythm transaction flows',
+      'rum barrel tokenization',
+    ],
+    camera_notes: [
+      'aerial island-chain perspectives',
+      'beach-level tech innovation shots',
+      'underwater-to-surface data metaphors',
+      'paradise-meets-technology contrast',
+      'small-scale intimate innovation framing',
+    ],
+    environments: [
+      'Nassau Bahamas digital currency center',
+      'Cayman Islands fund management towers',
+      'Puerto Rico Condado crypto corridor at sunset',
+      'Barbados fintech beach campus',
+      'Jamaica Kingston digital exchange plaza',
+      'Trinidad Port of Spain energy-crypto facility',
+      'Caribbean island chain with holographic data bridges',
+    ],
+  },
   global: {
     id: 'global',
     name: 'Global Default',
@@ -177,6 +340,15 @@ export function getRegionalProfile(region?: string): RegionalStyleProfile {
   }
   if (lower.includes('johannesburg') || lower.includes('south africa') || lower.includes('cape town')) {
     return regionalProfiles['africa-south'];
+  }
+  if (lower.includes('brazil') || lower.includes('são paulo') || lower.includes('sao paulo') || lower.includes('rio de janeiro') || lower.includes('brazilian') || lower.includes('pix') || lower.includes('nubank')) {
+    return regionalProfiles['latam-brazil'];
+  }
+  if (lower.includes('mexico') || lower.includes('argentina') || lower.includes('colombia') || lower.includes('el salvador') || lower.includes('venezuela') || lower.includes('chile') || lower.includes('peru') || lower.includes('bogota') || lower.includes('buenos aires') || lower.includes('cdmx') || lower.includes('medellín') || lower.includes('medellin') || lower.includes('latin america') || lower.includes('latam')) {
+    return regionalProfiles['latam-spanish'];
+  }
+  if (lower.includes('caribbean') || lower.includes('bahamas') || lower.includes('cayman') || lower.includes('jamaica') || lower.includes('barbados') || lower.includes('puerto rico') || lower.includes('trinidad') || lower.includes('sand dollar') || lower.includes('haiti') || lower.includes('dominican')) {
+    return regionalProfiles['caribbean'];
   }
   if (lower.includes('dubai') || lower.includes('abu dhabi') || lower.includes('middle east') || lower.includes('saudi')) {
     return regionalProfiles['middle-east'];

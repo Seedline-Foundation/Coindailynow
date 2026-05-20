@@ -102,6 +102,45 @@ export const symbolSets: Record<string, SymbolSet> = {
       'underground digital bazaars',
     ],
   },
+  latam: {
+    category: 'latam',
+    symbols: [
+      'PIX instant payment holograms',
+      'Bitcoin ATMs in street markets',
+      'remittance corridor holographic bridges',
+      'El Salvador Chivo wallet kiosks',
+      'peso hyperinflation charts dissolving into crypto',
+      'cross-border payment streams',
+      'stablecoin lifeline networks',
+      'Nubank fintech interfaces',
+    ],
+    contexts: [
+      'São Paulo Faria Lima fintech corridor',
+      'El Salvador Bitcoin Beach',
+      'Buenos Aires crypto exchange district',
+      'Mexico City CDMX fintech hub',
+      'Medellín innovation valley',
+    ],
+  },
+  caribbean: {
+    category: 'caribbean',
+    symbols: [
+      'CBDC sand dollar tokens',
+      'island-to-island crypto bridges',
+      'offshore digital vaults',
+      'coral reef blockchain networks',
+      'palm-tree satellite uplinks',
+      'beach-side crypto ATMs',
+      'hurricane-proof data centers',
+    ],
+    contexts: [
+      'Nassau digital currency center',
+      'Cayman Islands fund towers',
+      'Puerto Rico crypto corridor',
+      'Barbados fintech beach campus',
+      'Caribbean data bridge archipelago',
+    ],
+  },
   tradfi: {
     category: 'tradfi',
     symbols: [

@@ -89,6 +89,22 @@ export const domainNegatives: Record<string, string[]> = {
     'rural underdevelopment',
     'aid/charity imagery',
   ],
+  latam: [
+    'poverty exploitation',
+    'cartel and violence imagery',
+    'stereotypical depictions',
+    'colonial narratives',
+    'disaster exploitation',
+    'slum tourism aesthetics',
+  ],
+  caribbean: [
+    'disaster exploitation',
+    'tourist-only clichés',
+    'poverty imagery',
+    'colonial plantation aesthetics',
+    'storm damage focus',
+    'stereotypical beach-only imagery',
+  ],
   breaking: [
     'calm atmosphere',
     'peaceful composition',

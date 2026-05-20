@@ -36,6 +36,18 @@ export const colorPalettes: Record<string, ColorPalette> = {
     secondary: ['#0B132B', '#D4A373'],
     accent: ['#E76F51', '#2A9D8F'],
   },
+  latam: {
+    name: 'Latin American Frontier',
+    primary: ['#FFB703', '#E63946', '#2A9D8F'],
+    secondary: ['#264653', '#F4A261'],
+    accent: ['#E76F51', '#6A0DAD'],
+  },
+  caribbean: {
+    name: 'Caribbean Digital Islands',
+    primary: ['#00CED1', '#FF6B6B', '#2ECC71'],
+    secondary: ['#1A1A2E', '#F39C12'],
+    accent: ['#E74C3C', '#48C9B0'],
+  },
   regulation: {
     name: 'Regulation Authority',
     primary: ['#1E3A5F', '#6B7280', '#D4AF37'],

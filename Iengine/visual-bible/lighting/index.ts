@@ -60,6 +60,28 @@ export const lightingRules: Record<string, {
     ],
     avoid: ['cold sterile lighting', 'western corporate', 'overexposed flat'],
   },
+  latam: {
+    description: 'Tropical fintech revolution glow',
+    directives: [
+      'tropical golden hour warmth',
+      'carnival neon vibrancy',
+      'volcanic sunset drama',
+      'Atlantic coast reflection light',
+      'favela neon nightscape energy',
+    ],
+    avoid: ['sterile corporate lighting', 'cold northern light', 'muted desaturated tones'],
+  },
+  caribbean: {
+    description: 'Island digital paradise illumination',
+    directives: [
+      'turquoise water reflection light',
+      'tropical sunset with particle overlay',
+      'palm-shadow dappled tech glow',
+      'coral bioluminescent data aesthetics',
+      'clear Caribbean sky brilliance',
+    ],
+    avoid: ['cold industrial lighting', 'grey overcast', 'dark oppressive tones'],
+  },
   regulation: {
     description: 'Cold institutional authority',
     directives: [

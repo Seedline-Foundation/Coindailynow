@@ -1,0 +1,25 @@
+{
+  "name": "Brazilian Digital Fronteira",
+  "description": "Tropical fintech revolution, PIX democratization, carnival energy meets blockchain",
+  "palette": ["tropical green", "canary yellow", "ocean blue", "sunset orange", "favela neon pink"],
+  "camera": ["wide panoramic São Paulo skyline", "street-level favela innovation", "aerial coastal", "carnival-energy movement"],
+  "lighting": ["tropical golden hour with digital overlay", "carnival neon against warm twilight", "Atlantic coast holographic reflections", "favela neon nightscape"],
+  "environments": [
+    "São Paulo Faria Lima fintech towers at golden hour",
+    "Rio de Janeiro waterfront with holographic skyline",
+    "Florianópolis island tech campus",
+    "Recife Porto Digital innovation district",
+    "Brazilian agritech data farm in cerrado landscape"
+  ],
+  "symbols": [
+    "PIX instant payment holograms",
+    "Real digital currency tokens",
+    "Nubank purple fintech interfaces",
+    "agricultural commodities tokenization",
+    "Amazon rainforest data centers",
+    "street vendor mobile payment terminals"
+  ],
+  "motion": "carnival-rhythm data flow with tropical dynamism",
+  "composition": "panoramic urban depth with human entrepreneurship focus",
+  "negative": ["poverty exploitation", "stereotypical samba-only imagery", "colonial aesthetics", "violence-focused depictions"]
+}

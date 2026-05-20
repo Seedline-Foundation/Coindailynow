@@ -147,6 +147,8 @@ export class PromptComposer {
       'cybercrime-dark': 'dark cyber infiltration aesthetic, surveillance noir',
       'regulation-authority': 'institutional authority aesthetic, formal governance design',
       afrofuturism: 'African futurism aesthetic, pan-African tech innovation art',
+      'latam-frontier': 'Latin American crypto frontier aesthetic, tropical fintech revolution, remittance innovation art',
+      'caribbean-digital': 'Caribbean digital island aesthetic, turquoise offshore innovation, CBDC paradise art',
       'crypto-tradfi-fusion': 'institutional crypto aesthetic, finance meets blockchain',
       'startup-energy': 'innovation startup aesthetic, dynamic entrepreneurship art',
     };

@@ -178,6 +178,18 @@ export class ScenePlanner {
       'south africa': 'Johannesburg financial skyline',
       nigeria: 'Lagos fintech district',
       kenya: 'Nairobi innovation hub',
+      brazil: 'São Paulo Faria Lima fintech towers',
+      mexico: 'Mexico City CDMX crypto district',
+      argentina: 'Buenos Aires Puerto Madero tech hub',
+      colombia: 'Bogotá startup corridor with Andes backdrop',
+      'el salvador': 'Bitcoin Beach Chivo wallet kiosk',
+      venezuela: 'Venezuelan diaspora crypto remittance bridge',
+      bahamas: 'Nassau CBDC sand dollar terminal',
+      'cayman islands': 'Cayman Islands offshore crypto fund towers',
+      jamaica: 'Kingston digital exchange plaza',
+      'puerto rico': 'Condado crypto corridor',
+      nubank: 'Nubank purple fintech holographic interface',
+      'mercado libre': 'Mercado Libre crypto marketplace terminal',
     };
 
     return mapping[entity.toLowerCase()] || null;
@@ -217,6 +229,12 @@ export class ScenePlanner {
   private selectStyleProfile(storyType: StoryType, narrative: NarrativeAnalysis): StyleProfile {
     if (storyType === 'afrofuturism' || narrative.symbolic_archetypes.includes('african emergence')) {
       return 'afrofuturism';
+    }
+    if (narrative.symbolic_archetypes.includes('latam crypto adoption') || narrative.topic === 'latam') {
+      return 'latam-frontier';
+    }
+    if (narrative.symbolic_archetypes.includes('caribbean digital islands') || narrative.topic === 'caribbean') {
+      return 'caribbean-digital';
     }
     if (storyType === 'cybercrime') return 'cybercrime-dark';
     if (storyType === 'regulation') return 'regulation-authority';
