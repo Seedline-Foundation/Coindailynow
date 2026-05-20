@@ -4,12 +4,24 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
-const sidebarLinks = [
+const readerLinks = [
   { href: '/user', label: 'Dashboard', icon: '📊' },
   { href: '/user/bookmarks', label: 'Bookmarks', icon: '🔖' },
   { href: '/user/reading-history', label: 'Reading History', icon: '📚' },
   { href: '/user/notifications', label: 'Notifications', icon: '🔔' },
   { href: '/user/subscriptions', label: 'Subscriptions', icon: '💳' },
+];
+
+const creatorLinks = [
+  { href: '/user/creator', label: 'Creator Studio', icon: '🎨' },
+  { href: '/user/wallet', label: 'CP Wallet', icon: '🪙' },
+  { href: '/user/ads', label: 'My Ads', icon: '📢' },
+  { href: '/user/portfolio', label: 'Portfolio', icon: '💼' },
+];
+
+const sidebarLinks = [
+  ...readerLinks,
+  ...creatorLinks,
   { href: '/user/settings', label: 'Settings', icon: '⚙️' },
 ];
 
@@ -45,10 +57,10 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
         <aside className="lg:w-64 shrink-0">
           <nav className="bg-dark-900 border border-dark-700 rounded-xl p-4 lg:sticky lg:top-24">
             <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">
-              My Account
+              Reader
             </h2>
             <ul className="space-y-1">
-              {sidebarLinks.map((link) => {
+              {readerLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
                   <li key={link.href}>
@@ -67,6 +79,44 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 );
               })}
             </ul>
+
+            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-4 px-3">
+              Creator
+            </h2>
+            <ul className="space-y-1">
+              {creatorLinks.map((link) => {
+                const isActive = pathname === link.href || pathname?.startsWith(link.href + '/');
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        isActive
+                          ? 'bg-primary-500/10 text-primary-400'
+                          : 'text-gray-400 hover:text-white hover:bg-dark-800'
+                      }`}
+                    >
+                      <span className="text-lg">{link.icon}</span>
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="mt-4 pt-4 border-t border-dark-700">
+              <Link
+                href="/user/settings"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  pathname === '/user/settings'
+                    ? 'bg-primary-500/10 text-primary-400'
+                    : 'text-gray-400 hover:text-white hover:bg-dark-800'
+                }`}
+              >
+                <span className="text-lg">⚙️</span>
+                Settings
+              </Link>
+            </div>
 
             <div className="mt-6 pt-4 border-t border-dark-700">
               <button
