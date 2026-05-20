@@ -75,6 +75,7 @@ import structuredDataRouter from './routes/structured-data.routes';
 import marqueeRouter from './routes/marquee';
 import v1ChangenowRouter from './api/routes/v1Changenow.routes';
 import financeEventsRouter from './routes/financeEvents.routes';
+import adminAiTasksRouter from './api/admin/aiTasksRoutes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
@@ -521,6 +522,9 @@ export async function setupApp() {
   // to trigger receipt issuance + reconcile subscription / wallet records.
   app.use('/api/finance-events', financeEventsRouter);
 
+  // Admin AI task management (SPEC-ADM-4) — list/trigger/cancel.
+  app.use('/api/admin/ai-tasks', adminAiTasksRouter);
+
   // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
   app.use('/', rssFeedRouter);
 
@@ -665,6 +669,57 @@ export async function setupApp() {
 
 async function startServer() {
   const { app, httpServer } = await setupApp();
+
+  // Boot the Socket.IO admin push channel. We register the io instance with
+  // adminWebSocketService so editorial-queue, AI-task, finance-approval, and
+  // content-alert events can be pushed in real time to the admin app.
+  if (process.env.ENABLE_ADMIN_WS !== 'false') {
+    try {
+      const { Server: SocketIOServer } = await import('socket.io');
+      const adminIo = new SocketIOServer(httpServer, {
+        path: '/admin-ws',
+        cors: {
+          origin: process.env.ADMIN_ORIGIN?.split(',') || true,
+          credentials: true,
+        },
+      });
+      adminIo.use(async (socket, next) => {
+        try {
+          const token = socket.handshake.auth?.token || socket.handshake.query?.token;
+          if (!token || typeof token !== 'string') {
+            return next(new Error('AUTH_REQUIRED'));
+          }
+          const { verifyJWT } = await import('./utils/auth');
+          const decoded = verifyJWT(token) as any;
+          (socket as any).userId = decoded.sub;
+          (socket as any).role = decoded.role;
+          return next();
+        } catch (err: any) {
+          return next(new Error('AUTH_INVALID'));
+        }
+      });
+      adminIo.on('connection', (socket) => {
+        const role = (socket as any).role || '';
+        // Editorial+ roles can subscribe to queue events; only admins to system/finance.
+        const editorialRoles = ['JOURNALIST', 'EDITOR', 'CEO', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'];
+        const adminRoles = ['ADMIN', 'CEO', 'SUPER_ADMIN'];
+        if (editorialRoles.includes(role)) {
+          socket.join('admin:editorial-queue');
+          socket.join('admin:ai-tasks');
+          socket.join('admin:content-alerts');
+        }
+        if (adminRoles.includes(role)) {
+          socket.join('admin:finance-approvals');
+          socket.join('admin:system-alerts');
+        }
+      });
+      const { registerAdminSocketServer } = await import('./services/adminWebSocketService');
+      registerAdminSocketServer(adminIo);
+      logger.info('🛰  Admin WebSocket channel listening at /admin-ws');
+    } catch (err: any) {
+      logger.warn('Admin WebSocket failed to start (non-fatal)', { error: err.message });
+    }
+  }
 
   if (process.env.ENABLE_MODERATION !== 'false') {
     try {
