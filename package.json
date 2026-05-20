@@ -8,7 +8,8 @@
     "packages/*",
     "frontend",
     "backend",
-    "ai-system"
+    "ai-system",
+    "Iengine"
   ],
   "scripts": {
     "dev": "turbo run dev",
@@ -30,6 +31,9 @@
     "start:ai": "cd apps/ai && npm run start",
     "start:press": "cd apps/press && npm run start",
     "start:backend": "cd backend && npm run start",
+    "dev:iengine": "cd Iengine && npm run dev:workers",
+    "build:iengine": "cd Iengine && npm run build",
+    "start:iengine": "cd Iengine && npm run start:workers",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "clean": "turbo run clean && rimraf node_modules",

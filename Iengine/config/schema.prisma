@@ -1,0 +1,122 @@
+// Iengine Prisma Schema Additions
+// Add these models to the main backend/prisma/schema.prisma
+
+// ─── Generation Request ──────────────────────────────────────────────────────
+
+model IengineRequest {
+  id              String   @id @default(cuid())
+  articleId       String?
+  headline        String
+  excerpt         String?
+  category        String?
+  tags            String[]
+  region          String?
+  urgency         String   @default("medium")
+  storyType       String?
+  requestedBy     String?
+  callbackUrl     String?
+  status          String   @default("pending") // pending, processing, completed, failed, rejected
+  priority        Int      @default(5)
+  variants        Int      @default(1)
+
+  // Relations
+  article         Article? @relation(fields: [articleId], references: [id])
+  results         IengineResult[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([articleId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("iengine_requests")
+}
+
+// ─── Generation Result ───────────────────────────────────────────────────────
+
+model IengineResult {
+  id              String   @id @default(cuid())
+  requestId       String
+  articleId       String?
+
+  // Scene & Prompt
+  scenePlan       Json
+  prompt          String   @db.Text
+  negativePrompt  String   @db.Text
+  workflowUsed    String
+
+  // Image URLs
+  imageUrl        String?
+  thumbnailUrl    String?
+  webpUrl         String?
+  avifUrl         String?
+  cdnUrls         Json?
+
+  // Quality Scores
+  clipScore       Float?
+  aestheticScore  Float?
+  artifactScore   Float?
+  brandAlignment  Float?
+  compositionScore Float?
+  technicalQuality Float?
+  overallScore    Float?
+  approved        Boolean  @default(false)
+  rejectionReasons String[]
+
+  // Generation Metadata
+  generationTimeMs Int?
+  modelUsed       String?
+  seed            Int?
+  steps           Int?
+  cfg             Float?
+  sampler         String?
+  scheduler       String?
+  loras           String[]
+
+  // Status
+  status          String   @default("pending") // pending, generating, scoring, approved, rejected, delivered
+
+  // Relations
+  request         IengineRequest @relation(fields: [requestId], references: [id])
+  article         Article?       @relation(fields: [articleId], references: [id])
+
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+
+  @@index([requestId])
+  @@index([articleId])
+  @@index([status])
+  @@index([approved])
+  @@map("iengine_results")
+}
+
+// ─── Visual Bible Overrides ──────────────────────────────────────────────────
+
+model IengineStyleOverride {
+  id              String   @id @default(cuid())
+  domain          String   // crypto, tradfi, ai, cybercrime, afrofuturism, etc.
+  ruleType        String   // camera, lighting, color, symbolism, motion, composition
+  rules           Json     // Override rules as JSON
+  active          Boolean  @default(true)
+  createdBy       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([domain, ruleType])
+  @@map("iengine_style_overrides")
+}
+
+// ─── Quality Audit Log ───────────────────────────────────────────────────────
+
+model IengineQualityLog {
+  id              String   @id @default(cuid())
+  resultId        String
+  scores          Json
+  validationType  String   // technical, editorial, brand
+  passed          Boolean
+  details         Json?
+  createdAt       DateTime @default(now())
+
+  @@index([resultId])
+  @@map("iengine_quality_logs")
+}
