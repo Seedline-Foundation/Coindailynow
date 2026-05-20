@@ -37,5 +37,13 @@ module.exports = {
   forceExit: true,
   clearMocks: true,
   resetMocks: true,
-  restoreMocks: true
+  restoreMocks: true,
+  coverageThreshold: {
+    global: {
+      branches: 10,
+      functions: 10,
+      lines: 10,
+      statements: 10,
+    },
+  },
 };

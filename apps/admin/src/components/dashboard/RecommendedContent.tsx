@@ -7,6 +7,8 @@
 
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -79,7 +81,7 @@ export default function RecommendedContent() {
       const response = await axios.get('/api/user/recommendations', {
         params: { limit: 10 },
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${getAccessToken()}`,
         },
       });
 
@@ -112,7 +114,7 @@ export default function RecommendedContent() {
           },
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${getAccessToken()}`,
             },
           }
         );

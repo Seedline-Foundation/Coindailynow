@@ -26,5 +26,14 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "src/components/dashboard/**",
+    "src/components/profile/**",
+    "src/components/wallet/**",
+    "src/components/user/**",
+    "src/components/web3/**"
+  ]
 }

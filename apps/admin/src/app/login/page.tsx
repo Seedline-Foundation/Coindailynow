@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState, FormEvent } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { getPostLoginPath } from '@/lib/auth';
+import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { 
   Shield, 
@@ -27,8 +29,11 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-export default function StaffLoginPage() {
+function StaffLoginContent() {
   const router = useRouter();
+  const { login } = useAuth();
+  const searchParams = useSearchParams();
+  const requireSuper = searchParams.get('role') === 'super';
   const [step, setStep] = useState<'credentials' | '2fa'>('credentials');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -98,19 +103,21 @@ export default function StaffLoginPage() {
         throw new Error(data?.error?.message || 'Invalid credentials');
       }
 
-      // Check if user has admin role (ADMIN or SUPER_ADMIN)
-      const allowedRoles = ['ADMIN', 'MODERATOR', 'EDITOR', 'SUPER_ADMIN'];
+      const allowedRoles = requireSuper
+        ? ['SUPER_ADMIN']
+        : ['ADMIN', 'CONTENT_ADMIN', 'TECH_ADMIN', 'MARKETING_ADMIN', 'SUPER_ADMIN'];
       if (!allowedRoles.includes(data.user?.role)) {
-        throw new Error('Access denied. Staff login only.');
+        throw new Error(
+          requireSuper ? 'Super Admin access only.' : 'Access denied. Staff login only.',
+        );
       }
 
-      // Store tokens
-      localStorage.setItem('admin_access_token', data.tokens.accessToken);
-      localStorage.setItem('admin_refresh_token', data.tokens.refreshToken);
-      localStorage.setItem('admin_user', JSON.stringify(data.user));
+      login(
+        { accessToken: data.tokens.accessToken, refreshToken: data.tokens.refreshToken },
+        data.user,
+      );
 
-      // Redirect to admin dashboard
-      router.push('/admin');
+      router.push(getPostLoginPath(data.user.role));
       
     } catch (err) {
       console.error('Login error:', err);
@@ -361,5 +368,21 @@ export default function StaffLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function LoginFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 flex items-center justify-center p-4">
+      <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+    </div>
+  );
+}
+
+export default function StaffLoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <StaffLoginContent />
+    </Suspense>
   );
 }

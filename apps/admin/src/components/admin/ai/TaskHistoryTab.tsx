@@ -67,7 +67,7 @@ export default function TaskHistoryTab() {
       }
       
       setTasks(filtered);
-      setTotalPages(data.totalPages);
+      setTotalPages(data.totalPages ?? 1);
       setTotalTasks(data.total);
     } catch (error) {
       console.error('[TaskHistoryTab] Error:', error);
@@ -446,7 +446,7 @@ export default function TaskHistoryTab() {
               </div>
 
               {/* Metrics */}
-              {selectedTask.metrics && (
+              {selectedTask.metrics != null ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="bg-gray-50 rounded-lg p-3 text-center">
                     <p className="text-xs text-gray-500">Processing Time</p>
@@ -460,24 +460,24 @@ export default function TaskHistoryTab() {
                       ${selectedTask.metrics.cost?.toFixed(4)}
                     </p>
                   </div>
-                  {selectedTask.metrics.tokensUsed && (
+                  {selectedTask.metrics.tokensUsed != null ? (
                     <div className="bg-gray-50 rounded-lg p-3 text-center">
                       <p className="text-xs text-gray-500">Tokens</p>
                       <p className="text-lg font-bold text-gray-900">
                         {selectedTask.metrics.tokensUsed.toLocaleString()}
                       </p>
                     </div>
-                  )}
-                  {selectedTask.metrics.qualityScore && (
+                  ) : null}
+                  {selectedTask.metrics.qualityScore != null ? (
                     <div className="bg-gray-50 rounded-lg p-3 text-center">
                       <p className="text-xs text-gray-500">Quality</p>
                       <p className="text-lg font-bold text-gray-900">
                         {(selectedTask.metrics.qualityScore * 100).toFixed(0)}%
                       </p>
                     </div>
-                  )}
+                  ) : null}
                 </div>
-              )}
+              ) : null}
 
               {/* Input/Output */}
               <div>
@@ -486,14 +486,14 @@ export default function TaskHistoryTab() {
                   {JSON.stringify(selectedTask.inputData, null, 2)}
                 </pre>
               </div>
-              {selectedTask.outputData && (
+              {selectedTask.outputData != null ? (
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Output Data</h3>
                   <pre className="bg-green-50 p-4 rounded-lg text-sm overflow-auto max-h-48">
                     {JSON.stringify(selectedTask.outputData, null, 2)}
                   </pre>
                 </div>
-              )}
+              ) : null}
               {selectedTask.error && (
                 <div>
                   <h3 className="font-semibold text-red-600 mb-2">Error</h3>

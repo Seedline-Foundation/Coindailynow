@@ -1,0 +1,72 @@
+owner: nicefacer
+repo: coindaily-status
+
+sites:
+  - name: CoinDaily News
+    url: https://coindaily.online
+    expectedStatusCodes:
+      - 200
+      - 301
+      - 302
+
+  - name: CoinDaily API
+    url: https://api.coindaily.online/health
+    expectedStatusCodes:
+      - 200
+
+  - name: CoinDaily Admin
+    url: https://jet.coindaily.online
+    expectedStatusCodes:
+      - 200
+      - 301
+      - 302
+
+  - name: CoinDaily Press
+    url: https://press.coindaily.online
+    expectedStatusCodes:
+      - 200
+      - 301
+      - 302
+
+  - name: CoinDaily AI
+    url: https://ai.coindaily.online
+    expectedStatusCodes:
+      - 200
+      - 301
+      - 302
+
+status-website:
+  cname: status.coindaily.online
+  name: CoinDaily Status
+  theme: dark
+  logoUrl: https://coindaily.online/og-image.png
+  navbar:
+    - title: CoinDaily
+      href: https://coindaily.online
+    - title: News
+      href: https://coindaily.online/news
+
+notifications:
+  - type: email
+    address: admin@coindaily.online
+  # Uncomment after Telegram bot is set up:
+  # - type: telegram
+  #   botToken: $TELEGRAM_BOT_TOKEN
+  #   chatId: $TELEGRAM_CHAT_ID
+
+i18n:
+  activeIncidents: Active incidents
+  allSystemsOperational: All systems operational
+  incidentReport: Incident report for {0}
+  liveStatus: Live status
+  overallUptime: Overall uptime ({0})
+  pastIncidents: Past incidents
+
+workflowSchedule:
+  graphs: "0 0 * * *"
+  responseTime: "0 23 * * *"
+  staticSite: "0 1 * * *"
+  summary: "0 0 * * *"
+  updateTemplate: "0 0 * * *"
+  updates: "*/5 * * * *"
+  uptime: "*/5 * * * *"

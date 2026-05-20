@@ -50,7 +50,7 @@ export default function AITasksTab() {
         limit: 20,
       });
       setTasks(data.tasks);
-      setTotalPages(data.totalPages);
+      setTotalPages(data.totalPages ?? 1);
     } catch (error) {
       console.error('[AITasksTab] Error loading tasks:', error);
     } finally {
@@ -352,14 +352,14 @@ export default function AITasksTab() {
                   {JSON.stringify(selectedTask.inputData, null, 2)}
                 </pre>
               </div>
-              {selectedTask.outputData && (
+              {selectedTask.outputData != null ? (
                 <div>
                   <h3 className="font-semibold mb-2">Output Data</h3>
                   <pre className="bg-gray-50 p-4 rounded text-sm overflow-auto">
                     {JSON.stringify(selectedTask.outputData, null, 2)}
                   </pre>
                 </div>
-              )}
+              ) : null}
               {selectedTask.error && (
                 <div>
                   <h3 className="font-semibold mb-2 text-red-600">Error</h3>

@@ -10,13 +10,29 @@
  */
 
 import { Router, Request, Response } from 'express';
-import Redis from 'ioredis';
+import { authMiddleware, requireCapability } from '../../middleware/auth';
+import { getRedis } from '../../lib/redis';
+import prisma from '../../lib/prisma';
+import { logger } from '../../utils/logger';
 import { AIReviewAgent } from '../../agents/review/aiReviewAgent';
+import { runEditorialPipelineJob } from '../../services/aiEditorialPipelineService';
+import AIModerationService from '../../services/aiModerationService';
+import ContentModerationAgent from '../../agents/moderation/contentModerationAgent';
 import { AdminQueueItem, EditRequest } from '../../types/admin-types';
+import { emitAdminQueueUpdate } from '../../services/adminWebSocketService';
 
 const router = Router();
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-const reviewAgent = new AIReviewAgent(redis);
+router.use(authMiddleware as any);
+// All editorial queue ops require at least ARTICLE_APPROVE (EDITOR+).
+router.use(requireCapability('ARTICLE_APPROVE') as any);
+const redis = getRedis();
+const reviewAgent = new AIReviewAgent(redis, logger, prisma as any);
+const moderationAgent = new ContentModerationAgent();
+const perspectiveModeration = new AIModerationService(
+  prisma,
+  redis,
+  process.env.PERSPECTIVE_API_KEY || process.env.GOOGLE_PERSPECTIVE_API_KEY || '',
+);
 
 // ============================================================================
 // GET /api/admin/queue - Get all pending articles
@@ -123,6 +139,38 @@ router.post('/queue/:id/approve', async (req: Request, res: Response) => {
 
     const item: AdminQueueItem = JSON.parse(itemData);
 
+    const articleText = [
+      item.articles?.english?.title,
+      item.articles?.english?.content,
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+
+    if (articleText) {
+      const agentTask = await moderationAgent.execute(
+        { text: articleText, contentId: item.article_id },
+        'high',
+      );
+      const agentOut = (agentTask as { output?: { allowed?: boolean; score?: number } }).output;
+      const perspective = await perspectiveModeration.moderateContent({
+        contentId: item.article_id,
+        contentType: 'article',
+        text: articleText,
+        userId: admin_id || 'admin',
+      } as any);
+      const allowed =
+        agentOut?.allowed !== false &&
+        Number(agentOut?.score ?? 0) < 0.85 &&
+        (perspective as { allowed?: boolean }).allowed !== false;
+      if (!allowed) {
+        return res.status(422).json({
+          success: false,
+          error: 'Content failed moderation — cannot approve for publication',
+          moderation: { agent: agentOut, perspective },
+        });
+      }
+    }
+
     // Update status to approved
     item.status = 'approved';
     item.reviewed_at = new Date();
@@ -140,6 +188,15 @@ router.post('/queue/:id/approve', async (req: Request, res: Response) => {
 
     // Add to approved queue
     await redis.lpush('admin_queue:approved', JSON.stringify(item));
+
+    // Real-time push to admin app — refreshes the queue list without polling.
+    emitAdminQueueUpdate({
+      action: 'approved',
+      itemId: id || item.id,
+      status: item.status,
+      by: admin_id || (req as any).user?.id,
+      at: new Date().toISOString(),
+    });
 
     // TODO: Trigger publication workflow
     // - Save to database (Prisma)
@@ -239,7 +296,16 @@ router.post('/queue/:id/request-edit', async (req: Request, res: Response) => {
 router.get('/stats', async (req: Request, res: Response) => {
   try {
     const pendingCount = await redis.llen('admin_queue:pending');
-    const approvedCount = await redis.llen('admin_queue:approved');
+
+    // Get all approved items to filter by today
+    const allApproved = await redis.lrange('admin_queue:approved', 0, -1);
+    const startOfToday = new Date().setHours(0, 0, 0, 0);
+
+    const approvedTodayCount = allApproved.filter(item => {
+      const parsed: AdminQueueItem = JSON.parse(item);
+      if (!parsed.reviewed_at) return false;
+      return new Date(parsed.reviewed_at).getTime() >= startOfToday;
+    }).length;
 
     // Get items with edit requests
     const allPending = await redis.lrange('admin_queue:pending', 0, -1);
@@ -253,7 +319,7 @@ router.get('/stats', async (req: Request, res: Response) => {
       stats: {
         pending_approval: pendingCount - editRequestedCount,
         edit_requested: editRequestedCount,
-        approved_today: approvedCount, // TODO: Filter by today
+        approved_today: approvedTodayCount,
         total_pending: pendingCount
       }
     });
@@ -305,6 +371,14 @@ router.post('/queue/:id/publish', async (req: Request, res: Response) => {
     // Remove from approved queue
     await redis.lrem('admin_queue:approved', 1, itemData);
 
+    emitAdminQueueUpdate({
+      action: 'published',
+      itemId: id || item.id,
+      status: item.status,
+      by: (req as any).user?.id,
+      at: new Date().toISOString(),
+    });
+
     // TODO: Actual publication workflow
     // - Update article status in database to 'published'
     // - Set publication timestamp
@@ -331,6 +405,23 @@ router.post('/queue/:id/publish', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: 'Failed to publish article'
+    });
+  }
+});
+
+// ============================================================================
+// POST /api/admin/editorial-queue/run — trigger ai-system pipeline
+// ============================================================================
+
+router.post('/run', async (req: Request, res: Response) => {
+  try {
+    const result = await runEditorialPipelineJob();
+    res.json({ success: true, data: result });
+  } catch (error: any) {
+    console.error('[Admin Queue API] Pipeline run failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error?.message || 'Editorial pipeline failed',
     });
   }
 });

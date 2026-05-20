@@ -14,7 +14,7 @@ const tiers = [
     type: 'Content',
     requirements: ['Basic crypto/finance knowledge', 'Good writing skills in any African language', 'Active social media presence', 'Passion for African financial education'],
     perks: ['Published byline on articles', 'CoinDaily author badge', 'Access to community Slack', 'Free CoinDaily Premium', 'AI writing tools access'],
-    compensation: 'Per-article pay + Ad revenue share (55/45)',
+    compensation: '0.5 CP per 100 verified reads + Ad revenue share (55/45)',
     slots: 'Open — Apply Now',
   },
   {
@@ -24,8 +24,28 @@ const tiers = [
     type: 'Content & Analysis',
     requirements: ['Deep local market knowledge', '3+ published articles or equivalent', 'Verified expertise in your region', 'Local language fluency', 'Consistent availability'],
     perks: ['Featured author profile', 'Priority editorial calendar', 'Quarterly bonus pool', 'Event speaker invitations', 'Free CoinDaily Premium', 'Course creation rights'],
-    compensation: 'Retainer + Ad revenue share (55/45) + Course sales (80/20)',
+    compensation: '1.0 CP per 100 verified reads + Ad revenue share (55/45) + Course sales (80/20)',
     slots: '20 positions',
+  },
+  {
+    name: 'Verified Analyst',
+    emoji: '✅',
+    color: 'green',
+    type: 'Analysis & Insights',
+    requirements: ['50+ published articles on CoinDaily', '10K+ total verified reads', 'Consistent quality score above 80%', 'Proven track record of accurate analysis', 'Must maintain "NEXUS Verified" badge standards'],
+    perks: ['"CoinDaily Verified" trust badge', 'Full Content Studio access', 'Press release submission rights', 'Subscriber community feature', '30% rev share on their ads', 'Priority AI research tools'],
+    compensation: '1.5 CP per 100 verified reads + 30% ad rev share + Course sales (80/20)',
+    slots: '15 positions',
+  },
+  {
+    name: 'Senior Fellow',
+    emoji: '🎓',
+    color: 'indigo',
+    type: 'Expert Research',
+    requirements: ['Domain expert (regulators, ex-bankers, fund managers, founders)', 'Recruited actively or exceptional application', 'Must produce min 2 pieces/month', 'Demonstrated thought leadership in EM markets'],
+    perks: ['Co-branded research reports', 'Speaker slot at CoinDaily events', '50% rev share on all content ads', 'Quarterly bonus from Creator Fund', 'Free CHIMA Data access', 'Advisory board eligibility'],
+    compensation: '3.0 CP per 100 verified reads + 50% ad rev share + Creator Fund bonus',
+    slots: '10 positions',
   },
   {
     name: 'Senior Analyst',
@@ -34,7 +54,7 @@ const tiers = [
     type: 'Research & Data',
     requirements: ['Professional finance/crypto background', '10+ published works', 'Demonstrated analytical skills', 'Regular availability', 'Strong data interpretation'],
     perks: ['Premium author page', 'Monthly retainer', 'Revenue share on premium content', 'Conference sponsorship', 'Full AI tools suite', 'Premium podcast hosting'],
-    compensation: 'Monthly retainer + Ad revenue share (55/45) + Premium content split',
+    compensation: '2.0 CP per 100 verified reads + Monthly retainer + Premium content split',
     slots: '10 positions',
   },
   {
@@ -44,7 +64,7 @@ const tiers = [
     type: 'Strategy & Leadership',
     requirements: ['Industry leader status', 'Invitation only or outstanding application', 'Public figure or KOL', 'Commitment to quarterly review'],
     perks: ['Top-tier branding', 'Advisory compensation', 'Token allocation', 'Full editorial control', 'Direct line to CEO', 'Board voting rights'],
-    compensation: 'Retainer + Token allocation + Revenue share',
+    compensation: '4.0 CP per 100 verified reads + Token allocation + Revenue share',
     slots: '5 positions',
   },
 ];
@@ -113,6 +133,8 @@ export default function ExpertProgramPage() {
   const colorMap: Record<string, { bg: string; border: string; text: string; badge: string }> = {
     blue: { bg: 'bg-blue-50 dark:bg-blue-900/20', border: 'border-blue-300 dark:border-blue-700', text: 'text-blue-700 dark:text-blue-300', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200' },
     orange: { bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-300 dark:border-orange-700', text: 'text-orange-700 dark:text-orange-300', badge: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200' },
+    green: { bg: 'bg-green-50 dark:bg-green-900/20', border: 'border-green-300 dark:border-green-700', text: 'text-green-700 dark:text-green-300', badge: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200' },
+    indigo: { bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-300 dark:border-indigo-700', text: 'text-indigo-700 dark:text-indigo-300', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200' },
     purple: { bg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-300 dark:border-purple-700', text: 'text-purple-700 dark:text-purple-300', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200' },
     yellow: { bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-300 dark:border-yellow-700', text: 'text-yellow-700 dark:text-yellow-300', badge: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200' },
   };
@@ -232,7 +254,7 @@ export default function ExpertProgramPage() {
             {/* Contributor Tiers */}
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Contributor Tiers</h2>
             <p className="text-gray-500 mb-6">Each tier is also an open position — <Link href="/jobs" className="text-orange-600 hover:underline font-semibold">view all vacancies →</Link></p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
               {tiers.map(t => (
                 <div key={t.name} className={`rounded-2xl shadow-lg p-6 border-2 ${colorMap[t.color].bg} ${colorMap[t.color].border}`}>
                   <div className="flex items-center gap-3 mb-4">

@@ -35,7 +35,8 @@
     "db:studio": "prisma studio",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "type-check:ci": "node scripts/typecheck-ci.cjs"
   },
   "keywords": [
     "cryptocurrency",
@@ -48,15 +49,13 @@
   "author": "CoinDaily Team",
   "license": "MIT",
   "dependencies": {
+    "coindaily-ai-system": "*",
     "@apollo/server": "^4.9.0",
     "@elastic/elasticsearch": "^8.10.0",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
     "@google-cloud/vertexai": "^1.10.0",
     "@graphql-tools/schema": "^10.0.0",
     "@graphql-tools/utils": "^10.0.0",
-    "@mui/icons-material": "^7.3.4",
-    "@mui/material": "^7.3.4",
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "@prisma/client": "^6.19.2",
     "@sentry/node": "^10.53.1",
     "@types/helmet": "^4.0.0",
@@ -112,6 +111,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/lodash": "^4.17.20",
     "@types/node": "^20.19.23",
+    "@types/paypal__checkout-server-sdk": "^1.0.8",
     "@types/socket.io-client": "^3.0.0",
     "@types/supertest": "^2.0.16",
     "@types/uuid": "^9.0.7",

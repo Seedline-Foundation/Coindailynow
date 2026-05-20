@@ -1,7 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { authMiddleware } from '../../middleware/auth';
+import axios from 'axios';
+import { getRedis } from '../../lib/redis';
+import { notifyWireSubscribers, registerWireAlertKey, unregisterWireAlertKey } from '../../lib/wireAlertDispatcher';
 
 const router = Router();
+const wireAlertRedis = getRedis();
 
 function getPrisma(req: Request): any {
   return (req.app as any).locals.prisma;
@@ -74,6 +78,86 @@ const fallbackPackages = [
     isActive: true,
   },
 ];
+
+// ─── GET /press/wire (public wire feed) ─────────────────────
+
+const REGION_TO_COUNTRY: Record<string, string> = {
+  nigeria: 'NG',
+  kenya: 'KE',
+  south_africa: 'ZA',
+  ghana: 'GH',
+  tanzania: 'TZ',
+  egypt: 'EG',
+  africa: 'NG',
+  global: 'US',
+};
+
+const CATEGORY_TO_INDUSTRY: Record<string, string> = {
+  defi: 'DeFi',
+  nft: 'NFTs',
+  exchange: 'Exchange',
+  regulation: 'Regulation',
+  memecoin: 'Token',
+  general: 'Infrastructure',
+};
+
+function mapReleaseToWireItem(release: any) {
+  let tags: string[] = [];
+  if (release.tags) {
+    try {
+      const parsed = typeof release.tags === 'string' ? JSON.parse(release.tags) : release.tags;
+      tags = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      tags = [];
+    }
+  }
+
+  const region = (release.region || 'africa').toLowerCase();
+  const category = (release.category || 'general').toLowerCase();
+
+  return {
+    id: release.id,
+    title: release.title,
+    summary: release.summary,
+    source:
+      [release.user?.firstName, release.user?.lastName].filter(Boolean).join(' ') ||
+      release.user?.username ||
+      'CoinDaily Wire',
+    publishedAt: new Date(release.publishedAt || release.createdAt).toISOString(),
+    url: release.slug ? `/press/${release.slug}` : null,
+    tags,
+    industry: CATEGORY_TO_INDUSTRY[category] || 'DeFi',
+    country: REGION_TO_COUNTRY[region] || 'NG',
+    assetClass: 'Token',
+    status: release.status,
+  };
+}
+
+router.get('/wire', async (req: Request, res: Response) => {
+  const prisma = getPrisma(req);
+  const limit = Math.min(parseInt(String(req.query.limit || '50'), 10) || 50, 100);
+
+  const data = await safeQuery(
+    async () =>
+      prisma.pressRelease.findMany({
+        where: {
+          status: { in: ['approved', 'published'] },
+        },
+        include: {
+          user: { select: { id: true, username: true, firstName: true, lastName: true } },
+        },
+        orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+        take: limit,
+      }),
+    [],
+  );
+
+  return res.json({
+    data: data.map(mapReleaseToWireItem),
+    source: data.length > 0 ? 'database' : 'empty',
+    count: data.length,
+  });
+});
 
 // ─── GET /press/packages ────────────────────────────────────
 
@@ -166,7 +250,7 @@ router.get('/releases/:id', async (req: Request, res: Response) => {
         package: true,
         assets: true,
         logs: { orderBy: { createdAt: 'desc' } },
-        user: { select: { id: true, username: true, displayName: true } },
+        user: { select: { id: true, username: true, firstName: true, lastName: true } },
       },
     });
   }, null as any);
@@ -304,11 +388,147 @@ router.patch('/releases/:id/review', authMiddleware as any, async (req: Request,
         status,
         ...(status === 'approved' && { publishedAt: new Date() }),
       },
+      include: { user: { select: { firstName: true, lastName: true, username: true } } },
     });
+    if (status === 'approved') {
+      const pub = new Date(updated.publishedAt || new Date()).toISOString();
+      const company =
+        [updated.user?.firstName, updated.user?.lastName].filter(Boolean).join(' ') ||
+        updated.user?.username ||
+        'Press';
+      void notifyWireSubscribers({
+        id: updated.id,
+        headline: updated.title,
+        company,
+        publishedAt: pub,
+        category: (updated as any).category || 'general',
+        region: (updated as any).region || 'africa',
+      });
+    }
     return res.json({ data: updated });
   } catch (err: any) {
     return res.status(500).json({ error: { code: 'INTERNAL', message: err.message } });
   }
 });
+
+// ─── POST /press/checkout/yellowcard ────────────────────────
+
+router.post('/checkout/yellowcard', async (req: Request, res: Response) => {
+  const { orderId, publisherId, amountUsd } = req.body;
+  if (!orderId || !publisherId || amountUsd == null) {
+    return res.status(400).json({ error: { code: 'MISSING_FIELDS', message: 'orderId, publisherId, amountUsd required' } });
+  }
+
+  const reference = `press_${orderId}`;
+  const amount = Number(amountUsd).toFixed(2);
+  const baseUrl = process.env.YELLOWCARD_API_URL || 'https://api.yellowcard.io';
+  const checkoutUrl =
+    process.env.YELLOWCARD_CHECKOUT_URL ||
+    `${baseUrl}/checkout?amount=${amount}&currency=USD&ref=${reference}&metadata=${encodeURIComponent(
+      JSON.stringify({ publisherId, orderId }),
+    )}`;
+
+  return res.json({ checkoutUrl, reference });
+});
+
+// ─── Wire alerts (email / Telegram) ─────────────────────────
+
+router.post('/wire/alerts', async (req: Request, res: Response) => {
+  const { email, telegramChatId, sources } = req.body as {
+    email?: string;
+    telegramChatId?: string;
+    sources?: string[];
+  };
+
+  if (!email && !telegramChatId) {
+    return res.status(400).json({ message: 'email or telegramChatId required' });
+  }
+
+  const key = email ? `wire:alert:email:${email}` : `wire:alert:tg:${telegramChatId}`;
+  await wireAlertRedis.set(
+    key,
+    JSON.stringify({ sources: sources || [], subscribedAt: new Date().toISOString() }),
+    'EX',
+    60 * 60 * 24 * 365,
+  );
+  await registerWireAlertKey(key);
+
+  if (email && process.env.POSTMARK_SERVER_TOKEN) {
+    await axios
+      .post(
+        'https://api.postmarkapp.com/email',
+        {
+          From: process.env.WIRE_ALERT_FROM || 'wire@coindaily.online',
+          To: email,
+          Subject: 'CoinDaily Wire alerts enabled',
+          TextBody: `You will receive alerts for: ${(sources || []).join(', ') || 'all sources'}.`,
+        },
+        { headers: { 'X-Postmark-Server-Token': process.env.POSTMARK_SERVER_TOKEN } },
+      )
+      .catch(() => undefined);
+  }
+
+  if (telegramChatId && process.env.TELEGRAM_BOT_TOKEN) {
+    await axios
+      .post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        chat_id: telegramChatId,
+        text: `Wire alerts enabled for: ${(sources || []).join(', ') || 'all sources'}`,
+      })
+      .catch(() => undefined);
+  }
+
+  return res.json({ success: true });
+});
+
+router.delete('/wire/alerts', async (req: Request, res: Response) => {
+  const { email, telegramChatId } = req.body;
+  if (email) {
+    const k = `wire:alert:email:${email}`;
+    await unregisterWireAlertKey(k);
+    await wireAlertRedis.del(k);
+  }
+  if (telegramChatId) {
+    const k = `wire:alert:tg:${telegramChatId}`;
+    await unregisterWireAlertKey(k);
+    await wireAlertRedis.del(k);
+  }
+  return res.json({ success: true });
+});
+
+// ─── Admin: replay a wire alert dispatch for a past release ────────
+import { requireCapability } from '../../middleware/auth';
+
+router.post(
+  '/wire/replay/:releaseId',
+  authMiddleware,
+  requireCapability('ARTICLE_PUBLISH'),
+  async (req: Request, res: Response) => {
+    const releaseId = String(req.params.releaseId || '');
+    if (!releaseId) return res.status(400).json({ error: 'releaseId required' });
+    try {
+      const prisma = getPrisma(req);
+      const pr = await prisma.pressRelease?.findUnique({
+        where: { id: releaseId },
+        include: { user: { select: { firstName: true, lastName: true, username: true } } },
+      });
+      if (!pr) return res.status(404).json({ error: 'release not found' });
+      const company =
+        [pr.user?.firstName, pr.user?.lastName].filter(Boolean).join(' ') ||
+        pr.user?.username ||
+        'Press';
+      await notifyWireSubscribers({
+        id: pr.id,
+        headline: pr.title,
+        company,
+        publishedAt: new Date(pr.publishedAt || pr.createdAt || Date.now()).toISOString(),
+        category: (pr as any).category || 'general',
+        region: (pr as any).region || 'africa',
+      });
+      return res.json({ success: true, replayed: pr.id });
+    } catch (e: any) {
+      return res.status(500).json({ error: e.message });
+    }
+  },
+);
 
 export default router;

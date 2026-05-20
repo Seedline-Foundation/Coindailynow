@@ -1,14 +1,17 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Poppins } from 'next/font/google';
+import { Inter, Poppins, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../hooks/useAuth';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import TrafficCopClient from '@/components/security/TrafficCopClient';
+import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
 import AppInstallAndOfflinePrompt from '@/components/pwa/AppInstallAndOfflinePrompt';
 import PostHogProvider from '@/components/providers/PostHogProvider';
 import { GeoProvider } from '@/lib/GeoContext';
 import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
 import CriticalCSS from '@/components/performance/CriticalCSS';
+import KeyboardShortcuts from '@/components/shortcuts/KeyboardShortcuts';
+import { DensityProvider } from '@/components/ui/DensityToggle';
 
 // Font configurations
 const inter = Inter({ 
@@ -17,10 +20,16 @@ const inter = Inter({
   display: 'swap',
 });
 
-const poppins = Poppins({ 
+const poppins = Poppins({
   weight: ['300', '400', '500', '600', '700'],
   subsets: ['latin'],
   variable: '--font-poppins',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
   display: 'swap',
 });
 
@@ -238,7 +247,7 @@ export default function RootLayout({
         />
       </head>
       <body 
-        className={`${inter.className} font-sans antialiased bg-background text-neutral-900 selection:bg-primary-100 selection:text-primary-800`}
+        className={`${inter.className} ${jetbrainsMono.variable} font-sans antialiased bg-background text-neutral-900 selection:bg-primary-100 selection:text-primary-800`}
         suppressHydrationWarning
       >
         {/* Skip to main content for accessibility */}
@@ -254,12 +263,15 @@ export default function RootLayout({
           <GeoProvider>
             <AuthProvider>
               <PostHogProvider>
+              <DensityProvider>
               <div id="main-content" role="main" className="min-h-screen">
                 {children}
               </div>
               <AppInstallAndOfflinePrompt />
               <TrafficCopClient />
-              <CookieConsentBanner position="bottom" theme="light" />
+              <CookieConsentBanner position="bottom" theme="dark" showDeclineButton={true} />
+              <KeyboardShortcuts />
+              </DensityProvider>
               </PostHogProvider>
             </AuthProvider>
           </GeoProvider>

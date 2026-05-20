@@ -1,5 +1,7 @@
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { RefreshCw, Save, CheckCircle } from 'lucide-react';
 
@@ -80,7 +82,7 @@ export default function SettingsPanelPage({
   const fields = useMemo(() => PAGE_FIELDS[page] ?? [], [page]);
 
   const token = () =>
-    typeof window !== 'undefined' ? localStorage.getItem('super_admin_token') || '' : '';
+    typeof window !== 'undefined' ? getAccessToken() || '' : '';
 
   // Load live stats (metrics)
   const fetchStats = async () => {

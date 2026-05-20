@@ -1,0 +1,17 @@
+{
+  "name": "Crypto Core",
+  "description": "Dynamic decentralized energy, neon blockchain aesthetics",
+  "palette": ["neon cyan", "electric purple", "gold", "deep navy"],
+  "camera": ["dynamic low-angle", "cinematic motion", "wide-lens distortion"],
+  "lighting": ["neon volumetric glow", "holographic ambience", "electric edge lighting"],
+  "environments": [
+    "futuristic trading floor",
+    "blockchain data center",
+    "holographic crypto exchange",
+    "decentralized marketplace"
+  ],
+  "symbols": ["holographic coins", "blockchain streams", "glowing validators"],
+  "motion": "dynamic with floating particles",
+  "composition": "asymmetrical rule-of-thirds with depth layers",
+  "negative": ["stock photo", "clipart", "cartoon"]
+}

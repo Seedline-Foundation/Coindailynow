@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import * as Sentry from '@sentry/node';
 import { logger } from '../utils/logger';
 
 // Custom error class
@@ -49,6 +50,16 @@ export const errorHandler = (
     statusCode = 401;
     code = 'TOKEN_EXPIRED';
     message = 'Authentication token has expired';
+  }
+
+  // Report to Sentry (skip 4xx client errors — only 5xx)
+  if (statusCode >= 500) {
+    Sentry.withScope((scope) => {
+      scope.setTag('error.code', code);
+      scope.setExtra('url', req.url);
+      scope.setExtra('method', req.method);
+      Sentry.captureException(error);
+    });
   }
 
   // Log error

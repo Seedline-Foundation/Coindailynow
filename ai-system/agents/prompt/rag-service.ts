@@ -3,8 +3,12 @@
 
 /// <reference types="node" />
 // Audit logging (stubbed for standalone usage)
-const createAuditLog = async (action: string, data: any) => { /* stub */ };
-const AuditActions = { RAG_SEARCH: 'rag_search' };
+const createAuditLog = async (_action: string, _data?: any) => { /* stub */ };
+const AuditActions = {
+  RAG_SEARCH: 'rag_search',
+  SETTINGS_UPDATE: 'settings_update',
+  ARTICLE_CREATE: 'article_create',
+};
 
 /**
  * Search result from web scraping
@@ -77,8 +81,7 @@ export class RAGService {
     
     this.isInitialized = true;
     
-    await createAuditLog({
-      action: AuditActions.SETTINGS_UPDATE,
+    await createAuditLog(AuditActions.SETTINGS_UPDATE, {
       resource: 'rag_service',
       resourceId: 'rag-v1',
       details: {
@@ -149,8 +152,7 @@ export class RAGService {
       // Cache results
       this.cache.set(cacheKey, { context, timestamp: Date.now() });
 
-      await createAuditLog({
-        action: AuditActions.ARTICLE_CREATE,
+      await createAuditLog(AuditActions.ARTICLE_CREATE, {
         resource: 'rag_context',
         resourceId: `rag-${Date.now()}`,
         details: {

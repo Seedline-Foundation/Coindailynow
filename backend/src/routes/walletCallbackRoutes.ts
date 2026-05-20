@@ -16,10 +16,32 @@ import express, { Request, Response } from 'express';
 import { TransactionType, TransactionStatus } from '@prisma/client';
 import prisma from '../lib/prisma';
 import crypto from 'crypto';
-import { Redis } from 'ioredis';
+import { z } from 'zod';
+import { getRedis } from '../lib/redis';
+import { subscriptionService } from '../services/subscriptionService';
 
 const router = express.Router();
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = getRedis();
+
+// BE-2-4: Zod schemas for the public webhook payloads. We accept unknown
+// keys (passthrough) because providers occasionally extend their schemas.
+const yellowCardWebhookSchema = z
+  .object({
+    transactionId: z.string().min(4),
+    status: z.string().min(2),
+    amount: z.coerce.number().nonnegative(),
+    currency: z.string().min(2).max(8),
+    metadata: z.record(z.any()).optional(),
+  })
+  .passthrough();
+
+const changeNowWebhookSchema = z
+  .object({
+    id: z.string().min(4),
+    status: z.string().min(2),
+    payload: z.record(z.any()).optional(),
+  })
+  .passthrough();
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -419,6 +441,36 @@ router.post('/swap/callback', async (req: Request, res: Response) => {
       error: 'Failed to process swap',
       details: error.message,
     });
+  }
+});
+
+// ============================================================================
+// SUBSCRIPTION PAYMENT CALLBACK (YellowCard metadata)
+// ============================================================================
+
+router.post('/subscription/callback', async (req: Request, res: Response) => {
+  try {
+    const { userId, planId, gatewayTxId, amount, status } = req.body;
+    if (status && status !== 'completed' && status !== 'COMPLETED') {
+      return res.status(200).json({ success: true, message: 'Ignored non-complete status' });
+    }
+    if (!userId || !planId || !gatewayTxId) {
+      return res.status(400).json({ error: 'userId, planId, gatewayTxId required' });
+    }
+
+    const result = await subscriptionService.confirmPayment({
+      userId,
+      planId,
+      gatewayTxId,
+      amount: Number(amount) || 0,
+      paymentMethod: 'CARD',
+      paymentGateway: 'YELLOWCARD',
+    });
+
+    return res.status(200).json({ success: true, data: result });
+  } catch (error: any) {
+    console.error('Subscription callback error:', error);
+    return res.status(500).json({ error: error.message });
   }
 });
 

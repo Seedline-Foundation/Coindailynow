@@ -119,7 +119,7 @@ export default function ContentReviewModal({ workflowId, onClose, onDecision }: 
     try {
       setLoading(true);
       const data = await aiManagementService.getContentReviewDetails(workflowId);
-      setDetails(data);
+      setDetails(data as ContentReviewDetails);
     } catch (error) {
       console.error('[ContentReviewModal] Error loading details:', error);
     } finally {

@@ -1,0 +1,26 @@
+{
+  "name": "African Futurism",
+  "description": "African digital innovation, mobile finance revolution, cultural emergence",
+  "palette": ["warm gold", "deep blue", "neon amber", "coral orange", "rich earth"],
+  "camera": ["street-level realism", "human-centric", "movement-heavy", "optimism framing"],
+  "lighting": ["warm amber sunset", "humid cinematic glow", "neon market lighting", "tropical digital atmosphere"],
+  "environments": [
+    "Lagos smart-city skyline at twilight",
+    "Nairobi Silicon Savannah",
+    "Eko Atlantic fintech district",
+    "African digital marketplace",
+    "Kigali smart-city grid",
+    "youth innovation hub"
+  ],
+  "symbols": [
+    "mobile payment terminals",
+    "fintech kiosks",
+    "youth traders with smartphones",
+    "digital Naira tokens",
+    "pan-African data networks",
+    "solar-tech infrastructure"
+  ],
+  "motion": "bustling urban innovation with cultural energy",
+  "composition": "environmental depth with human-centric foreground",
+  "negative": ["poverty imagery", "colonial aesthetics", "stereotypical depictions", "aid imagery"]
+}

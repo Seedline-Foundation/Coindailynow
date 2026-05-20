@@ -19,9 +19,9 @@
  */
 
 import prisma from '../lib/prisma';
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
 import { fetchAllFeeds, markArticleAsPublished, isAlreadyPublished, FeedItem } from './rssFeedAggregator';
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = getRedis();
 
 // ============================================================================
 // TYPES & INTERFACES

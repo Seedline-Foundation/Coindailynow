@@ -3,6 +3,8 @@
 
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useState, useEffect } from 'react';
 import { Sparkles, TrendingUp, Clock, Award, Filter } from 'lucide-react';
 import Link from 'next/link';
@@ -61,7 +63,7 @@ export default function PersonalizedFeed({
       };
 
       if (userId) {
-        const token = localStorage.getItem('token');
+        const token = getAccessToken();
         if (token) {
           headers['Authorization'] = `Bearer ${token}`;
         }
@@ -91,7 +93,7 @@ export default function PersonalizedFeed({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${getAccessToken()}`,
           },
           body: JSON.stringify({
             recommendationId: article.recommendationId,

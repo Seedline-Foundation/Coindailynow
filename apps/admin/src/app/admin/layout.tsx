@@ -5,9 +5,13 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
+import SessionTimeoutWarning from '@/components/SessionTimeoutWarning';
+import { useAuth } from '@/contexts/AuthContext';
+import { getAccessToken, clearSession } from '@/lib/auth';
 import {
   LayoutDashboard,
   Users,
@@ -32,24 +36,53 @@ import {
   Monitor
 } from 'lucide-react';
 
-// Navigation items for super admin
-const navItems = [
+// Navigation items with role-based access control (S1-3)
+// requiredRoles: if omitted, visible to all authenticated admins
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  exact?: boolean;
+  requiredRoles?: string[];
+}
+
+// Role groupings — kept here so the admin shell mirrors backend/src/lib/roles.ts.
+const EDITORIAL_ROLES = ['CONTRIBUTOR', 'JOURNALIST', 'EDITOR', 'CEO'] as const;
+const PLATFORM_ADMINS = ['ADMIN', 'CONTENT_ADMIN', 'MARKETING_ADMIN', 'TECH_ADMIN', 'SUPER_ADMIN'] as const;
+const CONTENT_ROLES = ['JOURNALIST', 'EDITOR', 'CEO', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'];
+const MARKETING_ROLES = ['EDITOR', 'CEO', 'MARKETING_ADMIN', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'];
+const TECH_ROLES = ['TECH_ADMIN', 'ADMIN', 'SUPER_ADMIN', 'CEO'];
+
+const navItems: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/users', label: 'User Management', icon: Users },
-  { href: '/admin/content', label: 'Content', icon: FileText },
-  { href: '/admin/ai', label: 'AI Management', icon: Brain },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/admin/monetization', label: 'Monetization', icon: DollarSign },
-  { href: '/admin/community', label: 'Community', icon: MessageSquare },
-  { href: '/admin/seo', label: 'SEO', icon: Search },
-  { href: '/admin/distribution', label: 'Distribution', icon: Send },
-  { href: '/admin/ecommerce', label: 'E-commerce', icon: ShoppingCart },
-  { href: '/admin/compliance', label: 'Compliance', icon: Shield },
-  { href: '/admin/security', label: 'Security', icon: Lock },
-  { href: '/admin/audit', label: 'Audit Logs', icon: Eye },
-  { href: '/admin/system', label: 'System Health', icon: Monitor },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
+  { href: '/admin/users', label: 'User Management', icon: Users, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/content', label: 'Content', icon: FileText, requiredRoles: CONTENT_ROLES },
+  { href: '/admin/marquees', label: 'Marquee', icon: Monitor, requiredRoles: CONTENT_ROLES },
+  { href: '/admin/moderation/emergency', label: 'Emergency Moderation', icon: Shield, requiredRoles: ['EDITOR', 'CEO', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'] },
+  { href: '/admin/ai', label: 'AI Management', icon: Brain, requiredRoles: [...CONTENT_ROLES, 'TECH_ADMIN'] },
+  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3, requiredRoles: [...CONTENT_ROLES, 'MARKETING_ADMIN'] },
+  { href: '/admin/monetization', label: 'Monetization', icon: DollarSign, requiredRoles: ['CEO', ...MARKETING_ROLES] },
+  { href: '/admin/community', label: 'Community', icon: MessageSquare, requiredRoles: MARKETING_ROLES },
+  { href: '/admin/seo', label: 'SEO', icon: Search, requiredRoles: MARKETING_ROLES },
+  { href: '/admin/distribution', label: 'Distribution', icon: Send, requiredRoles: MARKETING_ROLES },
+  { href: '/admin/ecommerce', label: 'E-commerce', icon: ShoppingCart, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO', 'MARKETING_ADMIN'] },
+  { href: '/admin/compliance', label: 'Compliance', icon: Shield, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/security', label: 'Security', icon: Lock, requiredRoles: TECH_ROLES },
+  { href: '/admin/audit', label: 'Audit Logs', icon: Eye, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/system', label: 'System Health', icon: Monitor, requiredRoles: TECH_ROLES },
+  { href: '/admin/settings', label: 'Settings', icon: Settings, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/finance', label: 'CFIS Finance', icon: DollarSign, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
+  { href: '/admin/fraud-alerts', label: 'Fraud Alerts', icon: Shield, requiredRoles: TECH_ROLES },
 ];
+
+/** Filter nav items based on user role */
+function getVisibleNavItems(role: string | undefined): NavItem[] {
+  if (!role) return [];
+  return navItems.filter(item => {
+    if (!item.requiredRoles) return true; // No restriction = visible to all
+    return item.requiredRoles.includes(role);
+  });
+}
 
 export default function AdminSectionLayout({
   children,
@@ -63,6 +96,7 @@ export default function AdminSectionLayout({
   const [admin, setAdmin] = useState<{ name: string; email: string; role: string } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const { logout: authLogout } = useAuth();
   const isAdminLoginRoute = pathname === '/admin/login' || pathname === '/admin/login/';
 
   useEffect(() => {
@@ -75,7 +109,7 @@ export default function AdminSectionLayout({
       }
 
       try {
-        const token = localStorage.getItem('admin_access_token');
+        const token = getAccessToken();
         if (!token) {
           router.push('/login');
           return;
@@ -101,23 +135,29 @@ export default function AdminSectionLayout({
               setAdmin({ name: user.email, email: user.email, role: user.role });
               setIsAuthenticated(true);
             } else {
-              localStorage.removeItem('admin_access_token');
+              clearSession();
+              authLogout();
               router.push('/login');
             }
           } else {
-            localStorage.removeItem('admin_access_token');
+            clearSession();
+            authLogout();
             router.push('/login');
           }
         } catch (fetchErr) {
           clearTimeout(timer);
-          // For development — auto-authenticate on network errors
-          setIsAuthenticated(true);
-          setAdmin({ name: 'Super Admin', email: 'admin@coindaily.online', role: 'super_admin' });
+          // Backend unreachable — deny access, never auto-grant
+          console.error('Auth verification failed: backend unreachable');
+          clearSession();
+          authLogout();
+          router.push('/login');
         }
       } catch (error) {
-        // For development
-        setIsAuthenticated(true);
-        setAdmin({ name: 'Super Admin', email: 'admin@coindaily.online', role: 'super_admin' });
+        // Auth check failed — deny access
+        console.error('Auth check error:', error);
+        clearSession();
+        authLogout();
+        router.push('/login');
       } finally {
         setLoading(false);
       }
@@ -125,15 +165,17 @@ export default function AdminSectionLayout({
     checkAuth();
   }, [router, pathname, isAdminLoginRoute]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_access_token');
-    localStorage.removeItem('admin_refresh_token');
-    localStorage.removeItem('admin_user');
-    localStorage.removeItem('ceo_access_token');
-    localStorage.removeItem('ceo_refresh_token');
-    localStorage.removeItem('ceo_user');
+  const handleLogout = useCallback(() => {
+    clearSession();
+    authLogout();
     router.push('/login');
-  };
+  }, [router, authLogout]);
+
+  // Session timeout warning (SPEC-ADM-2) + auto-refresh on 401 (SPEC-ADM-1)
+  const { showWarning, secondsRemaining, extendSession, isRefreshing } = useSessionTimeout({
+    onLogout: handleLogout,
+    enabled: isAuthenticated && !isAdminLoginRoute,
+  });
 
   if (isAdminLoginRoute) {
     return <>{children}</>;
@@ -190,7 +232,7 @@ export default function AdminSectionLayout({
       {/* Sidebar */}
       <aside className={`fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] bg-dark-900 border-r border-dark-700 transition-all duration-300 overflow-y-auto ${sidebarOpen ? 'w-64' : 'w-16'} ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <nav className="p-3 space-y-1">
-          {navItems.map((item) => {
+          {getVisibleNavItems(admin?.role).map((item) => {
             const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
             const Icon = item.icon;
             return (
@@ -203,7 +245,7 @@ export default function AdminSectionLayout({
             );
           })}
         </nav>
-        {sidebarOpen && (
+        {sidebarOpen && admin?.role === 'SUPER_ADMIN' && (
           <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-dark-700">
             <Link href="/admin/CEO" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-gradient-to-r from-yellow-500/10 to-orange-500/10 text-yellow-500 hover:from-yellow-500/20 hover:to-orange-500/20">
               <Crown className="w-5 h-5" />CEO Portal
@@ -218,6 +260,15 @@ export default function AdminSectionLayout({
       <main className={`pt-16 min-h-screen transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}>
         <div className="p-6">{children}</div>
       </main>
+
+      {/* Session timeout warning (SPEC-ADM-2) */}
+      {showWarning && (
+        <SessionTimeoutWarning
+          secondsRemaining={secondsRemaining}
+          onExtend={extendSession}
+          isRefreshing={isRefreshing}
+        />
+      )}
     </div>
   );
 }

@@ -180,31 +180,35 @@ export class BinanceAfricaAdapter extends BaseExchangeAdapter {
    */
   async getAfricanP2PData(symbols: string[]): Promise<Map<string, BinanceP2PData>> {
     const p2pData = new Map<string, BinanceP2PData>();
+    const promises: Promise<void>[] = [];
 
     for (const currency of Array.from(this.africanCurrencies)) {
       for (const symbol of symbols) {
-        try {
-          // Simulate P2P API call (Binance P2P API is complex and requires special access)
-          const p2pPrice = await this.fetchP2PPrice(symbol, currency);
-          
-          if (p2pPrice) {
-            const mobileMethods = this.getMobileMoneyMethods(currency);
+        promises.push((async () => {
+          try {
+            // Simulate P2P API call (Binance P2P API is complex and requires special access)
+            const p2pPrice = await this.fetchP2PPrice(symbol, currency);
             
-            p2pData.set(`${symbol}_${currency}`, {
-              symbol,
-              localCurrency: currency,
-              buyPrice: p2pPrice.buy,
-              sellPrice: p2pPrice.sell,
-              volume24h: p2pPrice.volume,
-              mobileMoneyMethods: mobileMethods
-            });
-          }
+            if (p2pPrice) {
+              const mobileMethods = this.getMobileMoneyMethods(currency);
 
-        } catch (error: any) {
-          logger.debug('Failed to fetch P2P data', { symbol, currency, error: error.message });
-        }
+              p2pData.set(`${symbol}_${currency}`, {
+                symbol,
+                localCurrency: currency,
+                buyPrice: p2pPrice.buy,
+                sellPrice: p2pPrice.sell,
+                volume24h: p2pPrice.volume,
+                mobileMoneyMethods: mobileMethods
+              });
+            }
+          } catch (error: any) {
+            logger.debug('Failed to fetch P2P data', { symbol, currency, error: error.message });
+          }
+        })());
       }
     }
+
+    await Promise.all(promises);
 
     return p2pData;
   }

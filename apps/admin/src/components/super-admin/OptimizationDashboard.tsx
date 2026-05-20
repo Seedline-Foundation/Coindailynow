@@ -3,6 +3,8 @@
 
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useState, useEffect } from 'react';
 import {
   TrendingUp,
@@ -97,16 +99,16 @@ export default function OptimizationDashboard() {
 
       const [statsRes, auditsRes, testsRes, insightsRes] = await Promise.all([
         fetch('/api/optimization/stats', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          headers: { Authorization: `Bearer ${getAccessToken()}` },
         }),
         fetch('/api/optimization/audits?limit=10', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          headers: { Authorization: `Bearer ${getAccessToken()}` },
         }),
         fetch('/api/optimization/ab-tests?limit=10', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          headers: { Authorization: `Bearer ${getAccessToken()}` },
         }),
         fetch('/api/optimization/insights?status=new&limit=20', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          headers: { Authorization: `Bearer ${getAccessToken()}` },
         }),
       ]);
 
@@ -148,7 +150,7 @@ export default function OptimizationDashboard() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${getAccessToken()}`,
         },
         body: JSON.stringify({
           auditType,
@@ -171,7 +173,7 @@ export default function OptimizationDashboard() {
     try {
       const response = await fetch(`/api/optimization/ab-tests/${testId}/start`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        headers: { Authorization: `Bearer ${getAccessToken()}` },
       });
 
       if (!response.ok) throw new Error('Failed to start test');
@@ -189,7 +191,7 @@ export default function OptimizationDashboard() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${getAccessToken()}`,
         },
         body: JSON.stringify({
           status,

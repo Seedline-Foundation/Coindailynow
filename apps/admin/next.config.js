@@ -3,6 +3,9 @@ const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   transpilePackages: ['@coindaily/ui', '@coindaily/utils'],
+  experimental: {
+    externalDir: true,
+  },
   
   // Environment-specific configurations
   env: {
@@ -41,7 +44,17 @@ const nextConfig = {
     ];
   },
 
-  // No public redirects - this is a secured system
+  // S1-1 / S1-2: canonical routes under src/app — legacy paths redirect
+  async redirects() {
+    return [
+      { source: '/super-admin/login', destination: '/login?role=super', permanent: true },
+      { source: '/admin/login', destination: '/login?role=super', permanent: true },
+      { source: '/admin/admin/:path*', destination: '/admin/:path*', permanent: true },
+      { source: '/admin/withdrawals', destination: '/admin/finance', permanent: true },
+      { source: '/admin/traffic-cop', destination: '/admin/fraud-alerts', permanent: true },
+    ];
+  },
+
   poweredByHeader: false,
 };
 

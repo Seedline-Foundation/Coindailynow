@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
@@ -23,7 +24,7 @@ export default function RootLayout({
         <meta name="googlebot" content="noindex, nofollow" />
       </head>
       <body className={`${inter.variable} ${jakarta.variable} font-sans bg-dark-950 text-white antialiased`}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

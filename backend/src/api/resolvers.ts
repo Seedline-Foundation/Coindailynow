@@ -19,8 +19,15 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
       version: '1.0.0'
     }),
 
-    // User queries
+    // User queries — require authentication
     user: async (_: any, { id }: { id: string }, context: GraphQLContext) => {
+      if (!context.user) {
+        throw new Error('Authentication required');
+      }
+      // Non-admin users can only fetch their own profile
+      if (context.user.role !== 'ADMIN' && context.user.role !== 'SUPER_ADMIN' && context.user.id !== id) {
+        throw new Error('Not authorized to view this user');
+      }
       return await context.prisma.user.findUnique({
         where: { id },
         include: { UserProfile: true }
@@ -28,6 +35,13 @@ export const resolvers: IResolvers<any, GraphQLContext> = {
     },
 
     users: async (_: any, { limit = 50, offset = 0 }: { limit?: number; offset?: number }, context: GraphQLContext) => {
+      if (!context.user) {
+        throw new Error('Authentication required');
+      }
+      // Only admins can list all users
+      if (context.user.role !== 'ADMIN' && context.user.role !== 'SUPER_ADMIN') {
+        throw new Error('Admin access required');
+      }
       return await context.prisma.user.findMany({
         take: limit,
         skip: offset,

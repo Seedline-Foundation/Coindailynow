@@ -3,7 +3,7 @@
 /**
  * Cookie Consent Banner - Fixed Version
  * Task 30: FR-1394 Cookie Consent Management
- * 
+ *
  * GDPR/CCPA/POPIA compliant cookie consent banner
  */
 

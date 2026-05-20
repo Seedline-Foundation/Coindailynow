@@ -1,15 +1,15 @@
 import { authService, LoginCredentials, RegisterData } from '../services/authService';
 import { logger } from '../utils/logger';
-import jwt from 'jsonwebtoken';
-
-// Dev-mode fallback secret (matches utils/auth.ts DEV_SECRET)
-const DEV_JWT_SECRET = 'dev-only-secret-do-not-use-in-prod';
+import { generateJWT, generateRefreshToken } from '../utils/auth';
 
 /**
- * Generate dev-mode mock auth response when DB is unreachable
+ * Generate dev-mode mock auth response when DB is unreachable.
+ * Only works in development — utils/auth.ts throws in production if secrets are unset.
  */
 function getDevMockAuthResponse(email: string) {
-  const secret = process.env.JWT_SECRET || DEV_JWT_SECRET;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Mock auth is disabled in production');
+  }
   const mockUser = {
     id: 'dev-user-001',
     email: email,
@@ -24,16 +24,10 @@ function getDevMockAuthResponse(email: string) {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
-  const accessToken = jwt.sign(
-    { sub: mockUser.id, email: mockUser.email, username: mockUser.username, type: 'access' },
-    secret,
-    { expiresIn: '24h', issuer: 'coindaily-api' }
+  const accessToken = generateJWT(
+    { sub: mockUser.id, email: mockUser.email, username: mockUser.username, type: 'access' }
   );
-  const refreshToken = jwt.sign(
-    { sub: mockUser.id, type: 'refresh' },
-    secret,
-    { expiresIn: '7d', issuer: 'coindaily-api' }
-  );
+  const refreshToken = generateRefreshToken(mockUser.id);
   return {
     success: true,
     user: mockUser,
@@ -208,7 +202,12 @@ export const authResolvers = {
           throw new Error('Authentication required');
         }
 
-        await authService.logout(context.user.id, args.refreshToken);
+        const bearer = context.req?.headers?.authorization;
+        const accessToken =
+          typeof bearer === 'string' && bearer.startsWith('Bearer ')
+            ? bearer.slice(7)
+            : undefined;
+        await authService.logout(context.user.id, args.refreshToken, accessToken);
 
         return {
           success: true,
@@ -342,6 +341,117 @@ export const authResolvers = {
           }
         };
       }
+    },
+
+    /**
+     * Verify email address using token
+     */
+    verifyEmail: async (
+      _: any,
+      args: { token: string }
+    ) => {
+      try {
+        const result = await authService.verifyEmail(args.token);
+        if (result.success) {
+          return { success: true, message: result.message };
+        }
+        return {
+          success: false,
+          error: {
+            code: 'EMAIL_VERIFICATION_FAILED',
+            message: result.message
+          }
+        };
+      } catch (error) {
+        logger.error('Email verification mutation failed:', error);
+        return {
+          success: false,
+          error: {
+            code: 'EMAIL_VERIFICATION_FAILED',
+            message: error instanceof Error ? error.message : 'Email verification failed'
+          }
+        };
+      }
+    },
+
+    /**
+     * Resend email verification
+     */
+    resendVerificationEmail: async (
+      _: any,
+      args: { email: string }
+    ) => {
+      try {
+        const result = await authService.resendEmailVerification(args.email);
+        if (result.success) {
+          return { success: true, message: result.message };
+        }
+        return {
+          success: false,
+          error: {
+            code: 'RESEND_VERIFICATION_FAILED',
+            message: result.message
+          }
+        };
+      } catch (error) {
+        logger.error('Resend verification mutation failed:', error);
+        return {
+          success: false,
+          error: {
+            code: 'RESEND_VERIFICATION_FAILED',
+            message: error instanceof Error ? error.message : 'Failed to resend verification email'
+          }
+        };
+      }
+    },
+
+    /**
+     * GDPR Art. 17 — Request account deletion (right to erasure).
+     * Requires authentication + password confirmation.
+     */
+    requestAccountDeletion: async (
+      _: any,
+      args: { password: string; reason?: string },
+      context: any
+    ) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            error: {
+              code: 'AUTHENTICATION_REQUIRED',
+              message: 'You must be logged in to request account deletion'
+            }
+          };
+        }
+
+        const result = await authService.requestAccountDeletion(
+          context.user.id,
+          args.password,
+          args.reason
+        );
+
+        if (result.success) {
+          return { success: true, message: result.message };
+        }
+
+        return {
+          success: false,
+          error: {
+            code: 'DELETION_FAILED',
+            message: result.message
+          }
+        };
+      } catch (error) {
+        logger.error('Account deletion mutation failed:', error);
+        return {
+          success: false,
+          error: {
+            code: 'DELETION_FAILED',
+            message: error instanceof Error ? error.message : 'Failed to process account deletion request'
+          }
+        };
+      }
     }
   },
 
@@ -470,5 +580,8 @@ export const authTypeDefs = `
     resetPassword(token: String!, newPassword: String!): AuthResponse!
     changePassword(currentPassword: String!, newPassword: String!): AuthResponse!
     verifyToken(token: String!): UserResponse!
+    verifyEmail(token: String!): AuthResponse!
+    resendVerificationEmail(email: String!): AuthResponse!
+    requestAccountDeletion(password: String!, reason: String): AuthResponse!
   }
 `;

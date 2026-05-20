@@ -1,0 +1,19 @@
+[app]
+address = "0.0.0.0:9000"
+admin_username = "admin"
+admin_password = "CHANGE_ME_ON_FIRST_LOGIN"
+
+[db]
+host = "postgres"
+port = 5432
+user = "postgres"
+password = ""
+database = "listmonk"
+ssl_mode = "disable"
+max_open = 25
+max_idle = 25
+max_lifetime = "300s"
+
+# Postgres password comes from the shared compose .env:
+# Override via environment variable LISTMONK_db__password or
+# set it here after copying to production.

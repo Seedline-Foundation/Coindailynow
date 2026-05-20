@@ -3,6 +3,8 @@
 
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Loader } from 'lucide-react';
 
@@ -61,7 +63,7 @@ export default function VoiceArticlePlayer({ articleId }: VoiceArticlePlayerProp
     try {
       const response = await fetch(`/api/engagement/voice/${articleId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${getAccessToken()}`,
         },
       });
 
@@ -82,7 +84,7 @@ export default function VoiceArticlePlayer({ articleId }: VoiceArticlePlayerProp
       const response = await fetch(`/api/engagement/voice/${articleId}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${getAccessToken()}`,
         },
       });
 

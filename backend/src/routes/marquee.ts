@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import prisma from '../lib/prisma';
 import MarqueeService, { MarqueeData, MarqueeItemData, MarqueeTemplateData } from '../services/MarqueeService';
 import { body, param, query, validationResult } from 'express-validator';
+import { authMiddleware, requireCapability } from '../middleware/auth';
 
 const router = express.Router();
 const marqueeService = new MarqueeService(prisma);
@@ -20,18 +21,14 @@ const validateRequest = (req: Request, res: Response, next: NextFunction): void 
   next();
 };
 
-// Simple auth middleware (replace with real auth)
-const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
-  // For demo purposes, we'll skip authentication
-  // In production, verify JWT token here
-  next();
-};
+// Real auth middleware — verifies JWT and attaches user to request
+const authenticateUser = authMiddleware;
 
-const requireRole = (role: string) => (req: Request, res: Response, next: NextFunction) => {
-  // For demo purposes, we'll skip role checking
-  // In production, check user role here
-  next();
-};
+// Capability gates per editorial role spec:
+//   MARQUEE_PUSH    → JOURNALIST+ (publish a flash item)
+//   MARQUEE_MANAGE  → EDITOR+    (create/delete tickers, manage templates)
+const requireMarqueePush = requireCapability('MARQUEE_PUSH');
+const requireMarqueeManage = requireCapability('MARQUEE_MANAGE');
 
 // Validation schemas
 const createMarqueeValidation = [
@@ -124,7 +121,7 @@ router.post('/:id/click',
 // Get all marquees (admin)
 router.get('/admin',
   authenticateUser,
-  requireRole('admin'),
+  requireMarqueePush,
   async (req: Request, res: Response) => {
     try {
       const marquees = await marqueeService.getAllMarquees();
@@ -143,17 +140,17 @@ router.get('/admin',
   }
 );
 
-// Create marquee
+// Create marquee — EDITOR+ (creates a whole ticker strip)
 router.post('/admin',
   authenticateUser,
-  requireRole('admin'),
+  requireMarqueeManage,
   createMarqueeValidation,
   validateRequest,
   async (req: Request, res: Response) => {
     try {
       const marqueeData: MarqueeData = req.body;
-      // For demo purposes, use a default user ID
-      const createdBy = 'demo-admin';
+      const user = (req as any).user;
+      const createdBy = user?.id || user?.email || 'system';
       const marquee = await marqueeService.createMarquee(marqueeData, createdBy);
       
       return res.status(201).json({
@@ -170,10 +167,10 @@ router.post('/admin',
   }
 );
 
-// Update marquee
+// Update marquee — EDITOR+
 router.put('/admin/:id',
   authenticateUser,
-  requireRole('admin'),
+  requireMarqueeManage,
   updateMarqueeValidation,
   validateRequest,
   async (req: Request, res: Response) => {
@@ -204,10 +201,10 @@ router.put('/admin/:id',
   }
 );
 
-// Delete marquee
+// Delete marquee — EDITOR+
 router.delete('/admin/:id',
   authenticateUser,
-  requireRole('admin'),
+  requireMarqueeManage,
   param('id').notEmpty().withMessage('Marquee ID is required'),
   validateRequest,
   async (req: Request, res: Response) => {
@@ -242,7 +239,7 @@ router.delete('/admin/:id',
 // Get marquee items
 router.get('/admin/:marqueeId/items',
   authenticateUser,
-  requireRole('admin'),
+  requireMarqueePush,
   param('marqueeId').notEmpty().withMessage('Marquee ID is required'),
   validateRequest,
   async (req: Request, res: Response) => {
@@ -275,7 +272,7 @@ router.get('/admin/:marqueeId/items',
 // Add item to marquee
 router.post('/admin/:marqueeId/items',
   authenticateUser,
-  requireRole('admin'),
+  requireMarqueePush,
   createItemValidation,
   validateRequest,
   async (req: Request, res: Response) => {
@@ -309,7 +306,7 @@ router.post('/admin/:marqueeId/items',
 // Update marquee item
 router.put('/admin/:marqueeId/items/:itemId',
   authenticateUser,
-  requireRole('admin'),
+  requireMarqueePush,
   param('marqueeId').notEmpty().withMessage('Marquee ID is required'),
   param('itemId').notEmpty().withMessage('Item ID is required'),
   validateRequest,
@@ -341,10 +338,10 @@ router.put('/admin/:marqueeId/items/:itemId',
   }
 );
 
-// Delete marquee item
+// Delete marquee item — EDITOR+
 router.delete('/admin/:marqueeId/items/:itemId',
   authenticateUser,
-  requireRole('admin'),
+  requireMarqueeManage,
   param('marqueeId').notEmpty().withMessage('Marquee ID is required'),
   param('itemId').notEmpty().withMessage('Item ID is required'),
   validateRequest,
@@ -397,10 +394,10 @@ router.get('/templates',
   }
 );
 
-// Create template (admin only)
+// Create template — EDITOR+
 router.post('/admin/templates',
   authenticateUser,
-  requireRole('admin'),
+  requireMarqueeManage,
   body('name').notEmpty().trim().withMessage('Template name is required'),
   body('type').isIn(['token', 'news', 'custom']).withMessage('Invalid template type'),
   validateRequest,

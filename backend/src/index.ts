@@ -1,5 +1,7 @@
 import 'dotenv/config';
-import { initSentry } from './lib/sentry';
+import { initSentry, Sentry } from './lib/sentry';
+
+// Initialize Sentry BEFORE other imports for maximum coverage
 initSentry();
 import express from 'express';
 import cors from 'cors';
@@ -53,6 +55,12 @@ import v1PushRouter from './api/routes/v1Push.routes';
 import v1BountyRouter from './api/routes/v1Bounty.routes';
 import v1PressReleaseRouter from './api/routes/v1PressRelease.routes';
 import v1InfluencerRouter from './api/routes/v1Influencer.routes';
+import v1SearchRouter from './api/routes/v1Search.routes';
+import v1CreatorRouter from './api/routes/v1Creator.routes';
+import v1EventsRouter from './api/routes/v1Events.routes';
+import v1ChimaIndexRouter from './api/routes/v1ChimaIndex.routes';
+import v1HRRouter from './api/routes/v1HR.routes';
+import v1AICostRouter from './api/routes/v1AICost.routes';
 import newsAggregationRouter from './routes/news-aggregation.routes';
 import dataAnalysisAdminRouter from './routes/data-analysis-admin.routes';
 import adsRotationRouter from './routes/ads-rotation.routes';
@@ -61,8 +69,24 @@ import indexNowRouter from './routes/indexnow.routes';
 import legalRouter from './api/legal-routes';
 import structuredContentRouter from './routes/structured-content.routes';
 import knowledgeApiRouter from './api/routes/knowledgeApi.routes';
+import authRouter from './routes/auth.routes';
+import walletCallbackRouter from './routes/walletCallbackRoutes';
+import subscriptionRouter from './routes/subscription.routes';
+import adminEditorialQueueRouter from './api/admin/adminQueueRoutes';
+import mediaRouter from './routes/media.routes';
+import moderationScanRouter from './routes/moderationScan.routes';
+import sitemapRouter from './routes/sitemap.routes';
+import structuredDataRouter from './routes/structured-data.routes';
+import marqueeRouter from './routes/marquee';
+import v1ChangenowRouter from './api/routes/v1Changenow.routes';
+import financeEventsRouter from './routes/financeEvents.routes';
+import adminAiTasksRouter from './api/admin/aiTasksRoutes';
+import adminFinanceApprovalsRouter from './api/admin/financialApprovalsRoutes';
+import adminIpWhitelistRouter from './api/admin/ipWhitelistRoutes';
+import v1MarketplaceRouter from './api/routes/v1Marketplace.routes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
+import { integrateIengineRoutes } from './integrations/iengineIntegration';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
 import { startPipelineScheduler as startAnalysisScheduler } from './services/dataAnalysisPipeline';
 import { MarketDataAggregator } from './services/marketDataAggregator';
@@ -76,6 +100,7 @@ process.on('unhandledRejection', (reason: any) => {
     return;
   }
   console.error('Unhandled Rejection:', reason);
+  Sentry.captureException(reason);
 });
 
 const PORT = process.env.PORT || 4000;
@@ -326,9 +351,31 @@ export async function setupApp() {
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // Static assets for uploaded ad creatives
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  // Security: disable directory listing, restrict to safe MIME types, add cache headers
+  app.use('/uploads', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // Block directory traversal attempts
+    if (req.path.includes('..') || req.path.includes('\0')) {
+      return res.status(400).json({ success: false, error: 'Invalid path' });
+    }
+    // Only allow known safe file extensions
+    const allowedExtensions = /\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|pdf|ico)$/i;
+    if (!allowedExtensions.test(req.path)) {
+      return res.status(403).json({ success: false, error: 'File type not allowed' });
+    }
+    // Prevent content sniffing and framing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Content-Security-Policy', "default-src 'none'");
+    next();
+  }, express.static(path.join(process.cwd(), 'uploads'), {
+    dotfiles: 'deny',      // Block .htaccess, .env, etc.
+    index: false,           // Disable directory listing
+    maxAge: '7d',           // Cache uploaded assets for 7 days
+  }));
 
-  // Rate limiting
+  // Rate limiting — runs before auth, so tier-based limits are not active yet.
+  // All users get the same rate limit (100 req/15min in production).
+  // TODO(post-launch): move per-route rate limiting after auth middleware for tier-based enforcement.
   app.use(rateLimitMiddleware);
 
   // AI Prompt Injection Guard — scans POST/PUT/PATCH bodies for LLM attacks
@@ -338,43 +385,66 @@ export async function setupApp() {
     maxInputLength: 50_000,
     enableDeepAnalysis: false,
     logToDatabase: true,
-    excludedPaths: ['/health', '/metrics', '/api/auth/login', '/api/auth/register'],
+    excludedPaths: ['/health', '/metrics', '/api/auth/login', '/api/auth/register', '/api/auth/verify-email', '/api/auth/resend-verification'],
   }));
 
   // CSRF protection for state-changing requests
   // GraphQL has its own auth via Authorization header + CORS
   app.use(csrfProtection({
     excludedPaths: [
+      // Auth endpoints (no session yet, can't have CSRF token)
       '/api/auth/login',
       '/api/auth/register',
       '/api/auth/refresh',
+      '/api/auth/verify-email',
+      '/api/auth/resend-verification',
+      // Webhook callbacks (external services, use HMAC signature verification instead)
+      '/api/wallet/callbacks',
       '/api/v1/traffic',
-      '/api/super-admin',
-      '/api/content-automation',
-      '/api/user',
-      '/api/news',
-      '/api/admin',
-      '/api/ai/registry',
+      '/api/v1/changenow/callback',
+      '/api/finance-events',
+      // Health/metrics (read-only, no state changes)
       '/health',
       '/metrics',
+      // GraphQL (uses Authorization header + CORS, not cookie-based)
       '/graphql'
     ]
   }));
 
-  // Health check endpoint with detailed status
-  app.get('/health', (req, res) => {
-    res.json({
-      status: 'healthy',
+  // Health check endpoint with actual service probes
+  app.get('/health', async (req, res) => {
+    const checks: Record<string, 'ok' | 'degraded' | 'down'> = {
+      database: 'down',
+      redis: 'down',
+    };
+
+    // Probe database
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      checks.database = 'ok';
+    } catch {
+      checks.database = 'down';
+    }
+
+    // Probe Redis (mock redis always returns OK)
+    try {
+      const redisResult = await redis.set('health:ping', 'pong');
+      checks.redis = redisResult === 'OK' ? 'ok' : 'degraded';
+    } catch {
+      checks.redis = 'down';
+    }
+
+    const allOk = Object.values(checks).every(v => v === 'ok');
+    const anyDown = Object.values(checks).some(v => v === 'down');
+    const overallStatus = allOk ? 'healthy' : anyDown ? 'unhealthy' : 'degraded';
+
+    res.status(overallStatus === 'healthy' ? 200 : overallStatus === 'degraded' ? 200 : 503).json({
+      status: overallStatus,
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       version: process.env.npm_package_version || '1.0.0',
       environment: process.env.NODE_ENV || 'development',
-      features: {
-        graphql: true,
-        websockets: true,
-        redis: true,
-        authentication: true,
-      }
+      checks,
     });
   });
 
@@ -393,7 +463,13 @@ export async function setupApp() {
   app.use('/api/v1/bounty', v1BountyRouter);
   app.use('/api/v1/press', v1PressReleaseRouter);
   app.use('/api/v1/influencer', v1InfluencerRouter);
+  app.use('/api/v1/search', v1SearchRouter);
   app.use('/api/v1', structuredContentRouter);
+  app.use('/api/v1/creator', v1CreatorRouter);
+  app.use('/api/v1/events', v1EventsRouter);
+  app.use('/api/v1/chima-index', v1ChimaIndexRouter);
+  app.use('/api/v1/hr', v1HRRouter);
+  app.use('/api/v1/ai-cost', v1AICostRouter);
 
   // Knowledge API endpoints (manifest/search/feeds for RAG clients)
   app.use('/api/knowledge-api', knowledgeApiRouter);
@@ -422,9 +498,58 @@ export async function setupApp() {
   // AI Agent Registry Routes (26 self-hosted agents: DeepSeek R1 + Llama 3.1)
   integrateAIRegistryRoutes(app);
 
+  // Iengine — AI Visual Journalism Intelligence Engine
+  integrateIengineRoutes(app);
+
   // Ads Management & Rotation Agent Routes (DeepSeek R1-powered ad engine)
   app.use('/api/ads', adsRotationRouter);
   startMLRetrainingLoop();
+
+  // Auth routes (email verification, resend verification)
+  app.use('/api/auth', authRouter);
+
+  // Payment webhook callbacks (YellowCard + ChangeNOW) — CRITICAL for deposits/swaps
+  app.use('/api/wallet/callbacks', walletCallbackRouter);
+
+  // Subscription checkout, trial, paywall (YellowCard / ChangeNOW + CFIS handshake)
+  app.use('/api/subscriptions', subscriptionRouter);
+
+  // AI editorial Redis queue (ai-system → admin approval)
+  app.use('/api/admin/editorial-queue', adminEditorialQueueRouter);
+
+  // Media upload (B2 → CDN)
+  app.use('/api/media', mediaRouter);
+
+  // Moderation scan (ai-system ContentModerationAgent)
+  app.use('/api/moderation', moderationScanRouter);
+
+  // Sitemap routes (SEO — Google/Bing indexing)
+  app.use('/api/sitemap', sitemapRouter);
+
+  // Structured Data routes (schema.org markup API)
+  app.use('/api/structured-data', structuredDataRouter);
+
+  // Marquee routes (ticker bar / news flash management)
+  app.use('/api/marquee', marqueeRouter);
+
+  // ChangeNOW diaspora swap surface (estimate + create + status + callback)
+  app.use('/api/v1/changenow', v1ChangenowRouter);
+
+  // CFIS → backend reverse webhook leg (HMAC-signed). Used by finance-system
+  // to trigger receipt issuance + reconcile subscription / wallet records.
+  app.use('/api/finance-events', financeEventsRouter);
+
+  // Admin AI task management (SPEC-ADM-4) — list/trigger/cancel.
+  app.use('/api/admin/ai-tasks', adminAiTasksRouter);
+
+  // Admin financial approval workflow (SPEC-ADM-5) — two-step + audit.
+  app.use('/api/admin/finance-approvals', adminFinanceApprovalsRouter);
+
+  // Admin IP whitelist management (SPEC-ADM-6) — runtime allow-list.
+  app.use('/api/admin/ip-whitelist', adminIpWhitelistRouter);
+
+  // Marketplace (creator economy digital products, MKT-0-2 / MKT-2-5).
+  app.use('/api/v1/marketplace', v1MarketplaceRouter);
 
   // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
   app.use('/', rssFeedRouter);
@@ -572,7 +697,73 @@ export async function setupApp() {
 }
 
 async function startServer() {
-  const { httpServer } = await setupApp();
+  const { app, httpServer } = await setupApp();
+
+  // Boot the Socket.IO admin push channel. We register the io instance with
+  // adminWebSocketService so editorial-queue, AI-task, finance-approval, and
+  // content-alert events can be pushed in real time to the admin app.
+  if (process.env.ENABLE_ADMIN_WS !== 'false') {
+    try {
+      const { Server: SocketIOServer } = await import('socket.io');
+      const adminIo = new SocketIOServer(httpServer, {
+        path: '/admin-ws',
+        cors: {
+          origin: process.env.ADMIN_ORIGIN?.split(',') || true,
+          credentials: true,
+        },
+      });
+      adminIo.use(async (socket, next) => {
+        try {
+          const token = socket.handshake.auth?.token || socket.handshake.query?.token;
+          if (!token || typeof token !== 'string') {
+            return next(new Error('AUTH_REQUIRED'));
+          }
+          const { verifyJWT } = await import('./utils/auth');
+          const decoded = verifyJWT(token) as any;
+          (socket as any).userId = decoded.sub;
+          (socket as any).role = decoded.role;
+          return next();
+        } catch (err: any) {
+          return next(new Error('AUTH_INVALID'));
+        }
+      });
+      adminIo.on('connection', (socket) => {
+        const role = (socket as any).role || '';
+        // Editorial+ roles can subscribe to queue events; only admins to system/finance.
+        const editorialRoles = ['JOURNALIST', 'EDITOR', 'CEO', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'];
+        const adminRoles = ['ADMIN', 'CEO', 'SUPER_ADMIN'];
+        if (editorialRoles.includes(role)) {
+          socket.join('admin:editorial-queue');
+          socket.join('admin:ai-tasks');
+          socket.join('admin:content-alerts');
+        }
+        if (adminRoles.includes(role)) {
+          socket.join('admin:finance-approvals');
+          socket.join('admin:system-alerts');
+        }
+      });
+      const { registerAdminSocketServer } = await import('./services/adminWebSocketService');
+      registerAdminSocketServer(adminIo);
+      logger.info('🛰  Admin WebSocket channel listening at /admin-ws');
+    } catch (err: any) {
+      logger.warn('Admin WebSocket failed to start (non-fatal)', { error: err.message });
+    }
+  }
+
+  if (process.env.ENABLE_MODERATION !== 'false') {
+    try {
+      const { setupModeration } = await import('./moderation');
+      const moderation = setupModeration(app, httpServer, {
+        perspectiveApiKey: process.env.PERSPECTIVE_API_KEY,
+        verbose: process.env.NODE_ENV === 'development',
+      });
+      await moderation.start();
+      logger.info('🛡️ AI Moderation system started (REST + WebSocket + background worker)');
+    } catch (err: any) {
+      logger.warn('Moderation system failed to start (non-fatal)', { error: err.message });
+    }
+  }
+
   httpServer.listen(PORT, () => {
     logger.info(`🚀 Server ready at http://localhost:${PORT}`);
     logger.info(`🚀 GraphQL endpoint at http://localhost:${PORT}${GRAPHQL_PATH}`);
@@ -598,6 +789,20 @@ async function startServer() {
       startAnalysisScheduler();
       logger.info('🔬 Data Analysis Pipeline Scheduler started (runs Tuesday 10pm)');
     }
+
+    // Schedule daily cleanup of expired tokens, sessions, and verification tokens
+    const { authService: authSvc } = require('./services/authService');
+    const CLEANUP_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+    setInterval(() => {
+      authSvc.cleanupExpiredTokens().catch(e =>
+        logger.error('Token cleanup failed:', e)
+      );
+    }, CLEANUP_INTERVAL);
+    // Also run once at startup
+    authSvc.cleanupExpiredTokens().catch(e =>
+      logger.error('Initial token cleanup failed:', e)
+    );
+    logger.info('🧹 Token cleanup scheduled (every 24h)');
   });
 }
 

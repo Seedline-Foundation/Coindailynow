@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-coindaily_dev}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      # Used by initdb/04-create-cfis-role.sh on first boot.
+      CFIS_DB_PASSWORD: ${CFIS_DB_PASSWORD:-cfis_dev_password_change_me}
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
@@ -88,10 +90,32 @@ services:
       - coindaily-network
     restart: unless-stopped
 
+  listmonk:
+    image: listmonk/listmonk:v4.1.0
+    container_name: coindaily-listmonk
+    ports:
+      - "127.0.0.1:9000:9000"
+    environment:
+      - TZ=Africa/Lagos
+    volumes:
+      - ./listmonk/config.toml:/listmonk/config.toml:ro
+      - listmonk_uploads:/listmonk/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - coindaily-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
 volumes:
   postgres_data:
   redis_data:
   elasticsearch_data:
+  listmonk_uploads:
 
 networks:
   coindaily-network:

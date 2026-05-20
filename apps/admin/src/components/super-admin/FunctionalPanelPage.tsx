@@ -1,5 +1,7 @@
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 
@@ -48,7 +50,7 @@ export default function FunctionalPanelPage({
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('super_admin_token');
+      const token = getAccessToken();
       const response = await fetch(endpoint, {
         headers: {
           Authorization: `Bearer ${token}`,

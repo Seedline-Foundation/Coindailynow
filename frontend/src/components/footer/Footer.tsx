@@ -117,6 +117,7 @@ const Footer: React.FC = () => {
       title: t('learn'),
       links: [
         { label: t('cryptoBasics'), href: '/crypto-basics' },
+        { label: 'Factsheets', href: '/factsheets' },
       ]
     },
     {
@@ -136,6 +137,8 @@ const Footer: React.FC = () => {
       title: t('company'),
       links: [
         { label: t('about'), href: '/about' },
+        { label: 'Editorial Standards', href: '/editorial-standards' },
+        { label: 'FAQ', href: '/faq' },
         { label: 'Jobs', href: '/jobs' },
         { label: 'Blog', href: '/blog' },
         { label: t('privacy'), href: '/privacy' },
@@ -511,6 +514,18 @@ const Footer: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Financial Disclaimer Banner */}
+      <div className="bg-gray-800 dark:bg-gray-900 border-t border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <p className="text-xs text-gray-500 text-center leading-relaxed">
+            CoinDaily Africa is a news and information platform. Nothing on this site constitutes financial, investment, legal, or tax advice. Cryptocurrency investments carry significant risk &mdash; you could lose all invested capital. Always consult a licensed financial advisor.{' '}
+            <Link href="/disclaimer" className="text-gray-400 hover:text-white underline">
+              Full disclaimer
+            </Link>
+          </p>
         </div>
       </div>
 

@@ -1,0 +1,10 @@
+# Canonical Contabo paths — must match infrastructure/ecosystem.production.config.js
+# Format: PM2_NAME|CWD|SCRIPT_OR_ARGS
+
+coindaily-backend|/var/www/coindaily-app|dist/index.js
+coindaily-news|/var/www/coindaily|node_modules/.bin/next
+coindaily-admin|/var/www/coindaily-admin|node_modules/.bin/next
+coindaily-press|/var/www/coindaily-press|node_modules/.bin/next
+coindaily-ai|/var/www/coindaily-ai|node_modules/.bin/next
+coindaily-ai-pipeline|/var/www/coindaily-ai-system|dist/orchestrator/index.js
+coindaily-token|/var/www/coindaily-token|npm

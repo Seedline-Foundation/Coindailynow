@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { marqueeApi } from '@/lib/marqueeApi';
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -115,18 +116,17 @@ const MarqueeItemEditor: React.FC<MarqueeItemEditorProps> = ({
   const loadItems = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/admin/marquees/${marqueeId}/items`);
-      const result = await response.json();
-      
+      const result = await marqueeApi.listItems(marqueeId);
+
       if (result.success) {
-        setLocalItems(result.data);
-        onItemsChange(result.data);
+        setLocalItems(result.data as MarqueeItem[]);
+        onItemsChange(result.data as MarqueeItem[]);
         setError(null);
       } else {
-        setError(result.error || 'Failed to load items');
+        setError('Failed to load items');
       }
     } catch (err) {
-      setError('Network error loading items');
+      setError(err instanceof Error ? err.message : 'Network error loading items');
     } finally {
       setIsLoading(false);
     }
@@ -137,22 +137,14 @@ const MarqueeItemEditor: React.FC<MarqueeItemEditorProps> = ({
     try {
       setIsLoading(true);
       
-      const url = selectedItem 
-        ? `/api/admin/marquees/${marqueeId}/items/${selectedItem.id}`
-        : `/api/admin/marquees/${marqueeId}/items`;
-      
-      const method = selectedItem ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...itemForm,
-          order: selectedItem ? selectedItem.order : Math.max(...localItems.map(i => i.order), 0) + 1,
-        }),
-      });
-      
-      const result = await response.json();
+      const payload = {
+        ...itemForm,
+        order: selectedItem ? selectedItem.order : Math.max(...localItems.map(i => i.order), 0) + 1,
+      };
+
+      const result = selectedItem
+        ? await marqueeApi.updateItem(marqueeId, selectedItem.id, payload)
+        : await marqueeApi.createItem(marqueeId, payload);
       
       if (result.success) {
         setSuccess(selectedItem ? 'Item updated successfully' : 'Item created successfully');
@@ -176,20 +168,16 @@ const MarqueeItemEditor: React.FC<MarqueeItemEditorProps> = ({
     
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/admin/marquees/${marqueeId}/items/${itemId}`, {
-        method: 'DELETE',
-      });
-      
-      const result = await response.json();
-      
+      const result = await marqueeApi.removeItem(marqueeId, itemId);
+
       if (result.success) {
         setSuccess('Item deleted successfully');
         loadItems();
       } else {
-        setError(result.error || 'Failed to delete item');
+        setError('Failed to delete item');
       }
     } catch (err) {
-      setError('Network error deleting item');
+      setError(err instanceof Error ? err.message : 'Network error deleting item');
     } finally {
       setIsLoading(false);
     }
@@ -201,24 +189,18 @@ const MarqueeItemEditor: React.FC<MarqueeItemEditorProps> = ({
       const item = localItems.find(i => i.id === itemId);
       if (!item) return;
       
-      const response = await fetch(`/api/admin/marquees/${marqueeId}/items/${itemId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...item,
-          isVisible: !item.isVisible,
-        }),
+      const result = await marqueeApi.updateItem(marqueeId, itemId, {
+        ...item,
+        isVisible: !item.isVisible,
       });
-      
-      const result = await response.json();
-      
+
       if (result.success) {
         loadItems();
       } else {
-        setError(result.error || 'Failed to toggle visibility');
+        setError('Failed to toggle visibility');
       }
     } catch (err) {
-      setError('Network error toggling visibility');
+      setError(err instanceof Error ? err.message : 'Network error toggling visibility');
     }
   };
 
@@ -230,24 +212,18 @@ const MarqueeItemEditor: React.FC<MarqueeItemEditorProps> = ({
       
       const newOrder = direction === 'up' ? item.order - 1 : item.order + 1;
       
-      const response = await fetch(`/api/admin/marquees/${marqueeId}/items/${itemId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...item,
-          order: Math.max(1, newOrder),
-        }),
+      const result = await marqueeApi.updateItem(marqueeId, itemId, {
+        ...item,
+        order: Math.max(1, newOrder),
       });
-      
-      const result = await response.json();
-      
+
       if (result.success) {
         loadItems();
       } else {
-        setError(result.error || 'Failed to update order');
+        setError('Failed to update order');
       }
     } catch (err) {
-      setError('Network error updating order');
+      setError(err instanceof Error ? err.message : 'Network error updating order');
     }
   };
 

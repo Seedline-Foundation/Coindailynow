@@ -4,6 +4,12 @@ import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
 import prisma from '../lib/prisma';
 import { logger } from '../utils/logger';
+import {
+  revokeAccessTokenJti,
+  isAccessTokenJtiRevoked,
+  revokeAllAccessTokensForUser,
+  isUserAccessTokenRevoked,
+} from './tokenRevocationService';
 
 export interface LoginCredentials {
   email: string;
@@ -45,6 +51,7 @@ export class AuthService {
   private readonly ACCESS_TOKEN_EXPIRY = '15m';
   private readonly REFRESH_TOKEN_EXPIRY = '7d';
   private readonly PASSWORD_RESET_EXPIRY = '1h';
+  private readonly EMAIL_VERIFICATION_EXPIRY = '24h'; // 24 hours
   private readonly SESSION_EXPIRY = '30d';
   private readonly SALT_ROUNDS = 12;
 
@@ -139,6 +146,10 @@ export class AuthService {
         ...(data.ipAddress && { ipAddress: data.ipAddress }),
         ...(data.userAgent && { userAgent: data.userAgent })
       });
+
+      // Send verification email (fire-and-forget — don't block registration response)
+      this.sendEmailVerification(user.id, user.email, user.username)
+        .catch(e => logger.error('Failed to send verification email during registration:', e));
 
       return {
         user: this.formatUser(user),
@@ -311,7 +322,7 @@ export class AuthService {
       userAgent?: string;
     }
   ): Promise<TokenPair> {
-    // Generate access token
+    const jti = crypto.randomUUID();
     const accessToken = jwt.sign(
       {
         sub: user.id,
@@ -320,7 +331,8 @@ export class AuthService {
         subscriptionTier: user.subscriptionTier,
         status: user.status,
         emailVerified: user.emailVerified,
-        type: 'access'
+        type: 'access',
+        jti,
       },
       process.env.JWT_SECRET!,
       { 
@@ -389,8 +401,19 @@ export class AuthService {
   /**
    * Logout user and revoke tokens
    */
-  async logout(userId: string, refreshToken?: string): Promise<void> {
+  async logout(userId: string, refreshToken?: string, accessToken?: string): Promise<void> {
     try {
+      if (accessToken) {
+        try {
+          const decoded = jwt.decode(accessToken) as { jti?: string } | null;
+          if (decoded?.jti) await revokeAccessTokenJti(decoded.jti);
+        } catch {
+          /* ignore decode errors */
+        }
+      } else {
+        await revokeAllAccessTokensForUser(userId);
+      }
+
       if (refreshToken) {
         // Revoke specific refresh token
         await this.prisma.refreshToken.updateMany({
@@ -432,6 +455,7 @@ export class AuthService {
    * Revoke all tokens for a user
    */
   async revokeAllUserTokens(userId: string): Promise<void> {
+    await revokeAllAccessTokensForUser(userId);
     await this.prisma.refreshToken.updateMany({
       where: {
         userId,
@@ -662,6 +686,15 @@ export class AuthService {
   async verifyAccessToken(token: string): Promise<AuthenticatedUser> {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+      if (decoded.jti && (await isAccessTokenJtiRevoked(decoded.jti))) {
+        throw new Error('Token has been revoked');
+      }
+
+      const issuedAtSec = decoded.iat ?? 0;
+      if (decoded.sub && (await isUserAccessTokenRevoked(decoded.sub, issuedAtSec))) {
+        throw new Error('Token has been revoked');
+      }
       
       // Get fresh user data
       const user = await this.prisma.user.findUnique({
@@ -741,6 +774,316 @@ export class AuthService {
   }
 
   /**
+   * Create and send email verification token for a user
+   */
+  async sendEmailVerification(userId: string, email: string, username: string): Promise<void> {
+    try {
+      // Invalidate any existing unused verification tokens
+      await this.prisma.emailVerification.updateMany({
+        where: { userId, isUsed: false },
+        data: { isUsed: true, usedAt: new Date() }
+      });
+
+      // Generate verification token
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      const hashedToken = await bcrypt.hash(verificationToken, this.SALT_ROUNDS);
+
+      // Store verification token (24-hour expiry)
+      await this.prisma.emailVerification.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId,
+          token: verificationToken,
+          hashedToken,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        }
+      });
+
+      // Send verification email
+      const frontendUrl = process.env.FRONTEND_URL || 'https://coindaily.com';
+      const verificationUrl = `${frontendUrl}/auth/verify-email?token=${verificationToken}`;
+
+      const emailService = (await import('./emailService')).default;
+      const emailSent = await emailService.sendEmailVerification(email, verificationToken, verificationUrl);
+
+      if (!emailSent) {
+        logger.warn(`Failed to send verification email to ${email}, but token was generated`);
+      } else {
+        logger.info(`Verification email sent to ${email}`);
+      }
+
+      // Log security event
+      await this.logSecurityEvent({
+        userId,
+        eventType: 'EMAIL_VERIFICATION_SENT',
+        severity: 'INFO',
+        metadata: JSON.stringify({ email })
+      });
+    } catch (error) {
+      logger.error('Failed to send email verification:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verify email using token
+   */
+  async verifyEmail(token: string): Promise<{ success: boolean; message: string }> {
+    try {
+      // Find verification token
+      const record = await this.prisma.emailVerification.findUnique({
+        where: { token },
+        include: { User: true }
+      });
+
+      if (!record) {
+        return { success: false, message: 'Invalid verification token' };
+      }
+
+      if (record.isUsed) {
+        return { success: false, message: 'Verification token has already been used' };
+      }
+
+      if (record.expiresAt < new Date()) {
+        return { success: false, message: 'Verification token has expired. Please request a new one.' };
+      }
+
+      // Verify token hash
+      const isValid = await bcrypt.compare(token, record.hashedToken);
+      if (!isValid) {
+        return { success: false, message: 'Invalid verification token' };
+      }
+
+      // Check if user already verified
+      if (record.User.emailVerified) {
+        // Mark token as used anyway
+        await this.prisma.emailVerification.update({
+          where: { id: record.id },
+          data: { isUsed: true, usedAt: new Date() }
+        });
+        return { success: true, message: 'Email is already verified' };
+      }
+
+      // Update user and mark token as used in a transaction
+      await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: { id: record.userId },
+          data: {
+            emailVerified: true,
+            status: 'ACTIVE' // Transition from PENDING_VERIFICATION to ACTIVE
+          }
+        }),
+        this.prisma.emailVerification.update({
+          where: { id: record.id },
+          data: { isUsed: true, usedAt: new Date() }
+        })
+      ]);
+
+      // Log security event
+      await this.logSecurityEvent({
+        userId: record.userId,
+        eventType: 'EMAIL_VERIFIED',
+        severity: 'INFO',
+        metadata: JSON.stringify({ email: record.User.email })
+      });
+
+      logger.info(`Email verified for user ${record.userId}`);
+      return { success: true, message: 'Email verified successfully' };
+    } catch (error) {
+      logger.error('Email verification failed:', error);
+      return { success: false, message: 'Email verification failed. Please try again.' };
+    }
+  }
+
+  /**
+   * Resend email verification
+   */
+  async resendEmailVerification(email: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email: email.toLowerCase() }
+      });
+
+      if (!user) {
+        // Don't reveal if email exists for security
+        return { success: true, message: 'If this email exists, a verification email has been sent' };
+      }
+
+      if (user.emailVerified) {
+        return { success: true, message: 'Email is already verified' };
+      }
+
+      // Rate limit: check if a verification was sent in the last 2 minutes
+      const recentVerification = await this.prisma.emailVerification.findFirst({
+        where: {
+          userId: user.id,
+          isUsed: false,
+          createdAt: { gt: new Date(Date.now() - 2 * 60 * 1000) }
+        }
+      });
+
+      if (recentVerification) {
+        return { success: false, message: 'Please wait before requesting another verification email' };
+      }
+
+      await this.sendEmailVerification(user.id, user.email, user.username);
+      return { success: true, message: 'Verification email sent' };
+    } catch (error) {
+      logger.error('Resend verification failed:', error);
+      return { success: false, message: 'Failed to resend verification email' };
+    }
+  }
+
+  /**
+   * GDPR Art. 17 — Right to Erasure (Account Deletion)
+   *
+   * Anonymizes PII instead of hard-deleting to preserve referential integrity
+   * for articles, audit logs, and compliance records. Revokes all active
+   * sessions and tokens. Sets account status to DELETED.
+   *
+   * Flow: user requests → password confirmed → PII anonymized → tokens revoked
+   * → status set to DELETED → confirmation returned.
+   *
+   * Retention: anonymized record kept for 90 days for fraud/abuse review,
+   * then eligible for hard-delete via data retention cleanup job.
+   */
+  async requestAccountDeletion(
+    userId: string,
+    password: string,
+    reason?: string
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      // 1. Verify user exists and is active
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId }
+      });
+
+      if (!user) {
+        return { success: false, message: 'User not found' };
+      }
+
+      if (user.status === 'DELETED') {
+        return { success: false, message: 'Account already deleted' };
+      }
+
+      // 2. Verify password (prevent unauthorized deletion)
+      const passwordValid = await bcrypt.compare(password, user.passwordHash);
+      if (!passwordValid) {
+        return { success: false, message: 'Invalid password. Account deletion requires password confirmation.' };
+      }
+
+      // 3. Prevent admin self-deletion (admins must be demoted first)
+      if (['SUPER_ADMIN', 'ADMIN'].includes(user.role)) {
+        return { success: false, message: 'Admin accounts cannot self-delete. Contact a super-admin to demote the account first.' };
+      }
+
+      const anonymizedEmail = `deleted-${crypto.randomBytes(8).toString('hex')}@deleted.coindaily.local`;
+      const anonymizedUsername = `deleted-user-${crypto.randomBytes(6).toString('hex')}`;
+      const deletionTimestamp = new Date();
+
+      // 4. Anonymize PII in a transaction
+      await this.prisma.$transaction(async (tx) => {
+        // Anonymize the user record
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            email: anonymizedEmail,
+            username: anonymizedUsername,
+            passwordHash: 'DELETED',
+            firstName: null,
+            lastName: null,
+            avatarUrl: null,
+            bio: null,
+            location: null,
+            twoFactorSecret: null,
+            twoFactorEnabled: false,
+            status: 'DELETED',
+            updatedAt: deletionTimestamp,
+          }
+        });
+
+        // Anonymize user profile if exists
+        await tx.userProfile.updateMany({
+          where: { userId },
+          data: {
+            bio: null,
+            location: null,
+            website: null,
+            socialMedia: null,
+            tradingExperience: null,
+            investmentPortfolioSize: null,
+            preferredExchanges: null,
+            notificationPreferences: null,
+            privacySettings: null,
+            contentPreferences: null,
+          }
+        }).catch(() => { /* Profile may not exist */ });
+
+        // 5. Revoke all refresh tokens
+        await tx.refreshToken.updateMany({
+          where: { userId },
+          data: { isRevoked: true }
+        });
+
+        // 6. Delete all sessions
+        await tx.session.deleteMany({
+          where: { userId }
+        });
+
+        // 7. Delete password reset tokens
+        await tx.passwordReset.deleteMany({
+          where: { userId }
+        });
+
+        // 8. Delete email verification tokens
+        await tx.emailVerification.deleteMany({
+          where: { userId }
+        });
+
+        // 9. Revoke all API keys
+        await tx.aPIKey.updateMany({
+          where: { userId },
+          data: { isActive: false }
+        }).catch(() => { /* API keys may not exist */ });
+
+        // 10. Log the deletion for compliance audit trail
+        await tx.auditLog.create({
+          data: {
+            adminId: userId,
+            action: 'ACCOUNT_DELETION_GDPR_ART17',
+            resource: 'user',
+            resourceId: userId,
+            details: JSON.stringify({
+              reason: reason || 'User requested account deletion (GDPR Art. 17)',
+              anonymizedEmail,
+              deletionTimestamp: deletionTimestamp.toISOString(),
+            }),
+            ipAddress: 'self-service',
+            userAgent: 'self-service',
+            status: 'success',
+          }
+        }).catch((err) => {
+          // Audit log failure shouldn't block deletion
+          logger.warn('Failed to create deletion audit log:', err);
+        });
+      });
+
+      logger.info(`Account deletion completed for user ${userId} (anonymized to ${anonymizedEmail})`);
+
+      return {
+        success: true,
+        message: 'Your account has been deleted and personal data anonymized. This action cannot be undone.'
+      };
+    } catch (error) {
+      logger.error('Account deletion failed:', error);
+      return {
+        success: false,
+        message: 'Account deletion failed. Please try again or contact support.'
+      };
+    }
+  }
+
+  /**
    * Clean up expired tokens and sessions
    */
   async cleanupExpiredTokens(): Promise<void> {
@@ -759,6 +1102,16 @@ export class AuthService {
 
       // Delete expired password reset tokens
       await this.prisma.passwordReset.deleteMany({
+        where: {
+          OR: [
+            { expiresAt: { lt: now } },
+            { isUsed: true }
+          ]
+        }
+      });
+
+      // Delete expired/used email verification tokens
+      await this.prisma.emailVerification.deleteMany({
         where: {
           OR: [
             { expiresAt: { lt: now } },

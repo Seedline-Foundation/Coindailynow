@@ -14,9 +14,8 @@
  */
 
 import prisma from '../lib/prisma';
-import Redis from 'ioredis';
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-
+import { getRedis } from '../lib/redis';
+const redis = getRedis();
 // Cache TTLs
 const CACHE_TTL = {
   RECOMMENDATIONS: 300, // 5 minutes
@@ -606,24 +605,23 @@ class AIRecommendationService {
 
       // Portfolio-based insights
       if (preferences.portfolioSymbols && preferences.portfolioSymbols.length > 0) {
-        for (const symbol of preferences.portfolioSymbols.slice(0, 5)) {
-          const token = await prisma.token.findUnique({
-            where: { symbol },
-          });
+        const symbolsToFetch = preferences.portfolioSymbols.slice(0, 5);
+        const tokens = await prisma.token.findMany({
+          where: { symbol: { in: symbolsToFetch } },
+        });
 
-          if (token) {
-            insights.push({
-              insightId: `portfolio_${symbol}_${Date.now()}`,
-              type: 'portfolio',
-              title: `${token.name} (${token.symbol}) Update`,
-              description: this.generatePortfolioInsight(token),
-              relevanceScore: 0.9,
-              relatedSymbols: [token.symbol],
-              actionable: true,
-              confidence: 0.85,
-              timestamp: new Date(),
-            });
-          }
+        for (const token of tokens) {
+          insights.push({
+            insightId: `portfolio_${token.symbol}_${Date.now()}`,
+            type: 'portfolio',
+            title: `${token.name} (${token.symbol}) Update`,
+            description: this.generatePortfolioInsight(token),
+            relevanceScore: 0.9,
+            relatedSymbols: [token.symbol],
+            actionable: true,
+            confidence: 0.85,
+            timestamp: new Date(),
+          });
         }
       }
 

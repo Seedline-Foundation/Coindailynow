@@ -3,6 +3,8 @@
 
 'use client';
 
+import { getAccessToken, clearSession } from '@/lib/auth';
+
 import React, { useState, useEffect } from 'react';
 import {
   Award,
@@ -59,7 +61,7 @@ export default function EngagementStatsWidget() {
 
       const response = await fetch('/api/engagement/stats', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${getAccessToken()}`,
         },
       });
 
