@@ -26,6 +26,8 @@ const TOPIC_KEYWORDS: Record<string, string[]> = {
   ai: ['ai', 'artificial intelligence', 'machine learning', 'gpt', 'llm', 'neural', 'deepfake', 'openai', 'anthropic'],
   macro: ['fed', 'inflation', 'interest rate', 'recession', 'gdp', 'treasury', 'bond'],
   africa: ['africa', 'nigeria', 'kenya', 'lagos', 'nairobi', 'mpesa', 'south africa', 'ghana', 'african'],
+  latam: ['brazil', 'mexico', 'argentina', 'colombia', 'el salvador', 'venezuela', 'chile', 'peru', 'latam', 'latin america', 'pix', 'nubank', 'mercado libre', 'rappi', 'peso', 'real', 'bolivar', 'chivo'],
+  caribbean: ['caribbean', 'bahamas', 'cayman', 'jamaica', 'barbados', 'puerto rico', 'trinidad', 'sand dollar', 'haiti', 'dominican republic'],
   etf: ['etf', 'spot etf', 'blackrock', 'fidelity', 'grayscale', 'ark invest'],
   mining: ['mining', 'miner', 'hashrate', 'asic', 'proof of work'],
   memecoin: ['memecoin', 'meme', 'doge', 'shib', 'pepe', 'bonk', 'wif'],
@@ -56,6 +58,8 @@ const SYMBOLIC_ARCHETYPES: Record<string, string[]> = {
   'technological breakthrough': ['launch', 'upgrade', 'breakthrough', 'innovation', 'deploy'],
   'security crisis': ['hack', 'exploit', 'breach', 'drain', 'rug pull'],
   'african emergence': ['africa', 'nigeria', 'kenya', 'mpesa', 'fintech hub'],
+  'latam crypto adoption': ['el salvador', 'bitcoin beach', 'chivo', 'pix', 'nubank', 'mercado libre', 'argentina peso', 'venezuela bolivar', 'remittance'],
+  'caribbean digital islands': ['bahamas', 'sand dollar', 'cayman', 'caribbean', 'offshore', 'cbdc'],
   'ai convergence': ['ai', 'gpt', 'machine learning', 'neural', 'autonomous'],
 };
 
@@ -127,6 +131,8 @@ export class NarrativeEngine {
       'ripple', 'xrp', 'dogecoin', 'polygon', 'avalanche', 'chainlink',
       'openai', 'google', 'apple', 'tesla', 'microstrategy', 'grayscale',
       'nigeria', 'kenya', 'south africa', 'fed', 'ecb', 'imf',
+      'brazil', 'mexico', 'argentina', 'colombia', 'el salvador', 'venezuela',
+      'bahamas', 'cayman islands', 'jamaica', 'puerto rico', 'nubank', 'mercado libre',
     ];
 
     for (const entity of knownEntities) {

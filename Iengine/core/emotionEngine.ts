@@ -150,6 +150,12 @@ export class EmotionEngine {
     if (narrative.symbolic_archetypes.includes('african emergence')) {
       return 'cultural pride and innovation';
     }
+    if (narrative.symbolic_archetypes.includes('latam crypto adoption')) {
+      return 'financial liberation and grassroots resilience';
+    }
+    if (narrative.symbolic_archetypes.includes('caribbean digital islands')) {
+      return 'island-scale ambition and digital sovereignty';
+    }
     if (narrative.symbolic_archetypes.includes('ai convergence')) {
       return 'technological wonder and caution';
     }

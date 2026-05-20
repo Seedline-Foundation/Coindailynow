@@ -24,6 +24,9 @@ export type RegionalProfile =
   | 'africa-west'
   | 'africa-east'
   | 'africa-south'
+  | 'latam-brazil'
+  | 'latam-spanish'
+  | 'caribbean'
   | 'middle-east'
   | 'asia'
   | 'europe'
@@ -36,6 +39,8 @@ export type StyleProfile =
   | 'cybercrime-dark'
   | 'regulation-authority'
   | 'afrofuturism'
+  | 'latam-frontier'
+  | 'caribbean-digital'
   | 'crypto-tradfi-fusion'
   | 'startup-energy';
 
