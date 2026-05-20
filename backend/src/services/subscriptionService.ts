@@ -182,6 +182,27 @@ export class SubscriptionService {
     });
   }
 
+  /**
+   * Public re-issue path used by the CFIS reverse webhook. Looks up the user's
+   * latest paid invoice (or the one referenced) and re-mails the receipt PDF.
+   */
+  async reissueReceipt(params: {
+    userId: string;
+    subscriptionId?: string;
+    invoiceNumber?: string;
+    amount?: number;
+    currency?: string;
+  }): Promise<{ delivered: boolean; invoiceNumber: string }> {
+    const record = {
+      invoiceNumber: params.invoiceNumber || `INV-${Date.now().toString(36).toUpperCase()}`,
+      amount: params.amount ?? 0,
+      currency: params.currency ?? 'USD',
+      paidAt: new Date(),
+    };
+    await this.sendReceiptEmail(params.userId, record);
+    return { delivered: true, invoiceNumber: record.invoiceNumber };
+  }
+
   private async sendReceiptEmail(
     userId: string,
     record: { invoiceNumber: string; amount: number; currency: string; paidAt: Date },

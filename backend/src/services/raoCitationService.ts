@@ -11,7 +11,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
 import prismaBase from '../lib/prisma';
 
 // Extend Prisma types to include Task 74 models (VS Code cache workaround)
@@ -22,8 +22,7 @@ const prisma = prismaBase as PrismaClient & {
   trustSignal: any;
   rAOCitationMetrics: any;
 };
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-
+const redis = getRedis();
 const CACHE_TTL = 300; // 5 minutes
 
 // Types

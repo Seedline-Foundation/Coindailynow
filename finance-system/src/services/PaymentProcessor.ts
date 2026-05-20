@@ -6,6 +6,18 @@ import { ledgerService } from './LedgerService';
 import { notificationService } from './NotificationService';
 import { auditService } from './AuditService';
 import { aiVerificationAgent } from '../agents/AIVerificationAgent';
+import { backendNotifier, type CfisToBackendEventType } from './BackendNotifier';
+
+const TX_TYPE_TO_BACKEND_EVENT: Partial<Record<string, CfisToBackendEventType>> = {
+  TOKEN_WITHDRAWAL: 'WALLET_WITHDRAWAL_COMPLETED',
+  STAFF_PAYROLL: 'PAYROLL_DISBURSED',
+  PRESS_ESCROW_RELEASE: 'PRESS_PAYOUT_RELEASED',
+  PARTNERSHIP_PAYMENT: 'PAYROLL_DISBURSED',
+  BONUS_PAYMENT: 'PAYMENT_CONFIRMED',
+  TOKEN_PURCHASE: 'PAYMENT_CONFIRMED',
+  USDT_DEPOSIT: 'WALLET_DEPOSIT_CONFIRMED',
+  TOKEN_SWAP: 'SWAP_COMPLETED',
+};
 
 /**
  * PaymentProcessor — THE central payment gateway for CFIS.
@@ -369,6 +381,30 @@ export class PaymentProcessor {
         entity_id: txId,
         new_value: { amount: tx.amount, currency: tx.currency, context }
       });
+
+      // Reverse webhook leg → backend (issues receipt + reconciles).
+      const backendEventType =
+        TX_TYPE_TO_BACKEND_EVENT[tx.tx_type as string] ?? 'PAYMENT_CONFIRMED';
+      await backendNotifier.emit(
+        backendEventType,
+        txId,
+        {
+          amount: tx.amount,
+          currency: tx.currency,
+          context,
+          txType: tx.tx_type,
+          metadata: tx.metadata || {},
+        },
+        {
+          userId:
+            (tx.metadata as any)?.userId ||
+            (tx.requested_by?.startsWith('USER:') ? tx.requested_by.slice(5) : undefined),
+          backendReferenceId:
+            (tx.metadata as any)?.subscriptionId ||
+            (tx.metadata as any)?.orderId ||
+            undefined,
+        },
+      );
 
       return (await transactionService.getTransaction(txId))!;
 

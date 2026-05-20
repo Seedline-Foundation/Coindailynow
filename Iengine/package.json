@@ -1,0 +1,38 @@
+{
+  "name": "iengine",
+  "version": "1.0.0",
+  "description": "Iengine — AI Visual Journalism Intelligence Engine for CoinDaily",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --skipLibCheck",
+    "start": "node dist/Iengine/index.js",
+    "start:workers": "node dist/Iengine/index.js --workers",
+    "dev": "ts-node-dev --respawn --transpile-only index.ts",
+    "dev:workers": "ts-node-dev --respawn --transpile-only index.ts -- --workers",
+    "type-check": "tsc --noEmit --skipLibCheck",
+    "test": "jest"
+  },
+  "keywords": [
+    "ai",
+    "image-generation",
+    "visual-journalism",
+    "comfyui",
+    "stable-diffusion",
+    "editorial-visuals"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "bullmq": "^5.1.0",
+    "express": "^4.18.2",
+    "ioredis": "^5.8.1",
+    "sharp": "^0.33.0",
+    "ws": "^8.14.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/ws": "^8.5.10",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.0"
+  }
+}

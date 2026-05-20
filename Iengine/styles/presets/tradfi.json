@@ -1,0 +1,17 @@
+{
+  "name": "TradFi Institutional",
+  "description": "Institutional authority, stability, financial scale",
+  "palette": ["navy", "emerald", "silver", "white"],
+  "camera": ["symmetrical framing", "long-lens compression", "executive perspective"],
+  "lighting": ["clean institutional", "silver highlights", "formal ambient"],
+  "environments": [
+    "institutional trading floor",
+    "Wall Street corridor",
+    "central bank interior",
+    "financial district skyline"
+  ],
+  "symbols": ["institutional towers", "financial dashboards", "global market maps"],
+  "motion": "subtle steady institutional",
+  "composition": "centered symmetry with golden ratio",
+  "negative": ["neon chaos", "cyberpunk", "informal"]
+}

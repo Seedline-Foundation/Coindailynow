@@ -7,11 +7,11 @@
 
 import prisma from '../lib/prisma';
 import Parser from 'rss-parser';
-import { Redis } from 'ioredis';
+import { getRedis } from '../lib/redis';
 import nllbClient from './nllbTranslationClient';
 import { chatComplete } from './aiClient';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = getRedis();
 const rssParser = new Parser();
 
 interface ContentFeedConfig {
