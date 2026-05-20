@@ -7,31 +7,49 @@ class Database {
   private _connected = false;
 
   private constructor() {
-    // Prefer DATABASE_URL (Supabase connection string) over individual params
+    // CFIS now lives on the same self-hosted Postgres cluster as the rest of
+    // the stack (Contabo + TimescaleDB) so backups, network policy, and SLAs
+    // are unified. We still accept the legacy Supabase URL during migration:
+    // when DATABASE_URL points at supabase.co we keep the SSL relaxation,
+    // otherwise we honour DB_SSL=true for self-hosted deployments behind a
+    // public reverse proxy and skip SSL on the docker-compose internal net.
     const connectionString = process.env.DATABASE_URL;
+    const useSslEnv = process.env.DB_SSL === 'true' || process.env.PGSSL === 'true';
 
     if (connectionString) {
+      const isSupabase = connectionString.includes('supabase');
+      const isLocal =
+        connectionString.includes('@cfis-postgres') ||
+        connectionString.includes('@localhost') ||
+        connectionString.includes('@127.0.0.1');
+
       this.pool = new Pool({
         connectionString,
-        ssl: connectionString.includes('supabase') ? { rejectUnauthorized: false } : undefined,
-        max: 10,
+        ssl:
+          isSupabase || (useSslEnv && !isLocal)
+            ? { rejectUnauthorized: false }
+            : undefined,
+        max: parseInt(process.env.DB_POOL_MAX || '10', 10),
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 10000,
       });
-      console.log('[CFIS DB] Using Supabase connection string');
+      const banner = isSupabase
+        ? '[CFIS DB] DATABASE_URL points at Supabase (legacy). Plan migration per documentations/launch/CFIS_DB_MIGRATION.md'
+        : '[CFIS DB] Using DATABASE_URL (self-hosted)';
+      console.log(banner);
     } else {
       this.pool = new Pool({
-        host: process.env.DB_HOST || 'localhost',
+        host: process.env.DB_HOST || 'cfis-postgres',
         port: parseInt(process.env.DB_PORT || '5432'),
-        user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD || 'password',
+        user: process.env.DB_USER || 'cfis',
+        password: process.env.DB_PASSWORD || 'cfis_dev_password',
         database: process.env.DB_NAME || 'cfis_db',
-        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-        max: 10,
+        ssl: useSslEnv ? { rejectUnauthorized: false } : undefined,
+        max: parseInt(process.env.DB_POOL_MAX || '10', 10),
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 10000,
       });
-      console.log('[CFIS DB] Using individual connection params');
+      console.log('[CFIS DB] Using individual connection params (self-hosted default)');
     }
 
     this.pool.on('error', (err) => {
@@ -42,7 +60,7 @@ class Database {
     // Test connection on startup (non-blocking)
     this.pool.query('SELECT 1').then(() => {
       this._connected = true;
-      console.log('[CFIS DB] ✅ Connected to Supabase PostgreSQL');
+      console.log('[CFIS DB] ✅ Connected to Postgres');
     }).catch(err => {
       this._connected = false;
       console.warn('[CFIS DB] ⚠ Database not reachable:', err.message);

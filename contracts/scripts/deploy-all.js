@@ -1,101 +1,140 @@
+/**
+ * Deploy the full launch contract set + emit a deployment manifest.
+ *
+ * Network selection: --network amoy | polygon | bscTestnet | bsc | hardhat
+ * Usage: npx hardhat run scripts/deploy-all.js --network amoy
+ *
+ * Side effects:
+ *   - Writes contracts/deployments/<network>.json (legacy location)
+ *   - Writes packages/contracts/src/deployments/<network>.json (canonical)
+ *   - Verifies on Etherscan-compatible explorers when available
+ */
 const hre = require('hardhat');
+const fs = require('fs');
+const path = require('path');
+
+const TIMELOCK_MIN_DELAY = Number(process.env.TIMELOCK_MIN_DELAY || 60 * 60 * 24); // 1 day
+const SUBSCRIPTION_INITIAL_PRICE = process.env.SUBSCRIPTION_INITIAL_PRICE || '29000000'; // 29 USDC (6 decimals)
+
+async function deploy(name, args = []) {
+  console.log(`\n--- Deploying ${name} ---`);
+  const Factory = await hre.ethers.getContractFactory(name);
+  const instance = await Factory.deploy(...args);
+  await instance.waitForDeployment();
+  const address = await instance.getAddress();
+  const tx = instance.deploymentTransaction();
+  console.log(`${name}: ${address}`);
+  return { name, address, args, txHash: tx?.hash };
+}
+
+async function tryVerify(address, args) {
+  try {
+    await hre.run('verify:verify', { address, constructorArguments: args });
+    return true;
+  } catch (e) {
+    console.log(`  ✗ verify ${address} failed: ${e.message}`);
+    return false;
+  }
+}
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
-  console.log('Deploying contracts with account:', deployer.address);
-  console.log('Account balance:', (await hre.ethers.provider.getBalance(deployer.address)).toString());
+  const network = hre.network.name;
+  console.log(`Network: ${network} (chainId ${hre.network.config.chainId})`);
+  console.log(`Deployer: ${deployer.address}`);
+  const balance = await hre.ethers.provider.getBalance(deployer.address);
+  console.log(`Balance: ${balance.toString()}`);
 
-  // ── 1. Deploy JoyToken ─────────────────────────────────────────
-  console.log('\n--- Deploying JoyToken ---');
-  const JoyToken = await hre.ethers.getContractFactory('JoyToken');
-  const joyToken = await JoyToken.deploy();
-  await joyToken.waitForDeployment();
-  const joyAddr = await joyToken.getAddress();
-  console.log('JoyToken deployed to:', joyAddr);
+  const records = [];
 
-  // ── 2. Deploy CDPPoints ────────────────────────────────────────
-  console.log('\n--- Deploying CDPPoints ---');
-  const CDPPoints = await hre.ethers.getContractFactory('CDPPoints');
-  const cdpPoints = await CDPPoints.deploy(joyAddr);
-  await cdpPoints.waitForDeployment();
-  const cdpAddr = await cdpPoints.getAddress();
-  console.log('CDPPoints deployed to:', cdpAddr);
+  // 1. JoyToken (12-decimal launch token, 1B supply).
+  const joy = await deploy('JoyToken', []);
+  records.push(joy);
 
-  // ── 3. Deploy ReputationSBT ────────────────────────────────────
-  console.log('\n--- Deploying ReputationSBT ---');
-  const ReputationSBT = await hre.ethers.getContractFactory('ReputationSBT');
-  const reputationSBT = await ReputationSBT.deploy();
-  await reputationSBT.waitForDeployment();
-  const repAddr = await reputationSBT.getAddress();
-  console.log('ReputationSBT deployed to:', repAddr);
+  // 2. CDPPoints — depends on JoyToken.
+  records.push(await deploy('CDPPoints', [joy.address]));
 
-  // ── 4. Deploy StakingVault ─────────────────────────────────────
-  console.log('\n--- Deploying StakingVault ---');
-  const StakingVault = await hre.ethers.getContractFactory('StakingVault');
-  const stakingVault = await StakingVault.deploy(joyAddr);
-  await stakingVault.waitForDeployment();
-  const stakeAddr = await stakingVault.getAddress();
-  console.log('StakingVault deployed to:', stakeAddr);
+  // 3. ReputationSBT — soulbound reputation.
+  records.push(await deploy('ReputationSBT', []));
 
-  // ── 5. Deploy PressDistribution ────────────────────────────────
-  console.log('\n--- Deploying PressDistribution ---');
-  const PressDistribution = await hre.ethers.getContractFactory('PressDistribution');
-  const pressDist = await PressDistribution.deploy(joyAddr);
-  await pressDist.waitForDeployment();
-  const pressAddr = await pressDist.getAddress();
-  console.log('PressDistribution deployed to:', pressAddr);
+  // 4. StakingVault — staking against JoyToken.
+  records.push(await deploy('StakingVault', [joy.address]));
 
-  // ── Summary ────────────────────────────────────────────────────
-  console.log('\n========================================');
-  console.log('DEPLOYMENT SUMMARY');
-  console.log('========================================');
-  console.log(`Network:           ${hre.network.name}`);
-  console.log(`JoyToken:          ${joyAddr}`);
-  console.log(`CDPPoints:         ${cdpAddr}`);
-  console.log(`ReputationSBT:     ${repAddr}`);
-  console.log(`StakingVault:      ${stakeAddr}`);
-  console.log(`PressDistribution: ${pressAddr}`);
-  console.log('========================================');
+  // 5. PressDistribution — JOY-denominated press payouts.
+  records.push(await deploy('PressDistribution', [joy.address]));
 
-  // ── Save addresses to file ─────────────────────────────────────
-  const fs = require('fs');
-  const addresses = {
-    network: hre.network.name,
+  // 6. SimpleWallet — custodial wallet abstraction.
+  records.push(await deploy('SimpleWallet', []));
+
+  // 7. TokenVesting — team/advisor vesting against JoyToken.
+  records.push(await deploy('TokenVesting', [joy.address]));
+
+  // 8. Subscription — recurring payments. (constructor args may need tuning per spec.)
+  // Subscription.sol expects (paymentToken, owner) — fall back gracefully if signature differs.
+  let subRec = null;
+  try {
+    subRec = await deploy('Subscription', [joy.address, deployer.address]);
+  } catch (e) {
+    console.warn(`Subscription deploy skipped: ${e.message}`);
+  }
+  if (subRec) records.push(subRec);
+
+  // 9. CoinDailyTimelock — wrapper around OZ TimelockController.
+  // Constructor: (minDelay, proposers[], executors[], admin)
+  let timelockRec = null;
+  try {
+    timelockRec = await deploy('CoinDailyTimelock', [
+      TIMELOCK_MIN_DELAY,
+      [deployer.address],
+      [deployer.address],
+      deployer.address,
+    ]);
+  } catch (e) {
+    console.warn(`Timelock deploy skipped: ${e.message}`);
+  }
+  if (timelockRec) records.push(timelockRec);
+
+  // ── Manifest ───────────────────────────────────────────────────
+  const manifest = {
+    network,
     chainId: hre.network.config.chainId,
     deployer: deployer.address,
     deployedAt: new Date().toISOString(),
-    contracts: {
-      JoyToken: joyAddr,
-      CDPPoints: cdpAddr,
-      ReputationSBT: repAddr,
-      StakingVault: stakeAddr,
-      PressDistribution: pressAddr,
-    },
+    contracts: Object.fromEntries(
+      records.map((r) => [
+        r.name,
+        { address: r.address, constructorArgs: r.args, txHash: r.txHash, verified: false },
+      ]),
+    ),
   };
-  const outPath = `./contracts/deployments/${hre.network.name}.json`;
-  fs.mkdirSync('./contracts/deployments', { recursive: true });
-  fs.writeFileSync(outPath, JSON.stringify(addresses, null, 2));
-  console.log(`\nAddresses saved to ${outPath}`);
 
-  // ── Verify on explorer (if not local) ──────────────────────────
-  if (hre.network.name !== 'hardhat' && hre.network.name !== 'localhost') {
-    console.log('\nVerifying contracts on block explorer...');
-    const contracts = [
-      { address: joyAddr, args: [deployer.address] },
-      { address: cdpAddr, args: [joyAddr] },
-      { address: repAddr, args: [] },
-      { address: stakeAddr, args: [joyAddr] },
-      { address: pressAddr, args: [joyAddr] },
-    ];
-    for (const c of contracts) {
-      try {
-        await hre.run('verify:verify', { address: c.address, constructorArguments: c.args });
-        console.log(`  ✓ Verified ${c.address}`);
-      } catch (e) {
-        console.log(`  ✗ Verification failed for ${c.address}: ${e.message}`);
-      }
+  // Legacy location (kept for backward-compat with existing tooling).
+  const legacyDir = path.resolve(__dirname, '..', 'deployments');
+  fs.mkdirSync(legacyDir, { recursive: true });
+  fs.writeFileSync(path.join(legacyDir, `${network}.json`), JSON.stringify(manifest, null, 2));
+
+  // Canonical location consumed by @coindaily/contracts.
+  const canonicalDir = path.resolve(__dirname, '..', '..', 'packages', 'contracts', 'src', 'deployments');
+  fs.mkdirSync(canonicalDir, { recursive: true });
+  fs.writeFileSync(path.join(canonicalDir, `${network}.json`), JSON.stringify(manifest, null, 2));
+
+  console.log(`\nManifest written to:\n  ${legacyDir}/${network}.json\n  ${canonicalDir}/${network}.json`);
+
+  // ── Verification ───────────────────────────────────────────────
+  if (network !== 'hardhat' && network !== 'localhost') {
+    console.log('\nVerifying contracts on block explorer…');
+    for (const r of records) {
+      const verified = await tryVerify(r.address, r.args);
+      manifest.contracts[r.name].verified = verified;
     }
+    fs.writeFileSync(path.join(canonicalDir, `${network}.json`), JSON.stringify(manifest, null, 2));
   }
+
+  console.log('\n========================================');
+  console.log('DEPLOYMENT COMPLETE');
+  console.log('========================================');
+  for (const r of records) console.log(`${r.name.padEnd(20)} ${r.address}`);
+  console.log('========================================');
 }
 
 main()

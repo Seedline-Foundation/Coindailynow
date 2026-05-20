@@ -73,6 +73,12 @@ import moderationScanRouter from './routes/moderationScan.routes';
 import sitemapRouter from './routes/sitemap.routes';
 import structuredDataRouter from './routes/structured-data.routes';
 import marqueeRouter from './routes/marquee';
+import v1ChangenowRouter from './api/routes/v1Changenow.routes';
+import financeEventsRouter from './routes/financeEvents.routes';
+import adminAiTasksRouter from './api/admin/aiTasksRoutes';
+import adminFinanceApprovalsRouter from './api/admin/financialApprovalsRoutes';
+import adminIpWhitelistRouter from './api/admin/ipWhitelistRoutes';
+import v1MarketplaceRouter from './api/routes/v1Marketplace.routes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { integrateIengineRoutes } from './integrations/iengineIntegration';
@@ -390,6 +396,8 @@ export async function setupApp() {
       // Webhook callbacks (external services, use HMAC signature verification instead)
       '/api/wallet/callbacks',
       '/api/v1/traffic',
+      '/api/v1/changenow/callback',
+      '/api/finance-events',
       // Health/metrics (read-only, no state changes)
       '/health',
       '/metrics',
@@ -513,6 +521,25 @@ export async function setupApp() {
 
   // Marquee routes (ticker bar / news flash management)
   app.use('/api/marquee', marqueeRouter);
+
+  // ChangeNOW diaspora swap surface (estimate + create + status + callback)
+  app.use('/api/v1/changenow', v1ChangenowRouter);
+
+  // CFIS → backend reverse webhook leg (HMAC-signed). Used by finance-system
+  // to trigger receipt issuance + reconcile subscription / wallet records.
+  app.use('/api/finance-events', financeEventsRouter);
+
+  // Admin AI task management (SPEC-ADM-4) — list/trigger/cancel.
+  app.use('/api/admin/ai-tasks', adminAiTasksRouter);
+
+  // Admin financial approval workflow (SPEC-ADM-5) — two-step + audit.
+  app.use('/api/admin/finance-approvals', adminFinanceApprovalsRouter);
+
+  // Admin IP whitelist management (SPEC-ADM-6) — runtime allow-list.
+  app.use('/api/admin/ip-whitelist', adminIpWhitelistRouter);
+
+  // Marketplace (creator economy digital products, MKT-0-2 / MKT-2-5).
+  app.use('/api/v1/marketplace', v1MarketplaceRouter);
 
   // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
   app.use('/', rssFeedRouter);
@@ -658,6 +685,57 @@ export async function setupApp() {
 
 async function startServer() {
   const { app, httpServer } = await setupApp();
+
+  // Boot the Socket.IO admin push channel. We register the io instance with
+  // adminWebSocketService so editorial-queue, AI-task, finance-approval, and
+  // content-alert events can be pushed in real time to the admin app.
+  if (process.env.ENABLE_ADMIN_WS !== 'false') {
+    try {
+      const { Server: SocketIOServer } = await import('socket.io');
+      const adminIo = new SocketIOServer(httpServer, {
+        path: '/admin-ws',
+        cors: {
+          origin: process.env.ADMIN_ORIGIN?.split(',') || true,
+          credentials: true,
+        },
+      });
+      adminIo.use(async (socket, next) => {
+        try {
+          const token = socket.handshake.auth?.token || socket.handshake.query?.token;
+          if (!token || typeof token !== 'string') {
+            return next(new Error('AUTH_REQUIRED'));
+          }
+          const { verifyJWT } = await import('./utils/auth');
+          const decoded = verifyJWT(token) as any;
+          (socket as any).userId = decoded.sub;
+          (socket as any).role = decoded.role;
+          return next();
+        } catch (err: any) {
+          return next(new Error('AUTH_INVALID'));
+        }
+      });
+      adminIo.on('connection', (socket) => {
+        const role = (socket as any).role || '';
+        // Editorial+ roles can subscribe to queue events; only admins to system/finance.
+        const editorialRoles = ['JOURNALIST', 'EDITOR', 'CEO', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'];
+        const adminRoles = ['ADMIN', 'CEO', 'SUPER_ADMIN'];
+        if (editorialRoles.includes(role)) {
+          socket.join('admin:editorial-queue');
+          socket.join('admin:ai-tasks');
+          socket.join('admin:content-alerts');
+        }
+        if (adminRoles.includes(role)) {
+          socket.join('admin:finance-approvals');
+          socket.join('admin:system-alerts');
+        }
+      });
+      const { registerAdminSocketServer } = await import('./services/adminWebSocketService');
+      registerAdminSocketServer(adminIo);
+      logger.info('🛰  Admin WebSocket channel listening at /admin-ws');
+    } catch (err: any) {
+      logger.warn('Admin WebSocket failed to start (non-fatal)', { error: err.message });
+    }
+  }
 
   if (process.env.ENABLE_MODERATION !== 'false') {
     try {

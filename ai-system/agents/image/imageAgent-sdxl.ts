@@ -177,24 +177,64 @@ export class ImageAgent {
   }
 
   /**
-   * Upload image to CDN (Backblaze B2 + Cloudflare)
+   * Upload image to CDN (Backblaze B2 + Cloudflare).
+   *
+   * Posts to backend `/api/media/upload`, which writes to Backblaze B2 via the
+   * configured B2 client and returns the public Cloudflare-fronted URL. If
+   * `CFIS_PUBLIC_MEDIA_BASE` is set, rewrites the host so the same image is
+   * served from the canonical media domain.
+   *
+   * Falls back to a `data:` URL only when the upload genuinely fails — this is
+   * the AI-1-2 safety contract: never silently succeed with a 1-2 MB base64
+   * blob masquerading as a CDN URL.
    */
   private async uploadToCDN(imageBase64: string, articleId: string): Promise<string> {
-    // TODO: Implement Backblaze B2 upload with Cloudflare CDN
-    
-    this.logger.debug('[ImageAgent] Uploading to CDN (placeholder implementation)');
+    const apiBase = process.env.BACKEND_API_URL || process.env.API_URL || 'http://localhost:4000';
+    const token = process.env.AI_PIPELINE_SERVICE_TOKEN;
+    const dataUrl = `data:image/png;base64,${imageBase64}`;
 
-    // For now, save locally or return data URL
-    const filename = `article_${articleId}_${Date.now()}.png`;
-    
-    // In development, return local path
-    if (process.env.NODE_ENV === 'development') {
-      // Could save to local file system here
-      return `/images/${filename}`;
+    try {
+      this.logger.info('[ImageAgent] Uploading SDXL image to CDN', { articleId });
+
+      const res = await fetch(`${apiBase}/api/media/upload`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          image: dataUrl,
+          prefix: 'ai-images/articles',
+          filename: `article_${articleId}_${Date.now()}.png`,
+        }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`media/upload ${res.status}: ${text.slice(0, 200)}`);
+      }
+
+      const json = (await res.json()) as { url?: string };
+      if (!json.url) throw new Error('media/upload returned no url');
+
+      let url = json.url;
+      const pub = process.env.CFIS_PUBLIC_MEDIA_BASE?.replace(/\/$/, '');
+      if (pub) {
+        try {
+          url = `${pub}${new URL(url).pathname}`;
+        } catch {
+          // keep original on parse failure
+        }
+      }
+      this.logger.info('[ImageAgent] CDN upload OK', { articleId, url });
+      return url;
+    } catch (error: any) {
+      this.logger.error('[ImageAgent] CDN upload failed, falling back to data URL', {
+        articleId,
+        error: error?.message,
+      });
+      return dataUrl;
     }
-
-    // Placeholder CDN URL
-    return `https://cdn.coindaily.africa/images/${filename}`;
   }
 
   /**

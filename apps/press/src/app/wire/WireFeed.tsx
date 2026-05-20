@@ -18,7 +18,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { fetchWireReleases, type WireItem } from '@/lib/wireApi';
-import { subscribeWireAlerts } from '@/lib/wireAlerts';
+import WireAlertModal from '@/components/WireAlertModal';
 
 /* ── Filter options ── */
 
@@ -113,6 +113,8 @@ export default function WireFeed() {
   const [alerts, setAlerts] = useState<string[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(Date.now());
+  const [alertModalOpen, setAlertModalOpen] = useState(false);
+  const [alertModalSources, setAlertModalSources] = useState<string[]>([]);
 
   // Load alerts from localStorage
   useEffect(() => {
@@ -177,22 +179,17 @@ export default function WireFeed() {
 
   const activeFilterCount = [industry, country, assetClass].filter((f) => f !== 'All').length;
 
-  const handleAlert = async (source: string) => {
+  const handleAlert = (source: string) => {
     const updated = toggleAlert(source);
     setAlerts(updated);
     const enabling = updated.includes(source);
     if (enabling) {
-      const email =
-        typeof window !== 'undefined'
-          ? window.prompt('Email for wire alerts (optional — leave blank to skip remote delivery)')
-          : null;
-      if (email) {
-        try {
-          await subscribeWireAlerts({ email, sources: updated });
-        } catch (err) {
-          console.warn('[WireFeed] Remote alert subscribe failed:', err);
-        }
-      }
+      // Open the proper modal so the user can pick email and/or Telegram for
+      // real remote delivery rather than just localStorage. The modal calls
+      // /api/v1/press/wire/alerts which persists to Redis and confirms via
+      // Postmark + Telegram.
+      setAlertModalSources(updated);
+      setAlertModalOpen(true);
     }
   };
 
@@ -604,6 +601,12 @@ export default function WireFeed() {
           </div>
         </div>
       </main>
+
+      <WireAlertModal
+        open={alertModalOpen}
+        onClose={() => setAlertModalOpen(false)}
+        sources={alertModalSources}
+      />
     </div>
   );
 }

@@ -14,9 +14,8 @@
  */
 
 import prisma from '../lib/prisma';
-import Redis from 'ioredis';
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-
+import { getRedis } from '../lib/redis';
+const redis = getRedis();
 // Cache TTLs
 const CACHE_TTL = {
   RECOMMENDATIONS: 300, // 5 minutes

@@ -3,6 +3,16 @@
   "version": "1.0.0",
   "description": "CoinDaily AI Agent System - Content Generation, Translation, and Analysis",
   "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./orchestrator": "./dist/orchestrator/index.js",
+    "./agents/review": "./dist/agents/review/aiReviewAgent.js",
+    "./agents/research": "./dist/agents/research/researchAgent.js",
+    "./agents/image": "./dist/agents/image/imageAgent.js",
+    "./agents/translation": "./dist/agents/translation/translationAgentForReview.js",
+    "./agents/moderation": "./dist/agents/moderation/contentModerationAgent.js",
+    "./types": "./dist/types/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/orchestrator/index.js",

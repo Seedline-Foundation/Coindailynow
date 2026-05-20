@@ -10,7 +10,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { authMiddleware } from '../../middleware/auth';
+import { authMiddleware, requireCapability } from '../../middleware/auth';
 import { getRedis } from '../../lib/redis';
 import prisma from '../../lib/prisma';
 import { logger } from '../../utils/logger';
@@ -19,9 +19,12 @@ import { runEditorialPipelineJob } from '../../services/aiEditorialPipelineServi
 import AIModerationService from '../../services/aiModerationService';
 import ContentModerationAgent from '../../agents/moderation/contentModerationAgent';
 import { AdminQueueItem, EditRequest } from '../../types/admin-types';
+import { emitAdminQueueUpdate } from '../../services/adminWebSocketService';
 
 const router = Router();
 router.use(authMiddleware as any);
+// All editorial queue ops require at least ARTICLE_APPROVE (EDITOR+).
+router.use(requireCapability('ARTICLE_APPROVE') as any);
 const redis = getRedis();
 const reviewAgent = new AIReviewAgent(redis, logger, prisma as any);
 const moderationAgent = new ContentModerationAgent();
@@ -185,6 +188,15 @@ router.post('/queue/:id/approve', async (req: Request, res: Response) => {
 
     // Add to approved queue
     await redis.lpush('admin_queue:approved', JSON.stringify(item));
+
+    // Real-time push to admin app — refreshes the queue list without polling.
+    emitAdminQueueUpdate({
+      action: 'approved',
+      itemId: id || item.id,
+      status: item.status,
+      by: admin_id || (req as any).user?.id,
+      at: new Date().toISOString(),
+    });
 
     // TODO: Trigger publication workflow
     // - Save to database (Prisma)
@@ -358,6 +370,14 @@ router.post('/queue/:id/publish', async (req: Request, res: Response) => {
 
     // Remove from approved queue
     await redis.lrem('admin_queue:approved', 1, itemData);
+
+    emitAdminQueueUpdate({
+      action: 'published',
+      itemId: id || item.id,
+      status: item.status,
+      by: (req as any).user?.id,
+      at: new Date().toISOString(),
+    });
 
     // TODO: Actual publication workflow
     // - Update article status in database to 'published'
