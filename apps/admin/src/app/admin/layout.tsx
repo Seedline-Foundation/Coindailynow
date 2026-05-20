@@ -58,6 +58,7 @@ const navItems: NavItem[] = [
   { href: '/admin/users', label: 'User Management', icon: Users, requiredRoles: ['SUPER_ADMIN', 'ADMIN', 'CEO'] },
   { href: '/admin/content', label: 'Content', icon: FileText, requiredRoles: CONTENT_ROLES },
   { href: '/admin/marquees', label: 'Marquee', icon: Monitor, requiredRoles: CONTENT_ROLES },
+  { href: '/admin/moderation/emergency', label: 'Emergency Moderation', icon: Shield, requiredRoles: ['EDITOR', 'CEO', 'CONTENT_ADMIN', 'ADMIN', 'SUPER_ADMIN'] },
   { href: '/admin/ai', label: 'AI Management', icon: Brain, requiredRoles: [...CONTENT_ROLES, 'TECH_ADMIN'] },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3, requiredRoles: [...CONTENT_ROLES, 'MARKETING_ADMIN'] },
   { href: '/admin/monetization', label: 'Monetization', icon: DollarSign, requiredRoles: ['CEO', ...MARKETING_ROLES] },
