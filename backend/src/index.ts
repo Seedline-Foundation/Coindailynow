@@ -57,6 +57,11 @@ import v1BountyRouter from './api/routes/v1Bounty.routes';
 import v1PressReleaseRouter from './api/routes/v1PressRelease.routes';
 import v1InfluencerRouter from './api/routes/v1Influencer.routes';
 import v1SearchRouter from './api/routes/v1Search.routes';
+import v1CreatorRouter from './api/routes/v1Creator.routes';
+import v1EventsRouter from './api/routes/v1Events.routes';
+import v1ChimaIndexRouter from './api/routes/v1ChimaIndex.routes';
+import v1HRRouter from './api/routes/v1HR.routes';
+import v1AICostRouter from './api/routes/v1AICost.routes';
 import newsAggregationRouter from './routes/news-aggregation.routes';
 import dataAnalysisAdminRouter from './routes/data-analysis-admin.routes';
 import adsRotationRouter from './routes/ads-rotation.routes';
@@ -460,6 +465,11 @@ export async function setupApp() {
   app.use('/api/v1/influencer', v1InfluencerRouter);
   app.use('/api/v1/search', v1SearchRouter);
   app.use('/api/v1', structuredContentRouter);
+  app.use('/api/v1/creator', v1CreatorRouter);
+  app.use('/api/v1/events', v1EventsRouter);
+  app.use('/api/v1/chima-index', v1ChimaIndexRouter);
+  app.use('/api/v1/hr', v1HRRouter);
+  app.use('/api/v1/ai-cost', v1AICostRouter);
 
   // Knowledge API endpoints (manifest/search/feeds for RAG clients)
   app.use('/api/knowledge-api', knowledgeApiRouter);

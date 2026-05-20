@@ -1,89 +1,88 @@
 /**
  * AI Cost Control & Budget Management Service
  * 
- * NOTE: This is a STUB implementation. The full implementation has been completed
- * and documented in documentations/ai/TASK_10.3_IMPLEMENTATION.md
- * 
- * To activate the full implementation:
- * 1. Run database migration: npx prisma migrate dev
- * 2. Regenerate Prisma client: npx prisma generate  
- * 3. Restore the full implementation from: documentations/ai/task-10.3-backup-*
- * 
- * The complete production-ready implementation includes:
- * - Real-time cost tracking for all AI operations
- * - Budget management with automatic enforcement
- * - Three-tier alert system (80%, 90%, 100%)
- * - ML-powered cost forecasting
- * - AI-driven optimization recommendations
- * - REST & GraphQL APIs
- * - Background worker for scheduled jobs
- * 
- * See: documentations/ai/TASK_10.3_COMPLETION_SUMMARY.md for full details
+ * Production implementation backed by AICostRecord and AICostBudget models.
+ * Delegates to the full aiCostTrackingService for real tracking.
+ * This file maintains backward compatibility with existing imports.
  */
 
+import aiCostTrackingService from './aiCostTrackingService';
 import { logger } from '../utils/logger';
 
 export const aiCostService = {
-  // Stub methods - will be replaced with full implementation after migration
-  
   async trackCost(data: any) {
-    logger.info('AI Cost tracking called (stub mode)');
-    return { id: 'stub', ...data };
+    return aiCostTrackingService.trackCost(data);
   },
 
   async createBudgetLimit(data: any) {
-    logger.info('Create budget limit called (stub mode)');
-    return { id: 'stub', ...data };
+    return aiCostTrackingService.createBudget(data);
   },
 
   async checkBudgetStatus(budgetId: string) {
-    logger.info('Check budget status called (stub mode)');
-    return {
+    const budgets = await aiCostTrackingService.getBudgetStatus(budgetId);
+    const budget = budgets[0];
+    return budget || {
       budgetId,
       percentageUsed: 0,
       isOverBudget: false,
-      remainingBudget: 1000
+      remainingBudget: 1000,
     };
   },
 
-  async getBudgetAlerts(params: any) {
-    logger.info('Get budget alerts called (stub mode)');
-    return [];
+  async getBudgetAlerts(_params: any) {
+    const budgets = await aiCostTrackingService.getBudgetStatus();
+    return budgets.filter(b => b.alertThreshold80 || b.alertThreshold90 || b.alertThreshold100);
   },
 
   async getCostOverview(params: any) {
-    logger.info('Get cost overview called (stub mode)');
-    return {
-      totalCost: 0,
-      totalTasks: 0,
-      totalTokens: 0,
-      averageCostPerTask: 0
-    };
+    return aiCostTrackingService.getCostOverview({
+      startDate: params?.startDate,
+      endDate: params?.endDate,
+      agentName: params?.agentName,
+      groupBy: params?.groupBy,
+    });
   },
 
   async forecastCosts(params: any) {
-    logger.info('Forecast costs called (stub mode)');
-    return {
-      period: params.period,
-      forecastedCost: 0,
-      confidence: 0.5,
-      trend: 'stable'
-    };
+    const days = params?.days || 30;
+    return aiCostTrackingService.forecastCosts(days);
   },
 
   async generateReport(params: any) {
-    logger.info('Generate report called (stub mode)');
+    logger.info('Generate report called', params);
+    const overview = await aiCostTrackingService.getCostOverview({
+      startDate: params?.startDate,
+      endDate: params?.endDate,
+    });
     return {
-      id: 'stub',
-      reportType: params.reportType,
-      totalCost: 0
+      id: `report-${Date.now()}`,
+      reportType: params?.reportType || 'overview',
+      ...overview,
     };
   },
 
-  async getOptimizationRecommendations(params: any) {
-    logger.info('Get optimization recommendations called (stub mode)');
-    return [];
-  }
+  async getOptimizationRecommendations(_params: any) {
+    const overview = await aiCostTrackingService.getCostOverview({ groupBy: 'agent' });
+    const recommendations = [];
+
+    if (overview.averageCostPerTask > 0.5) {
+      recommendations.push({
+        type: 'MODEL_OPTIMIZATION',
+        message: 'Consider using cheaper models for low-stakes tasks (social posts, summaries)',
+        impact: 'Could reduce costs by 30-40%',
+      });
+    }
+
+    if (overview.totalTasks > 1000 && overview.averageLatency > 3000) {
+      recommendations.push({
+        type: 'CACHING',
+        message: 'High task volume with slow latency — implement response caching for repeated queries',
+        impact: 'Could reduce API calls by 20-30%',
+      });
+    }
+
+    return recommendations;
+  },
 };
 
 export default aiCostService;

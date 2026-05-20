@@ -834,6 +834,25 @@ enum UserRole {
   MARKETING_ADMIN
   TECH_ADMIN
   SUPER_ADMIN
+  DEPARTMENT_HEAD
+  SENIOR_EDITOR
+  JUNIOR_EDITOR
+  FINANCE_OFFICER
+  HR_MANAGER
+  AD_OPS_MANAGER
+  ENGINEERING
+  EVENTS_MANAGER
+  RESEARCH_ANALYST
+  READ_ONLY_OBSERVER
+}
+
+enum CreatorTier {
+  COMMUNITY_WRITER
+  REGIONAL_EXPERT
+  VERIFIED_ANALYST
+  SENIOR_FELLOW
+  SENIOR_ANALYST
+  ADVISORY_BOARD
 }
 
 model User {
@@ -9887,6 +9906,685 @@ model DatasourceStat {
   @@map("datasource_stats")
 }
 
+// ═══════════════════════════════════════════════════════════════
+// Creator Economy Models
+// ═══════════════════════════════════════════════════════════════
+
+model CreatorProfile {
+  id                String      @id @default(cuid())
+  userId            String      @unique
+  tier              CreatorTier @default(COMMUNITY_WRITER)
+
+  displayName       String?
+  tagline           String?
+  specialties       String?     @db.Text // JSON array
+  languages         String?     // JSON array of language codes
+  country           String?
+  portfolioUrl      String?
+
+  // Performance metrics
+  totalArticles     Int         @default(0)
+  totalReads        Int         @default(0)
+  totalCPEarned     Float       @default(0)
+  qualityScore      Float       @default(0)
+  consistencyScore  Float       @default(0)
+
+  // Revenue share based on tier
+  adRevenueShare    Float       @default(0.55) // 55% default
+  courseRevenueShare Float      @default(0.80) // 80% default
+
+  verifiedAt        DateTime?
+  isActive          Boolean     @default(true)
+  applicationStatus String      @default("PENDING") // PENDING, APPROVED, REJECTED
+  applicationNote   String?
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  trendingEarnings  TrendingContentEarning[]
+  creatorAnalytics  CreatorAnalytics[]
+
+  @@index([tier])
+  @@index([isActive])
+  @@index([totalReads])
+  @@index([qualityScore])
+  @@map("creator_profiles")
+}
+
+model TrendingContentEarning {
+  id              String   @id @default(cuid())
+  creatorId       String
+  articleId       String
+
+  // Trending metrics at time of calculation
+  trendingScore   Float    @default(0)
+  trendingRank    Int?
+  viewCount       Int      @default(0)
+  shareCount      Int      @default(0)
+  commentCount    Int      @default(0)
+  readCompletions Int      @default(0)
+
+  // CP earned from trending
+  cpEarned        Float    @default(0)
+  multiplier      Float    @default(1.0)
+  earningTier     String   @default("STANDARD") // STANDARD, RISING, VIRAL, MEGA_VIRAL
+
+  // Period
+  periodStart     DateTime
+  periodEnd       DateTime
+  isPaid          Boolean  @default(false)
+  paidAt          DateTime?
+
+  createdAt       DateTime @default(now())
+
+  creator         CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@unique([creatorId, articleId, periodStart])
+  @@index([creatorId, createdAt])
+  @@index([articleId])
+  @@index([trendingScore])
+  @@index([isPaid])
+  @@map("trending_content_earnings")
+}
+
+model CreatorAnalytics {
+  id              String   @id @default(cuid())
+  creatorId       String
+  period          String   // DAILY, WEEKLY, MONTHLY
+  periodStart     DateTime
+
+  // Content metrics
+  articlesPublished Int    @default(0)
+  totalViews        Int    @default(0)
+  uniqueReaders     Int    @default(0)
+  avgReadTime       Float  @default(0)
+  completionRate    Float  @default(0)
+
+  // Engagement metrics
+  likes             Int    @default(0)
+  comments          Int    @default(0)
+  shares            Int    @default(0)
+  bookmarks         Int    @default(0)
+
+  // Earnings
+  cpEarned          Float  @default(0)
+  adRevenue         Float  @default(0)
+
+  // Audience
+  topCountries      String? @db.Text // JSON
+  topReferrers      String? @db.Text // JSON
+  audienceGrowth    Float   @default(0) // percentage
+
+  // SEO
+  searchImpressions Int     @default(0)
+  searchClicks      Int     @default(0)
+  avgPosition       Float?
+
+  createdAt         DateTime @default(now())
+
+  creator           CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@unique([creatorId, period, periodStart])
+  @@index([creatorId, periodStart])
+  @@map("creator_analytics")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Events Intelligence Engine Models
+// ═══════════════════════════════════════════════════════════════
+
+model CryptoEvent {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  description     String?   @db.Text
+  shortDescription String?
+
+  // Event details
+  eventType       String    // CONFERENCE, SUMMIT, WEBINAR, HACKATHON, MEETUP, WORKSHOP, AMA, REGULATORY_HEARING
+  format          String    @default("IN_PERSON") // IN_PERSON, VIRTUAL, HYBRID
+  category        String    // CRYPTO, AI, BLOCKCHAIN, TRADFI, DEFI, REGULATORY, STARTUP_PITCH, FINTECH
+
+  // Location & time
+  country         String?
+  city            String?
+  venue           String?
+  timezone        String?
+  startDate       DateTime
+  endDate         DateTime?
+
+  // Organizer
+  organizerId     String?
+  organizerName   String?
+  organizerEmail  String?
+  organizerUrl    String?
+
+  // Pricing
+  isFree          Boolean   @default(true)
+  price           Float?
+  currency        String?   @default("USD")
+  ticketUrl       String?
+
+  // Promotion
+  isFeatured      Boolean   @default(false)
+  featuredUntil   DateTime?
+  promotionTier   String?   // BASIC, STANDARD, PREMIUM
+  cpPaid          Float     @default(0)
+
+  // Content
+  imageUrl        String?
+  websiteUrl      String?
+  registrationUrl String?
+  tags            String?   // JSON array
+  speakers        String?   @db.Text // JSON array of speaker objects
+
+  // Metrics
+  registrations   Int       @default(0)
+  attendance      Int       @default(0)
+  viewCount       Int       @default(0)
+
+  // Moderation
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED, LIVE, COMPLETED, CANCELLED
+  submissionSource String?  // USER, SCRAPER, ADMIN, API
+  relevanceScore  Float?
+  moderatedBy     String?
+  moderatedAt     DateTime?
+
+  // Recap
+  recapArticleId  String?
+  recapGenerated  Boolean   @default(false)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  speakers_rel    EventSpeaker[]
+  promotions      EventPromotion[]
+
+  @@index([startDate])
+  @@index([country])
+  @@index([eventType])
+  @@index([category])
+  @@index([status])
+  @@index([isFeatured])
+  @@map("crypto_events")
+}
+
+model EventSpeaker {
+  id              String   @id @default(cuid())
+  eventId         String
+  name            String
+  title           String?
+  organization    String?
+  bio             String?  @db.Text
+  photoUrl        String?
+  linkedinUrl     String?
+  twitterHandle   String?
+  country         String?
+  expertise       String?  // JSON array
+
+  // Speaker bureau
+  isInBureau      Boolean  @default(false)
+  bureauRate      Float?
+  rating          Float?
+  pastEvents      Int      @default(0)
+
+  createdAt       DateTime @default(now())
+
+  event           CryptoEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([isInBureau])
+  @@map("event_speakers")
+}
+
+model EventPromotion {
+  id              String   @id @default(cuid())
+  eventId         String
+  promotionType   String   // FEATURED_LISTING, ARTICLE, NEWSLETTER, SOCIAL, WHATSAPP, FULL_BUNDLE
+  cpCost          Float    @default(0)
+  status          String   @default("PENDING") // PENDING, ACTIVE, COMPLETED
+  deliverables    String?  @db.Text // JSON
+
+  startDate       DateTime?
+  endDate         DateTime?
+
+  // Results
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+
+  createdAt       DateTime @default(now())
+
+  event           CryptoEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([status])
+  @@map("event_promotions")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HR & Hiring System Models
+// ═══════════════════════════════════════════════════════════════
+
+model JobVacancy {
+  id              String    @id @default(cuid())
+  title           String
+  department      String
+  location        String?
+  locationType    String    @default("REMOTE") // REMOTE, ONSITE, HYBRID
+  employmentType  String    @default("FULL_TIME") // FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP
+
+  description     String    @db.Text
+  requirements    String?   @db.Text // JSON array
+  responsibilities String?  @db.Text // JSON array
+  benefits        String?   @db.Text // JSON array
+  salaryMin       Float?
+  salaryMax       Float?
+  salaryCurrency  String?   @default("USD")
+
+  // Status
+  status          String    @default("DRAFT") // DRAFT, OPEN, PAUSED, CLOSED, FILLED
+  publishedAt     DateTime?
+  closingDate     DateTime?
+
+  // Posting channels
+  postedChannels  String?   // JSON: ["INTERNAL", "LINKEDIN", "INDEED"]
+
+  // Metrics
+  applicantCount  Int       @default(0)
+  viewCount       Int       @default(0)
+
+  createdBy       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  applications    JobApplication[]
+
+  @@index([status])
+  @@index([department])
+  @@map("job_vacancies")
+}
+
+model JobApplication {
+  id              String    @id @default(cuid())
+  vacancyId       String
+  candidateName   String
+  candidateEmail  String
+  phone           String?
+  country         String?
+  resumeUrl       String?
+  coverLetter     String?   @db.Text
+  linkedinUrl     String?
+  portfolioUrl    String?
+
+  // Pipeline stage
+  stage           String    @default("APPLIED") // APPLIED, SCREENING, AI_SCORED, INTERVIEW, OFFER, HIRED, REJECTED
+  stageHistory    String?   @db.Text // JSON array of stage changes with timestamps
+
+  // AI Scoring
+  aiScore         Float?
+  aiSummary       String?   @db.Text
+  skillMatch      Float?
+  experienceMatch Float?
+  cultureMatch    Float?
+
+  // Interview
+  interviewDate   DateTime?
+  interviewNotes  String?   @db.Text
+  interviewScore  Float?
+  interviewerIds  String?   // JSON array
+
+  // Decision
+  offerDate       DateTime?
+  offerSalary     Float?
+  rejectionReason String?
+
+  // Metadata
+  source          String?   // LINKEDIN, INDEED, INTERNAL, REFERRAL, DIRECT
+  referredBy      String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  vacancy         JobVacancy @relation(fields: [vacancyId], references: [id], onDelete: Cascade)
+
+  @@index([vacancyId, stage])
+  @@index([candidateEmail])
+  @@map("job_applications")
+}
+
+model StaffOnboarding {
+  id              String    @id @default(cuid())
+  userId          String
+  applicationId   String?
+
+  // Onboarding progress
+  status          String    @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED
+  startDate       DateTime?
+  completedDate   DateTime?
+
+  // Checklist items
+  checklist       String?   @db.Text // JSON array of checklist items with status
+  documentsUploaded String? @db.Text // JSON: {nda: true, id: true, contract: true}
+  systemAccess    String?   @db.Text // JSON: tools and access granted
+  trainingModules String?   @db.Text // JSON: modules assigned with completion status
+
+  // Buddy system
+  buddyId         String?
+  buddyAssignedAt DateTime?
+
+  // Milestones
+  day30Review     String?   @db.Text
+  day60Review     String?   @db.Text
+  day90Review     String?   @db.Text
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@map("staff_onboarding")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHIMA Index Products
+// ═══════════════════════════════════════════════════════════════
+
+model ChimaIndex {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  symbol          String   @unique // EMAI, ADAI, RRS, CRI
+  indexType       String   // ADOPTION, DEFI_ACTIVITY, REGULATORY_RISK, REMITTANCE
+
+  // Description & methodology
+  description     String?  @db.Text
+  methodology     String?  @db.Text
+  dataSourcesDesc String?  @db.Text // JSON: description of all data inputs
+
+  // Current value
+  currentValue    Float    @default(0)
+  previousValue   Float    @default(0)
+  change24h       Float    @default(0)
+  changePercent24h Float   @default(0)
+  change7d        Float    @default(0)
+  change30d       Float    @default(0)
+
+  // Bounds
+  allTimeHigh     Float    @default(0)
+  allTimeLow      Float    @default(0)
+  athDate         DateTime?
+  atlDate         DateTime?
+
+  // Components (country-level breakdown)
+  components      String?  @db.Text // JSON: [{country, value, weight, change}]
+
+  // Publication
+  isPublished     Boolean  @default(false)
+  isPublic        Boolean  @default(true) // headline free, details paid
+  updateFrequency String   @default("DAILY") // HOURLY, DAILY, WEEKLY, MONTHLY
+
+  lastCalculated  DateTime?
+  lastPublished   DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  historicalData  ChimaIndexHistory[]
+  countryScores   ChimaCountryScore[]
+
+  @@index([symbol])
+  @@index([indexType])
+  @@index([isPublished])
+  @@map("chima_indexes")
+}
+
+model ChimaIndexHistory {
+  id              String   @id @default(cuid())
+  indexId         String
+  value           Float
+  components      String?  @db.Text // JSON snapshot of component values
+  metadata        String?  @db.Text // JSON: additional context
+  timestamp       DateTime
+
+  index           ChimaIndex @relation(fields: [indexId], references: [id], onDelete: Cascade)
+
+  @@unique([indexId, timestamp])
+  @@index([indexId, timestamp])
+  @@map("chima_index_history")
+}
+
+model ChimaCountryScore {
+  id              String   @id @default(cuid())
+  indexId         String
+  countryCode     String
+  countryName     String
+  score           Float    @default(0)
+  previousScore   Float    @default(0)
+  weight          Float    @default(1.0)
+  rank            Int?
+
+  // Breakdown (index-specific sub-metrics)
+  subMetrics      String?  @db.Text // JSON: {walletGrowth, onChainVolume, p2pVolume, ...}
+
+  lastUpdated     DateTime @default(now())
+
+  index           ChimaIndex @relation(fields: [indexId], references: [id], onDelete: Cascade)
+
+  @@unique([indexId, countryCode])
+  @@index([indexId, rank])
+  @@index([countryCode])
+  @@map("chima_country_scores")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Video Generation Pipeline (Vengine)
+// ═══════════════════════════════════════════════════════════════
+
+model VideoJob {
+  id              String    @id @default(cuid())
+  articleId       String?
+  title           String
+  jobType         String    @default("SHORT") // SHORT (60s), LONG (3min), EXPLAINER, SOCIAL_CLIP
+
+  // Script
+  script          String?   @db.Text
+  scriptVersion   Int       @default(1)
+  scriptApproved  Boolean   @default(false)
+  scriptApprovedBy String?
+
+  // Generation
+  status          String    @default("PENDING") // PENDING, SCRIPTING, GENERATING, COMPOSING, REVIEW, PUBLISHED, FAILED
+  provider        String?   // WAN21, COGVIDEOX, KLING, RUNWAY
+  generationParams String?  @db.Text // JSON: model params, resolution, duration
+
+  // Output
+  videoUrl        String?
+  thumbnailUrl    String?
+  duration        Int?      // seconds
+  resolution      String?   // 1080x1920 (vertical), 1920x1080 (landscape)
+  fileSize        Int?      // bytes
+
+  // Captions & assets
+  captionsUrl     String?
+  backgroundMusic String?
+  watermark       Boolean   @default(true)
+
+  // Distribution
+  distributedTo   String?   @db.Text // JSON: [{platform, url, publishedAt, views}]
+  youtubeId       String?
+  tiktokId        String?
+  instagramId     String?
+
+  // Metrics
+  totalViews      Int       @default(0)
+  totalLikes      Int       @default(0)
+  totalShares     Int       @default(0)
+
+  // Cost
+  generationCost  Float     @default(0)
+  generationTime  Int?      // seconds
+
+  // Error handling
+  errorMessage    String?
+  retryCount      Int       @default(0)
+  maxRetries      Int       @default(3)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  createdBy       String?
+
+  @@index([articleId])
+  @@index([status])
+  @@index([jobType])
+  @@map("video_jobs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Ad Fraud Detection
+// ═══════════════════════════════════════════════════════════════
+
+model AdFraudEvent {
+  id              String   @id @default(cuid())
+  campaignId      String?
+  adId            String?
+
+  // Detection
+  fraudType       String   // BOT_CLICK, CLICK_FARM, IMPRESSION_FRAUD, DEVICE_SPOOFING, GEO_MISMATCH, RAPID_CLICKS
+  confidence      Float    @default(0) // 0-1
+  severity        String   @default("LOW") // LOW, MEDIUM, HIGH, CRITICAL
+
+  // Evidence
+  ipAddress       String?
+  userAgent       String?
+  deviceFingerprint String?
+  geoLocation     String?  // JSON: {country, city, lat, lng}
+  clickPattern    String?  @db.Text // JSON: click timing and frequency data
+  sessionData     String?  @db.Text // JSON: session behavior signals
+
+  // Action taken
+  actionTaken     String   @default("FLAGGED") // FLAGGED, BLOCKED, REFUNDED, DISMISSED
+  actionTakenBy   String?
+  actionTakenAt   DateTime?
+  refundAmount    Float?
+
+  // Impact
+  blockedClicks   Int      @default(0)
+  savedBudget     Float    @default(0)
+
+  createdAt       DateTime @default(now())
+
+  @@index([campaignId])
+  @@index([fraudType])
+  @@index([severity])
+  @@index([createdAt])
+  @@map("ad_fraud_events")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Regulatory Change Detection
+// ═══════════════════════════════════════════════════════════════
+
+model RegulatorySnapshot {
+  id              String   @id @default(cuid())
+  countryCode     String
+  sourceUrl       String
+  sourceName      String
+
+  // Content
+  contentHash     String
+  contentText     String?  @db.Text
+  previousHash    String?
+
+  // Change detection
+  hasChanged      Boolean  @default(false)
+  changeType      String?  // ADDITION, REMOVAL, MODIFICATION, NEW_DOCUMENT
+  changeSummary   String?  @db.Text
+  materialChange  Boolean  @default(false) // Only material changes trigger alerts
+
+  // Processing
+  processedAt     DateTime?
+  alertSent       Boolean  @default(false)
+  articleGenerated Boolean @default(false)
+  generatedArticleId String?
+
+  // Impact analysis
+  riskScoreImpact Float?
+  affectedEntities String? @db.Text // JSON: exchanges, products affected
+
+  createdAt       DateTime @default(now())
+
+  @@index([countryCode])
+  @@index([hasChanged])
+  @@index([materialChange])
+  @@index([createdAt])
+  @@map("regulatory_snapshots")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AI Cost Tracking (replacing stub)
+// ═══════════════════════════════════════════════════════════════
+
+model AICostRecord {
+  id              String   @id @default(cuid())
+  agentName       String
+  agentType       String?  // WRITER, SEO, IMAGE, VIDEO, FACT_CHECK, REGULATORY, EVENTS, TRANSLATOR
+
+  // Token usage
+  inputTokens     Int      @default(0)
+  outputTokens    Int      @default(0)
+  totalTokens     Int      @default(0)
+
+  // Cost
+  costUsd         Float    @default(0)
+  modelUsed       String?  // claude-sonnet, gpt-4o-mini, etc.
+  provider        String?  // ANTHROPIC, OPENAI, COHERE, LOCAL
+
+  // Task context
+  taskType        String?  // ARTICLE_GENERATION, IMAGE_GENERATION, TRANSLATION, SEO_OPTIMIZATION, etc.
+  taskId          String?
+  articleId       String?
+  success         Boolean  @default(true)
+
+  // Performance
+  latencyMs       Int?
+  retries         Int      @default(0)
+
+  createdAt       DateTime @default(now())
+
+  @@index([agentName, createdAt])
+  @@index([taskType])
+  @@index([provider])
+  @@index([createdAt])
+  @@map("ai_cost_records")
+}
+
+model AICostBudget {
+  id              String   @id @default(cuid())
+  name            String
+  budgetType      String   // DAILY, WEEKLY, MONTHLY, PER_AGENT, GLOBAL
+  agentName       String?  // null = global budget
+
+  // Limits
+  budgetLimit     Float
+  currentSpend    Float    @default(0)
+  periodStart     DateTime
+  periodEnd       DateTime
+
+  // Alerts
+  alertThreshold80 Boolean @default(false)
+  alertThreshold90 Boolean @default(false)
+  alertThreshold100 Boolean @default(false)
+
+  // Actions
+  hardCap         Boolean  @default(false) // Stop operations when budget hit
+  notifyEmails    String?  // JSON array of emails
+
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([budgetType, isActive])
+  @@index([agentName])
+  @@map("ai_cost_budgets")
 // ═══════════════════════════════════════════════════════════════════════
 // Marketplace — Creator Economy Digital Products (Wave 1, MKT-0-1)
 // Off-chain MVP: products + orders + reviews + seller payouts.
