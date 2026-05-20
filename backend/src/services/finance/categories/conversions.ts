@@ -358,7 +358,7 @@ export class FinanceConversions {
           purpose: `JOY Token to ${targetCrypto} Swap via ${swapProvider}`,
           amount: joyTokenAmount,
           currency: targetCrypto,
-          status: TransactionStatus.PENDING, // Will update to COMPLETED when swap confirms
+          status: TransactionStatus.PENDING,
           paymentMethod: PaymentMethod.CRYPTO,
           externalReference: externalWalletAddress,
           metadata: JSON.stringify({ 
@@ -388,13 +388,60 @@ export class FinanceConversions {
         },
       });
 
-      // TODO: Integrate with ChangeNOW API
-      // 1. Create swap order via ChangeNOW API
-      // 2. Get deposit address for JOY tokens
-      // 3. Transfer JOY to ChangeNOW deposit address
-      // 4. Poll for swap completion
-      // 5. Update transaction status to COMPLETED
-      // 6. Notify user of successful swap
+      // ChangeNOW integration: create exchange and track
+      let exchangeId: string | undefined;
+      let payinAddress: string | undefined;
+
+      try {
+        const axios = (await import('axios')).default;
+        const cnApiKey = process.env.CHANGENOW_API_KEY;
+        const cnBaseUrl = process.env.CHANGENOW_API_URL || 'https://api.changenow.io/v2';
+
+        if (cnApiKey) {
+          const exchangeResponse = await axios.post(
+            `${cnBaseUrl}/exchange`,
+            {
+              fromCurrency: 'joy',
+              toCurrency: targetCrypto.toLowerCase(),
+              fromAmount: joyTokenAmount,
+              address: externalWalletAddress,
+              flow: 'standard',
+              type: 'direct',
+              extraId: transaction.id,
+            },
+            {
+              headers: {
+                'x-changenow-api-key': cnApiKey,
+                'Content-Type': 'application/json',
+              },
+              timeout: 15000,
+            }
+          );
+
+          exchangeId = exchangeResponse.data.id;
+          payinAddress = exchangeResponse.data.payinAddress;
+
+          await prisma.walletTransaction.update({
+            where: { id: transaction.id },
+            data: {
+              metadata: JSON.stringify({
+                ...metadata,
+                joyTokenAmount,
+                cryptoAmount,
+                targetCrypto,
+                exchangeRate,
+                externalWalletAddress,
+                swapProvider,
+                swapStatus: 'awaiting_deposit',
+                exchangeId,
+                payinAddress,
+              }),
+            },
+          });
+        }
+      } catch (cnError: any) {
+        console.error('ChangeNOW exchange creation failed:', cnError.message);
+      }
 
       return { 
         success: true, 

@@ -24,6 +24,15 @@ contract CDPPoints is AccessControl, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     // ═══════════════════════════════════════════════════════════════════════
+    // Constants
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /// @dev JOY token uses 12 decimals; 1 JOY = 1e12 base-units.
+    ///      All JOY amount calculations MUST use this constant to avoid
+    ///      decimal mismatches between on-chain (12 dp) and off-chain (6 dp) systems.
+    uint256 public constant JOY_DECIMAL_FACTOR = 1e12;
+
+    // ═══════════════════════════════════════════════════════════════════════
     // Roles
     // ═══════════════════════════════════════════════════════════════════════
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
@@ -45,7 +54,7 @@ contract CDPPoints is AccessControl, ReentrancyGuard {
     uint256 public totalSupply;
 
     /// @dev Conversion rate: how many CDP = 1 JOY min-unit (12 decimals).
-    ///      Default 100 → 100 CDP = 1e12 JOY base-units = 1 JOY
+    ///      Default 100 → 100 CDP = JOY_DECIMAL_FACTOR base-units = 1 JOY
     uint256 public cdpPerJoy = 100;
 
     /// @dev The JOY token contract used for conversions.
@@ -152,7 +161,7 @@ contract CDPPoints is AccessControl, ReentrancyGuard {
         require(cdpAmount >= cdpPerJoy, "Below minimum conversion");
         require(balanceOf[msg.sender] >= cdpAmount, "Insufficient CDP");
 
-        uint256 joyAmount = (cdpAmount * 1e12) / cdpPerJoy; // 1e12 = JOY decimal base
+        uint256 joyAmount = (cdpAmount * JOY_DECIMAL_FACTOR) / cdpPerJoy;
 
         // Check JOY balance in this contract using IERC20 interface (not raw call)
         IERC20 joy = IERC20(joyToken);

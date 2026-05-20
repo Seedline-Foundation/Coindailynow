@@ -12,15 +12,9 @@
  */
 
 import prisma from '../lib/prisma';
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
 import sharp from 'sharp';
-const redis = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  ...(process.env.REDIS_PASSWORD && { password: process.env.REDIS_PASSWORD }),
-  db: 0,
-  retryStrategy: (times: number) => Math.min(times * 50, 2000),
-});
+const redis = getRedis();
 
 // Cache TTL configurations
 const CACHE_TTL = {

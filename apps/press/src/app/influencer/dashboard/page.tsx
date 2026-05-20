@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   Megaphone, DollarSign, Users, TrendingUp, BarChart3,
   CheckCircle, Clock, XCircle, ArrowRight, Loader2,
-  ExternalLink, Star, Handshake, Wallet
+  ExternalLink, Star, HeartHandshake, Wallet
 } from 'lucide-react';
 
 interface ProfileData {
@@ -235,7 +235,7 @@ export default function InfluencerDashboardPage() {
           </div>
           <div className="bg-dark-900/60 border border-white/10 rounded-xl p-4">
             <div className="flex items-center gap-2 text-sm text-gray-400 mb-1">
-              <Handshake className="h-4 w-4" /> Active Collabs
+              <HeartHandshake className="h-4 w-4" /> Active Collabs
             </div>
             <div className="text-2xl font-bold text-blue-400">{activeCollabs}</div>
           </div>

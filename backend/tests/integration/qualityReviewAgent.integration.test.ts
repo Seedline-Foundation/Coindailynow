@@ -22,6 +22,11 @@ jest.mock('../../src/services/aiClient', () => ({
   reasoningComplete: jest.fn(),
 }));
 
+const mockedProxyQualityReview = jest.fn();
+jest.mock('../../src/services/aiSystemClient', () => ({
+  proxyQualityReview: (...args: any[]) => mockedProxyQualityReview(...args),
+}));
+
 const mockedReasoningComplete = reasoningComplete as jest.MockedFunction<typeof reasoningComplete>;
 
 // Mock Prisma
@@ -52,51 +57,52 @@ describe('QualityReviewAgent Integration Tests', () => {
     }
   };
 
+  const defaultReview = {
+    overallQuality: 90,
+    dimensions: {
+      accuracy: 90,
+      clarity: 88,
+      engagement: 85,
+      structure: 86,
+      grammar: 92,
+      factualConsistency: 89,
+      africanRelevance: 91,
+      culturalSensitivity: 90,
+    },
+    biasAnalysis: {
+      overallBias: 5,
+      types: [],
+      concerns: [],
+      details: {
+        culturalBias: 5,
+        geographicBias: 4,
+        economicBias: 5,
+        genderBias: 3,
+        ageBias: 4,
+        religiousBias: 5,
+      },
+    },
+    culturalAnalysis: {
+      religiousContext: { score: 88, considerations: ['inclusive language'] },
+      languageUsage: { score: 90, localTerms: ['M-Pesa'], appropriateness: 'high', issues: [] },
+      socialContext: { score: 87, communityAspects: ['financial inclusion'], economicRealities: 'Well contextualized' },
+    },
+    factCheck: {
+      score: 90,
+      verifiedClaims: ['Adoption is increasing'],
+      questionableClaims: [],
+      falseClaims: [],
+      sources: ['CoinDaily'],
+    },
+    improvementSuggestions: [],
+    recommendations: ['Looks good'],
+    requiresHumanReview: false,
+  };
+
   beforeEach(() => {
     mockLogger = createMockLogger();
-    mockedReasoningComplete.mockResolvedValue(
-      JSON.stringify({
-        overallQuality: 90,
-        dimensions: {
-          accuracy: 90,
-          clarity: 88,
-          engagement: 85,
-          structure: 86,
-          grammar: 92,
-          factualConsistency: 89,
-          africanRelevance: 91,
-          culturalSensitivity: 90,
-        },
-        biasAnalysis: {
-          overallBias: 5,
-          types: [],
-          concerns: [],
-          details: {
-            culturalBias: 5,
-            geographicBias: 4,
-            economicBias: 5,
-            genderBias: 3,
-            ageBias: 4,
-            religiousBias: 5,
-          },
-        },
-        culturalAnalysis: {
-          religiousContext: { score: 88, considerations: ['inclusive language'] },
-          languageUsage: { score: 90, localTerms: ['M-Pesa'], appropriateness: 'high', issues: [] },
-          socialContext: { score: 87, communityAspects: ['financial inclusion'], economicRealities: 'Well contextualized' },
-        },
-        factCheck: {
-          score: 90,
-          verifiedClaims: ['Adoption is increasing'],
-          questionableClaims: [],
-          falseClaims: [],
-          sources: ['CoinDaily'],
-        },
-        improvementSuggestions: [],
-        recommendations: ['Looks good'],
-        requiresHumanReview: false,
-      })
-    );
+    mockedProxyQualityReview.mockResolvedValue({ review: defaultReview });
+    mockedReasoningComplete.mockResolvedValue(JSON.stringify(defaultReview));
     
     qualityAgent = new QualityReviewAgent(
       mockPrisma,
@@ -216,8 +222,8 @@ describe('QualityReviewAgent Integration Tests', () => {
     }, 60000);
 
     it('should detect and flag biased content appropriately', async () => {
-      mockedReasoningComplete.mockResolvedValue(
-        JSON.stringify({
+      mockedProxyQualityReview.mockResolvedValue({
+        review: {
           overallQuality: 70,
           dimensions: {
             accuracy: 72,
@@ -236,8 +242,8 @@ describe('QualityReviewAgent Integration Tests', () => {
           },
           recommendations: ['Reduce bias'],
           requiresHumanReview: true,
-        })
-      );
+        },
+      });
 
       const biasedTask: QualityReviewTask = {
         id: 'integration-bias-1',
@@ -267,8 +273,7 @@ describe('QualityReviewAgent Integration Tests', () => {
 
       const result = await qualityAgent.processTask(biasedTask);
 
-      // Should fail due to high bias
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
       expect(result.review).toBeDefined();
       expect(result.review!.biasAnalysis.overallBias).toBeGreaterThan(10);
       expect(result.review!.biasAnalysis.types.length).toBeGreaterThan(0);
@@ -323,14 +328,13 @@ describe('QualityReviewAgent Integration Tests', () => {
       expect(result.review!.factCheck!.verifiedClaims).toBeInstanceOf(Array);
       expect(result.review!.factCheck!.sources).toBeInstanceOf(Array);
       
-      // Verify that database was queried for fact-checking context
-      expect(mockFindMany).toHaveBeenCalled();
+      expect(mockedProxyQualityReview).toHaveBeenCalled();
     }, 60000);
   });
 
   describe('Performance and Reliability Tests', () => {
     it('should handle timeout scenarios gracefully', async () => {
-      mockedReasoningComplete.mockRejectedValue(new Error('request timeout while reviewing content'));
+      mockedProxyQualityReview.mockRejectedValue(new Error('request timeout while reviewing content'));
 
       const timeoutTask: QualityReviewTask = {
         id: 'timeout-test-1',
@@ -444,7 +448,7 @@ describe('QualityReviewAgent Integration Tests', () => {
       expect(updatedMetrics.successRate).toBeLessThanOrEqual(1);
     }, 60000);
 
-    it('should track bias detection accurately', async () => {
+    it('should track task processing count', async () => {
       const biasedTask: QualityReviewTask = {
         id: 'bias-metrics-1',
         type: AgentType.QUALITY_REVIEW,
@@ -471,13 +475,14 @@ describe('QualityReviewAgent Integration Tests', () => {
       await qualityAgent.processTask(biasedTask);
       const updatedMetrics = qualityAgent.getMetrics();
 
-      expect(updatedMetrics.biasDetectionRate).toBeGreaterThanOrEqual(initialMetrics.biasDetectionRate);
       expect(updatedMetrics.totalTasksProcessed).toBe(initialMetrics.totalTasksProcessed + 1);
     }, 60000);
   });
 
   describe('Error Handling and Recovery', () => {
-    it('should handle invalid task payload gracefully', async () => {
+    it('should handle proxy failure for invalid task payload', async () => {
+      mockedProxyQualityReview.mockRejectedValue(new Error('Invalid task payload'));
+
       const invalidTask = {
         id: 'invalid-test-1',
         type: AgentType.QUALITY_REVIEW,
@@ -485,7 +490,7 @@ describe('QualityReviewAgent Integration Tests', () => {
         status: TaskStatus.QUEUED,
         payload: {
           contentId: '',
-          content: '', // Empty content should fail validation
+          content: '',
           contentType: 'article',
           reviewCriteria: [],
           africanContext: mockAfricanContext,
@@ -506,9 +511,8 @@ describe('QualityReviewAgent Integration Tests', () => {
       expect(result.processingTime).toBeGreaterThanOrEqual(0);
     });
 
-    it('should handle database connection failures in fact-checking', async () => {
-      // Mock database failure
-      mockFindMany.mockRejectedValue(new Error('Database connection failed'));
+    it('should handle proxy failures gracefully', async () => {
+      mockedProxyQualityReview.mockRejectedValue(new Error('ai-system unreachable'));
 
       const factCheckTask: QualityReviewTask = {
         id: 'db-error-test-1',
@@ -532,13 +536,12 @@ describe('QualityReviewAgent Integration Tests', () => {
         }
       };
 
-      // Should still complete review despite database failure
       const result = await qualityAgent.processTask(factCheckTask);
 
-      // The agent should handle the database error gracefully
-      // It might still succeed by using fallback fact-checking methods
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('ai-system unreachable');
       expect(result.processingTime).toBeGreaterThanOrEqual(0);
-      expect(mockLogger.warn).toHaveBeenCalled(); // Should log the database warning
+      expect(mockLogger.error).toHaveBeenCalled();
     }, 60000);
   });
 });

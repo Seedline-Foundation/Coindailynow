@@ -13,7 +13,8 @@
 
 import express, { Request, Response } from 'express';
 import prisma from '../lib/prisma';
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
+const redis = getRedis();
 import AISearchService, {
   SearchQuery,
   SemanticSearchParams,
@@ -25,8 +26,6 @@ const router = express.Router();
 // ============================================================================
 // Initialize Services
 // ============================================================================
-
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const aiSearchService = new AISearchService(prisma, redis);
 
 // ============================================================================

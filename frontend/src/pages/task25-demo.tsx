@@ -248,7 +248,7 @@ const demoSettings = {
       trustedDevices: []
     },
     subscription: {
-      currentTier: SubscriptionTier.VIP,
+      currentTier: SubscriptionTier.ENTERPRISE,
       billingCycle: BillingCycle.YEARLY,
       autoRenewal: true,
       paymentMethod: PaymentMethodType.CREDIT_CARD,
@@ -331,7 +331,7 @@ const demoSettings = {
       trustedDevices: []
     },
     subscription: {
-      currentTier: SubscriptionTier.BASIC,
+      currentTier: SubscriptionTier.PREMIUM,
       billingCycle: BillingCycle.QUARTERLY,
       autoRenewal: false,
       paymentMethod: PaymentMethodType.BANK_TRANSFER,

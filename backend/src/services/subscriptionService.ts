@@ -74,21 +74,131 @@ export class SubscriptionService {
     const amountUsd = (plan.priceCents / 100).toFixed(2);
 
     if (input.provider === 'yellowcard') {
-      const apiKey = process.env.YELLOWCARD_API_KEY;
-      const baseUrl = process.env.YELLOWCARD_API_URL || 'https://api.yellowcard.io';
-      const checkoutUrl =
-        process.env.YELLOWCARD_CHECKOUT_URL ||
-        `${baseUrl}/checkout?amount=${amountUsd}&currency=USD&ref=${reference}`;
+      return this.createYellowCardCheckout(reference, amountUsd, plan, input);
+    }
 
-      return {
-        provider: 'yellowcard',
-        reference,
-        checkoutUrl,
-        amount: plan.priceCents,
-        currency: plan.currency,
-        planId: plan.id,
-        planName: plan.name,
-      };
+    return this.createChangeNOWCheckout(reference, amountUsd, plan, input);
+  }
+
+  private async createYellowCardCheckout(
+    reference: string,
+    amountUsd: string,
+    plan: { id: string; name: string; priceCents: number; currency: string },
+    input: CheckoutSessionInput
+  ) {
+    const apiKey = process.env.YELLOWCARD_API_KEY;
+    const secretKey = process.env.YELLOWCARD_SECRET_KEY;
+    const baseUrl = process.env.YELLOWCARD_API_URL || 'https://sandbox.api.yellowcard.io';
+
+    if (apiKey && secretKey) {
+      try {
+        const response = await axios.post(
+          `${baseUrl}/payments`,
+          {
+            amount: parseFloat(amountUsd),
+            currency: 'USD',
+            reason: `CoinDaily subscription: ${plan.name}`,
+            customerEmail: undefined,
+            metadata: {
+              reference,
+              planId: plan.id,
+              userId: input.userId,
+            },
+            ...(input.successUrl && { callbackUrl: input.successUrl }),
+          },
+          {
+            headers: {
+              'YC-API-KEY': apiKey,
+              'YC-SECRET-KEY': secretKey,
+              'Content-Type': 'application/json',
+            },
+            timeout: 15000,
+          }
+        );
+
+        const data = response.data;
+        return {
+          provider: 'yellowcard' as const,
+          reference,
+          checkoutUrl: data.redirectUrl || data.checkoutUrl || data.url || `${baseUrl}/checkout?ref=${reference}`,
+          paymentId: data.id || data.paymentId,
+          amount: plan.priceCents,
+          currency: plan.currency,
+          planId: plan.id,
+          planName: plan.name,
+        };
+      } catch (error: any) {
+        logger.warn('YellowCard API payment creation failed, using fallback URL', {
+          error: error.message,
+          status: error.response?.status,
+        });
+      }
+    }
+
+    const checkoutUrl =
+      process.env.YELLOWCARD_CHECKOUT_URL ||
+      `${baseUrl}/checkout?amount=${amountUsd}&currency=USD&ref=${reference}`;
+
+    return {
+      provider: 'yellowcard' as const,
+      reference,
+      checkoutUrl,
+      amount: plan.priceCents,
+      currency: plan.currency,
+      planId: plan.id,
+      planName: plan.name,
+    };
+  }
+
+  private async createChangeNOWCheckout(
+    reference: string,
+    amountUsd: string,
+    plan: { id: string; name: string; priceCents: number; currency: string },
+    input: CheckoutSessionInput
+  ) {
+    const apiKey = process.env.CHANGENOW_API_KEY;
+    const baseUrl = process.env.CHANGENOW_API_URL || 'https://api.changenow.io/v2';
+
+    if (apiKey) {
+      try {
+        const response = await axios.post(
+          `${baseUrl}/exchange`,
+          {
+            fromCurrency: 'usd',
+            toCurrency: 'btc',
+            fromAmount: parseFloat(amountUsd),
+            address: process.env.CHANGENOW_RECEIVE_ADDRESS || '',
+            flow: 'standard',
+            extraId: reference,
+            type: 'direct',
+          },
+          {
+            headers: {
+              'x-changenow-api-key': apiKey,
+              'Content-Type': 'application/json',
+            },
+            timeout: 15000,
+          }
+        );
+
+        const data = response.data;
+        return {
+          provider: 'changenow' as const,
+          reference,
+          checkoutUrl: data.redirectUrl || `https://changenow.io/exchange/txs/${data.id}`,
+          exchangeId: data.id,
+          payinAddress: data.payinAddress,
+          amount: plan.priceCents,
+          currency: plan.currency,
+          planId: plan.id,
+          planName: plan.name,
+        };
+      } catch (error: any) {
+        logger.warn('ChangeNOW API exchange creation failed, using fallback URL', {
+          error: error.message,
+          status: error.response?.status,
+        });
+      }
     }
 
     const partnerId = process.env.CHANGENOW_PARTNER_ID || '';
@@ -97,7 +207,7 @@ export class SubscriptionService {
       `https://changenow.io/exchange?from=usd&to=btc&amount=${amountUsd}&partner_id=${partnerId}&order_id=${reference}`;
 
     return {
-      provider: 'changenow',
+      provider: 'changenow' as const,
       reference,
       checkoutUrl,
       amount: plan.priceCents,
@@ -157,13 +267,16 @@ export class SubscriptionService {
       },
     });
 
+    const plan = await this.prisma.subscriptionPlan.findUnique({ where: { id: params.planId } });
+    const tier = this.deriveTierFromPlan(plan);
+
     await this.prisma.user.update({
       where: { id: params.userId },
-      data: { subscriptionTier: 'PREMIUM', updatedAt: now },
+      data: { subscriptionTier: tier, updatedAt: now },
     });
 
     await this.sendReceiptEmail(params.userId, record);
-    const { emitCfisEvent } = await import('./cfisWebhookService');
+    const { emitCfisEvent, emitCfisSubscriptionEvent } = await import('./cfisWebhookService');
     await emitCfisEvent('SUBSCRIPTION_PAYMENT', {
       subscriptionId: subscription.id,
       userId: params.userId,
@@ -172,14 +285,108 @@ export class SubscriptionService {
       currency: params.currency || 'USD',
     });
 
+    await emitCfisSubscriptionEvent('subscription.created', {
+      subscriptionId: subscription.id,
+      userId: params.userId,
+      planId: params.planId,
+      amount: params.amount,
+      currency: params.currency || 'USD',
+      currentPeriodStart: now.toISOString(),
+      currentPeriodEnd: periodEnd.toISOString(),
+    });
+
+    return { subscription, paymentRecord: record };
+  }
+
+  async renewSubscription(params: {
+    userId: string;
+    planId: string;
+    gatewayTxId: string;
+    paymentMethod: string;
+    paymentGateway: string;
+    amount: number;
+    currency?: string;
+  }) {
+    const now = new Date();
+    const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const invoiceNumber = `INV-${Date.now()}-${params.userId.slice(0, 6)}`;
+
+    const subscription = await this.prisma.subscription.update({
+      where: { userId: params.userId },
+      data: {
+        planId: params.planId,
+        status: 'ACTIVE',
+        currentPeriodStart: now,
+        currentPeriodEnd: periodEnd,
+        cancelAtPeriodEnd: false,
+        cancelledAt: null,
+        updatedAt: now,
+      },
+    });
+
+    const record = await this.prisma.subscriptionPaymentRecord.create({
+      data: {
+        userId: params.userId,
+        subscriptionId: subscription.id,
+        amount: params.amount,
+        currency: params.currency || 'USD',
+        paymentMethod: params.paymentMethod,
+        paymentGateway: params.paymentGateway,
+        gatewayTxId: params.gatewayTxId,
+        invoiceNumber,
+        status: 'COMPLETED',
+        nextBillingDate: periodEnd,
+      },
+    });
+
+    await this.sendReceiptEmail(params.userId, record);
+
+    const { emitCfisEvent, emitCfisSubscriptionEvent } = await import('./cfisWebhookService');
+    await emitCfisEvent('SUBSCRIPTION_PAYMENT', {
+      subscriptionId: subscription.id,
+      userId: params.userId,
+      amount: params.amount,
+      invoiceNumber,
+      currency: params.currency || 'USD',
+    });
+
+    await emitCfisSubscriptionEvent('subscription.renewed', {
+      subscriptionId: subscription.id,
+      userId: params.userId,
+      planId: params.planId,
+      amount: params.amount,
+      currency: params.currency || 'USD',
+      currentPeriodStart: now.toISOString(),
+      currentPeriodEnd: periodEnd.toISOString(),
+    });
+
     return { subscription, paymentRecord: record };
   }
 
   async cancelAtPeriodEnd(userId: string) {
-    return this.prisma.subscription.update({
+    const subscription = await this.prisma.subscription.update({
       where: { userId },
       data: { cancelAtPeriodEnd: true, cancelledAt: new Date(), updatedAt: new Date() },
     });
+
+    const { emitCfisSubscriptionEvent } = await import('./cfisWebhookService');
+    await emitCfisSubscriptionEvent('subscription.cancelled', {
+      subscriptionId: subscription.id,
+      userId,
+      planId: subscription.planId,
+      cancelledAt: new Date().toISOString(),
+      currentPeriodEnd: subscription.currentPeriodEnd?.toISOString(),
+    });
+
+    return subscription;
+  }
+
+  private deriveTierFromPlan(plan: { name: string } | null): 'FREE' | 'PREMIUM' | 'ENTERPRISE' {
+    if (!plan) return 'PREMIUM';
+    const name = plan.name.toUpperCase();
+    if (name.includes('ENTERPRISE')) return 'ENTERPRISE';
+    if (name.includes('FREE')) return 'FREE';
+    return 'PREMIUM';
   }
 
   /**

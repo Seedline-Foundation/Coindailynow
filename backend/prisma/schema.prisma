@@ -8643,6 +8643,9 @@ model PlatformSettings {
   platformUrl     String?
   maintenanceMode Boolean @default(false)
 
+  // AI Content Pipeline Kill-Switch
+  aiContentPipelineEnabled Boolean @default(true)
+
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -9475,6 +9478,24 @@ model PressDistributionLog {
   @@index([releaseId])
   @@index([status])
   @@map("press_distribution_logs")
+}
+
+// =============================================
+// Wire Alert Subscriptions
+// =============================================
+
+model WireAlertSubscription {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  telegramChatId  String?
+  filters         String?  @db.Text // JSON: source/category filters
+  active          Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([active])
+  @@map("wire_alert_subscriptions")
 }
 
 // =============================================

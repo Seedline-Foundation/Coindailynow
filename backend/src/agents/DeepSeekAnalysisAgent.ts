@@ -1,17 +1,13 @@
 /**
  * DeepSeek R1 Data Analysis Agent
  *
- * AI Agent powered by DeepSeek R1 model (self-hosted via Ollama) that:
- * - Analyzes data from the Data Source Center
- * - Identifies market trends, regional patterns, and anomalies
- * - Generates comprehensive weekly analysis reports
- * - Scores data items for relevance and quality
- *
- * This agent runs SEPARATELY from the news content pipeline.
- * It's specifically designed for data analysis, not content generation.
+ * @deprecated THIN WRAPPER — canonical implementation lives in ai-system.
+ * This file delegates to the ai-system service via HTTP (see aiSystemClient).
+ * Do not add business logic here; extend ai-system/agents/analysis/ instead.
  */
 
 import { DataSourceItem, queryDataItems, updateItemScores } from '../services/dataSourceCenter';
+import { proxyDeepSeekAnalysis } from '../services/aiSystemClient';
 
 // ============================================================================
 // TYPES
@@ -314,217 +310,92 @@ Respond with JSON array:
 // ============================================================================
 
 /**
- * Run full data analysis on items from the Data Source Center
+ * Run full data analysis — delegates to ai-system.
  */
 export async function runDataAnalysis(context: AnalysisContext): Promise<AnalysisResult> {
-  console.log(`[DeepSeekAgent] Starting analysis of ${context.items.length} items...`);
-
-  const prompt = buildAnalysisPrompt(context);
-  
-  const { response, tokensUsed, durationMs } = await callDeepSeekR1(prompt, {
-    systemPrompt: ANALYSIS_SYSTEM_PROMPT,
-    temperature: 0.3,
-    maxTokens: 8192,
-  });
-
-  // Parse the JSON response
-  let analysisResult: any;
+  console.log(`[DeepSeekAgent] Proxying analysis of ${context.items.length} items to ai-system...`);
+  const startTime = Date.now();
   try {
-    // Extract JSON from response (in case there's extra text)
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in response');
-    }
-    analysisResult = JSON.parse(jsonMatch[0]);
-  } catch (parseError) {
-    console.error('[DeepSeekAgent] Failed to parse analysis response:', parseError);
-    // Return a default structure with the raw response
+    const result = await proxyDeepSeekAnalysis({ action: 'runDataAnalysis', context }) as any;
     return {
-      executiveSummary: 'Analysis parsing failed. Raw response available in mainAnalysis.',
-      mainAnalysis: response,
+      executiveSummary: result?.executiveSummary || '',
+      mainAnalysis: result?.mainAnalysis || '',
+      keyFindings: result?.keyFindings || [],
+      dataInsights: result?.dataInsights || [],
+      recommendations: result?.recommendations || [],
+      trendAnalysis: result?.trendAnalysis || [],
+      anomalies: result?.anomalies || [],
+      confidence: result?.confidence || 0,
+      tokensUsed: result?.tokensUsed || 0,
+      processingTimeMs: Date.now() - startTime,
+    };
+  } catch (error) {
+    console.error('[DeepSeekAgent] ai-system proxy failed, returning empty result:', error);
+    return {
+      executiveSummary: 'ai-system unreachable — analysis unavailable',
+      mainAnalysis: '',
       keyFindings: [],
       dataInsights: [],
       recommendations: [],
       trendAnalysis: [],
       anomalies: [],
       confidence: 0,
-      tokensUsed,
-      processingTimeMs: durationMs,
+      tokensUsed: 0,
+      processingTimeMs: Date.now() - startTime,
     };
   }
-
-  console.log(`[DeepSeekAgent] Analysis complete in ${durationMs}ms, used ${tokensUsed} tokens`);
-
-  return {
-    executiveSummary: analysisResult.executiveSummary || '',
-    mainAnalysis: analysisResult.mainAnalysis || '',
-    keyFindings: analysisResult.keyFindings || [],
-    dataInsights: analysisResult.dataInsights || [],
-    recommendations: analysisResult.recommendations || [],
-    trendAnalysis: analysisResult.trendAnalysis || [],
-    anomalies: analysisResult.anomalies || [],
-    confidence: analysisResult.confidence || 50,
-    tokensUsed,
-    processingTimeMs: durationMs,
-  };
 }
 
 /**
- * Score data items for relevance and quality
+ * Score data items — delegates to ai-system.
  */
 export async function scoreDataItems(items: DataSourceItem[]): Promise<ScoreResult[]> {
   if (items.length === 0) return [];
-
-  console.log(`[DeepSeekAgent] Scoring ${items.length} items...`);
-
-  // Process in batches of 20 to avoid token limits
-  const BATCH_SIZE = 20;
-  const results: ScoreResult[] = [];
-
-  for (let i = 0; i < items.length; i += BATCH_SIZE) {
-    const batch = items.slice(i, i + BATCH_SIZE);
-    const prompt = buildScoringPrompt(batch);
-
-    try {
-      const { response, tokensUsed, durationMs } = await callDeepSeekR1(prompt, {
-        systemPrompt: 'You are a news quality analyst. Respond only with valid JSON.',
-        temperature: 0.1,
-        maxTokens: 2048,
-      });
-
-      // Parse response
-      const jsonMatch = response.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const scores = JSON.parse(jsonMatch[0]);
-        results.push(...scores);
-
-        // Update scores in database
-        for (const score of scores) {
-          await updateItemScores(score.itemId, {
-            relevanceScore: score.relevanceScore,
-            qualityScore: score.qualityScore,
-            sentiment: score.sentiment,
-            tags: score.tags,
-          });
-        }
-      }
-
-      console.log(`[DeepSeekAgent] Scored batch ${Math.floor(i / BATCH_SIZE) + 1}, used ${tokensUsed} tokens`);
-    } catch (error) {
-      console.error(`[DeepSeekAgent] Failed to score batch:`, error);
-    }
-
-    // Small delay between batches
-    if (i + BATCH_SIZE < items.length) {
-      await new Promise(r => setTimeout(r, 1000));
-    }
+  try {
+    const result = await proxyDeepSeekAnalysis({ action: 'scoreDataItems', items }) as any;
+    return Array.isArray(result) ? result : [];
+  } catch (error) {
+    console.error('[DeepSeekAgent] ai-system proxy failed for scoring:', error);
+    return [];
   }
-
-  return results;
 }
 
 /**
- * Detect anomalies in recent data
+ * Detect anomalies — delegates to ai-system.
  */
 export async function detectAnomalies(
   items: DataSourceItem[],
-  historicalBaseline?: { avgCount: number; avgRelevance: number }
+  historicalBaseline?: { avgCount: number; avgRelevance: number },
 ): Promise<Anomaly[]> {
-  console.log(`[DeepSeekAgent] Detecting anomalies in ${items.length} items...`);
-
-  // Group items by day
-  const dailyCounts = new Map<string, number>();
-  for (const item of items) {
-    const dateKey = item.pubDate.toISOString().split('T')[0];
-    dailyCounts.set(dateKey, (dailyCounts.get(dateKey) || 0) + 1);
+  try {
+    const result = await proxyDeepSeekAnalysis({ action: 'detectAnomalies', items, historicalBaseline }) as any;
+    return Array.isArray(result) ? result : [];
+  } catch (error) {
+    console.error('[DeepSeekAgent] ai-system proxy failed for anomaly detection:', error);
+    return [];
   }
-
-  // Calculate statistics
-  const counts = Array.from(dailyCounts.values());
-  const avgCount = counts.reduce((a, b) => a + b, 0) / counts.length;
-  const stdDev = Math.sqrt(
-    counts.reduce((acc, val) => acc + Math.pow(val - avgCount, 2), 0) / counts.length
-  );
-
-  const anomalies: Anomaly[] = [];
-
-  // Detect spikes/drops (more than 2 standard deviations from mean)
-  for (const [date, count] of dailyCounts) {
-    if (count > avgCount + 2 * stdDev) {
-      anomalies.push({
-        id: `spike_${date}`,
-        type: 'spike',
-        description: `Unusual spike in news volume on ${date}: ${count} items (average: ${avgCount.toFixed(1)})`,
-        severity: count > avgCount + 3 * stdDev ? 'critical' : 'warning',
-        detectedAt: new Date(date),
-        affectedItems: items.filter(i => i.pubDate.toISOString().startsWith(date)).map(i => i.id),
-      });
-    } else if (count < avgCount - 2 * stdDev && stdDev > 0) {
-      anomalies.push({
-        id: `drop_${date}`,
-        type: 'drop',
-        description: `Unusual drop in news volume on ${date}: ${count} items (average: ${avgCount.toFixed(1)})`,
-        severity: 'info',
-        detectedAt: new Date(date),
-        affectedItems: [],
-      });
-    }
-  }
-
-  // Detect category anomalies (sudden topic surges)
-  const categoryCounts = new Map<string, number>();
-  for (const item of items) {
-    categoryCounts.set(item.category, (categoryCounts.get(item.category) || 0) + 1);
-  }
-
-  const totalItems = items.length;
-  for (const [category, count] of categoryCounts) {
-    const percentage = (count / totalItems) * 100;
-    if (percentage > 40 && count > 10) {
-      anomalies.push({
-        id: `category_surge_${category}`,
-        type: 'pattern_break',
-        description: `${category} news dominance: ${percentage.toFixed(1)}% of all items (${count} items)`,
-        severity: 'warning',
-        detectedAt: new Date(),
-        affectedItems: items.filter(i => i.category === category).slice(0, 10).map(i => i.id),
-      });
-    }
-  }
-
-  console.log(`[DeepSeekAgent] Detected ${anomalies.length} anomalies`);
-  return anomalies;
 }
 
 /**
- * Generate a quick summary without full analysis (for previews)
+ * Generate a quick summary — delegates to ai-system.
  */
 export async function generateQuickSummary(items: DataSourceItem[]): Promise<string> {
   if (items.length === 0) return 'No data items to summarize.';
-
-  const prompt = `
-Provide a brief 2-3 sentence summary of these ${items.length} news items:
-
-${items.slice(0, 20).map(i => `- ${i.title} (${i.category}, ${i.region})`).join('\n')}
-
-Focus on the main themes and any notable trends.`;
-
-  const { response } = await callDeepSeekR1(prompt, {
-    temperature: 0.5,
-    maxTokens: 256,
-  });
-
-  return response.trim();
+  try {
+    const result = await proxyDeepSeekAnalysis({ action: 'generateQuickSummary', items }) as any;
+    return typeof result === 'string' ? result : (result?.summary || 'Summary unavailable');
+  } catch {
+    return 'ai-system unreachable — summary unavailable';
+  }
 }
 
 /**
- * Check if DeepSeek R1 model is available
+ * Check if the ai-system DeepSeek model endpoint is reachable.
  */
 export async function checkModelHealth(): Promise<boolean> {
   try {
     const response = await fetch(`${OLLAMA_URL}/api/tags`);
     if (!response.ok) return false;
-    
     const data = await response.json();
     const models = data.models || [];
     return models.some((m: any) => m.name.includes('deepseek'));

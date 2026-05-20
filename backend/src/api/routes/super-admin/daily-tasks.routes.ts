@@ -16,7 +16,11 @@ import {
   getPermissionCategories,
 } from './shared';
 import { validateBody } from '../../../middleware/validate';
-import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
+import {
+  putDailyTaskTemplatesSchema,
+  putDailyTaskTodaySchema,
+  putDailyTaskAssignSchema,
+} from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
@@ -34,10 +38,9 @@ router.get('/daily-tasks/templates', authMiddleware, async (_req: Request, res: 
 });
 
 // ─── PUT /daily-tasks/templates — save master task list (CEO only) ────
-router.put('/daily-tasks/templates', authMiddleware, async (req: Request, res: Response) => {
+router.put('/daily-tasks/templates', authMiddleware, validateBody(putDailyTaskTemplatesSchema), async (req: Request, res: Response) => {
   try {
     const { templates } = req.body;
-    if (!templates) return res.status(400).json({ success: false, error: 'templates required' });
 
     await prisma.systemConfiguration.upsert({
       where: { key: 'dailytasks.templates' },
@@ -67,10 +70,9 @@ router.get('/daily-tasks/today', authMiddleware, async (req: Request, res: Respo
 });
 
 // ─── PUT /daily-tasks/today — save today's task progress ──────────────
-router.put('/daily-tasks/today', authMiddleware, async (req: Request, res: Response) => {
+router.put('/daily-tasks/today', authMiddleware, validateBody(putDailyTaskTodaySchema), async (req: Request, res: Response) => {
   try {
     const { log, date } = req.body;
-    if (!log) return res.status(400).json({ success: false, error: 'log required' });
 
     const dateStr = date || new Date().toISOString().split('T')[0];
     const key = `dailytasks.log.${dateStr}`;
@@ -112,10 +114,9 @@ router.get('/daily-tasks/history', authMiddleware, async (req: Request, res: Res
 });
 
 // ─── PUT /daily-tasks/assign — assign tasks to a staff member ─────────
-router.put('/daily-tasks/assign', authMiddleware, async (req: Request, res: Response) => {
+router.put('/daily-tasks/assign', authMiddleware, validateBody(putDailyTaskAssignSchema), async (req: Request, res: Response) => {
   try {
     const { staffId, staffName, tasks, date, assignedBy } = req.body;
-    if (!staffId || !tasks) return res.status(400).json({ success: false, error: 'staffId and tasks required' });
 
     const dateStr = date || new Date().toISOString().split('T')[0];
     const key = `dailytasks.assignment.${dateStr}.${staffId}`;

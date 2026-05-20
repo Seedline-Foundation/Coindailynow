@@ -196,132 +196,158 @@ export const conversionResolvers = {
   Query: {
     /**
      * Get CE Points to JOY Token conversion rate
+     * Rate is configurable via CE_TO_JY_CONVERSION_RATE env var
      */
     getCEToJOYRate: async (_: any, __: any, context: any) => {
       requireAuth(context);
 
-      // TODO: Implement dynamic rate calculation based on market conditions
-      // For now, return a fixed rate (can be configured by super admin)
-      const conversionRate = 100; // 100 CE Points = 1 JOY token
+      const rateFromEnv = parseFloat(process.env.CE_TO_JY_CONVERSION_RATE || '0.01');
+      const conversionRate = rateFromEnv > 0 ? Math.round(1 / rateFromEnv) : 100;
 
       return {
         conversionRate,
-        minCEPoints: 100, // Minimum CE Points required for conversion
-        maxCEPoints: 1000000, // Maximum CE Points per transaction
+        minCEPoints: 100,
+        maxCEPoints: 1000000,
         description: `${conversionRate} CE Points = 1 JOY token`,
       };
     },
 
     /**
      * Get JOY Token to Fiat exchange rates
+     * Fetches live rates from YellowCard when API key is configured
      */
     getJOYToFiatRates: async (_: any, { currencies }: any, context: any) => {
       requireAuth(context);
 
-      // TODO: Integrate with real-time exchange rate API
-      // For now, return mock rates for supported African and major currencies
-      const supportedRates = {
-        USD: 1.00,   // US Dollar (base)
-        EUR: 0.92,   // Euro
-        GBP: 0.79,   // British Pound
-        NGN: 1550.00, // Nigerian Naira
-        KES: 150.00, // Kenyan Shilling
-        ZAR: 18.50,  // South African Rand
-        GHS: 15.00,  // Ghanaian Cedi
-        UGX: 3700.00, // Ugandan Shilling
-        TZS: 2500.00, // Tanzanian Shilling
+      const fallbackRates: Record<string, number> = {
+        USD: 1.00,
+        EUR: 0.92,
+        GBP: 0.79,
+        NGN: 1550.00,
+        KES: 150.00,
+        ZAR: 18.50,
+        GHS: 15.00,
+        UGX: 3700.00,
+        TZS: 2500.00,
       };
 
-      // Filter by requested currencies if provided
-      const requestedCurrencies = currencies || Object.keys(supportedRates);
+      let liveRates: Record<string, number> | null = null;
+
+      const ycApiKey = process.env.YELLOWCARD_API_KEY;
+      const ycSecretKey = process.env.YELLOWCARD_SECRET_KEY;
+      const ycBaseUrl = process.env.YELLOWCARD_API_URL || 'https://sandbox.api.yellowcard.io';
+
+      if (ycApiKey && ycSecretKey) {
+        try {
+          const axios = (await import('axios')).default;
+          const response = await axios.get(`${ycBaseUrl}/rates`, {
+            headers: {
+              'YC-API-KEY': ycApiKey,
+              'YC-SECRET-KEY': ycSecretKey,
+              'Content-Type': 'application/json',
+            },
+            timeout: 10000,
+          });
+
+          const data = response.data;
+          if (data && (Array.isArray(data) || typeof data === 'object')) {
+            liveRates = {};
+            const rateList = Array.isArray(data) ? data : (data.rates || [data]);
+            for (const entry of rateList) {
+              const code = (entry.currency || entry.code || '').toUpperCase();
+              const rate = entry.rate ?? entry.buy ?? entry.sell;
+              if (code && typeof rate === 'number') {
+                liveRates[code] = rate;
+              }
+            }
+            if (Object.keys(liveRates).length === 0) liveRates = null;
+          }
+        } catch (err: any) {
+          console.error('YellowCard rates fetch failed:', err.message);
+        }
+      }
+
+      const activeRates = liveRates || fallbackRates;
+      const requestedCurrencies = currencies || Object.keys(activeRates);
       const rates = requestedCurrencies
-        .filter((currency: string) => currency in supportedRates)
+        .filter((currency: string) => currency in activeRates)
         .map((currency: string) => ({
           currency,
-          rate: supportedRates[currency as keyof typeof supportedRates],
-          description: `1 JOY = ${supportedRates[currency as keyof typeof supportedRates]} ${currency}`,
+          rate: activeRates[currency],
+          description: `1 JOY = ${activeRates[currency]} ${currency}`,
         }));
 
       return {
         baseToken: 'JOY',
         rates,
         lastUpdated: new Date().toISOString(),
-        minJOYAmount: 1, // Minimum JOY tokens for conversion
-        maxJOYAmount: 1000000, // Maximum JOY tokens per transaction
+        minJOYAmount: 1,
+        maxJOYAmount: 1000000,
+        source: liveRates ? 'YellowCard' : 'fallback',
       };
     },
 
     /**
      * Get supported cryptocurrencies for JOY token swaps
+     * Fetches live data from ChangeNOW when API key is configured
      */
     getSupportedCryptos: async (_: any, __: any, context: any) => {
       requireAuth(context);
 
-      // TODO: Integrate with ChangeNOW API to get real-time supported currencies
-      // For now, return popular cryptocurrencies
-      const supportedCryptos = [
-        {
-          symbol: 'BTC',
-          name: 'Bitcoin',
-          network: 'Bitcoin',
-          minAmount: 0.0001,
-          estimatedRate: 0.00002, // 1 JOY = 0.00002 BTC (example)
-        },
-        {
-          symbol: 'ETH',
-          name: 'Ethereum',
-          network: 'Ethereum',
-          minAmount: 0.001,
-          estimatedRate: 0.0003, // 1 JOY = 0.0003 ETH (example)
-        },
-        {
-          symbol: 'USDT',
-          name: 'Tether',
-          network: 'ERC20',
-          minAmount: 1,
-          estimatedRate: 1.0, // 1 JOY = 1 USDT (example)
-        },
-        {
-          symbol: 'BNB',
-          name: 'Binance Coin',
-          network: 'BSC',
-          minAmount: 0.01,
-          estimatedRate: 0.002, // 1 JOY = 0.002 BNB (example)
-        },
-        {
-          symbol: 'USDC',
-          name: 'USD Coin',
-          network: 'ERC20',
-          minAmount: 1,
-          estimatedRate: 1.0, // 1 JOY = 1 USDC (example)
-        },
-        {
-          symbol: 'SOL',
-          name: 'Solana',
-          network: 'Solana',
-          minAmount: 0.01,
-          estimatedRate: 0.005, // 1 JOY = 0.005 SOL (example)
-        },
-        {
-          symbol: 'MATIC',
-          name: 'Polygon',
-          network: 'Polygon',
-          minAmount: 1,
-          estimatedRate: 0.5, // 1 JOY = 0.5 MATIC (example)
-        },
-        {
-          symbol: 'ADA',
-          name: 'Cardano',
-          network: 'Cardano',
-          minAmount: 1,
-          estimatedRate: 1.5, // 1 JOY = 1.5 ADA (example)
-        },
+      const fallbackCryptos = [
+        { symbol: 'BTC', name: 'Bitcoin', network: 'Bitcoin', minAmount: 0.0001, estimatedRate: 0.00002 },
+        { symbol: 'ETH', name: 'Ethereum', network: 'Ethereum', minAmount: 0.001, estimatedRate: 0.0003 },
+        { symbol: 'USDT', name: 'Tether', network: 'ERC20', minAmount: 1, estimatedRate: 1.0 },
+        { symbol: 'BNB', name: 'Binance Coin', network: 'BSC', minAmount: 0.01, estimatedRate: 0.002 },
+        { symbol: 'USDC', name: 'USD Coin', network: 'ERC20', minAmount: 1, estimatedRate: 1.0 },
+        { symbol: 'SOL', name: 'Solana', network: 'Solana', minAmount: 0.01, estimatedRate: 0.005 },
+        { symbol: 'MATIC', name: 'Polygon', network: 'Polygon', minAmount: 1, estimatedRate: 0.5 },
+        { symbol: 'ADA', name: 'Cardano', network: 'Cardano', minAmount: 1, estimatedRate: 1.5 },
       ];
 
+      const cnApiKey = process.env.CHANGENOW_API_KEY;
+      const cnBaseUrl = process.env.CHANGENOW_API_URL || 'https://api.changenow.io/v2';
+
+      if (cnApiKey) {
+        try {
+          const axios = (await import('axios')).default;
+          const response = await axios.get(`${cnBaseUrl}/exchange/currencies`, {
+            headers: { 'x-changenow-api-key': cnApiKey },
+            params: { active: true },
+            timeout: 10000,
+          });
+
+          const currencies = response.data;
+          if (Array.isArray(currencies) && currencies.length > 0) {
+            const targetSymbols = new Set(['btc', 'eth', 'usdt', 'bnb', 'usdc', 'sol', 'matic', 'ada', 'xrp', 'doge', 'trx']);
+            const liveCryptos = currencies
+              .filter((c: any) => targetSymbols.has((c.ticker || '').toLowerCase()))
+              .map((c: any) => ({
+                symbol: (c.ticker || '').toUpperCase(),
+                name: c.name || c.ticker,
+                network: c.network || c.ticker,
+                minAmount: c.minAmount ?? 0.001,
+                estimatedRate: null,
+              }));
+
+            if (liveCryptos.length > 0) {
+              return {
+                swapProviders: ['ChangeNOW'],
+                recommendedProvider: 'ChangeNOW',
+                supportedCryptos: liveCryptos,
+                note: 'Live data from ChangeNOW. Exchange rates vary based on market conditions.',
+              };
+            }
+          }
+        } catch (err: any) {
+          console.error('ChangeNOW currencies fetch failed:', err.message);
+        }
+      }
+
       return {
-        swapProviders: ['ChangeNOW', 'SimpleSwap', 'StealthEX'],
+        swapProviders: ['ChangeNOW'],
         recommendedProvider: 'ChangeNOW',
-        supportedCryptos,
+        supportedCryptos: fallbackCryptos,
         note: 'Exchange rates are estimates and may vary based on market conditions',
       };
     },

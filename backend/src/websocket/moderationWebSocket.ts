@@ -1,10 +1,12 @@
 import { Server as HTTPServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { PrismaClient } from '@prisma/client';
-import Redis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { pubsub, SUBSCRIPTION_EVENTS } from '../config/pubsub';
 import prisma from '../lib/prisma';
+import { getRedis } from '../lib/redis';
+import { createRedisClient } from '../config/ioredis';
+const redis = getRedis();
 
 /**
  * WebSocket Server for Real-time Moderation Alerts
@@ -20,13 +22,13 @@ import prisma from '../lib/prisma';
 export class ModerationWebSocketServer {
   private io: SocketIOServer;
   private prisma: PrismaClient;
-  private redis: Redis;
+  private redis: ReturnType<typeof getRedis>;
   private connectedAdmins: Map<string, { socket: Socket; userId: string; role: string }> = new Map();
   private subscriptions: Map<string, Set<string>> = new Map(); // userId -> Set<subscriptionTypes>
   
   constructor(httpServer: HTTPServer) {
     this.prisma = prisma;
-    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    this.redis = redis;
     
     this.io = new SocketIOServer(httpServer, {
       cors: {
@@ -274,8 +276,8 @@ export class ModerationWebSocketServer {
    * Setup event forwarding from GraphQL subscriptions to WebSocket
    */
   private setupEventForwarding(): void {
-    // Use Redis pub/sub for distributed event handling
-    const redisSub = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    // Use Redis pub/sub for distributed event handling — separate connection for subscriber
+    const redisSub = createRedisClient();
 
     // Subscribe to all moderation events
     Object.values(SUBSCRIPTION_EVENTS).forEach(eventType => {

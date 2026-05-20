@@ -16,7 +16,7 @@ import {
   getPermissionCategories,
 } from './shared';
 import { validateBody } from '../../../middleware/validate';
-import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
+import { aiPipelineToggleSchema } from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { runEditorialPipelineJob } from '../../../services/aiEditorialPipelineService';
@@ -135,6 +135,57 @@ router.get('/ai-tasks', authMiddleware, async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching AI tasks:', error);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+});
+
+/**
+ * POST /api/super-admin/ai/pipeline/toggle
+ * Toggle the AI content pipeline kill-switch on/off.
+ */
+router.post('/ai/pipeline/toggle', authMiddleware, validateBody(aiPipelineToggleSchema), async (req: Request, res: Response) => {
+  try {
+    if (requireAdmin(req, res)) return;
+
+    const { enabled } = req.body as { enabled: boolean };
+
+    const settings = await prisma.platformSettings.findFirst();
+    if (settings) {
+      await prisma.platformSettings.update({
+        where: { id: settings.id },
+        data: { aiContentPipelineEnabled: enabled },
+      });
+    } else {
+      await prisma.platformSettings.create({
+        data: { aiContentPipelineEnabled: enabled },
+      });
+    }
+
+    res.json({
+      success: true,
+      data: { aiContentPipelineEnabled: enabled },
+    });
+  } catch (error: any) {
+    console.error('AI pipeline toggle failed:', error);
+    res.status(500).json({ success: false, error: error?.message || 'Toggle failed' });
+  }
+});
+
+/**
+ * GET /api/super-admin/ai/pipeline/status
+ * Retrieve current AI content pipeline status.
+ */
+router.get('/ai/pipeline/status', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    if (requireAdmin(req, res)) return;
+
+    const settings = await prisma.platformSettings.findFirst();
+    res.json({
+      success: true,
+      data: { aiContentPipelineEnabled: settings?.aiContentPipelineEnabled ?? true },
+    });
+  } catch (error: any) {
+    console.error('AI pipeline status check failed:', error);
+    res.status(500).json({ success: false, error: error?.message || 'Status check failed' });
   }
 });
 

@@ -77,19 +77,8 @@ class AISocialMediaIntegrationImpl implements AISocialMediaIntegration {
     try {
       // Import dependencies
       const prisma = (await import('../lib/prisma')).default;
-      const Redis = (await import('ioredis')).default;
-      
-      const redisConfig: any = {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-        db: 0,
-      };
-      
-      if (process.env.REDIS_PASSWORD) {
-        redisConfig.password = process.env.REDIS_PASSWORD;
-      }
-      
-      const redis = new Redis(redisConfig);
+      const { getRedis } = await import('../lib/redis');
+      const redis = getRedis();
 
       // Check database
       let dbHealthy = false;

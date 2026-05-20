@@ -1,8 +1,9 @@
 /**
  * CFIS escrow handshake after press distribution order is created.
+ *
+ * The actual HMAC signing happens server-side in the API route
+ * (/api/cfis/press-order) so the secret is never exposed to the browser.
  */
-
-const CFIS_URL = process.env.NEXT_PUBLIC_CFIS_API_URL || process.env.NEXT_PUBLIC_FINANCE_API_URL;
 
 export interface CfisPressOrderPayload {
   orderId: string;
@@ -17,17 +18,9 @@ export interface CfisPressOrderPayload {
 }
 
 export async function notifyCfisPressOrder(payload: CfisPressOrderPayload): Promise<void> {
-  if (!CFIS_URL) {
-    console.warn('[CFIS] NEXT_PUBLIC_CFIS_API_URL not set — escrow handshake skipped');
-    return;
-  }
-
-  const res = await fetch(`${CFIS_URL.replace(/\/$/, '')}/api/press-orders/create`, {
+  const res = await fetch('/api/cfis/press-order', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-press-timestamp': String(Date.now()),
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
 

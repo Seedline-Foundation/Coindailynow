@@ -16,7 +16,11 @@ import {
   getPermissionCategories,
 } from './shared';
 import { validateBody } from '../../../middleware/validate';
-import { emergencyUnpublishSchema } from '../../../validation/superAdmin.schemas';
+import {
+  approveDisbursementSchema,
+  rejectDisbursementSchema,
+  lockWalletSchema,
+} from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
@@ -209,7 +213,7 @@ router.get('/monetization', authMiddleware, async (req: Request, res: Response) 
 /**
  * POST /api/super-admin/monetization/disbursements/:requestId/approve
  */
-router.post('/monetization/disbursements/:requestId/approve', authMiddleware, async (req: Request, res: Response) => {
+router.post('/monetization/disbursements/:requestId/approve', authMiddleware, validateBody(approveDisbursementSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
     if (await requireFinancePermission(req, res, ['FINANCE_APPROVE_TRANSACTION'])) return;
@@ -239,18 +243,13 @@ router.post('/monetization/disbursements/:requestId/approve', authMiddleware, as
 /**
  * POST /api/super-admin/monetization/disbursements/:requestId/reject
  */
-router.post('/monetization/disbursements/:requestId/reject', authMiddleware, async (req: Request, res: Response) => {
+router.post('/monetization/disbursements/:requestId/reject', authMiddleware, validateBody(rejectDisbursementSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
     if (await requireFinancePermission(req, res, ['FINANCE_CANCEL_TRANSACTION'])) return;
 
     const { requestId } = req.params;
     const { reason, adminNotes } = req.body;
-
-    if (!reason || typeof reason !== 'string') {
-      res.status(400).json({ success: false, error: 'reason is required' });
-      return;
-    }
 
     const result = await financeService.rejectWithdrawalRequest({
       requestId,
@@ -274,18 +273,13 @@ router.post('/monetization/disbursements/:requestId/reject', authMiddleware, asy
 /**
  * POST /api/super-admin/monetization/wallets/:walletId/lock
  */
-router.post('/monetization/wallets/:walletId/lock', authMiddleware, async (req: Request, res: Response) => {
+router.post('/monetization/wallets/:walletId/lock', authMiddleware, validateBody(lockWalletSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
     if (await requireFinancePermission(req, res, ['FINANCE_LOCK_WALLET'])) return;
 
     const { walletId } = req.params;
     const { reason } = req.body;
-
-    if (!reason || typeof reason !== 'string') {
-      res.status(400).json({ success: false, error: 'reason is required' });
-      return;
-    }
 
     const updatedWallet = await prisma.wallet.update({
       where: { id: walletId },

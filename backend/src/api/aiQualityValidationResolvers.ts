@@ -107,19 +107,11 @@ export const aiQualityValidationResolvers = {
      */
     qualityReport: async (_: any, { reportId }: any) => {
       // Try to get from cache
-      const Redis = (await import('ioredis')).default;
-      const redisConfig: any = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-};
-if (process.env.REDIS_PASSWORD) {
-  redisConfig.password = process.env.REDIS_PASSWORD;
-}
-const redis = new Redis(redisConfig);
+      const { getRedis } = await import('../lib/redis');
+      const redis = getRedis();
 
       const cacheKey = `quality:report:${reportId}`;
       const cached = await redis.get(cacheKey);
-      await redis.quit();
 
       if (!cached) {
         return null;

@@ -50,6 +50,7 @@ import { useAuth } from '@/lib/auth-context';
 
 const ADMIN_NAV = [
   { name: 'Overview', href: '/admin', icon: LayoutDashboard },
+  { name: 'Press Approval', href: '/admin/press', icon: FileText },
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Sites', href: '/admin/sites', icon: Globe },
   { name: 'Distributions', href: '/admin/distributions', icon: Send },

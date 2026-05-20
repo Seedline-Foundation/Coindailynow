@@ -233,7 +233,7 @@ describe('GraphQL API Foundation', () => {
 
         mockPrisma.user.findUnique.mockResolvedValue(mockUser);
         
-        const context = createMockContext();
+        const context = createMockContext({ id: 'user-1', role: 'ADMIN' });
         const result = await resolvers.Query!.user(null, { id: 'user-1' }, context, {} as any);
         
         expect(result).toEqual(mockUser);
@@ -253,7 +253,7 @@ describe('GraphQL API Foundation', () => {
 
         mockPrisma.user.findMany.mockResolvedValue(mockUsers);
         
-        const context = createMockContext();
+        const context = createMockContext({ id: 'admin-1', role: 'ADMIN' });
         const result = await resolvers.Query!.users(
           null, 
           { limit: 10, offset: 0, filter: 'test' }, 
@@ -494,7 +494,7 @@ describe('GraphQL API Foundation', () => {
             context,
             {} as any
           )
-        ).rejects.toThrow('Editor role required');
+        ).rejects.toThrow('Content publishing role required');
       });
     });
 

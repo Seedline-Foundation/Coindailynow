@@ -16,7 +16,10 @@ import {
   getPermissionCategories,
 } from './shared';
 import { validateBody } from '../../../middleware/validate';
-import { emergencyUnpublishSchema, superAdminCreateUserSchema } from '../../../validation/superAdmin.schemas';
+import {
+  superAdminCreateUserSchema,
+  patchUserSchema,
+} from '../../../validation/superAdmin.schemas';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
@@ -161,7 +164,7 @@ router.get('/users', authMiddleware, async (req: Request, res: Response) => {
  * Get system alerts from AI tasks and system events
  */
 
-router.patch('/users/:id', authMiddleware, async (req: Request, res: Response) => {
+router.patch('/users/:id', authMiddleware, validateBody(patchUserSchema), async (req: Request, res: Response) => {
   try {
     if (requireAdmin(req, res)) return;
 

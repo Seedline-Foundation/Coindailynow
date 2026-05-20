@@ -1,13 +1,13 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../lib/prisma';
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
+const redis = getRedis();
 import AIModerationService from '../services/aiModerationService';
 import { authenticate, requireRole } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import { z } from 'zod';
 
 const router = Router();
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const moderationService = new AIModerationService(
   prisma, 
   redis, 

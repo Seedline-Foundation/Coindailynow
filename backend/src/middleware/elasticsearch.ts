@@ -1,7 +1,7 @@
 import { ElasticsearchService } from '../services/elasticsearchService';
 import { CacheService } from './cache';
 import { logger } from '../utils/logger';
-import { Redis } from 'ioredis';
+import { getRedis } from '../lib/redis';
 
 /**
  * ElasticsearchMiddleware - Integrates Elasticsearch search with the existing cache layer
@@ -13,7 +13,7 @@ export class ElasticsearchMiddleware {
 
   constructor(elasticsearchService?: ElasticsearchService, cacheService?: CacheService) {
     this.elasticsearchService = elasticsearchService || new ElasticsearchService();
-    this.cacheService = cacheService || new CacheService(new Redis(process.env.REDIS_URL || 'redis://localhost:6379'));
+    this.cacheService = cacheService || new CacheService(getRedis() as any);
   }
 
   /**

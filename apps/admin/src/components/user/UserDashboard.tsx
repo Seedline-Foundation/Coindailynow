@@ -132,13 +132,11 @@ export default function UserDashboard({ user, adminControls, communityIntegratio
 
   const getSubscriptionFeatures = (tier: string): string[] => {
     const features: Record<string, string[]> = {
-      free: ['Basic news access', 'Community participation', 'Basic portfolio'],
-      basic: ['Ad-free experience', 'Premium articles', 'Email support', 'Auto verification'],
-      premium: ['All basic features', 'Premium alpha', 'Private community', 'Chat support', 'Portfolio monitoring'],
-      vip: ['All premium features', 'Phone support', 'Exclusive tools', 'Priority moderation', '2.5x CE points'],
-      enterprise: ['All VIP features', 'Custom branding', 'API access', 'Dedicated account manager', 'White-label solution', 'Multi-user management', 'Advanced analytics', 'Custom integrations', 'SLA guarantee', 'Priority feature requests'],
+      FREE: ['Basic news access', 'Community participation', 'Basic portfolio'],
+      PREMIUM: ['Ad-free experience', 'Premium articles', 'Email support', 'Auto verification', 'Premium alpha', 'Private community', 'Chat support', 'Portfolio monitoring'],
+      ENTERPRISE: ['All Premium features', 'Phone support', 'Exclusive tools', 'Priority moderation', 'Custom branding', 'API access', 'Dedicated account manager', 'White-label solution', 'Multi-user management', 'Advanced analytics', 'Custom integrations', 'SLA guarantee', 'Priority feature requests'],
     };
-    return (features[tier] as string[]) || features.free;
+    return (features[tier] as string[]) || features.FREE;
   };
 
   if (loading) {
@@ -153,7 +151,7 @@ export default function UserDashboard({ user, adminControls, communityIntegratio
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         {/* Flashing Ads for Free Users */}
-        {user.subscriptionTier === 'free' && <FlashingAds />}
+        {user.subscriptionTier === 'FREE' && <FlashingAds />}
 
         {/* Choose A Plan Section */}
         <ChooseAPlanSection user={user} />
@@ -235,8 +233,8 @@ export default function UserDashboard({ user, adminControls, communityIntegratio
 function ChooseAPlanSection({ user }: { user: User }) {
   const plans = [
     { 
-      name: 'Bishops', 
-      tier: 'free', 
+      name: 'Free', 
+      tier: 'FREE', 
       pricing: 'Free',
       features: [
         'Basic news access',
@@ -251,32 +249,18 @@ function ChooseAPlanSection({ user }: { user: User }) {
       }
     },
     { 
-      name: 'Apostles', 
-      tier: 'basic', 
-      pricing: '$19.99/month',
+      name: 'Pro', 
+      tier: 'PREMIUM', 
+      pricing: '$29/month',
       features: [
         'All in Free',
-        'Ad-free',
+        'Ad-free experience',
         'Premium articles',
         'Sell your digital Products',
-        'Special Exclusive Newsletter',
-        'Email support'
-      ],
-      contentLimits: {
-        articles: 10,
-        videos: 10,
-        podcasts: 15
-      }
-    },
-    { 
-      name: 'Teachers', 
-      tier: 'premium', 
-      pricing: '$97.79/month',
-      features: [
-        'All in Apostles',
-        'Premium Alpha',
-        'Grow private Community',
-        'Chat Support'
+        'Premium newsletter',
+        'Email + chat support',
+        'Portfolio tracking',
+        'Price alerts'
       ],
       contentLimits: {
         articles: 20,
@@ -285,32 +269,17 @@ function ChooseAPlanSection({ user }: { user: User }) {
       }
     },
     { 
-      name: 'Prophets', 
-      tier: 'vip', 
-      pricing: '$199.99/month',
+      name: 'Enterprise', 
+      tier: 'ENTERPRISE', 
+      pricing: 'Custom',
       features: [
-        'All in Teachers',
-        'Phone Support',
-        'Shape Meme coin Industry',
-        'Exclusive tools',
-        'Exclusive Deals'
-      ],
-      contentLimits: {
-        articles: 40,
-        videos: 40,
-        podcasts: 35
-      }
-    },
-    { 
-      name: 'Apostolic Fathers', 
-      tier: 'enterprise', 
-      pricing: '$250/User/Month',
-      features: [
-        'All in Prophets',
+        'All in Pro',
+        'Phone support',
         'Custom branding',
         'API Access',
         'Dedicated Manager',
-        'SLA Guarantee'
+        'SLA Guarantee',
+        'White-label solution'
       ],
       contentLimits: {
         articles: 60,
@@ -322,7 +291,7 @@ function ChooseAPlanSection({ user }: { user: User }) {
 
   // Get tier priority for comparison
   const getTierPriority = (tier: string) => {
-    const priorities = { free: 0, basic: 1, premium: 2, vip: 3, enterprise: 4 };
+    const priorities = { FREE: 0, PREMIUM: 1, ENTERPRISE: 2 };
     return priorities[tier as keyof typeof priorities] || 0;
   };
 
@@ -393,7 +362,7 @@ function ChooseAPlanSection({ user }: { user: User }) {
               </div>
 
               {/* Content Limits */}
-              {plan.tier !== 'free' && (
+              {plan.tier !== 'FREE' && (
                 <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">
                     Monthly Content Limits:
@@ -625,7 +594,7 @@ function MarketTab({ user }: { user: User }) {
 
 // Rewards Tab Component
 function RewardsTab({ user }: { user: User }) {
-  const isPaid = user.subscriptionTier !== 'free';
+  const isPaid = user.subscriptionTier !== 'FREE';
   const [activeRewardView, setActiveRewardView] = useState<'overview' | 'airdrops'>('overview');
   const [activeAirdropView, setActiveAirdropView] = useState<'current' | 'past' | 'upcoming'>('current');
 
@@ -1047,22 +1016,18 @@ function ToolsTab({ user }: { user: User }) {
   // Get usage limits based on subscription tier
   const getUsageLimits = () => {
     switch (user.subscriptionTier) {
-      case 'basic': // Apostles
-        return { articles: 10, videos: 10, podcasts: 15 };
-      case 'premium': // Teachers
+      case 'PREMIUM':
         return { articles: 20, videos: 20, podcasts: 25 };
-      case 'vip': // Prophets
-        return { articles: 40, videos: 40, podcasts: 35 };
-      case 'enterprise': // Apostolic Fathers
+      case 'ENTERPRISE':
         return { articles: 60, videos: 60, podcasts: 75 };
-      default: // Free (Bishops)
+      default: // FREE
         return { articles: 0, videos: 0, podcasts: 0 };
     }
   };
 
   const limits = getUsageLimits();
-  const isPaid = user.subscriptionTier !== 'free';
-  const isVIPOrHigher = ['premium', 'vip', 'enterprise'].includes(user.subscriptionTier);
+  const isPaid = user.subscriptionTier !== 'FREE';
+  const isVIPOrHigher = ['PREMIUM', 'ENTERPRISE'].includes(user.subscriptionTier);
 
   const tools = [
     {
@@ -1077,7 +1042,7 @@ function ToolsTab({ user }: { user: User }) {
     },
     {
       name: 'Write Article',
-      description: ['vip', 'enterprise'].includes(user.subscriptionTier) ? 'Create articles (1200 words max)' : 'Create articles (300 words max)',
+      description: user.subscriptionTier === 'ENTERPRISE' ? 'Create articles (1200 words max)' : 'Create articles (300 words max)',
       icon: Edit3,
       available: isPaid,
       action: () => { setContentType('article'); setShowWritingTool(true); },
@@ -1089,7 +1054,7 @@ function ToolsTab({ user }: { user: User }) {
       name: 'Create Video',
       description: 'Record and edit video content',
       icon: Video,
-      available: user.subscriptionTier === 'basic' ? false : isVIPOrHigher,
+      available: isVIPOrHigher,
       action: () => { setContentType('video'); setShowWritingTool(true); },
       buttonText: 'Create Video',
       limit: limits.videos,
@@ -1286,7 +1251,7 @@ function ToolsTab({ user }: { user: User }) {
                   Upgrade Required
                 </button>
                 <p className="text-xs text-gray-500">
-                  Available for {user.subscriptionTier === 'free' ? 'paid plans' : 'higher tier plans'}
+                  Available for {user.subscriptionTier === 'FREE' ? 'paid plans' : 'higher tier plans'}
                 </p>
               </div>
             )}
@@ -1865,7 +1830,7 @@ function AirdropCreatorModal({ user, onClose }: { user: User; onClose: () => voi
 function DigitalStoreModal({ user, onClose }: { user: User; onClose: () => void }) {
   const [courseTitle, setCourseTitle] = useState('');
   const [groupName, setGroupName] = useState('');
-  const [selectedPlan, setSelectedPlan] = useState('basic');
+  const [selectedPlan, setSelectedPlan] = useState('PREMIUM');
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -2662,8 +2627,8 @@ function WritingTool({ contentType, user, onClose }: {
   const [aiSuggestions, setAISuggestions] = useState<string[]>([]);
   
   // Access control - only paid users can write articles
-  const isPaid = user.subscriptionTier !== 'free';
-  const isEnterpriseOrProphet = ['enterprise', 'prophets'].includes(user.subscriptionTier);
+  const isPaid = user.subscriptionTier !== 'FREE';
+  const isEnterpriseOrProphet = user.subscriptionTier === 'ENTERPRISE';
   
   // Word limits for articles only
   const maxWords = isEnterpriseOrProphet ? 1200 : 300;
@@ -2967,7 +2932,7 @@ function VideoEditor({ user, onClose }: { user: User; onClose: () => void }) {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   // Access control - VIP or higher for video creation
-  const isVIPOrHigher = ['vip', 'enterprise', 'prophets'].includes(user.subscriptionTier);
+  const isVIPOrHigher = ['PREMIUM', 'ENTERPRISE'].includes(user.subscriptionTier);
 
   if (!isVIPOrHigher) {
     return (
@@ -3840,7 +3805,7 @@ function PodcastEditor({ user, onClose }: { user: User; onClose: () => void }) {
   const [recordingDuration, setRecordingDuration] = useState(0);
 
   // Access control - paid users only for podcast creation
-  const isPaid = user.subscriptionTier !== 'free';
+  const isPaid = user.subscriptionTier !== 'FREE';
 
   if (!isPaid) {
     return (
@@ -4146,26 +4111,22 @@ function OverviewTab({ user, dashboardData }: { user: User; dashboardData: Dashb
   // Get tier display info
   const getTierInfo = (tier: string) => {
     switch (tier) {
-      case 'free': return { name: 'Bishops', color: 'text-gray-600', bgColor: 'bg-gray-100', description: 'Community members with basic access' };
-      case 'basic': return { name: 'Apostles', color: 'text-blue-600', bgColor: 'bg-blue-100', description: 'Premium members with writing tools' };
-      case 'premium': return { name: 'Teachers', color: 'text-purple-600', bgColor: 'bg-purple-100', description: 'VIP members with advanced features' };
-      case 'vip': return { name: 'Enterprise', color: 'text-green-600', bgColor: 'bg-green-100', description: 'Enterprise users with all features' };
-      case 'enterprise': return { name: 'Prophets', color: 'text-yellow-600', bgColor: 'bg-yellow-100', description: 'Elite members with exclusive access' };
+      case 'FREE': return { name: 'Free', color: 'text-gray-600', bgColor: 'bg-gray-100', description: 'Community members with basic access' };
+      case 'PREMIUM': return { name: 'Pro', color: 'text-blue-600', bgColor: 'bg-blue-100', description: 'Premium members with advanced features' };
+      case 'ENTERPRISE': return { name: 'Enterprise', color: 'text-purple-600', bgColor: 'bg-purple-100', description: 'Enterprise users with all features' };
       default: return { name: 'Unknown', color: 'text-gray-600', bgColor: 'bg-gray-100', description: 'Unknown tier' };
     }
   };
 
   const tierInfo = getTierInfo(user.subscriptionTier);
-  const isPaid = user.subscriptionTier !== 'free';
+  const isPaid = user.subscriptionTier !== 'FREE';
 
   // Calculate available tools count
   const getAvailableToolsCount = () => {
     switch (user.subscriptionTier) {
-      case 'free': return 5; // Post, Portfolio, Token Sub, Staking, Wallet Whitelist
-      case 'basic': return 8; // + Article, Podcast, Airdrop Creator
-      case 'premium': return 10; // + Video, Digital Store
-      case 'vip': return 10; // All tools
-      case 'enterprise': return 10; // All tools
+      case 'FREE': return 5;
+      case 'PREMIUM': return 8;
+      case 'ENTERPRISE': return 10;
       default: return 5;
     }
   };
@@ -4211,9 +4172,9 @@ function OverviewTab({ user, dashboardData }: { user: User; dashboardData: Dashb
             <div className="flex justify-between">
               <span className="text-gray-600 dark:text-gray-400">Status:</span>
               <span className={`font-medium ${
-                user.subscriptionTier !== 'free' ? 'text-green-600' : 'text-orange-600'
+                user.subscriptionTier !== 'FREE' ? 'text-green-600' : 'text-orange-600'
               }`}>
-                {user.subscriptionTier !== 'free' ? 'Active Premium' : 'Free Tier'}
+                {user.subscriptionTier !== 'FREE' ? 'Active Premium' : 'Free Tier'}
               </span>
             </div>
           </div>
@@ -4238,7 +4199,7 @@ function OverviewTab({ user, dashboardData }: { user: User; dashboardData: Dashb
                   </li>
                 </>
               )}
-              {['premium', 'vip', 'enterprise'].includes(user.subscriptionTier) && (
+              {['PREMIUM', 'ENTERPRISE'].includes(user.subscriptionTier) && (
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-3 h-3 text-green-500" />
                   Video creation & digital store
@@ -4358,9 +4319,8 @@ function OverviewTab({ user, dashboardData }: { user: User; dashboardData: Dashb
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-gray-400">Writing Tools</span>
               <span className="text-sm font-medium text-green-600">
-                {user.subscriptionTier === 'free' ? '1/4' : 
-                 user.subscriptionTier === 'basic' ? '3/4' : 
-                 ['premium', 'vip'].includes(user.subscriptionTier) ? '3/4' : '4/4'}
+                {user.subscriptionTier === 'FREE' ? '1/4' : 
+                 user.subscriptionTier === 'PREMIUM' ? '3/4' : '4/4'}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -4556,7 +4516,7 @@ function ContentTab({ user, adminControls }: { user: User; adminControls: AdminU
 function CommunityTab({ user, communityIntegration }: { user: User; communityIntegration: CommunityIntegration }) {
   const [selectedTimeFilter, setSelectedTimeFilter] = useState('24hrs');
   const [selectedSection, setSelectedSection] = useState('latest');
-  const isPaid = user.subscriptionTier !== 'free';
+  const isPaid = user.subscriptionTier !== 'FREE';
 
   const timeFilters = [
     { id: '6hrs', label: '6hrs' },
@@ -4905,7 +4865,7 @@ function CommunityTab({ user, communityIntegration }: { user: User; communityInt
 // Live Tab Component
 function LiveTab({ user, adminControls }: { user: User; adminControls: AdminUserControls }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const isPaid = user.subscriptionTier !== 'free';
+  const isPaid = user.subscriptionTier !== 'FREE';
 
   const categories = [
     { id: 'all', name: 'All' },
@@ -5345,7 +5305,7 @@ function SupportTab({ user }: { user: User }) {
   // Get support access based on subscription tier
   const getSupportAccess = () => {
     switch (user.subscriptionTier) {
-      case 'enterprise': // Enterprise - Full access with highest priority + dedicated support
+      case 'ENTERPRISE':
         return {
           telegram: true,
           email: true,
@@ -5355,19 +5315,9 @@ function SupportTab({ user }: { user: User }) {
           priority: 'critical',
           dedicatedManager: true
         };
-      case 'vip': // VIP - Full access with high priority
+      case 'PREMIUM':
         return {
           telegram: true,
-          email: true,
-          phone: true,
-          instantChat: true,
-          supportTicket: true,
-          priority: 'high',
-          dedicatedManager: false
-        };
-      case 'premium': // Premium - Instant chat, support ticket, email
-        return {
-          telegram: false,
           email: true,
           phone: false,
           instantChat: true,
@@ -5375,17 +5325,7 @@ function SupportTab({ user }: { user: User }) {
           priority: 'medium',
           dedicatedManager: false
         };
-      case 'basic': // Basic - Telegram, support ticket, email
-        return {
-          telegram: true,
-          email: true,
-          phone: false,
-          instantChat: false,
-          supportTicket: true,
-          priority: 'normal',
-          dedicatedManager: false
-        };
-      default: // Free - Support ticket, telegram only
+      default: // FREE
         return {
           telegram: true,
           email: false,
@@ -5561,7 +5501,7 @@ function SupportTab({ user }: { user: User }) {
                   Upgrade Required
                 </button>
                 <p className="text-xs text-gray-500 text-center">
-                  Available for {user.subscriptionTier === 'free' ? 'paid plans' : 'higher tier plans'}
+                  Available for {user.subscriptionTier === 'FREE' ? 'paid plans' : 'higher tier plans'}
                 </p>
               </div>
             )}

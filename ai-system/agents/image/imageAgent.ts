@@ -6,6 +6,7 @@
 import { Logger } from 'winston';
 import { ImageOutcome, ArticleOutcome } from '../../types/admin-types';
 import axios from 'axios';
+import { uploadToCDN as cdnUpload } from '../../config/cdn-upload';
 
 // Local SDXL endpoint
 const SDXL_URL = process.env.SDXL_API_URL || 'http://localhost:7860';
@@ -117,13 +118,36 @@ Include: Bitcoin/cryptocurrency symbols, charts, graphs, Nigerian/African flag c
   }
 
   /**
-   * Upload image to CDN (Backblaze/Cloudflare)
-   * @param imageUrl - Base64 or temporary URL
+   * Upload image to CDN (Backblaze B2 via S3-compatible API → Cloudflare).
+   * Falls back to the backend /api/media/upload endpoint, then to the
+   * original data URL if both paths fail.
+   *
+   * @param imageUrl - Base64 data-URL or remote URL
    * @returns Permanent CDN URL
    */
   async uploadToCDN(imageUrl: string): Promise<string> {
     try {
       this.logger.info('[ImageAgent] Uploading image to CDN');
+
+      // Direct S3-compatible upload (preferred)
+      const filename = `image_${Date.now()}`;
+      const isDataUrl = imageUrl.startsWith('data:');
+      if (isDataUrl) {
+        const contentType = imageUrl.match(/^data:(image\/\w+);/)?.[1] || 'image/png';
+        return await cdnUpload(imageUrl, filename, contentType);
+      }
+
+      // Remote URL — download first, then upload
+      const downloaded = await this.downloadImage(imageUrl);
+      return await cdnUpload(downloaded, filename, 'image/png');
+    } catch (directErr: any) {
+      this.logger.warn('[ImageAgent] Direct CDN upload failed, trying backend API', {
+        error: directErr.message,
+      });
+    }
+
+    // Fallback: delegate to backend media upload endpoint
+    try {
       const apiBase = process.env.BACKEND_API_URL || process.env.API_URL || 'http://localhost:4000';
       const token = process.env.AI_PIPELINE_SERVICE_TOKEN;
 
@@ -138,26 +162,13 @@ Include: Bitcoin/cryptocurrency symbols, charts, graphs, Nigerian/African flag c
 
       if (res.ok) {
         const json = (await res.json()) as { url?: string };
-        if (json.url) {
-          let url = json.url;
-          const pub = process.env.CFIS_PUBLIC_MEDIA_BASE?.replace(/\/$/, '');
-          if (pub) {
-            try {
-              const pathOnly = new URL(url).pathname;
-              url = `${pub}${pathOnly}`;
-            } catch {
-              /* keep original */
-            }
-          }
-          return url;
-        }
+        if (json.url) return json.url;
       }
-
-      return imageUrl;
-    } catch (error: any) {
-      this.logger.error('[ImageAgent] CDN upload failed:', error);
-      return imageUrl; // Fallback to original
+    } catch (apiErr: any) {
+      this.logger.error('[ImageAgent] Backend API upload also failed:', apiErr);
     }
+
+    return imageUrl;
   }
 
   private async downloadImage(url: string): Promise<Buffer> {

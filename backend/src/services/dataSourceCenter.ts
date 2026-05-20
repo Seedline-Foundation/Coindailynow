@@ -12,23 +12,13 @@
  */
 
 import { PrismaClient } from '@prisma/client';
-import Redis from 'ioredis';
+import { getRedis } from '../lib/redis';
 import { UnifiedNewsItem } from './unifiedNewsAggregator';
 
 // Use 'any' for Prisma until models are generated via `npx prisma generate`
 const prisma = new PrismaClient() as any;
 
-// Optional Redis - only connect if enabled
-const isRedisEnabled = process.env.REDIS_ENABLED !== 'false';
-let redis: Redis | null = null;
-if (isRedisEnabled) {
-  redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: 3,
-    lazyConnect: true,
-    retryStrategy: (times) => times > 3 ? null : Math.min(times * 100, 3000),
-  });
-  redis.on('error', (err) => console.warn('[DataSourceCenter] Redis error:', err.message));
-}
+const redis = getRedis();
 
 // ============================================================================
 // TYPES

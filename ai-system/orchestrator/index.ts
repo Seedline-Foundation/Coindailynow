@@ -937,3 +937,40 @@ class CircuitBreaker {
     return this.state;
   }
 }
+
+// ============================================================================
+// Unified Orchestrator integration
+// Re-export the unified entry point so consumers can access both the legacy
+// AIAgentOrchestrator and the new UnifiedOrchestrator from one module.
+// ============================================================================
+
+export { UnifiedOrchestrator, getUnifiedOrchestrator } from '../src/unified-orchestrator.js';
+export type { UnifiedTaskResult, UnifiedOrchestratorConfig } from '../src/unified-orchestrator.js';
+export { AgentRegistry } from '../src/agent-registry.js';
+export type { AgentDescriptor, AgentStatusInfo } from '../src/agent-registry.js';
+
+/**
+ * Create a fully-wired UnifiedOrchestrator backed by this AIAgentOrchestrator.
+ *
+ * Usage:
+ *   const { unified, queue } = await createUnifiedSystem(config, logger);
+ *   await unified.processTask('sentiment-analysis-agent', { data: [...] });
+ *   await unified.processTask('queue.content_generation', { topic: '...' });
+ *   await unified.processTask('review.pipeline', {});
+ */
+export async function createUnifiedSystem(
+  config: OrchestratorConfig,
+  logger: Logger,
+): Promise<{ unified: InstanceType<typeof import('../src/unified-orchestrator').UnifiedOrchestrator>; queue: AIAgentOrchestrator }> {
+  const { UnifiedOrchestrator: UO } = await import('../src/unified-orchestrator.js');
+  const { imoOrchestrator } = await import('./imo-orchestrator.js');
+
+  const queue = new AIAgentOrchestrator(config, logger);
+  const unified = new UO();
+
+  unified.attachQueueOrchestrator(queue);
+  unified.attachImoOrchestrator(imoOrchestrator);
+  await unified.initialize();
+
+  return { unified, queue };
+}
