@@ -102,11 +102,10 @@ function StaffLoginContent() {
       }
 
       // Only general staff roles are allowed on this page. Super Admins must use the secure portal.
-      const allowedRoles = ['ADMIN', 'CONTENT_ADMIN', 'TECH_ADMIN', 'MARKETING_ADMIN'];
-      if (!allowedRoles.includes(data.user?.role)) {
-        if (data.user?.role === 'SUPER_ADMIN') {
-          throw new Error('Super Admins must use the secure Super Admin login portal at /auth/sadmin.');
-        }
+      if (data.user?.role === 'SUPER_ADMIN') {
+        throw new Error('Super Admins must use the secure Super Admin login portal at /auth/sadmin.');
+      }
+      if (data.user?.role === 'USER') {
         throw new Error('Access denied. Staff login only.');
       }
 

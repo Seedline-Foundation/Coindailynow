@@ -17,8 +17,8 @@ const getWhitelistedIPs = (): Set<string> => {
   const ips = process.env.ADMIN_WHITELISTED_IPS || '';
   const ipList = ips.split(',').map(ip => ip.trim()).filter(Boolean);
   
-  // Always allow localhost in development
-  if (process.env.NODE_ENV === 'development') {
+  // Always allow localhost in development or when whitelist is bypassed
+  if (process.env.NODE_ENV === 'development' || process.env.ADMIN_WHITELISTED_IPS === 'BYPASS_ALL') {
     ipList.push('127.0.0.1', '::1', '::ffff:127.0.0.1', 'localhost');
   }
   
@@ -30,7 +30,7 @@ const getCEOIPs = (): Set<string> => {
   const ips = process.env.CEO_WHITELISTED_IPS || '';
   const ipList = ips.split(',').map(ip => ip.trim()).filter(Boolean);
   
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.ADMIN_WHITELISTED_IPS === 'BYPASS_ALL') {
     ipList.push('127.0.0.1', '::1', '::ffff:127.0.0.1', 'localhost');
   }
   
@@ -154,8 +154,8 @@ export function middleware(request: NextRequest) {
   const whitelistedIPs = getWhitelistedIPs();
   const ceoIPs = getCEOIPs();
 
-  // Check if IP is whitelisted (BYPASS_ALL only works in development)
-  const bypassWhitelist = process.env.NODE_ENV === 'development' && process.env.ADMIN_WHITELISTED_IPS === 'BYPASS_ALL';
+  // Check if IP is whitelisted (BYPASS_ALL allows bypassing the whitelist check)
+  const bypassWhitelist = process.env.ADMIN_WHITELISTED_IPS === 'BYPASS_ALL';
   if (!bypassWhitelist && !whitelistedIPs.has(clientIP)) {
     console.log(`[ADMIN BLOCKED] IP ${clientIP} not whitelisted. Path: ${pathname}`);
     // Return a generic 404 to not reveal the existence of the admin panel
