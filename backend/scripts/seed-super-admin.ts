@@ -15,7 +15,7 @@ async function seedSuperAdmin() {
     // Check if super admin already exists
     const existingAdmin = await prisma.user.findFirst({
       where: {
-        role: 'SUPER_ADMIN'
+        email: 'admin@coindaily.africa'
       }
     });
 
@@ -31,7 +31,7 @@ async function seedSuperAdmin() {
       data: {
         id: 'super_admin_001',
         email: 'admin@coindaily.africa',
-        username: 'superadmin',
+        username: 'superadmin_africa',
         passwordHash: hashedPassword,
         role: 'SUPER_ADMIN',
         firstName: 'Super',

@@ -150,7 +150,7 @@ export class AICostTrackingService {
     let breakdown: any[] = [];
 
     if (options.groupBy === 'agent') {
-      breakdown = await prisma.aICostRecord.groupBy({
+      breakdown = await (prisma.aICostRecord as any).groupBy({
         by: ['agentName'],
         where,
         _sum: { costUsd: true, totalTokens: true },
@@ -159,7 +159,7 @@ export class AICostTrackingService {
         orderBy: { _sum: { costUsd: 'desc' } },
       });
     } else if (options.groupBy === 'model') {
-      breakdown = await prisma.aICostRecord.groupBy({
+      breakdown = await (prisma.aICostRecord as any).groupBy({
         by: ['modelUsed'],
         where,
         _sum: { costUsd: true, totalTokens: true },
@@ -167,7 +167,7 @@ export class AICostTrackingService {
         orderBy: { _sum: { costUsd: 'desc' } },
       });
     } else if (options.groupBy === 'taskType') {
-      breakdown = await prisma.aICostRecord.groupBy({
+      breakdown = await (prisma.aICostRecord as any).groupBy({
         by: ['taskType'],
         where,
         _sum: { costUsd: true, totalTokens: true },
@@ -210,7 +210,7 @@ export class AICostTrackingService {
    * Get cost per article analysis
    */
   async getCostPerArticle(limit: number = 20) {
-    const articles = await prisma.aICostRecord.groupBy({
+    const articles = await (prisma.aICostRecord as any).groupBy({
       by: ['articleId'],
       where: { articleId: { not: null } },
       _sum: { costUsd: true, totalTokens: true },

@@ -137,6 +137,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem('coindaily_tokens');
     localStorage.removeItem('coindaily_user');
     localStorage.removeItem('coindaily_token_expires_at');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setAuthState({
       user: null,
       tokens: null,
@@ -148,8 +153,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Store authentication data
   const storeAuthData = useCallback((user: User, tokens: AuthTokens) => {
+    const accessToken = tokens.accessToken;
     localStorage.setItem('coindaily_tokens', JSON.stringify(tokens));
     localStorage.setItem('coindaily_user', JSON.stringify(user));
+    localStorage.setItem('authToken', accessToken);
+    localStorage.setItem('auth_token', accessToken);
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('user', JSON.stringify(user));
     // Store absolute expiry timestamp (expiresIn from token or default 24h)
     const expiresIn = tokens.expiresIn || DEFAULT_EXPIRES_IN;
     localStorage.setItem('coindaily_token_expires_at', String(Date.now() + expiresIn * 1000));
@@ -164,10 +175,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Helper: set authToken cookie for Next.js middleware
   const setAuthCookie = useCallback((token: string | null) => {
-    if (token) {
-      document.cookie = `authToken=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
-    } else {
-      document.cookie = 'authToken=; path=/; max-age=0';
+    if (typeof window !== 'undefined') {
+      if (token && token !== 'null' && token !== 'undefined') {
+        document.cookie = `authToken=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax; path=/`;
+      } else {
+        document.cookie = 'authToken=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+      }
     }
   }, []);
 
@@ -261,6 +274,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
               password: data.password,
               firstName: data.firstName,
               lastName: data.lastName,
+              country: data.country,
+              preferredLanguage: data.preferredLanguage,
               deviceFingerprint: deviceInfo.fingerprint,
               userAgent: deviceInfo.userAgent
             }

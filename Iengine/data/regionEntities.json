@@ -1,0 +1,7 @@
+{
+  "africa": ["africa", "nigeria", "kenya", "lagos", "nairobi", "mpesa", "south africa", "ghana", "african"],
+  "latam": ["brazil", "mexico", "argentina", "colombia", "el salvador", "venezuela", "chile", "peru", "latam", "latin america", "pix", "nubank", "mercado libre", "rappi", "peso", "real", "bolivar", "chivo"],
+  "caribbean": ["caribbean", "bahamas", "cayman", "jamaica", "barbados", "puerto rico", "trinidad", "sand dollar", "haiti", "dominican republic"],
+  "asia": ["tokyo", "singapore", "hong kong", "asia", "china", "japan", "korea"],
+  "us": ["us", "usa", "united states", "fed", "sec", "wall street", "american"]
+}

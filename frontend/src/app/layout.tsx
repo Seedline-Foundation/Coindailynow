@@ -8,7 +8,6 @@ import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
 import AppInstallAndOfflinePrompt from '@/components/pwa/AppInstallAndOfflinePrompt';
 import PostHogProvider from '@/components/providers/PostHogProvider';
 import { GeoProvider } from '@/lib/GeoContext';
-import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
 import CriticalCSS from '@/components/performance/CriticalCSS';
 import KeyboardShortcuts from '@/components/shortcuts/KeyboardShortcuts';
 import { DensityProvider } from '@/components/ui/DensityToggle';

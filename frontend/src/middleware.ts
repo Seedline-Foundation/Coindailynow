@@ -74,8 +74,9 @@ export function middleware(request: NextRequest) {
   }
 
   // Check for auth token in cookies or Authorization header
-  const authToken = request.cookies.get('authToken')?.value 
+  const rawToken = request.cookies.get('authToken')?.value 
     || request.headers.get('authorization')?.replace('Bearer ', '');
+  const authToken = (rawToken && rawToken !== 'null' && rawToken !== 'undefined') ? rawToken : null;
 
   const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
   const isAuthRoute = AUTH_ROUTES.some(route => pathname.startsWith(route));
@@ -89,7 +90,7 @@ export function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from login/register pages
   if (isAuthRoute && authToken) {
-    return NextResponse.redirect(new URL('/user/dashboard', request.url));
+    return NextResponse.redirect(new URL('/user', request.url));
   }
 
   // Add security headers to all responses

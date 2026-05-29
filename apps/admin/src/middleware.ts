@@ -19,7 +19,7 @@ const getWhitelistedIPs = (): Set<string> => {
   
   // Always allow localhost in development
   if (process.env.NODE_ENV === 'development') {
-    ipList.push('127.0.0.1', '::1', 'localhost');
+    ipList.push('127.0.0.1', '::1', '::ffff:127.0.0.1', 'localhost');
   }
   
   return new Set(ipList);
@@ -31,14 +31,14 @@ const getCEOIPs = (): Set<string> => {
   const ipList = ips.split(',').map(ip => ip.trim()).filter(Boolean);
   
   if (process.env.NODE_ENV === 'development') {
-    ipList.push('127.0.0.1', '::1', 'localhost');
+    ipList.push('127.0.0.1', '::1', '::ffff:127.0.0.1', 'localhost');
   }
   
   return new Set(ipList);
 };
 
 // Routes that DON'T require authentication (public pages)
-const PUBLIC_ROUTES = ['/login', '/admin/login'];
+const PUBLIC_ROUTES = ['/login', '/admin/login', '/auth/sadmin'];
 
 const PROTECTED_PREFIXES = ['/admin', '/super-admin'];
 
@@ -188,27 +188,30 @@ export function middleware(request: NextRequest) {
     const jwt = token || headerToken;
 
     if (!jwt) {
-      // No token — redirect to login
-      console.log(`[ADMIN AUTH] No JWT token for ${pathname}. Redirecting to /login`);
-      return NextResponse.redirect(new URL('/login', request.url));
+      const redirectUrl = pathname.startsWith('/super-admin') ? '/auth/sadmin' : '/login';
+      console.log(`[ADMIN AUTH] No JWT token for ${pathname}. Redirecting to ${redirectUrl}`);
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
 
     const payload = decodeJwtPayload(jwt);
     if (!payload) {
-      console.log(`[ADMIN AUTH] Malformed JWT for ${pathname}. Redirecting to /login`);
-      return NextResponse.redirect(new URL('/login', request.url));
+      const redirectUrl = pathname.startsWith('/super-admin') ? '/auth/sadmin' : '/login';
+      console.log(`[ADMIN AUTH] Malformed JWT for ${pathname}. Redirecting to ${redirectUrl}`);
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
 
     // Check expiry
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-      console.log(`[ADMIN AUTH] Expired JWT for ${pathname}. Redirecting to /login`);
-      return NextResponse.redirect(new URL('/login', request.url));
+      const redirectUrl = pathname.startsWith('/super-admin') ? '/auth/sadmin' : '/login';
+      console.log(`[ADMIN AUTH] Expired JWT for ${pathname}. Redirecting to ${redirectUrl}`);
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
 
     // Role-based route guard (S1-3)
     if (!isRoleAllowed(pathname, payload.role)) {
-      console.log(`[ADMIN RBAC] Role ${payload.role} not allowed for ${pathname}. Redirecting to /admin`);
-      return NextResponse.redirect(new URL('/admin', request.url));
+      const redirectUrl = pathname.startsWith('/super-admin') ? '/auth/sadmin' : '/admin';
+      console.log(`[ADMIN RBAC] Role ${payload.role} not allowed for ${pathname}. Redirecting to ${redirectUrl}`);
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
   }
 

@@ -114,7 +114,11 @@ router.post(
     const id = `appr_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     const rec: ApprovalRecord = {
       id,
-      ...parsed.data,
+      kind: parsed.data.kind,
+      amount: parsed.data.amount,
+      currency: parsed.data.currency,
+      recipient: parsed.data.recipient,
+      reason: parsed.data.reason,
       status: 'pending',
       requestedBy: (req as any).user?.id || 'unknown',
       requestedAt: new Date().toISOString(),

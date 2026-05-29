@@ -248,8 +248,13 @@ export class ChimaIndexService {
 
     if (format === 'csv') {
       let csv = 'timestamp,value,change\n';
-      for (const h of index.historicalData) {
-        csv += `${h.timestamp.toISOString()},${h.value},${h.changePercent || 0}\n`;
+      // Sort ascending to calculate chronological changes
+      const history = [...index.historicalData].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+      for (let i = 0; i < history.length; i++) {
+        const h = history[i];
+        const prev = i > 0 ? history[i - 1] : null;
+        const change = prev && prev.value > 0 ? ((h.value - prev.value) / prev.value) * 100 : 0;
+        csv += `${h.timestamp.toISOString()},${h.value},${change}\n`;
       }
       return csv;
     }

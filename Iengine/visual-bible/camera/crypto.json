@@ -1,0 +1,15 @@
+{
+  "camera": [
+    "low-angle perspective",
+    "dynamic framing",
+    "asymmetrical composition",
+    "strong motion vectors",
+    "wide-lens distortion",
+    "cinematic parallax"
+  ],
+  "avoid": [
+    "static compositions",
+    "centered symmetry",
+    "corporate stiffness"
+  ]
+}

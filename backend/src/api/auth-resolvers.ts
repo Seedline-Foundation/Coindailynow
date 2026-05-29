@@ -25,7 +25,7 @@ function getDevMockAuthResponse(email: string) {
     updatedAt: new Date().toISOString(),
   };
   const accessToken = generateJWT(
-    { sub: mockUser.id, email: mockUser.email, username: mockUser.username, type: 'access' }
+    { sub: mockUser.id, email: mockUser.email, username: mockUser.username, role: mockUser.role, type: 'access' }
   );
   const refreshToken = generateRefreshToken(mockUser.id);
   return {
@@ -553,6 +553,8 @@ export const authTypeDefs = `
     password: String!
     firstName: String
     lastName: String
+    country: String
+    preferredLanguage: String
     deviceFingerprint: String
     ipAddress: String
     userAgent: String

@@ -657,7 +657,7 @@ export const financeApi = {
 // REST API FALLBACK (for operations not in GraphQL)
 // ============================================================================
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
 export const financeRestApi = {
   // Admin Operations

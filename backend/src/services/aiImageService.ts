@@ -14,6 +14,7 @@
 import prisma from '../lib/prisma';
 import { getRedis } from '../lib/redis';
 import sharp from 'sharp';
+import { IengineService } from '../../../Iengine/api/iengineService';
 const redis = getRedis();
 
 // Cache TTL configurations
@@ -63,9 +64,11 @@ export interface ChartGenerationOptions {
 export class AIImageService {
   private sdxlEndpoint: string;
   private isInitialized: boolean = false;
+  private iengineService: IengineService;
 
   constructor() {
     this.sdxlEndpoint = process.env.SDXL_API_ENDPOINT || 'http://localhost:7860';
+    this.iengineService = new IengineService();
   }
 
   /**
@@ -97,88 +100,123 @@ export class AIImageService {
   ): Promise<ImageGenerationResult> {
     const startTime = Date.now();
 
+    // Keep QuickChart generation for market data charts
+    if (options.type === 'chart') {
+      return this.generateMarketChart({
+        symbol: options.chartSymbol || 'BTC',
+        type: options.chartType || 'line',
+        timeframe: '24h',
+      });
+    }
+
     try {
       if (!this.isInitialized) {
         await this.initialize();
       }
 
-      // Build enhanced prompt with SEO keywords
-      const enhancedPrompt = await this.buildImagePrompt(articleId, options);
+      // Fetch article details to build context
+      const article = await prisma.article.findUnique({
+        where: { id: articleId },
+        select: {
+          title: true,
+          excerpt: true,
+          tags: true,
+          territory: true,
+          Category: { select: { name: true } },
+        },
+      });
 
-      // Check cache first
-      const cacheKey = `ai:image:generation:${articleId}:${options.type}:${this.hashPrompt(enhancedPrompt)}`;
+      if (!article) {
+        throw new Error(`Article ${articleId} not found`);
+      }
+
+      // Extract tags
+      const tagsArray = article.tags
+        ? article.tags.split(',').map((t) => t.trim())
+        : [];
+      
+      // Determine region
+      const region = article.territory?.[0] || 'global';
+
+      // Map options.type to story_type if applicable
+      let storyType: any = undefined;
+      if (options.type === 'thumbnail') {
+        storyType = 'thumbnail-fast';
+      } else if (options.type === 'social') {
+        storyType = 'social-banner';
+      }
+
+      // Check cache first using input parameters
+      const cacheKey = `ai:image:generation:${articleId}:${options.type}:${this.hashPrompt(options.prompt || article.title)}`;
       const cached = await this.getFromCache<ImageGenerationResult>(cacheKey);
       if (cached) {
         console.log(`[AIImageService] Cache hit for article ${articleId}`);
         return cached;
       }
 
-      // Determine optimal size based on image type
-      const size = options.size || this.getOptimalSize(options.type);
-      const quality = options.quality || 'standard';
-      const [width, height] = size.split('x').map(Number);
-
-      // Call self-hosted SDXL API
-      const sdxlResponse = await fetch(`${this.sdxlEndpoint}/sdapi/v1/txt2img`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: enhancedPrompt,
-          negative_prompt: 'blurry, low quality, distorted, watermark, text overlay, signature, username, low resolution, bad anatomy, poorly drawn, deformed',
-          width: width || 1024,
-          height: height || 1024,
-          steps: quality === 'hd' ? 40 : 30,
-          cfg_scale: 7.5,
-          sampler_name: 'DPM++ 2M Karras',
-          n_iter: 1,
-          batch_size: 1,
-        }),
+      // Call Iengine synchronous Direct Generation pipeline
+      console.log(`[AIImageService] Routing ${options.type} image request for article ${articleId} through Iengine...`);
+      const iengineResult = await this.iengineService.generateDirect({
+        id: `backend_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`,
+        articleId,
+        headline: options.prompt || article.title,
+        excerpt: article.excerpt || '',
+        category: article.Category?.name || '',
+        tags: tagsArray,
+        region,
+        story_type: storyType,
       });
 
-      if (!sdxlResponse.ok) {
-        const errorData = await sdxlResponse.text().catch(() => 'Unknown error');
-        throw new Error(`SDXL API error: ${sdxlResponse.statusText} - ${errorData}`);
+      // Optimize the generated image using backend's optimizeImage logic
+      let optimizedImage: any = {};
+      if (iengineResult.image_url && iengineResult.status === 'approved') {
+        try {
+          optimizedImage = await this.optimizeImage(iengineResult.image_url);
+        } catch (e) {
+          console.warn('[AIImageService] Iengine image optimization failed, using defaults:', e);
+        }
       }
 
-      const sdxlData = await sdxlResponse.json();
-      const imageBase64 = sdxlData.images?.[0];
-      const imageDataUrl = imageBase64 ? `data:image/png;base64,${imageBase64}` : '';
+      // Determine size & aspect ratio from requested parameters or optimized metadata
+      const size = options.size || this.getOptimalSize(options.type);
+      const [defaultWidth, defaultHeight] = size.split('x').map(Number);
+      const width = optimizedImage.width || defaultWidth || 1024;
+      const height = optimizedImage.height || defaultHeight || 1024;
+      const aspectRatio = optimizedImage.width && optimizedImage.height 
+        ? `${optimizedImage.width}:${optimizedImage.height}`
+        : this.calculateAspectRatio(size);
 
-      // Optimize the generated image
-      const optimizedImage = await this.optimizeImage(imageDataUrl);
-
-      // Generate SEO-optimized alt text
-      const altText = await this.generateAltText(articleId, options);
-
-      // Save to database
+      // Save final URLs, prompts, quality scores, and metadata to Prisma model
       const savedImage = await prisma.articleImage.create({
         data: {
           articleId,
           imageType: options.type,
-          imageUrl: optimizedImage.url,
-          thumbnailUrl: optimizedImage.thumbnailUrl,
-          altText,
-          generationPrompt: enhancedPrompt,
-          revisedPrompt: enhancedPrompt,
-          dalleModel: 'sdxl-self-hosted',
-          width: optimizedImage.width,
-          height: optimizedImage.height,
-          format: optimizedImage.format,
-          size: optimizedImage.size,
-          quality,
+          imageUrl: optimizedImage.url || iengineResult.image_url || iengineResult.cdn_urls?.original || '',
+          thumbnailUrl: optimizedImage.thumbnailUrl || iengineResult.thumbnail_url || iengineResult.cdn_urls?.thumbnail || null,
+          altText: iengineResult.scene_plan?.narrative || options.prompt || article.title,
+          generationPrompt: iengineResult.prompt,
+          revisedPrompt: iengineResult.prompt,
+          dalleModel: iengineResult.metadata?.model_used || 'sdxl-iengine',
+          width,
+          height,
+          format: optimizedImage.format || 'png',
+          size: optimizedImage.size || 0,
+          quality: options.quality || 'standard',
           isOptimized: true,
-          optimizedUrl: optimizedImage.optimizedUrl,
-          webpUrl: optimizedImage.webpUrl,
-          avifUrl: optimizedImage.avifUrl,
-          placeholderBase64: optimizedImage.placeholderBase64,
-          seoKeywords: JSON.stringify(options.keywords || []),
+          optimizedUrl: optimizedImage.optimizedUrl || iengineResult.cdn_urls?.original || iengineResult.image_url,
+          webpUrl: optimizedImage.webpUrl || iengineResult.cdn_urls?.webp || null,
+          avifUrl: optimizedImage.avifUrl || iengineResult.cdn_urls?.avif || null,
+          placeholderBase64: optimizedImage.placeholderBase64 || null,
+          seoKeywords: JSON.stringify(options.keywords || tagsArray || []),
           loadingPriority: options.type === 'featured' ? 'eager' : 'lazy',
-          aspectRatio: this.calculateAspectRatio(size),
-          processingStatus: 'completed',
+          aspectRatio,
+          processingStatus: iengineResult.status === 'approved' ? 'completed' : 'failed',
+          errorMessage: iengineResult.status === 'rejected' ? (iengineResult.quality_scores?.rejection_reasons?.join(', ') || 'Rejected by Quality Judge') : null,
           metadata: JSON.stringify({
-            generationTime: Date.now() - startTime,
-            style: options.style || 'professional',
-            model: 'sdxl-self-hosted',
+            generationTime: iengineResult.metadata?.generation_time_ms || (Date.now() - startTime),
+            seed: iengineResult.metadata?.seed,
+            qualityScores: iengineResult.quality_scores,
+            scenePlan: iengineResult.scene_plan,
           }),
         },
       });
@@ -201,12 +239,12 @@ export class AIImageService {
       // Cache the result
       await this.setCache(cacheKey, result, CACHE_TTL.GENERATION_RESULT);
 
-      console.log(`[AIImageService] Generated image for article ${articleId} in ${Date.now() - startTime}ms`);
+      console.log(`[AIImageService] Generated image via Iengine for article ${articleId} in ${Date.now() - startTime}ms`);
 
       return result;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('[AIImageService] Image generation failed:', errorMessage);
+      console.error('[AIImageService] Iengine image generation failed:', errorMessage);
 
       // Save failed attempt to database
       await prisma.articleImage.create({

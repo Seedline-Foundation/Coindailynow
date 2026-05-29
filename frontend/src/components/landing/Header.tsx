@@ -43,7 +43,6 @@ const NAV_MENUS = [
     children: [
       { tKey: 'latestNews', href: '/news', icon: NewspaperIcon },
       { tKey: 'newsAggregator', href: '/news-aggregator', icon: RssIcon },
-      { tKey: 'aiSummarizer', href: '/ai-summarizer', icon: SparklesIcon },
     ],
   },
   {
@@ -57,7 +56,7 @@ const NAV_MENUS = [
       { tKey: 'taxCalc', href: '/tools/tax-calculator', icon: CalculatorIcon },
       { tKey: 'remittance', href: '/tools/remittance-calculator', icon: BanknotesIcon },
       { tKey: 'onramp', href: '/tools/onramp-aggregator', icon: CreditCardIcon },
-      { tKey: 'automations', href: '/automations', icon: CpuChipIcon },
+      { tKey: 'automations', href: '/tools/terminal', icon: CpuChipIcon },
     ],
   },
   {
@@ -68,7 +67,7 @@ const NAV_MENUS = [
     children: [
       { tKey: 'scamWatch', href: '/scam-watch', icon: ExclamationTriangleIcon },
       { tKey: 'regulation', href: '/regulation', icon: ScaleIcon },
-      { tKey: 'regulatoryBot', href: '/regulatory-bot', icon: ChatBubbleLeftRightIcon },
+      { tKey: 'regulatoryBot', href: '/regulation', icon: ChatBubbleLeftRightIcon },
     ],
   },
   {
@@ -78,8 +77,7 @@ const NAV_MENUS = [
     icon: UserGroupIcon,
     children: [
       { tKey: 'events', href: '/events', icon: CalendarDaysIcon },
-      { tKey: 'authors', href: '/authors', icon: UserGroupIcon },
-      { tKey: 'expertProgram', href: '/expert-program', icon: BoltIcon },
+      { tKey: 'authors', href: '/about', icon: UserGroupIcon },
       { tKey: 'paymentDir', href: '/payment-directory', icon: CreditCardIcon },
     ],
   },

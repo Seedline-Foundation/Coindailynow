@@ -1,0 +1,32 @@
+{
+  "palette": ["#FFB703", "#1D3557", "#FF7F50", "#D4A373"],
+  "lighting": [
+    "warm amber neon",
+    "humid cinematic glow",
+    "sunset gold gradients",
+    "electric urban glow"
+  ],
+  "environments": [
+    "Lagos fintech district",
+    "Nairobi startup hub",
+    "Lagos marina skyline",
+    "mobile money kiosk street"
+  ],
+  "subjects": [
+    "African youth traders",
+    "mobile fintech devices",
+    "pan-African data networks",
+    "solar-tech infrastructure"
+  ],
+  "camera": [
+    "street-level realism",
+    "human-centric",
+    "movement-heavy",
+    "optimism-focused framing"
+  ],
+  "mood": [
+    "digital renaissance",
+    "emerging power",
+    "urban innovation"
+  ]
+}

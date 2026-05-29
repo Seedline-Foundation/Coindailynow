@@ -14,7 +14,7 @@ export class ResearchWriterAgent extends BaseAgent {
       name: 'ResearchWriter Agent',
       type: 'research_writer',
       category: 'content',
-      description: 'Automatically generates professional research reports, market analysis documents, weekly/monthly summaries, and investor briefings with data-driven insights for African crypto markets.',
+      description: 'Automatically generates professional research reports, market analysis documents, weekly/monthly summaries, and investor briefings with data-driven insights for African, LatAm, and Caribbean crypto markets.',
       capabilities: [
         'report_generation',
         'data_analysis_writing',
@@ -24,6 +24,8 @@ export class ResearchWriterAgent extends BaseAgent {
         'investor_briefing',
         'token_report',
         'african_market_report',
+        'caribbean_market_report',
+        'latam_market_report',
         'comparison_analysis',
         'regulatory_summary',
       ],
@@ -89,6 +91,18 @@ Write a professional report. Return JSON:
       "exchangeVolumes": [{"exchange": string, "volume": string, "change": string}],
       "regulatoryUpdates": [string]
     },
+    "caribbeanMarket": {
+      "summary": string,
+      "countryHighlights": [{"country": string, "highlight": string}],
+      "exchangeVolumes": [{"exchange": string, "volume": string, "change": string}],
+      "regulatoryUpdates": [string]
+    },
+    "latamMarket": {
+      "summary": string,
+      "countryHighlights": [{"country": string, "highlight": string}],
+      "exchangeVolumes": [{"exchange": string, "volume": string, "change": string}],
+      "regulatoryUpdates": [string]
+    },
     "topPerformers": [{"name": string, "change": string}],
     "worstPerformers": [{"name": string, "change": string}],
     "weekAhead": string,
@@ -129,6 +143,22 @@ Return JSON:
       {"sector": string, "performance": string, "outlook": string, "topProjects": [string]}
     ],
     "africanDeepDive": {
+      "adoption": string,
+      "volumeGrowth": string,
+      "topCountries": [{"country": string, "metrics": string}],
+      "regulatoryChanges": [string],
+      "mobileMoneyTrends": string,
+      "p2pMarket": string
+    },
+    "caribbeanDeepDive": {
+      "adoption": string,
+      "volumeGrowth": string,
+      "topCountries": [{"country": string, "metrics": string}],
+      "regulatoryChanges": [string],
+      "mobileMoneyTrends": string,
+      "p2pMarket": string
+    },
+    "latamDeepDive": {
       "adoption": string,
       "volumeGrowth": string,
       "topCountries": [{"country": string, "metrics": string}],
@@ -286,14 +316,14 @@ Return JSON:
   }
 
   private async generateRegulatoryReport(data: any): Promise<Record<string, any>> {
-    const prompt = `Generate a regulatory landscape report for crypto in Africa:
+    const prompt = `Generate a regulatory landscape report for crypto in Africa, LatAm, and the Caribbean:
 
 Data: ${JSON.stringify(data || {}, null, 2)}
 
 Return JSON:
 {
   "report": {
-    "title": "Crypto Regulatory Report - Africa",
+    "title": "Crypto Regulatory Report - Africa, LatAm & Caribbean",
     "countries": [
       {
         "name": string,
@@ -304,7 +334,7 @@ Return JSON:
         "outlook": string
       }
     ],
-    "panAfricanInitiatives": [string],
+    "regionalInitiatives": [string],
     "trends": [string],
     "risks": [string],
     "opportunities": [string],

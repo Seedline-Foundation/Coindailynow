@@ -57,7 +57,7 @@ class AIWebSocketService {
   private connectionState: 'disconnected' | 'connecting' | 'connected' | 'error' = 'disconnected';
 
   constructor() {
-    const api = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
     this.wsURL =
       process.env.NEXT_PUBLIC_WS_URL ||
       api.replace(/^http/, 'ws').replace(/^https/, 'wss');

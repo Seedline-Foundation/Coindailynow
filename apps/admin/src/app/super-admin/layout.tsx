@@ -16,7 +16,7 @@ interface SuperAdminLayoutProps {
   children: React.ReactNode;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
 export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -43,7 +43,7 @@ export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
     const verify = async () => {
       const token = getAccessToken();
       if (!token) {
-        router.push('/login?role=super');
+        router.push('/auth/sadmin');
         setChecking(false);
         return;
       }
@@ -63,17 +63,17 @@ export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
           } else {
             clearSession();
             logout();
-            router.push('/login?role=super');
+            router.push('/auth/sadmin');
           }
         } else {
           clearSession();
           logout();
-          router.push('/login?role=super');
+          router.push('/auth/sadmin');
         }
       } catch {
         clearSession();
         logout();
-        router.push('/login?role=super');
+        router.push('/auth/sadmin');
       } finally {
         setChecking(false);
       }

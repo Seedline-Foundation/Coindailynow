@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { PILLAR_ARTICLES, type BlogArticle } from '@/data/blog-articles';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
 type Tab = 'overview' | 'create' | 'manage' | 'seo';
 

@@ -1,0 +1,27 @@
+{
+  "palette": ["#00F0FF", "#8B5CF6", "#FFD700", "#0F172A"],
+  "lighting": [
+    "neon volumetric glow",
+    "holographic ambience",
+    "cinematic depth lighting"
+  ],
+  "environments": [
+    "futuristic trading floors",
+    "holographic data centers",
+    "cyberpunk metropolis"
+  ],
+  "subjects": [
+    "holographic crypto coins",
+    "blockchain data streams",
+    "global financial networks"
+  ],
+  "camera": [
+    "cinematic wide-angle",
+    "dynamic low-angle power shots"
+  ],
+  "mood": [
+    "technological advancement",
+    "market dynamics",
+    "digital frontier"
+  ]
+}

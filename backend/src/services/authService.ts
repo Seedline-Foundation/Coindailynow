@@ -25,6 +25,8 @@ export interface RegisterData {
   password: string;
   firstName?: string;
   lastName?: string;
+  country?: string;
+  preferredLanguage?: string;
   deviceFingerprint?: string;
   ipAddress?: string;
   userAgent?: string;
@@ -96,6 +98,9 @@ export class AuthService {
           passwordHash,
           firstName: data.firstName || null,
           lastName: data.lastName || null,
+          country: data.country || null,
+          preferredLanguage: data.preferredLanguage || 'en',
+          onboardingCompleted: false,
           status: 'PENDING_VERIFICATION',
           updatedAt: new Date()
         },
@@ -119,11 +124,7 @@ export class AuthService {
             showTradingStats: false,
             allowDataAnalytics: true
           }),
-          contentPreferences: JSON.stringify({
-            categories: ['bitcoin', 'ethereum', 'defi'],
-            languages: ['en'],
-            difficulty: 'BEGINNER'
-          }),
+          contentPreferences: null, // Left null until onboarding wizard completes
           updatedAt: new Date()
         }
       });
@@ -328,6 +329,7 @@ export class AuthService {
         sub: user.id,
         email: user.email,
         username: user.username,
+        role: user.role,
         subscriptionTier: user.subscriptionTier,
         status: user.status,
         emailVerified: user.emailVerified,

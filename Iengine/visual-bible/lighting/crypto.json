@@ -1,0 +1,12 @@
+{
+  "lighting": [
+    "neon cyan glow",
+    "electric purple edge light",
+    "gold market illumination",
+    "holographic volumetrics"
+  ],
+  "avoid": [
+    "flat corporate lighting",
+    "daylight naturalism"
+  ]
+}

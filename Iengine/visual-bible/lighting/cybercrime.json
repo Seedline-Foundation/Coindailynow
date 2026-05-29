@@ -1,0 +1,13 @@
+{
+  "lighting": [
+    "red alert lighting",
+    "dark server contrast",
+    "fragmented monitor illumination",
+    "green terminal glow"
+  ],
+  "avoid": [
+    "warm ambient",
+    "bright open lighting",
+    "natural sunlight"
+  ]
+}

@@ -12,14 +12,14 @@ import { createRedisConnection } from './redis';
 // ─── Queue Names ─────────────────────────────────────────────────────────────
 
 export const QUEUE_NAMES = {
-  BREAKING_PRIORITY: 'iengine:breaking-priority',
-  PREMIUM_PRIORITY: 'iengine:premium-priority',
-  STANDARD: 'iengine:standard',
-  THUMBNAIL_FAST: 'iengine:thumbnail-fast',
-  UPSCALE: 'iengine:upscale',
-  QUALITY_CHECK: 'iengine:quality-check',
-  RETRY_FAILED: 'iengine:retry-failed',
-  DELIVERY: 'iengine:delivery',
+  BREAKING_PRIORITY: 'iengine-breaking-priority',
+  PREMIUM_PRIORITY: 'iengine-premium-priority',
+  STANDARD: 'iengine-standard',
+  THUMBNAIL_FAST: 'iengine-thumbnail-fast',
+  UPSCALE: 'iengine-upscale',
+  QUALITY_CHECK: 'iengine-quality-check',
+  RETRY_FAILED: 'iengine-retry-failed',
+  DELIVERY: 'iengine-delivery',
 } as const;
 
 // ─── Priority Values (lower = higher priority) ──────────────────────────────

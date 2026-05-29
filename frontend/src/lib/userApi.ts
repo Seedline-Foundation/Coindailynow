@@ -159,3 +159,35 @@ export async function deleteNotification(id: string) {
 export async function fetchDashboardStats() {
   return authFetch('/api/user/stats');
 }
+
+// ─── Help & Support ─────────────────
+export async function fetchTickets(status?: string, search?: string, page = 1, limit = 10) {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (status && status !== 'all') params.set('status', status);
+  if (search) params.set('search', search);
+  return authFetch<any>(`/api/tickets?${params.toString()}`);
+}
+
+export async function createTicket(data: { subject: string; message: string; category: string; priority: string }) {
+  return authFetch<any>('/api/tickets', { method: 'POST', body: JSON.stringify(data) });
+}
+
+export async function replyTicket(id: string, message: string) {
+  return authFetch<any>(`/api/tickets/${id}`, { method: 'PATCH', body: JSON.stringify({ message }) });
+}
+
+export async function sendContactEmail(data: { department: string; subject: string; message: string }) {
+  return authFetch<any>('/api/help/contact', { method: 'POST', body: JSON.stringify(data) });
+}
+
+export async function sendAIChatMessage(message: string, conversationHistory?: Array<{ role: string; content: string }>) {
+  return authFetch<any>('/api/help/ai-chat', { method: 'POST', body: JSON.stringify({ message, conversationHistory }) });
+}
+
+export async function fetchOnboardingStatus() {
+  return authFetch<any>('/api/onboarding/status');
+}
+
+export async function completeOnboarding(data: { interests: string[]; identity: string; goals: string[] }) {
+  return authFetch<any>('/api/onboarding/complete', { method: 'PATCH', body: JSON.stringify(data) });
+}

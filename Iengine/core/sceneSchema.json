@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ScenePlan",
+  "type": "object",
+  "properties": {
+    "story_type": { "type": "string" },
+    "urgency": { "type": "string" },
+    "narrative": { "type": "string" },
+    "emotion": { "type": "string" },
+    "camera": {
+      "type": "object",
+      "properties": {
+        "angle": { "type": "string" },
+        "lens": { "type": "string" },
+        "movement": { "type": "string" },
+        "depth": { "type": "string" }
+      },
+      "required": ["angle", "lens", "movement", "depth"]
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "location": { "type": "string" },
+        "time": { "type": "string" },
+        "weather": { "type": "string" },
+        "architecture": { "type": "string" }
+      },
+      "required": ["location", "time", "weather", "architecture"]
+    },
+    "subjects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "importance": { "type": "string", "enum": ["primary", "secondary", "background"] },
+          "position": { "type": "string" }
+        },
+        "required": ["type", "importance"]
+      }
+    },
+    "lighting": {
+      "type": "object",
+      "properties": {
+        "primary": { "type": "string" },
+        "secondary": { "type": "string" },
+        "ambient": { "type": "string" },
+        "volumetric": { "type": "boolean" }
+      },
+      "required": ["primary"]
+    },
+    "motion": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "intensity": { "type": "string" },
+        "direction": { "type": "string" }
+      },
+      "required": ["type", "intensity"]
+    },
+    "symbolism": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "composition": {
+      "type": "object",
+      "properties": {
+        "rule": { "type": "string" },
+        "focal_point": { "type": "string" },
+        "balance": { "type": "string" },
+        "depth_layers": { "type": "number" }
+      },
+      "required": ["rule", "focal_point", "balance"]
+    },
+    "workflow": { "type": "string" },
+    "style_profile": { "type": "string" },
+    "regional_profile": { "type": "string" }
+  },
+  "required": [
+    "story_type",
+    "urgency",
+    "narrative",
+    "emotion",
+    "camera",
+    "environment",
+    "subjects",
+    "lighting",
+    "motion",
+    "symbolism",
+    "composition",
+    "workflow",
+    "style_profile",
+    "regional_profile"
+  ]
+}

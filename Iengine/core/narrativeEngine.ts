@@ -11,40 +11,17 @@ import {
   UrgencyLevel,
 } from '../types';
 import { detectStoryType } from '../visual-bible/storytypes';
+import { TopicClassifier } from './topicClassifier';
+import { UrgencyDetector } from './urgencyDetector';
+import { RegionDetector } from './regionDetector';
+import regionEntities from '../data/regionEntities.json';
 
 // ─── Keyword Maps ────────────────────────────────────────────────────────────
-
-const TOPIC_KEYWORDS: Record<string, string[]> = {
-  bitcoin: ['bitcoin', 'btc', 'satoshi', 'lightning network', 'halving'],
-  ethereum: ['ethereum', 'eth', 'vitalik', 'erc-20', 'layer 2', 'rollup'],
-  defi: ['defi', 'dex', 'amm', 'yield', 'liquidity', 'tvl', 'aave', 'uniswap', 'compound'],
-  nft: ['nft', 'opensea', 'collectible', 'digital art', 'metaverse'],
-  stablecoin: ['stablecoin', 'usdt', 'usdc', 'tether', 'dai', 'cbdc'],
-  regulation: ['sec', 'regulation', 'compliance', 'ban', 'lawsuit', 'legal', 'court', 'judge', 'enforcement', 'license', 'cbdc', 'policy'],
-  exchange: ['binance', 'coinbase', 'kraken', 'exchange', 'cex', 'listing', 'delist'],
-  security: ['hack', 'breach', 'exploit', 'vulnerability', 'rug pull', 'scam', 'phishing', 'drain'],
-  ai: ['ai', 'artificial intelligence', 'machine learning', 'gpt', 'llm', 'neural', 'deepfake', 'openai', 'anthropic'],
-  macro: ['fed', 'inflation', 'interest rate', 'recession', 'gdp', 'treasury', 'bond'],
-  africa: ['africa', 'nigeria', 'kenya', 'lagos', 'nairobi', 'mpesa', 'south africa', 'ghana', 'african'],
-  latam: ['brazil', 'mexico', 'argentina', 'colombia', 'el salvador', 'venezuela', 'chile', 'peru', 'latam', 'latin america', 'pix', 'nubank', 'mercado libre', 'rappi', 'peso', 'real', 'bolivar', 'chivo'],
-  caribbean: ['caribbean', 'bahamas', 'cayman', 'jamaica', 'barbados', 'puerto rico', 'trinidad', 'sand dollar', 'haiti', 'dominican republic'],
-  etf: ['etf', 'spot etf', 'blackrock', 'fidelity', 'grayscale', 'ark invest'],
-  mining: ['mining', 'miner', 'hashrate', 'asic', 'proof of work'],
-  memecoin: ['memecoin', 'meme', 'doge', 'shib', 'pepe', 'bonk', 'wif'],
-  startup: ['startup', 'funding', 'venture', 'seed round', 'series a', 'series b', 'raise', 'unicorn'],
-};
 
 const SENTIMENT_KEYWORDS: Record<string, string[]> = {
   bullish: ['surge', 'rally', 'soar', 'breakout', 'all-time high', 'ath', 'moon', 'pump', 'bullish', 'gain', 'record', 'milestone', 'approval', 'adopt', 'partnership'],
   bearish: ['crash', 'plunge', 'dump', 'collapse', 'plummet', 'liquidat', 'bearish', 'loss', 'sell-off', 'decline', 'drop', 'slump', 'fear'],
   neutral: ['report', 'announce', 'update', 'launch', 'release', 'plan', 'consider', 'explore'],
-};
-
-const URGENCY_KEYWORDS: Record<UrgencyLevel, string[]> = {
-  critical: ['breaking', 'urgent', 'emergency', 'flash', 'just in', 'alert', 'crash', 'hack'],
-  high: ['exclusive', 'major', 'significant', 'massive', 'billion', 'unprecedented'],
-  medium: ['report', 'announce', 'update', 'launch', 'new'],
-  low: ['analysis', 'opinion', 'review', 'history', 'explained', 'guide'],
 };
 
 const INSTITUTIONAL_KEYWORDS = ['blackrock', 'fidelity', 'jpmorgan', 'goldman', 'institution', 'bank', 'hedge fund', 'etf', 'sovereign', 'pension'];
@@ -66,6 +43,16 @@ const SYMBOLIC_ARCHETYPES: Record<string, string[]> = {
 // ─── Core Engine ─────────────────────────────────────────────────────────────
 
 export class NarrativeEngine {
+  private topicClassifier: TopicClassifier;
+  private urgencyDetector: UrgencyDetector;
+  private regionDetector: RegionDetector;
+
+  constructor() {
+    this.topicClassifier = new TopicClassifier();
+    this.urgencyDetector = new UrgencyDetector();
+    this.regionDetector = new RegionDetector();
+  }
+
   /**
    * Analyze headline + metadata to produce a structured narrative analysis.
    * This is Layer 1: fast, rule-based, no LLM dependency.
@@ -78,12 +65,12 @@ export class NarrativeEngine {
   ): NarrativeAnalysis {
     const text = `${headline} ${excerpt || ''} ${category || ''} ${(tags || []).join(' ')}`.toLowerCase();
 
-    const topic = this.detectTopic(text);
+    const topic = this.topicClassifier.classify(text);
     const storyType = detectStoryType(headline, category, tags);
     const entities = this.extractEntities(text);
     const keywords = this.extractKeywords(headline, text);
     const sentiment = this.detectSentiment(text);
-    const urgency = this.detectUrgency(text);
+    const urgency = this.urgencyDetector.detect(text);
     const geopoliticalTension = this.scoreGeopoliticalTension(text);
     const marketEmotion = this.detectMarketEmotion(text, sentiment);
     const institutionalRetail = this.detectInstitutionalRetail(text);
@@ -104,38 +91,35 @@ export class NarrativeEngine {
     };
   }
 
-  private detectTopic(text: string): string {
-    let bestTopic = 'crypto';
-    let bestScore = 0;
-
-    for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
-      let score = 0;
-      for (const kw of keywords) {
-        if (text.includes(kw)) score++;
-      }
-      if (score > bestScore) {
-        bestScore = score;
-        bestTopic = topic;
-      }
-    }
-
-    return bestTopic;
+  /**
+   * Detect region based on text content.
+   */
+  detectRegion(text: string): string {
+    return this.regionDetector.detect(text);
   }
 
   private extractEntities(text: string): string[] {
     const entities: string[] = [];
 
+    // Flatten all keywords from regionEntities as entities to detect
     const knownEntities = [
       'bitcoin', 'ethereum', 'binance', 'coinbase', 'sec', 'blackrock',
       'fidelity', 'jpmorgan', 'tether', 'usdc', 'solana', 'cardano',
       'ripple', 'xrp', 'dogecoin', 'polygon', 'avalanche', 'chainlink',
       'openai', 'google', 'apple', 'tesla', 'microstrategy', 'grayscale',
-      'nigeria', 'kenya', 'south africa', 'fed', 'ecb', 'imf',
-      'brazil', 'mexico', 'argentina', 'colombia', 'el salvador', 'venezuela',
-      'bahamas', 'cayman islands', 'jamaica', 'puerto rico', 'nubank', 'mercado libre',
+      'fed', 'ecb', 'imf', 'nubank', 'mercado libre',
     ];
 
-    for (const entity of knownEntities) {
+    // Also add region-specific entities
+    for (const list of Object.values(regionEntities)) {
+      if (Array.isArray(list)) {
+        knownEntities.push(...list);
+      }
+    }
+
+    const uniqueEntities = [...new Set(knownEntities)];
+
+    for (const entity of uniqueEntities) {
       if (text.includes(entity)) {
         entities.push(entity);
       }
@@ -178,15 +162,6 @@ export class NarrativeEngine {
     if (bullishScore > bearishScore) return 'bullish';
     if (bearishScore > bullishScore) return 'bearish';
     return 'neutral';
-  }
-
-  private detectUrgency(text: string): UrgencyLevel {
-    for (const level of ['critical', 'high', 'medium', 'low'] as UrgencyLevel[]) {
-      for (const kw of URGENCY_KEYWORDS[level]) {
-        if (text.includes(kw)) return level;
-      }
-    }
-    return 'medium';
   }
 
   private scoreGeopoliticalTension(text: string): number {

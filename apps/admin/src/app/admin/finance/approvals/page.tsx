@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { getAccessToken } from '@/lib/auth';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
 type Status = 'pending' | 'approved' | 'rejected' | 'executed' | 'cancelled';
 

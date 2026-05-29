@@ -1,0 +1,19 @@
+{
+  "bitcoin": ["bitcoin", "btc", "satoshi", "lightning network", "halving"],
+  "ethereum": ["ethereum", "eth", "vitalik", "erc-20", "layer 2", "rollup"],
+  "defi": ["defi", "dex", "amm", "yield", "liquidity", "tvl", "aave", "uniswap", "compound"],
+  "nft": ["nft", "opensea", "collectible", "digital art", "metaverse"],
+  "stablecoin": ["stablecoin", "usdt", "usdc", "tether", "dai", "cbdc"],
+  "regulation": ["sec", "regulation", "compliance", "ban", "lawsuit", "legal", "court", "judge", "enforcement", "license", "cbdc", "policy"],
+  "exchange": ["binance", "coinbase", "kraken", "exchange", "cex", "listing", "delist"],
+  "security": ["hack", "breach", "exploit", "vulnerability", "rug pull", "scam", "phishing", "drain"],
+  "ai": ["ai", "artificial intelligence", "machine learning", "gpt", "llm", "neural", "deepfake", "openai", "anthropic"],
+  "macro": ["fed", "inflation", "interest rate", "recession", "gdp", "treasury", "bond"],
+  "africa": ["africa", "nigeria", "kenya", "lagos", "nairobi", "mpesa", "south africa", "ghana", "african"],
+  "latam": ["brazil", "mexico", "argentina", "colombia", "el salvador", "venezuela", "chile", "peru", "latam", "latin america", "pix", "nubank", "mercado libre", "rappi", "peso", "real", "bolivar", "chivo"],
+  "caribbean": ["caribbean", "bahamas", "cayman", "jamaica", "barbados", "puerto rico", "trinidad", "sand dollar", "haiti", "dominican republic"],
+  "etf": ["etf", "spot etf", "blackrock", "fidelity", "grayscale", "ark invest"],
+  "mining": ["mining", "miner", "hashrate", "asic", "proof of work"],
+  "memecoin": ["memecoin", "meme", "doge", "shib", "pepe", "bonk", "wif"],
+  "startup": ["startup", "funding", "venture", "seed round", "series a", "series b", "raise", "unicorn"]
+}

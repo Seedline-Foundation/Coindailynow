@@ -4,11 +4,7 @@ import MarqueeWrapper from '@/components/landing/MarqueeWrapper';
 import TickerBar from '@/components/landing/TickerBar';
 import Footer from '@/components/footer/Footer';
 import LanguageBanner from '@/components/geo/LanguageBanner';
-import CountrySwitcher from '@/components/news/CountrySwitcher';
-import {
-  HomeArticlesFallback,
-  HomeArticlesSection,
-} from '@/components/home/HomeArticlesSection';
+import HomepageDashboard from '@/components/home/HomepageDashboard';
 import { countryCodeToRoute, routeToCountryCode } from '@/lib/geo';
 import { cookies } from 'next/headers';
 
@@ -98,17 +94,11 @@ export default async function Home({
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <CountrySwitcher currentCountryCode={countryCode} />
-
-        <Suspense fallback={<HomeArticlesFallback />}>
-          <HomeArticlesSection
-            countryCode={countryCode}
-            countrySlug={countrySlug}
-            languageCode={languageCode}
-          />
-        </Suspense>
-      </div>
+      <HomepageDashboard 
+        countryCode={countryCode}
+        countrySlug={countrySlug}
+        languageCode={languageCode}
+      />
       <Footer />
     </div>
   );

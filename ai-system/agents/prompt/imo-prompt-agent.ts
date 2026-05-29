@@ -50,6 +50,8 @@ export interface ImoPromptRequest {
     // Content-specific
     keywords?: string[];
     africanFocus?: boolean;
+    caribbeanFocus?: boolean;
+    latamFocus?: boolean;
     language?: string;
     sourceLanguage?: string;
     targetLanguage?: string;
@@ -554,33 +556,46 @@ Generate a comprehensive, well-structured response:`;
    */
   private static readonly EDITORIAL_TONE_CONSTRAINT = `
 === EDITORIAL TONE POLICY (MANDATORY) ===
-You are writing for CoinDaily Africa — a Bloomberg-tier financial news platform, NOT a crypto hype blog.
+You are writing for CoinDaily — a Bloomberg-tier financial news platform, NOT a hype blog. We cover Crypto, AI, TradFi, and Blockchain across Africa, LatAm, and the Caribbean.
 
 BANNED LANGUAGE — never use these words or their synonyms:
-"moon", "mooning", "to the moon", "rocket", "skyrocket", "parabolic",
-"crash", "plunge", "tank", "doom", "collapse", "bloodbath", "carnage",
-"WAGMI", "NGMI", "diamond hands", "paper hands", "ape in", "degen",
-"lambo", "pump", "dump", "shill", "FUD" (as dismissal), "hopium",
-"gem", "100x", "guaranteed returns", "can't lose", "next Bitcoin"
+- Crypto/Blockchain: "moon", "mooning", "to the moon", "rocket", "skyrocket", "lambo", "pump", "dump", "shill", "FUD" (as dismissal), "hopium", "gem", "100x", "Ethereum killer", "web3 will save the world", "decentralize everything", "guaranteed returns", "can't lose", "WAGMI", "NGMI", "diamond hands", "degen"
+- AI: "sentient", "singularity", "killer AI", "AGI next month", "revolutionary algorithm", "mind-blowing tool", "100x productivity", "world-ending", "God-like AI", "skynet", "silver bullet"
+- TradFi: "hyperinflation collapse", "infinite money printer", "bank run tomorrow", "easy double", "no-risk yield", "get rich quick", "fiat is dead", "unlimited printing"
 
 REQUIRED TONE:
 - Confident, neutral, data-driven — like Bloomberg, Reuters, or the Financial Times
-- Use precise language: "rose 12%", "declined to $X", "regulatory framework"
-- Attribute claims: "according to CBN data", "analysts at X estimate"
+- Use precise language: "rose 12%", "declined to $X", "regulatory framework", "technological capacity", "monetary policy"
+- Attribute claims: "according to CBN data", "reports from Banco Central do Brasil show", "Eastern Caribbean Central Bank estimates"
 - No exclamation marks in body text. No clickbait headlines.
-- Every claim must be attributable to data or a named source
-- Africa-first framing: lead with African market impact, not US/EU context
+- Every claim must be attributable to data or a named source.
+- Regional-first framing: lead with regional impact (Africa, LatAm, Caribbean), not US/EU context.
 === END EDITORIAL TONE POLICY ===`;
 
   private buildArticlePrompt(request: ImoPromptRequest): string {
-    const { topic, tone = 'professional', targetAudience = 'general', africanFocus, keywords = [] } = request.context;
+    const { topic, tone = 'professional', targetAudience = 'general', africanFocus, caribbeanFocus, latamFocus, keywords = [] } = request.context;
 
-    return `You are an expert cryptocurrency journalist writing for CoinDaily Africa.
+    return `You are an expert journalist writing for CoinDaily (covering Crypto, AI, TradFi, and Blockchain).
 
-TOPIC: ${topic || 'cryptocurrency news'}
+TOPIC: ${topic || 'financial news'}
 AUDIENCE: ${targetAudience}
 TONE: ${tone}
-${africanFocus ? 'FOCUS: African cryptocurrency market, regulations, adoption, and impact' : ''}
+${africanFocus ? 'FOCUS: African market, regulations, adoption, and regional impact (lead with African context first)' : ''}
+${latamFocus ? 'FOCUS: Latin American market, fintech, regulations, and regional impact (lead with LatAm context first)' : ''}
+${caribbeanFocus ? 'FOCUS: Caribbean market, banking/CBDCs, regulations, and regional impact (lead with Caribbean context first)' : ''}
+
+=== TARGET REGIONAL PRIORITIES ===
+- Africa: Nigeria (weight 40%, CBN, Quidax/Binance), Kenya (weight 20%, M-Pesa), South Africa (weight 20%, FSCA, Luno/VALR), Ghana (weight 10%, BoG), Egypt (weight 10%, CBE).
+- LatAm: Brazil (weight 40%, BCB, Pix), Argentina (weight 25%, Ripio/Lemon Cash, inflation hedging), El Salvador (weight 15%, legal tender), Colombia (weight 10%, PSE), Mexico (weight 10%, Bitso/SPEI).
+- Caribbean: ECCU (weight 35%, ECCB, DCash), Jamaica (weight 30%, BOJ, JamDex), Trinidad & Tobago (weight 20%, WiPay), Bahamas (weight 15%, CBOB, Sand Dollar).
+
+=== MACROECONOMIC CONTEXT INTEGRATION ===
+- Force check of inflation hedging (e.g. stablecoin adoption in regions facing high inflation like Nigeria or Argentina).
+- Force check of remittance cost-savings metrics (Stablecoins/Stellar vs. Western Union/MoneyGram).
+
+=== MOBILE MONEY & LOCAL PAYMENTS ===
+- Actively require mentioning local payment infrastructure (e.g., M-Pesa, MTN MoMo for Africa; Pix, PSE for LatAm; JamDex, DCash, WiPay for Caribbean) where relevant to accessibility.
+
 ${ImoPromptAgent.EDITORIAL_TONE_CONSTRAINT}
 ${keywords.length > 0 ? `TARGET KEYWORDS: ${keywords.join(', ')}` : ''}
 
@@ -606,7 +621,7 @@ STEP 5 - FAQ SECTION (with JSON-LD): Include 3-5 FAQs targeting "People Also Ask
 \`\`\`
 
 STEP 6 - SOURCES CITED: At the end of the article, include a "Sources" section listing every factual claim's source. Each source must include:
-  - Source name (e.g., "Central Bank of Nigeria", "CoinGecko", "Reuters")
+  - Source name (e.g., central bank name, local exchanges, Reuters)
   - Date of data/publication (if known)
   - URL or document reference (if available)
 Format: numbered list. Minimum 3 sources per article. Bloomberg and Reuters cite every claim — so do we.
@@ -618,7 +633,7 @@ STEP 8 - METADATA: Output a structured metadata block at the very end:
 sources_count: [number]
 faq_count: [number]
 word_count: [approximate]
-primary_region: [African country/region most relevant]
+primary_region: [Country/region most relevant]
 \`\`\`
 
 === END FRAMEWORK ===
@@ -628,7 +643,7 @@ Write a comprehensive, engaging article that:
 2. Includes table of contents with jump links
 3. Provides accurate, well-researched information in H2/H3 hierarchy
 4. Includes multimedia placeholders every 300 words
-5. Addresses African market context and implications
+5. Addresses regional market context (Africa, LatAm, Caribbean), payment systems, and macroeconomic implications
 6. Includes FAQ section with FAQPage JSON-LD structured data
 7. Includes a "Sources" section citing every factual claim
 8. Ends with strong CTA + metadata block
@@ -638,9 +653,9 @@ ${request.context.customInstructions || ''}`;
   }
 
   private buildImagePrompt(request: ImoPromptRequest): string {
-    const { topic, visualStyle = 'modern professional', africanFocus, articleTitle } = request.context;
+    const { topic, visualStyle = 'modern professional', africanFocus, caribbeanFocus, latamFocus, articleTitle } = request.context;
 
-    let prompt = `${visualStyle} cryptocurrency illustration`;
+    let prompt = `${visualStyle} graphic illustration`;
     
     if (topic) {
       prompt += `, ${topic}`;
@@ -651,10 +666,16 @@ ${request.context.customInstructions || ''}`;
     }
     
     if (africanFocus) {
-      prompt += ', incorporating African elements, vibrant colors, African continent silhouette or patterns';
+      prompt += ', incorporating African elements, vibrant colors, African continent silhouette or regional patterns';
+    }
+    if (latamFocus) {
+      prompt += ', incorporating Latin American cultural elements, vibrant colors, regional geography or patterns';
+    }
+    if (caribbeanFocus) {
+      prompt += ', incorporating Caribbean tropical elements, island aesthetics, vibrant ocean colors, or local patterns';
     }
     
-    prompt += ', clean composition, high quality, professional graphic design, blockchain technology theme, digital assets visualization';
+    prompt += ', clean composition, high quality, professional graphic design, tech/finance theme, digital assets visualization';
     
     if (request.context.aspectRatio) {
       prompt += `, ${request.context.aspectRatio} aspect ratio`;
@@ -664,14 +685,18 @@ ${request.context.customInstructions || ''}`;
   }
 
   private buildTranslationPrompt(request: ImoPromptRequest): string {
-    const { sourceLanguage, targetLanguage, topic } = request.context;
+    const { sourceLanguage, targetLanguage, topic, africanFocus, caribbeanFocus, latamFocus } = request.context;
+
+    let regionName = 'African';
+    if (latamFocus) regionName = 'Latin American';
+    if (caribbeanFocus) regionName = 'Caribbean';
 
     return `Translate the following ${sourceLanguage || 'English'} text to ${targetLanguage || 'target language'}.
 
 IMPORTANT GUIDELINES:
 1. Maintain the original tone and style
-2. Preserve cryptocurrency terminology (do not translate technical terms like "blockchain", "DeFi", "staking")
-3. Adapt cultural references appropriately for African ${targetLanguage} speakers
+2. Preserve technical terminology (do not translate terms like "blockchain", "DeFi", "staking", "L1/L2", "large language model")
+3. Adapt cultural references appropriately for regional ${targetLanguage} speakers in ${regionName} countries
 4. Keep proper nouns, brand names, and ticker symbols unchanged
 5. Ensure the translation reads naturally in ${targetLanguage}
 6. Preserve formatting, line breaks, and special characters
@@ -680,9 +705,9 @@ TEXT TO TRANSLATE:`;
   }
 
   private buildSEOPrompt(request: ImoPromptRequest): string {
-    const { topic, targetKeywords = [], wordCount = 1000, targetAudience = 'general' } = request.context;
+    const { topic, targetKeywords = [], wordCount = 1000, targetAudience = 'general', africanFocus, caribbeanFocus, latamFocus } = request.context;
 
-    return `You are an SEO expert specializing in cryptocurrency content for African markets.
+    return `You are an SEO expert specializing in Crypto, AI, TradFi, and Blockchain content for regional markets.
 ${ImoPromptAgent.EDITORIAL_TONE_CONSTRAINT}
 
 Create an SEO-optimized article about: ${topic}
@@ -696,7 +721,8 @@ REQUIREMENTS:
 - Natural keyword placement (avoid keyword stuffing)
 - Include FAQ section with common questions
 - Add internal linking suggestions
-- Focus on African cryptocurrency market context
+- Focus on regional market context (${africanFocus ? 'Africa' : ''}${latamFocus ? 'LatAm' : ''}${caribbeanFocus ? 'Caribbean' : ''})
+- Target priority regions, payment systems (MTN MoMo, M-Pesa, Pix, PSE, JamDex, DCash, WiPay), and macroeconomic factors (inflation, remittances).
 
 === MANDATORY: RANKBRAIN-FRIENDLY CONTENT FRAMEWORK (6 STEPS) ===
 Every article MUST follow this 6-step structure:
@@ -709,11 +735,11 @@ STEP 3 - H2/H3 HIERARCHY WITH KEYWORD VARIATIONS: Use at least 5-7 H2 sections w
 
 STEP 4 - MULTIMEDIA EVERY 300 WORDS: Insert [IMAGE: description], [VIDEO: description], or [CHART: description] placeholders every ~300 words for post-production media insertion.
 
-STEP 5 - FAQ SECTION (3-5 questions): Target Google "People Also Ask" boxes. Write common questions African users would search. Include direct, concise answers (2-3 sentences each). Include FAQPage JSON-LD structured data block after the FAQ section.
+STEP 5 - FAQ SECTION (3-5 questions): Target Google "People Also Ask" boxes. Write common questions regional users would search. Include direct, concise answers (2-3 sentences each). Include FAQPage JSON-LD structured data block after the FAQ section.
 
 STEP 6 - SOURCES CITED: Numbered list of every source referenced in the article. Each source: name, date, URL/reference. Minimum 3 sources.
 
-STEP 7 - STRONG CTA: End with call-to-action directing to related CoinDaily content, newsletter signup, or community. Format: "What to read next: [topic]" and "Stay informed: Subscribe to CoinDaily's African crypto briefing."
+STEP 7 - STRONG CTA: End with call-to-action directing to related CoinDaily content, newsletter signup, or community. Format: "What to read next: [topic]" and "Stay informed: Subscribe to CoinDaily's regional briefing."
 === END FRAMEWORK ===
 
 Structure:
@@ -721,7 +747,7 @@ Structure:
 2. Table of contents with jump links
 3. Problem/context explanation
 4. Detailed solution/information sections (H2/H3 with keyword variations)
-5. African market implications
+5. Regional market implications and local payments/macroeconomics
 6. Actionable conclusion
 7. FAQ section (3-5 questions targeting People Also Ask) with FAQPage JSON-LD
 8. Sources Cited section (minimum 3 sources with attribution)
@@ -764,7 +790,11 @@ TEXT TO ANALYZE:`;
   }
 
   private buildContextualTranslationPrompt(request: ImoPromptRequest): string {
-    const { targetLanguage } = request.context;
+    const { targetLanguage, africanFocus, caribbeanFocus, latamFocus } = request.context;
+
+    let regionName = 'African';
+    if (latamFocus) regionName = 'Latin American';
+    if (caribbeanFocus) regionName = 'Caribbean';
 
     return `Using the extracted terminology and tone from step 1, translate this article to ${targetLanguage}.
 
@@ -772,14 +802,14 @@ CRITICAL RULES:
 1. DO NOT translate the terms listed in "terminology" - keep them in English
 2. MAINTAIN the tone identified in step 1
 3. PRESERVE all proper nouns exactly as listed
-4. ADAPT cultural contexts appropriately for ${targetLanguage}-speaking African audiences
+4. ADAPT cultural contexts appropriately for ${targetLanguage}-speaking regional audiences in ${regionName} countries
 5. Keep the same paragraph structure and formatting
 
 Translate:`;
   }
 
   private buildResearchPrompt(request: ImoPromptRequest): string {
-    const { topic, targetKeywords = [], targetAudience = 'general' } = request.context;
+    const { topic, targetKeywords = [], targetAudience = 'general', africanFocus, caribbeanFocus, latamFocus } = request.context;
 
     return `You are an SEO strategist researching: ${topic}
 
@@ -788,7 +818,7 @@ TASK: Create a comprehensive content outline using the RankBrain 6-Step Framewor
 1. KEYWORD RESEARCH:
    - Primary keyword: ${targetKeywords[0] || topic}
    - Secondary keywords: ${targetKeywords.slice(1).join(', ') || 'suggest related keywords'}
-   - Long-tail variations for African markets
+   - Long-tail variations for regional markets (Africa, LatAm, Caribbean)
 
 2. COMPETITIVE ANALYSIS:
    - What are top-ranking articles covering?
@@ -805,10 +835,10 @@ TASK: Create a comprehensive content outline using the RankBrain 6-Step Framewor
    STEP 5 (FAQ): Draft 5 "People Also Ask" questions with brief answers
    STEP 6 (CTA): Plan closing CTA and related content links
 
-4. AFRICAN MARKET ANGLE:
-   - Local exchanges to mention (Luno, Quidax, Binance Africa)
-   - Regional regulations or trends
-   - Mobile money integration if relevant
+4. REGIONAL MARKET ANGLE (Africa, LatAm, Caribbean):
+   - Local exchanges/payment systems to mention (MTN MoMo, M-Pesa, Pix, PSE, JamDex, DCash, WiPay, Ripio, VALR, Luno, Bitso, Sand Dollar)
+   - Regional regulations or trends (CBN, FSCA, BCB, ECCB, BOJ)
+   - Macroeconomic context (hedging inflation, remittance savings)
 
 Return detailed outline with estimated word count per section.
 
@@ -829,7 +859,7 @@ REQUIREMENTS:
 ADDITIONAL:
 - Write for ${request.context.targetAudience || 'general'} audience
 - Maintain ${request.context.tone || 'professional'} tone
-- Include African market context in each major section
+- Include regional market context (Africa, LatAm, Caribbean) and payment/remittance networks in each major section
 - Write compelling transitions between sections
 - Include specific examples and data points
 - Incorporate suggested keywords naturally
@@ -849,7 +879,7 @@ YOUR TASK:
 2. Identify top-ranking content gaps
 3. Determine optimal content structure
 4. List primary and secondary keywords
-5. Plan African market integration points
+5. Plan regional market integration points (Africa, LatAm, Caribbean) including payment systems and macroeconomics
 6. Suggest internal/external linking opportunities
 
 REQUIRED: Plan the RankBrain-Friendly 6-Step Framework:
@@ -879,7 +909,7 @@ EXECUTION CHECKLIST (RankBrain 6-Step Framework):
 ADDITIONAL REQUIREMENTS:
 ✓ Target ${request.context.wordCount || 1000} words
 ✓ Write for ${request.context.targetAudience || 'general'} readers
-✓ Include African cryptocurrency market context in each major section
+✓ Include regional cryptocurrency/fintech market context (Africa, LatAm, Caribbean) in each major section
 ✓ Add meta title (60 chars) and meta description (160 chars)
 ✓ Ensure readability and flow between sections
 
@@ -887,25 +917,37 @@ Write the polished, SEO-optimized article following all 6 framework steps:`;
   }
 
   private buildVisualAnalysisPrompt(request: ImoPromptRequest): string {
+    const { africanFocus, caribbeanFocus, latamFocus } = request.context;
+    let styleGuide = 'professional crypto theme';
+    if (africanFocus) styleGuide = 'incorporating African vibrant colors/patterns';
+    else if (latamFocus) styleGuide = 'incorporating Latin American cultural elements';
+    else if (caribbeanFocus) styleGuide = 'incorporating Caribbean tropical aesthetics/colors';
+
     return `Analyze visual requirements for: ${request.context.articleTitle || request.context.topic}
 
 Consider:
 1. Key visual elements to represent the topic
-2. Color scheme (${request.context.africanFocus ? 'incorporating African vibrant colors' : 'professional crypto theme'})
+2. Color scheme (${styleGuide})
 3. Composition and layout
 4. Style and mood
-5. African elements if applicable
+5. Regional elements if applicable
 
 Provide visual composition strategy:`;
   }
 
   private buildDetailedImagePrompt(request: ImoPromptRequest): string {
+    const { africanFocus, caribbeanFocus, latamFocus } = request.context;
+    let styleGuide = 'Modern digital design';
+    if (africanFocus) styleGuide = 'African cultural elements';
+    else if (latamFocus) styleGuide = 'Latin American cultural elements';
+    else if (caribbeanFocus) styleGuide = 'Caribbean tropical elements';
+
     return `Based on the visual strategy from Step 1, create a detailed image generation prompt.
 
 Requirements:
 - Specific, descriptive language
-- Professional cryptocurrency theme
-- ${request.context.africanFocus ? 'African cultural elements' : 'Modern digital design'}
+- Professional cryptocurrency/finance/AI theme
+- ${styleGuide}
 - High quality, clean composition
 - ${request.context.aspectRatio || 'balanced'} layout
 

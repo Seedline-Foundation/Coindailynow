@@ -866,6 +866,8 @@ model User {
   avatarUrl                    String?
   bio                          String?
   location                     String?
+  country                      String?
+  onboardingCompleted          Boolean                    @default(false)
   preferredLanguage            String                     @default("en")
   subscriptionTier             String                     @default("FREE")
   emailVerified                Boolean                    @default(false)
@@ -10606,6 +10608,7 @@ model AICostBudget {
   @@index([budgetType, isActive])
   @@index([agentName])
   @@map("ai_cost_budgets")
+}
 // ═══════════════════════════════════════════════════════════════════════
 // Marketplace — Creator Economy Digital Products (Wave 1, MKT-0-1)
 // Off-chain MVP: products + orders + reviews + seller payouts.

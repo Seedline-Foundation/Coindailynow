@@ -71,8 +71,8 @@ export class ImageAgentBridge {
    * Analyze an article headline and return the scene plan + prompt
    * without actually generating an image.
    */
-  analyze(article: ArticleContext) {
-    return this.service.analyzeHeadline(
+  async analyze(article: ArticleContext) {
+    return await this.service.analyzeHeadline(
       article.title,
       article.excerpt,
       article.category,

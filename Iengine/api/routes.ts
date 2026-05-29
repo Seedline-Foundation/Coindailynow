@@ -102,7 +102,7 @@ router.post('/analyze', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'headline is required' });
     }
 
-    const analysis = iengine.analyzeHeadline(headline, excerpt, category, tags, region);
+    const analysis = await iengine.analyzeHeadline(headline, excerpt, category, tags, region);
 
     return res.json({
       success: true,

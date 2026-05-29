@@ -27,7 +27,7 @@ import {
  * - IP logging
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
 function StaffLoginContent() {
   const router = useRouter();
@@ -66,10 +66,8 @@ function StaffLoginContent() {
                   id
                   email
                   role
-                  profile {
-                    firstName
-                    lastName
-                  }
+                  firstName
+                  lastName
                 }
                 tokens {
                   accessToken
@@ -103,18 +101,28 @@ function StaffLoginContent() {
         throw new Error(data?.error?.message || 'Invalid credentials');
       }
 
-      const allowedRoles = requireSuper
-        ? ['SUPER_ADMIN']
-        : ['ADMIN', 'CONTENT_ADMIN', 'TECH_ADMIN', 'MARKETING_ADMIN', 'SUPER_ADMIN'];
+      // Only general staff roles are allowed on this page. Super Admins must use the secure portal.
+      const allowedRoles = ['ADMIN', 'CONTENT_ADMIN', 'TECH_ADMIN', 'MARKETING_ADMIN'];
       if (!allowedRoles.includes(data.user?.role)) {
-        throw new Error(
-          requireSuper ? 'Super Admin access only.' : 'Access denied. Staff login only.',
-        );
+        if (data.user?.role === 'SUPER_ADMIN') {
+          throw new Error('Super Admins must use the secure Super Admin login portal at /auth/sadmin.');
+        }
+        throw new Error('Access denied. Staff login only.');
       }
+
+      const sessionUser = {
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.role,
+        profile: {
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+        }
+      };
 
       login(
         { accessToken: data.tokens.accessToken, refreshToken: data.tokens.refreshToken },
-        data.user,
+        sessionUser,
       );
 
       router.push(getPostLoginPath(data.user.role));

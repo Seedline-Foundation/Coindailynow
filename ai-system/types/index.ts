@@ -205,11 +205,29 @@ export interface AfricanMarketContext {
   culturalContext?: Record<string, any>;
 }
 
+export interface CaribbeanMarketContext {
+  countries: string[];
+  languages: string[];
+  currencies: string[];
+  timezone: string;
+  localRegulators?: string[];
+}
+
+export interface LatAmMarketContext {
+  countries: string[];
+  languages: string[];
+  exchanges: string[];
+  timezone: string;
+  paymentSystems?: string[];
+}
+
 export interface ContentGenerationTask extends AITask {
   payload: {
     topic: string;
     targetLanguages: string[];
-    africanContext: AfricanMarketContext;
+    africanContext?: AfricanMarketContext;
+    caribbeanContext?: CaribbeanMarketContext;
+    latamContext?: LatAmMarketContext;
     contentType: 'article' | 'summary' | 'social_post' | 'newsletter';
     keywords: string[];
     sources?: string[];
@@ -225,7 +243,9 @@ export interface MarketAnalysisTask extends AITask {
       start: Date;
       end: Date;
     };
-    africanContext: AfricanMarketContext;
+    africanContext?: AfricanMarketContext;
+    caribbeanContext?: CaribbeanMarketContext;
+    latamContext?: LatAmMarketContext;
   };
 }
 
@@ -235,7 +255,9 @@ export interface QualityReviewTask extends AITask {
     content: string;
     contentType: string;
     reviewCriteria: string[];
-    africanContext: AfricanMarketContext;
+    africanContext?: AfricanMarketContext;
+    caribbeanContext?: CaribbeanMarketContext;
+    latamContext?: LatAmMarketContext;
     requiresFactCheck: boolean;
   };
 }

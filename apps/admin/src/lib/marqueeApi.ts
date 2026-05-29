@@ -3,7 +3,7 @@ import { getAuthHeaders as buildAuthHeaders } from '@/lib/auth';
  * Marquee admin API — targets backend `/api/marquee/admin*` routes.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 const BASE = `${API_URL}/api/marquee`;
 
 function getAuthHeaders(): Record<string, string> {

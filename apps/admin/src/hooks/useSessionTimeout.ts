@@ -17,7 +17,7 @@ function decodeJwtPayload(token: string): { exp?: number; iat?: number } | null 
   }
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
 /** How many seconds before expiry to show the warning */
 const WARNING_LEAD_SECONDS = 60;

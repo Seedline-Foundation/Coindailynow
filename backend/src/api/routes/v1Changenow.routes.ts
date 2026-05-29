@@ -42,7 +42,12 @@ router.get('/estimate', optionalAuthMiddleware, async (req: Request, res: Respon
     return res.status(400).json({ success: false, error: parsed.error.flatten() });
   }
   try {
-    const result = await changeNowProvider.estimate(parsed.data);
+    const result = await changeNowProvider.estimate({
+      fromCurrency: parsed.data.fromCurrency,
+      toCurrency: parsed.data.toCurrency,
+      fromAmount: parsed.data.fromAmount,
+      flow: parsed.data.flow,
+    });
     return res.json({ success: true, data: result });
   } catch (e: any) {
     logger.error('[ChangeNOW estimate]', { error: e.message });
@@ -57,7 +62,12 @@ router.post('/exchange', authMiddleware, async (req: Request, res: Response) => 
   }
   try {
     const exchange = await changeNowProvider.createExchange({
-      ...parsed.data,
+      fromCurrency: parsed.data.fromCurrency,
+      toCurrency: parsed.data.toCurrency,
+      fromAmount: parsed.data.fromAmount,
+      toAddress: parsed.data.toAddress,
+      refundAddress: parsed.data.refundAddress,
+      flow: parsed.data.flow,
       userId: req.user?.id,
     });
     return res.status(201).json({ success: true, data: exchange });

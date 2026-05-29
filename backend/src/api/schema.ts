@@ -46,6 +46,8 @@ export const typeDefs = `
     password: String!
     firstName: String
     lastName: String
+    country: String
+    preferredLanguage: String
     deviceFingerprint: String
     ipAddress: String
     userAgent: String
@@ -87,6 +89,10 @@ export const typeDefs = `
 
   enum UserRole {
     USER
+    CONTRIBUTOR
+    JOURNALIST
+    EDITOR
+    CEO
     ADMIN
     CONTENT_ADMIN
     MARKETING_ADMIN

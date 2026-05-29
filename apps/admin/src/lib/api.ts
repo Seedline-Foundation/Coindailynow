@@ -5,7 +5,7 @@
 
 import { getAccessToken } from './auth';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
 interface FetchOptions {
   method?: string;
@@ -171,10 +171,8 @@ export async function loginAdmin(email: string, password: string) {
           id
           email
           role
-          profile {
-            firstName
-            lastName
-          }
+          firstName
+          lastName
         }
         tokens {
           accessToken

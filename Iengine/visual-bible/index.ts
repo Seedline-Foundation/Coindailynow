@@ -12,3 +12,5 @@ export { compositionRules, getCompositionDirective } from './composition';
 export { regionalProfiles, getRegionalProfile, buildRegionalInstruction } from './regional';
 export { storyTypeConfigs, detectStoryType, getStoryTypeConfig } from './storytypes';
 export { universalNegatives, domainNegatives, buildNegativePrompt, getDomainFromStoryType } from './negative-rules';
+export { getStyle } from './visualBible';
+

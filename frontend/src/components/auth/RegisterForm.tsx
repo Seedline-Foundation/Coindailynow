@@ -11,7 +11,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { Input, Button, Checkbox, Select, Alert } from '../ui';
 import { useFormValidation, validateRegisterForm } from '../../utils/validation';
-import { RegisterFormData, AFRICAN_LOCALES } from '../../types/auth';
+import { RegisterFormData } from '../../types/auth';
+import { COUNTRY_MENU, GLOBAL_LANGUAGES } from '../../lib/geo';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -47,7 +48,7 @@ export function RegisterForm({
       lastName: '',
       agreeToTerms: false,
       subscribeToNewsletter: false,
-      preferredLanguage: 'en-NG',
+      preferredLanguage: 'en',
       country: 'NG'
     },
     {
@@ -64,21 +65,39 @@ export function RegisterForm({
     }
   );
 
-  // Country options for African markets
-  const countryOptions = AFRICAN_LOCALES.map(locale => {
-    const countryCode = locale.code.split('-')[1];
-    return {
-      value: countryCode || 'NG',
-      label: locale.name.replace(/^English \(/, '').replace(/\)$/, ''),
-      flag: locale.flag
-    };
-  });
+  const countryFlags: Record<string, string> = {
+    NG: '🇳🇬',
+    KE: '🇰🇪',
+    ZA: '🇿🇦',
+    GH: '🇬🇭',
+    BR: '🇧🇷',
+    PY: '🇵🇾',
+    CL: '🇨🇱',
+    TT: '🇹🇹',
+    BB: '🇧🇧',
+    LC: '🇱🇨'
+  };
+
+  const languageFlags: Record<string, string> = {
+    en: '🇬🇧',
+    fr: '🇫🇷',
+    de: '🇩🇪',
+    es: '🇪🇸',
+    pt: '🇵🇹'
+  };
+
+  // Country options for regional markets
+  const countryOptions = COUNTRY_MENU.map(c => ({
+    value: c.code,
+    label: c.label,
+    flag: countryFlags[c.code] || '🌐'
+  }));
 
   // Language options
-  const languageOptions = AFRICAN_LOCALES.map(locale => ({
-    value: locale.code,
-    label: locale.name,
-    flag: locale.flag
+  const languageOptions = GLOBAL_LANGUAGES.map(l => ({
+    value: l.code,
+    label: l.name,
+    flag: languageFlags[l.code] || '🌐'
   }));
 
   const handleSubmit = async (event: React.FormEvent) => {

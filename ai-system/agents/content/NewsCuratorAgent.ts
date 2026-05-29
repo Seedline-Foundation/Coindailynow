@@ -73,18 +73,22 @@ Return JSON:
       "seoTitle": string,
       "seoDescription": string,
       "tags": [string],
-      "africanAngle": string
+      "africanAngle": string,
+      "caribbeanAngle": string,
+      "latamAngle": string
     },
     "articles": [
       {
         "headline": string,
         "summary": string (2-3 sentences),
-        "category": "market"|"defi"|"regulation"|"african"|"memecoin"|"technology"|"opinion",
+        "category": "market"|"defi"|"regulation"|"african"|"caribbean"|"latam"|"memecoin"|"technology"|"opinion"|"ai"|"tradfi"|"blockchain",
         "priority": "breaking"|"high"|"normal",
         "seoTitle": string,
         "tags": [string],
         "readTime": number,
         "africanRelevance": number (0-1),
+        "caribbeanRelevance": number (0-1),
+        "latamRelevance": number (0-1),
         "publishReady": boolean
       }
     ],
@@ -112,7 +116,7 @@ Return JSON:
 
 Source data: ${JSON.stringify(data || {}, null, 2)}
 
-Write in journalistic style, focusing on African crypto market relevance. Return JSON:
+Write in journalistic style, focusing on regional crypto market relevance (Africa, LatAm, Caribbean). Return JSON:
 {
   "article": {
     "headline": string,
@@ -126,6 +130,8 @@ Write in journalistic style, focusing on African crypto market relevance. Return
     "keywords": [string],
     "readTime": number,
     "africanContext": string (1-2 sentences tying to African markets),
+    "caribbeanContext": string (1-2 sentences tying to Caribbean markets),
+    "latamContext": string (1-2 sentences tying to Latin American markets),
     "sources": [{"name": string, "url": string}],
     "relatedTopics": [string],
     "publishReady": boolean,

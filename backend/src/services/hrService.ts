@@ -158,7 +158,7 @@ Respond in JSON format only:
   "summary": "<2-3 sentence assessment>"
 }`;
 
-      const response = await complete(prompt, { model: AI_MODELS.FAST });
+      const response = await complete(prompt, { model: AI_MODELS.LLAMA });
       const jsonMatch = response.match(/\{[\s\S]*\}/);
 
       if (jsonMatch) {

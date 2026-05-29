@@ -85,6 +85,10 @@ import adminAiTasksRouter from './api/admin/aiTasksRoutes';
 import adminFinanceApprovalsRouter from './api/admin/financialApprovalsRoutes';
 import adminIpWhitelistRouter from './api/admin/ipWhitelistRoutes';
 import v1MarketplaceRouter from './api/routes/v1Marketplace.routes';
+import onboardingRouter from './routes/onboarding.routes';
+import ticketsRouter from './routes/tickets.routes';
+import helpRouter from './routes/help.routes';
+import botRouter from './routes/bot.routes';
 import { startMLRetrainingLoop } from './agents/AdsRotationAgent';
 import { integrateAIRegistryRoutes } from './integrations/aiRegistryIntegration';
 import { integrateIengineRoutes } from './integrations/iengineIntegration';
@@ -313,6 +317,11 @@ export async function setupApp() {
     'http://localhost:3002',
     'http://localhost:3003',
     'http://localhost:3004',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:3002',
+    'http://127.0.0.1:3003',
+    'http://127.0.0.1:3004',
     // Additional origins from env (comma-separated)
     ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(o => o.trim()) : []),
   ].filter(Boolean);
@@ -404,6 +413,9 @@ export async function setupApp() {
       '/api/v1/traffic',
       '/api/v1/changenow/callback',
       '/api/finance-events',
+      // Onboarding & user routes
+      '/api/onboarding',
+      '/api/user',
       // Health/metrics (read-only, no state changes)
       '/health',
       '/metrics',
@@ -554,6 +566,12 @@ export async function setupApp() {
 
   // Marketplace (creator economy digital products, MKT-0-2 / MKT-2-5).
   app.use('/api/v1/marketplace', v1MarketplaceRouter);
+
+  // Help & Support Intelligence Layer
+  app.use('/api/onboarding', onboardingRouter);
+  app.use('/api/tickets', ticketsRouter);
+  app.use('/api/help', helpRouter);
+  app.use('/api/bots', botRouter);
 
   // RSS Feed Output Routes (full-text RSS, Atom, JSON Feed, Google News feed)
   app.use('/', rssFeedRouter);

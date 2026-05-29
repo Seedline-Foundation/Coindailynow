@@ -87,7 +87,7 @@ export class IengineService {
     );
 
     const emotion = this.emotionEngine.analyze(narrative);
-    const scene = this.scenePlanner.plan(narrative, emotion, request.region);
+    const scene = await this.scenePlanner.plan(narrative, emotion, request.region, request.headline);
     const { positive, negative } = this.promptComposer.compose(scene);
     const workflow = this.workflowRouter.route(scene);
 
@@ -136,7 +136,7 @@ export class IengineService {
       request.tags
     );
     const emotion = this.emotionEngine.analyze(narrative);
-    const scene = this.scenePlanner.plan(narrative, emotion, request.region);
+    const scene = await this.scenePlanner.plan(narrative, emotion, request.region, request.headline);
     const { positive, negative } = this.promptComposer.compose(scene);
     const workflow = this.workflowRouter.route(scene);
 
@@ -219,13 +219,13 @@ export class IengineService {
    * Analyze a headline without generating an image.
    * Useful for preview/debugging in the admin dashboard.
    */
-  analyzeHeadline(
+  async analyzeHeadline(
     headline: string,
     excerpt?: string,
     category?: string,
     tags?: string[],
     region?: string
-  ): {
+  ): Promise<{
     narrative: NarrativeAnalysis;
     emotion: EmotionAnalysis;
     scene: ScenePlan;
@@ -233,10 +233,10 @@ export class IengineService {
     negative_prompt: string;
     workflow: WorkflowConfig;
     thumbnail_plan: ThumbnailPlan;
-  } {
+  }> {
     const narrative = this.narrativeEngine.analyze(headline, excerpt, category, tags);
     const emotion = this.emotionEngine.analyze(narrative);
-    const scene = this.scenePlanner.plan(narrative, emotion, region);
+    const scene = await this.scenePlanner.plan(narrative, emotion, region, headline);
     const { positive, negative } = this.promptComposer.compose(scene);
     const workflow = this.workflowRouter.route(scene);
     const thumbnailPlan = this.thumbnailIntelligence.plan(scene);

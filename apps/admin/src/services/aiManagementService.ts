@@ -253,7 +253,7 @@ class AIManagementService {
   private api: AxiosInstance;
 
   constructor() {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const baseURL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
     this.api = axios.create({
       baseURL,
       timeout: 30000,

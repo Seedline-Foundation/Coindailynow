@@ -1,0 +1,13 @@
+{
+  "lighting": [
+    "white-blue diffusion",
+    "chrome reflections",
+    "synthetic ambient glow",
+    "holographic data illumination"
+  ],
+  "avoid": [
+    "warm tones",
+    "organic lighting",
+    "shadow-heavy"
+  ]
+}

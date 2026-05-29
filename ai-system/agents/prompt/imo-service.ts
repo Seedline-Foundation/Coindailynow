@@ -49,6 +49,8 @@ export class ImoService {
     category?: string;
     keywords?: string[];
     africanFocus?: boolean;
+    caribbeanFocus?: boolean;
+    latamFocus?: boolean;
     aspectRatio?: '16:9' | '4:3' | '1:1';
     // Extended fields used by AIReviewAgent
     article_title?: string;
@@ -60,6 +62,8 @@ export class ImoService {
     const title = params.articleTitle || params.article_title || '';
     const topic = params.category || params.article_theme || '';
     const africanFocus = params.africanFocus ?? params.include_african_elements ?? true;
+    const caribbeanFocus = params.caribbeanFocus ?? false;
+    const latamFocus = params.latamFocus ?? false;
 
     // Build visual style from style param or default
     let visualStyle = 'modern professional cryptocurrency illustration';
@@ -80,6 +84,8 @@ export class ImoService {
         topic,
         keywords: params.keywords,
         africanFocus,
+        caribbeanFocus,
+        latamFocus,
         aspectRatio: params.aspectRatio || '16:9',
         visualStyle,
         ...(customInstructions && { customInstructions })
@@ -167,6 +173,8 @@ export class ImoService {
     targetAudience?: 'beginner' | 'intermediate' | 'expert' | string;
     wordCount?: number;
     africanFocus?: boolean;
+    caribbeanFocus?: boolean;
+    latamFocus?: boolean;
     // Extended fields used by AIReviewAgent
     target_word_count?: number;
     facts_to_preserve?: string[];
@@ -204,6 +212,8 @@ export class ImoService {
         targetAudience: audience as any,
         wordCount,
         africanFocus: params.africanFocus ?? true,
+        caribbeanFocus: params.caribbeanFocus ?? false,
+        latamFocus: params.latamFocus ?? false,
         tone: (params.tone || 'professional') as any,
         ...(customParts.length > 0 && { customInstructions: customParts.join('\n') })
       },
@@ -221,6 +231,8 @@ export class ImoService {
     topic: string;
     keywords: string[];
     competitorUrls?: string[];
+    caribbeanFocus?: boolean;
+    latamFocus?: boolean;
   }): Promise<ImoPromptResult> {
     // First, if competitor URLs provided, fetch RAG context
     let contextDocs: ImoPromptRequest['context']['contextDocs'] = [];
@@ -243,7 +255,9 @@ export class ImoService {
         targetKeywords: params.keywords,
         competitorUrls: params.competitorUrls,
         contextDocs,
-        africanFocus: true
+        africanFocus: true,
+        caribbeanFocus: params.caribbeanFocus ?? false,
+        latamFocus: params.latamFocus ?? false
       },
       options: {
         enableRAG: contextDocs.length > 0,
@@ -266,6 +280,8 @@ export class ImoService {
     targetLanguage?: string;
     contentType?: 'article' | 'headline' | 'social_post' | 'meta_description';
     preserveTerms?: string[];
+    caribbeanFocus?: boolean;
+    latamFocus?: boolean;
     // Extended fields used by AIReviewAgent
     source_text?: string;
     source_language?: string;
@@ -302,7 +318,9 @@ export class ImoService {
         targetLanguage,
         keywords: params.preserveTerms,
         tone: 'professional',
-        customInstructions: customParts.join('\n')
+        customInstructions: customParts.join('\n'),
+        caribbeanFocus: params.caribbeanFocus ?? false,
+        latamFocus: params.latamFocus ?? false
       },
       options: {
         maxSteps: 2,
@@ -352,6 +370,8 @@ export class ImoService {
   async generateSearchResponsePrompt(params: {
     userQuery: string;
     maxSources?: number;
+    caribbeanFocus?: boolean;
+    latamFocus?: boolean;
   }): Promise<ImoPromptResult> {
     // Fetch real-time context from web
     const ragResults = await this.fetchRAGContext(params.userQuery);
@@ -371,7 +391,9 @@ export class ImoService {
       context: {
         searchQuery: params.userQuery,
         contextDocs,
-        africanFocus: true
+        africanFocus: true,
+        caribbeanFocus: params.caribbeanFocus ?? false,
+        latamFocus: params.latamFocus ?? false
       },
       options: {
         enableRAG: true
@@ -425,6 +447,8 @@ export class ImoService {
     platform: 'twitter' | 'facebook' | 'linkedin' | 'instagram';
     articleUrl?: string;
     hashtags?: string[];
+    caribbeanFocus?: boolean;
+    latamFocus?: boolean;
   }): Promise<ImoPromptResult> {
     const platformLimits: Record<string, number> = {
       twitter: 280,
@@ -439,6 +463,8 @@ export class ImoService {
       context: {
         topic: params.topic,
         africanFocus: true,
+        caribbeanFocus: params.caribbeanFocus ?? false,
+        latamFocus: params.latamFocus ?? false,
         keywords: params.hashtags,
         customInstructions: `
 Platform: ${params.platform}

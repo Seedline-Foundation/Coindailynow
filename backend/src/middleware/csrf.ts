@@ -127,6 +127,11 @@ export function csrfProtection(config: Partial<CsrfConfig> = {}) {
       return next();
     }
 
+    // Skip CSRF protection if Authorization header with Bearer token is present
+    if (req.headers.authorization?.startsWith('Bearer ')) {
+      return next();
+    }
+
     // Skip CSRF protection for safe methods (GET, HEAD, OPTIONS)
     if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
       // For GET requests, generate and set new token if not exists

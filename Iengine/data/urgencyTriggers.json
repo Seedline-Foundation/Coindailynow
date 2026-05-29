@@ -1,0 +1,6 @@
+{
+  "critical": ["breaking", "urgent", "emergency", "flash", "just in", "alert", "crash", "hack"],
+  "high": ["exclusive", "major", "significant", "massive", "billion", "unprecedented"],
+  "medium": ["report", "announce", "update", "launch", "new"],
+  "low": ["analysis", "opinion", "review", "history", "explained", "guide"]
+}

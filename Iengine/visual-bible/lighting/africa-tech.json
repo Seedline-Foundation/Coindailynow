@@ -1,0 +1,13 @@
+{
+  "lighting": [
+    "warm sunlight gradients",
+    "amber neon",
+    "rich atmospheric gold",
+    "humid urban glow"
+  ],
+  "avoid": [
+    "cold sterile lighting",
+    "western corporate",
+    "overexposed flat"
+  ]
+}
