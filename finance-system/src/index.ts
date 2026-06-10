@@ -16,9 +16,14 @@ import dotenv from 'dotenv';
 // Load environment variables before any local module imports
 dotenv.config();
 
+// Bypass self-signed SSL certificate issues with Supabase in development
+if (process.env.NODE_ENV === 'development') {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { requireSuperAdmin, loginSuperAdmin, verifyTOTP, setupTOTP, verifyInternalHMAC } from './middleware/auth';
+import { requireSuperAdmin, loginSuperAdmin, verifyTOTP, setupTOTP, verifyInternalHMAC, ipWhitelist } from './middleware/auth';
 
 // Route modules
 import dashboardRoutes from './routes/dashboard';
@@ -57,6 +62,9 @@ app.use(helmet({
 }));
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Apply IP Whitelist protection globally (W4)
+app.use(ipWhitelist);
 
 // ─── Rate Limiting ──────────────────────────────────────────────────
 const loginLimiter = rateLimit({
@@ -121,6 +129,7 @@ app.use((req, res, next) => {
 // ─── Static Dashboard (auth-gated — Super Admin only) ────────────────
 // The dashboard HTML is a client-side SPA that calls CFIS APIs with a JWT.
 // We gate access so the UI structure and endpoints aren't exposed to unauthorized users.
+app.use('/login', express.static(path.join(__dirname, '..', 'public', 'dashboard')));
 app.use('/dashboard', requireSuperAdmin, express.static(path.join(__dirname, '..', 'public', 'dashboard')));
 app.get('/', (req, res) => res.redirect('/dashboard'));
 

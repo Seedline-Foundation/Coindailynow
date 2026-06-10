@@ -4,6 +4,7 @@ import { auditService } from '../services/AuditService';
 import { adminService } from '../services/AdminService';
 
 const JWT_SECRET = process.env.CFIS_JWT_SECRET || 'cfis-super-secret-key-change-in-production';
+const BACKEND_JWT_SECRET = process.env.BACKEND_JWT_SECRET || 'dev_jwt_secret_key_change_in_production_123456789';
 // Separate secret for short-lived pre-auth tokens (password verified, TOTP pending)
 const TEMP_TOKEN_SECRET = JWT_SECRET + ':totp-pending';
 
@@ -17,39 +18,115 @@ export interface AuthenticatedRequest extends Request {
   };
 }
 
-// ─── JWT Guard (unchanged — protects all authenticated routes) ──────
+// ─── IP Whitelist Middleware ───────────────────────────────────────
 /**
- * Verifies the Bearer JWT on every protected route.
- * Only SUPER_ADMIN role is accepted.
+ * Verifies client IP is whitelisted (W4). Returns 404 if blocked.
  */
-export function requireSuperAdmin(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ error: { code: 'AUTH_REQUIRED', message: 'Authentication required. Super Admin access only.' } });
+export function ipWhitelist(req: Request, res: Response, next: NextFunction): void {
+  const bypassWhitelist = process.env.ADMIN_WHITELISTED_IPS === 'BYPASS_ALL';
+  if (bypassWhitelist) {
+    next();
     return;
   }
 
-  const token = authHeader.substring(7);
-  try {
-    const payload = jwt.verify(token, JWT_SECRET) as any;
-    if (payload.role !== 'SUPER_ADMIN') {
-      res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Super Admin access only.' } });
-      return;
-    }
-    if (!SUPER_ADMIN_EMAILS.includes(payload.email)) {
-      res.status(403).json({ error: { code: 'UNAUTHORIZED_ADMIN', message: 'Email not authorized.' } });
-      return;
-    }
+  const forwardedFor = req.headers['x-forwarded-for'] as string;
+  const clientIP = forwardedFor?.split(',')[0]?.trim() || req.ip || 'unknown';
 
-    req.admin = {
-      id: payload.id,
-      email: payload.email,
-      role: 'SUPER_ADMIN',
-    };
-    next();
-  } catch {
-    res.status(401).json({ error: { code: 'INVALID_TOKEN', message: 'Invalid or expired token.' } });
+  const whitelist = (process.env.ADMIN_WHITELISTED_IPS || '127.0.0.1,::1').split(',').map(ip => ip.trim()).filter(Boolean);
+  
+  if (!whitelist.includes(clientIP)) {
+    console.log(`[CFIS IP BLOCKED] IP ${clientIP} not whitelisted.`);
+    res.status(404).send('Not Found');
+    return;
   }
+
+  next();
+}
+
+// ─── JWT Guard (protects all authenticated routes & /dashboard) ──────
+/**
+ * Verifies the JWT on every protected route/page load.
+ * Supports Authorization header, token query param, or cfis_token cookie.
+ * Redirects browser navigation requests to /login instead of JSON response.
+ */
+export function requireSuperAdmin(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
+  let token = '';
+
+  // 1. Check Authorization header
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7);
+  }
+
+  // 2. Check query parameter
+  if (!token && req.query && req.query.token) {
+    token = String(req.query.token);
+  }
+
+  // 3. Check cookies (basic parser)
+  if (!token && req.headers.cookie) {
+    const match = req.headers.cookie.match(/cfis_token=([^;]+)/);
+    if (match) {
+      token = match[1];
+    }
+  }
+
+  const handleUnauthorized = (code: string, message: string, status = 401) => {
+    const acceptHeader = req.headers.accept || '';
+    if (acceptHeader.includes('text/html')) {
+      res.redirect('/login');
+      return;
+    }
+    res.status(status).json({ error: { code, message } });
+  };
+
+  if (!token) {
+    handleUnauthorized('AUTH_REQUIRED', 'Authentication required. Super Admin access only.', 401);
+    return;
+  }
+
+  let payload: any = null;
+  let verifiedWithCfisSecret = false;
+
+  try {
+    payload = jwt.verify(token, JWT_SECRET) as any;
+    verifiedWithCfisSecret = true;
+  } catch (err) {
+    // If not verified with CFIS secret, we can try BACKEND_JWT_SECRET
+    // ONLY if the request is NOT for the standalone portal HTML pages (direct access /dashboard)
+    const isHtmlRequest = (req.headers.accept || '').includes('text/html') || 
+                          req.path.startsWith('/dashboard');
+    if (!isHtmlRequest) {
+      try {
+        payload = jwt.verify(token, BACKEND_JWT_SECRET) as any;
+      } catch (backendErr) {
+        // Ignore, payload is null
+      }
+    }
+  }
+
+  if (!payload) {
+    handleUnauthorized('INVALID_TOKEN', 'Invalid or expired token.', 401);
+    return;
+  }
+
+  if (payload.role !== 'SUPER_ADMIN') {
+    handleUnauthorized('FORBIDDEN', 'Super Admin access only.', 403);
+    return;
+  }
+
+  // Email must be in the whitelist
+  if (!SUPER_ADMIN_EMAILS.includes(payload.email)) {
+    handleUnauthorized('UNAUTHORIZED_ADMIN', 'Email not authorized.', 403);
+    return;
+  }
+
+  req.admin = {
+    id: payload.id || 'super-admin-1',
+    email: payload.email,
+    role: 'SUPER_ADMIN',
+  };
+  next();
 }
 
 // ─── Step 1: Login (email + password → temp token) ──────────────────

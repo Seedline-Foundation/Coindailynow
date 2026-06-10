@@ -167,11 +167,32 @@ tr:hover td{background:rgba(245,158,11,.03);color:var(--text)}
     </div>
     <h1>CFIS</h1>
     <p>CoinDaily Financial Intelligence System<br><span style="font-size:12px;color:var(--text3)">Super Admin Access Only</span></p>
-    <label>Email</label>
-    <input type="email" id="login-email" placeholder="admin@coindaily.online" value="admin@coindaily.online">
-    <label>Password</label>
-    <input type="password" id="login-password" placeholder="Enter password">
-    <button onclick="handleLogin()">Sign In to CFIS</button>
+    
+    <div id="login-form-fields">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="admin@coindaily.online" value="admin@coindaily.online">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Enter password">
+      <button onclick="handleLogin()">Sign In to CFIS</button>
+    </div>
+
+    <div id="mfa-form-fields" style="display:none">
+      <h2 style="font-size:18px;margin-bottom:12px;color:var(--brand);text-align:center" id="mfa-title">MFA Verification</h2>
+      <p style="color:var(--text2);font-size:13px;text-align:center;margin-bottom:16px" id="mfa-desc"></p>
+      
+      <div id="mfa-setup-qr" style="text-align:center;margin-bottom:16px;display:none">
+        <img id="mfa-qr-img" src="" alt="MFA QR Code" style="width:180px;height:180px;border-radius:8px;border:4px solid white;margin-bottom:8px">
+        <div style="font-size:12px;color:var(--text2)">
+          Secret: <code id="mfa-secret-text" style="font-weight:bold;color:var(--brand)"></code>
+        </div>
+      </div>
+
+      <label style="text-align:center">6-Digit Authenticator Code</label>
+      <input type="text" id="mfa-code" placeholder="123456" maxlength="6" style="text-align:center;font-size:20px;letter-spacing:6px;font-weight:bold;margin-top:8px">
+      <button onclick="handleMfaVerify()">Verify Code</button>
+      <a href="#" onclick="cancelMfa()" style="display:block;text-align:center;margin-top:16px;font-size:13px;color:var(--text2)">Back to Login</a>
+    </div>
+
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
@@ -279,37 +300,117 @@ async function api(path, method = 'GET', body = null) {
 }
 
 // ──── Auth ────
+let tempMfaData = null;
+
 async function handleLogin() {
   const email = document.getElementById('login-email').value;
   const password = document.getElementById('login-password').value;
   const errorEl = document.getElementById('login-error');
+  errorEl.style.display = 'none';
+  
   try {
     const res = await api('/auth/login', 'POST', { email, password });
-    TOKEN = res.data.token;
-    localStorage.setItem('cfis_token', TOKEN);
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    loadPage('overview');
-    loadNotificationCount();
+    if (res.data && res.data.step) {
+      tempMfaData = res.data;
+      showMfaScreen(res.data);
+    } else if (res.data && res.data.token) {
+      completeLogin(res.data.token);
+    } else {
+      throw new Error('Authentication failed');
+    }
   } catch (e) {
     errorEl.textContent = e.message;
     errorEl.style.display = 'block';
   }
 }
 
+function showMfaScreen(mfaData) {
+  document.getElementById('login-form-fields').style.display = 'none';
+  document.getElementById('mfa-form-fields').style.display = 'block';
+  document.getElementById('mfa-code').value = '';
+  
+  const mfaTitle = document.getElementById('mfa-title');
+  const mfaDesc = document.getElementById('mfa-desc');
+  const mfaQrDiv = document.getElementById('mfa-setup-qr');
+  
+  if (mfaData.step === 'totp-setup') {
+    mfaTitle.textContent = 'Setup Google Authenticator';
+    mfaDesc.textContent = 'Scan the QR code below or enter the secret key manually into your authenticator app, then enter the 6-digit code to complete setup.';
+    document.getElementById('mfa-qr-img').src = `https://quickchart.io/chart?cht=qr&chs=180x180&chl=${encodeURIComponent(mfaData.totpUri)}`;
+    document.getElementById('mfa-secret-text').textContent = mfaData.totpSecret;
+    mfaQrDiv.style.display = 'block';
+  } else {
+    mfaTitle.textContent = 'MFA Verification';
+    mfaDesc.textContent = 'Enter the 6-digit verification code from your authenticator app to log in.';
+    mfaQrDiv.style.display = 'none';
+  }
+}
+
+async function handleMfaVerify() {
+  const code = document.getElementById('mfa-code').value.trim();
+  const errorEl = document.getElementById('login-error');
+  errorEl.style.display = 'none';
+  
+  if (!code || code.length !== 6) {
+    errorEl.textContent = 'Please enter a valid 6-digit code.';
+    errorEl.style.display = 'block';
+    return;
+  }
+  
+  const endpoint = tempMfaData.step === 'totp-setup' ? '/auth/setup-totp' : '/auth/verify-totp';
+  try {
+    const res = await api(endpoint, 'POST', {
+      tempToken: tempMfaData.tempToken,
+      code
+    });
+    if (res.data && res.data.token) {
+      completeLogin(res.data.token);
+    } else {
+      throw new Error('MFA verification failed');
+    }
+  } catch (e) {
+    errorEl.textContent = e.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+function completeLogin(token) {
+  TOKEN = token;
+  localStorage.setItem('cfis_token', TOKEN);
+  // Set cookie so requireSuperAdmin middleware allows page loads on /dashboard
+  document.cookie = "cfis_token=" + TOKEN + "; path=/; max-age=14400; SameSite=Lax";
+  window.location.href = '/dashboard';
+}
+
+function cancelMfa() {
+  tempMfaData = null;
+  document.getElementById('login-form-fields').style.display = 'block';
+  document.getElementById('mfa-form-fields').style.display = 'none';
+  document.getElementById('login-error').style.display = 'none';
+}
+
 function logout() {
   TOKEN = '';
   localStorage.removeItem('cfis_token');
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
+  // Clear cookie
+  document.cookie = "cfis_token=; path=/; max-age=0; SameSite=Lax";
+  window.location.href = '/login';
 }
 
-// Auto-login if token exists
+// Auto-login or redirect based on authentication state
 if (TOKEN) {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  loadPage('overview');
-  loadNotificationCount();
+  if (window.location.pathname === '/login' || window.location.pathname === '/login/') {
+    window.location.href = '/dashboard';
+  } else {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadPage('overview');
+    loadNotificationCount();
+  }
+} else {
+  if (window.location.pathname === '/dashboard' || window.location.pathname === '/dashboard/') {
+    window.location.href = '/login';
+  }
 }
 
 // ──── Navigation ────
