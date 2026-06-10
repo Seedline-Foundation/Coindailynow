@@ -21,10 +21,12 @@ router.get('/export', async (req: Request, res: Response) => {
     let csv: string;
     let filename: string;
     if (format === 'tokentax') {
-      csv = taxReportService.toTokenTaxCsv(rows);
+      const categorized = taxReportService.categorizeTransactions(rows);
+      csv = taxReportService.toTokenTaxCsv(categorized);
       filename = `cfis-tax-${year}-tokentax.csv`;
     } else if (format === 'koinly') {
-      csv = taxReportService.toKoinlyCsv(rows);
+      const categorized = taxReportService.categorizeTransactions(rows);
+      csv = taxReportService.toKoinlyCsv(categorized);
       filename = `cfis-tax-${year}-koinly.csv`;
     } else {
       csv = taxReportService.toCsv(rows);

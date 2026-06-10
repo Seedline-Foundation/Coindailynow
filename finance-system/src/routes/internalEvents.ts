@@ -33,7 +33,7 @@ router.post('/events', async (req: Request, res: Response) => {
     `Backend event: ${type || 'UNKNOWN'}`,
     JSON.stringify(rest).slice(0, 500),
     'SYSTEM',
-    'NORMAL',
+    'MEDIUM',
     'EVENT',
     String(rest.userId || rest.orderId || 'n/a'),
   );
@@ -43,7 +43,7 @@ router.post('/events', async (req: Request, res: Response) => {
     actor: 'BACKEND',
     entity_type: 'EVENT',
     entity_id: String(rest.subscriptionId || rest.transactionId || Date.now()),
-    metadata: rest,
+    new_value: rest,
   });
 
   res.json({ success: true });

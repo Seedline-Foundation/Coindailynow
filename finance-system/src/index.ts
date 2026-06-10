@@ -13,6 +13,9 @@
 import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
+// Load environment variables before any local module imports
+dotenv.config();
+
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { requireSuperAdmin, loginSuperAdmin, verifyTOTP, setupTOTP, verifyInternalHMAC } from './middleware/auth';
@@ -34,8 +37,6 @@ import payrollRoutes from './routes/payroll';
 import partnershipRoutes from './routes/partnerships';
 import airdropRoutes from './routes/airdrops';
 import notificationRoutes from './routes/notifications';
-
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3005;
