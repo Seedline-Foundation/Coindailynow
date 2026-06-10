@@ -116,11 +116,10 @@ export default function AdminSectionLayout({
         }
 
         // Verify token by querying current user via GraphQL
-        const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 10000);
         try {
-          const response = await fetch(`${API_URL}/graphql`, {
+          const response = await fetch('/graphql', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ query: '{ me { success user { id email role } } }' }),

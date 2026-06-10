@@ -199,3 +199,42 @@ export async function emergencyUnpublishArticle(articleId: string, reason?: stri
     body: { reason: reason || 'Emergency moderation unpublish' },
   });
 }
+
+export interface CreateArticleInput {
+  title: string;
+  excerpt: string;
+  content: string;
+  categoryId: string;
+  tags: string[];
+  isPremium: boolean;
+  featuredImageUrl?: string;
+  publishScheduledAt?: string;
+}
+
+export async function createArticle(input: CreateArticleInput) {
+  return graphqlRequest(`
+    mutation CreateArticle($input: CreateArticleInput!) {
+      createArticle(input: $input) {
+        id
+        title
+        slug
+      }
+    }
+  `, { input });
+}
+
+export interface AIGenerateInput {
+  topic: string;
+  category?: string;
+  tone?: string;
+  targetLength?: number;
+  language?: string;
+}
+
+export async function generateAIArticle(input: AIGenerateInput) {
+  return apiRequest('/api/super-admin/content/ai/generate', {
+    method: 'POST',
+    body: input,
+  });
+}
+

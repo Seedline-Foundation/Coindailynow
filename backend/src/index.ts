@@ -322,6 +322,9 @@ export async function setupApp() {
     'http://127.0.0.1:3002',
     'http://127.0.0.1:3003',
     'http://127.0.0.1:3004',
+    // Admin dev server ports
+    'http://localhost:3010',
+    'http://127.0.0.1:3010',
     // Additional origins from env (comma-separated)
     ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(o => o.trim()) : []),
   ].filter(Boolean);

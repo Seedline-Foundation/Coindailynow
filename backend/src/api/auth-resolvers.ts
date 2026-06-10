@@ -503,6 +503,7 @@ export const authTypeDefs = `
     username: String!
     firstName: String
     lastName: String
+    role: String!
     subscriptionTier: String!
     emailVerified: Boolean!
     status: String!

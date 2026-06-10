@@ -30,7 +30,7 @@ describe('TokenVesting (C-4-1)', function () {
     const factoryNonce = await ethers.provider.getTransactionCount(owner.address);
     const expectedVestingAddr = ethers.getCreateAddress({
       from: owner.address,
-      nonce: factoryNonce,
+      nonce: factoryNonce + 1,
     });
     await joy.approve(expectedVestingAddr, TOTAL);
 

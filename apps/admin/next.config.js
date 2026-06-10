@@ -29,7 +29,11 @@ const nextConfig = {
     const isProd = process.env.NODE_ENV === 'production';
     const connectSrc = isProd
       ? "connect-src 'self' https://app.coindaily.online wss://app.coindaily.online;"
-      : "connect-src 'self' http://localhost:4000 ws://localhost:4000 http://localhost:3002 ws://localhost:3002;";
+      : "connect-src 'self' http://localhost:4000 ws://localhost:4000 http://127.0.0.1:4000 ws://127.0.0.1:4000 http://localhost:3002 ws://localhost:3002 http://127.0.0.1:3002 ws://127.0.0.1:3002 http://localhost:3010 ws://localhost:3010 http://127.0.0.1:3010 ws://127.0.0.1:3010;";
+
+    const scriptSrc = isProd
+      ? "script-src 'self' 'unsafe-inline';"
+      : "script-src 'self' 'unsafe-inline' 'unsafe-eval';";
 
     return [
       {
@@ -42,7 +46,7 @@ const nextConfig = {
           { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
           { 
             key: 'Content-Security-Policy', 
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; ${connectSrc} frame-ancestors 'none';`
+            value: `default-src 'self'; ${scriptSrc} style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; ${connectSrc} frame-ancestors 'none';`
           },
         ],
       },

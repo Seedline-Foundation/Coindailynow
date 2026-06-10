@@ -52,7 +52,7 @@ function StaffLoginContent() {
 
     try {
       // Use GraphQL mutation for login
-      const response = await fetch(`${API_URL}/graphql`, {
+      const response = await fetch('/graphql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ function StaffLoginContent() {
     try {
       // For now, 2FA is handled during initial login
       // This is a placeholder for when 2FA step is separate
-      const response = await fetch(`${API_URL}/graphql`, {
+      const response = await fetch('/graphql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

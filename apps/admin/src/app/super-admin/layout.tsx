@@ -49,7 +49,7 @@ export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
       }
 
       try {
-        const response = await fetch(`${API_URL}/graphql`, {
+        const response = await fetch('/graphql', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ query: '{ me { success user { id email role } } }' }),
@@ -107,7 +107,7 @@ export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
         <SuperAdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="flex-1 flex flex-col min-w-0">
           <SuperAdminHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-          <main className="flex-1 overflow-auto p-6">{children}</main>
+          <main className={`flex-1 overflow-auto p-6 pt-20 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}>{children}</main>
         </div>
       </div>
     </SuperAdminProvider>

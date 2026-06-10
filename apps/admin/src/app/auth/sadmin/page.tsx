@@ -39,7 +39,7 @@ function SuperAdminLoginContent() {
 
     try {
       // Use GraphQL mutation for login
-      const response = await fetch(`${API_URL}/graphql`, {
+      const response = await fetch('/graphql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ function SuperAdminLoginContent() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/graphql`, {
+      const response = await fetch('/graphql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

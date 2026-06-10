@@ -104,12 +104,38 @@ export default function RolesAccessPage() {
       if (res.ok) {
         const data = await res.json();
         setAllPermissions(data.permissions || []);
-        setPermissionCategories(data.categories || {});
+        
+        const rawCategories = data.categories || {};
+        const categoriesDict: Record<string, Permission[]> = {};
+        
+        if (Array.isArray(rawCategories)) {
+          rawCategories.forEach((cat: any) => {
+            if (cat && typeof cat === 'object') {
+              const name = cat.name || cat.displayName || '';
+              const perms = Array.isArray(cat.permissions) ? cat.permissions : [];
+              if (name) {
+                categoriesDict[name] = perms;
+              }
+            }
+          });
+        } else if (rawCategories && typeof rawCategories === 'object') {
+          Object.entries(rawCategories).forEach(([key, value]: [string, any]) => {
+            if (value && Array.isArray(value)) {
+              categoriesDict[key] = value;
+            } else if (value && typeof value === 'object') {
+              const perms = Array.isArray(value.permissions) ? value.permissions : [];
+              categoriesDict[key] = perms;
+            }
+          });
+        }
+        setPermissionCategories(categoriesDict);
       }
     } catch (err) {
       console.error('Failed to load permissions:', err);
     }
   };
+
+
 
   const handleCreateRole = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -449,10 +475,12 @@ export default function RolesAccessPage() {
                   </div>
 
                   <div className="space-y-2 max-h-[400px] overflow-y-auto border border-gray-600 rounded-lg p-3">
-                    {Object.entries(permissionCategories).map(([category, perms]) => {
+                    {Object.entries(permissionCategories).map(([category, rawPerms]) => {
+                      const perms = Array.isArray(rawPerms) ? rawPerms : [];
                       const isExpanded = expandedCategories.includes(category);
                       const selectedCount = perms.filter(p => selectedPermissions.includes(p.key)).length;
                       const allSelected = perms.length === selectedCount;
+
 
                       return (
                         <div key={category} className="border border-gray-700 rounded-lg overflow-hidden">
