@@ -52,8 +52,9 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],  // dashboard needs inline scripts
+      "script-src-attr": ["'unsafe-inline'"],   // allow inline event handlers like onclick
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:"],
+      imgSrc: ["'self'", "data:", "https://quickchart.io"], // allow loading MFA QR code from QuickChart
       connectSrc: ["'self'"],
       frameAncestors: ["'none'"],
     },
