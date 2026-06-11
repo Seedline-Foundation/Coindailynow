@@ -30,7 +30,12 @@ export function ipWhitelist(req: Request, res: Response, next: NextFunction): vo
   }
 
   const forwardedFor = req.headers['x-forwarded-for'] as string;
-  const clientIP = forwardedFor?.split(',')[0]?.trim() || req.ip || 'unknown';
+  let clientIP = forwardedFor?.split(',')[0]?.trim() || req.ip || 'unknown';
+
+  // Strip IPv6-mapped IPv4 prefix
+  if (clientIP.startsWith('::ffff:')) {
+    clientIP = clientIP.substring(7);
+  }
 
   const whitelist = (process.env.ADMIN_WHITELISTED_IPS || '127.0.0.1,::1').split(',').map(ip => ip.trim()).filter(Boolean);
   
