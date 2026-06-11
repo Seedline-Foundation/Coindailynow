@@ -282,7 +282,17 @@ tr:hover td{background:rgba(245,158,11,.03);color:var(--text)}
 // ────────────────────────────────────────────────────────────────────
 
 const API = window.location.origin + '/api';
-let TOKEN = localStorage.getItem('cfis_token') || '';
+
+// Safe localStorage helper
+let TOKEN = '';
+try {
+  TOKEN = localStorage.getItem('cfis_token') || '';
+} catch (e) {
+  console.warn('[CFIS] localStorage is blocked or not supported:', e.message);
+}
+if (TOKEN === 'undefined' || TOKEN === 'null') {
+  TOKEN = '';
+}
 let currentPage = 'overview';
 
 // ──── API Helper ────
@@ -293,6 +303,8 @@ async function api(path, method = 'GET', body = null) {
   };
   if (TOKEN) opts.headers['Authorization'] = `Bearer ${TOKEN}`;
   if (body) opts.body = JSON.stringify(body);
+  
+  console.log(`[CFIS API] Requesting ${method} ${path}...`);
   const res = await fetch(API + path, opts);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || 'Request failed');
@@ -303,28 +315,41 @@ async function api(path, method = 'GET', body = null) {
 let tempMfaData = null;
 
 async function handleLogin() {
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
+  console.log('[CFIS Auth] handleLogin triggered');
+  const emailEl = document.getElementById('login-email');
+  const passwordEl = document.getElementById('login-password');
   const errorEl = document.getElementById('login-error');
+  
+  if (!emailEl || !passwordEl) {
+    console.error('[CFIS Auth] Login inputs not found in DOM!');
+    return;
+  }
+  
+  const email = emailEl.value;
+  const password = passwordEl.value;
   errorEl.style.display = 'none';
   
   try {
     const res = await api('/auth/login', 'POST', { email, password });
+    console.log('[CFIS Auth] Login response received:', res);
+    
     if (res.data && res.data.step) {
       tempMfaData = res.data;
       showMfaScreen(res.data);
     } else if (res.data && res.data.token) {
       completeLogin(res.data.token);
     } else {
-      throw new Error('Authentication failed');
+      throw new Error('Authentication response missing expected fields');
     }
   } catch (e) {
+    console.error('[CFIS Auth] Login error:', e);
     errorEl.textContent = e.message;
     errorEl.style.display = 'block';
   }
 }
 
 function showMfaScreen(mfaData) {
+  console.log('[CFIS Auth] Displaying MFA screen for step:', mfaData.step);
   document.getElementById('login-form-fields').style.display = 'none';
   document.getElementById('mfa-form-fields').style.display = 'block';
   document.getElementById('mfa-code').value = '';
@@ -347,6 +372,7 @@ function showMfaScreen(mfaData) {
 }
 
 async function handleMfaVerify() {
+  console.log('[CFIS Auth] handleMfaVerify triggered');
   const code = document.getElementById('mfa-code').value.trim();
   const errorEl = document.getElementById('login-error');
   errorEl.style.display = 'none';
@@ -363,26 +389,35 @@ async function handleMfaVerify() {
       tempToken: tempMfaData.tempToken,
       code
     });
+    console.log('[CFIS Auth] MFA verification response:', res);
+    
     if (res.data && res.data.token) {
       completeLogin(res.data.token);
     } else {
-      throw new Error('MFA verification failed');
+      throw new Error('MFA verification response missing session token');
     }
   } catch (e) {
+    console.error('[CFIS Auth] MFA verify error:', e);
     errorEl.textContent = e.message;
     errorEl.style.display = 'block';
   }
 }
 
 function completeLogin(token) {
+  console.log('[CFIS Auth] completeLogin called. Saving token...');
   TOKEN = token;
-  localStorage.setItem('cfis_token', TOKEN);
+  try {
+    localStorage.setItem('cfis_token', TOKEN);
+  } catch (e) {
+    console.warn('[CFIS] Could not write token to localStorage:', e.message);
+  }
   // Set cookie so requireSuperAdmin middleware allows page loads on /dashboard
   document.cookie = "cfis_token=" + TOKEN + "; path=/; max-age=14400; SameSite=Lax";
-  window.location.href = '/dashboard';
+  window.location.href = '/dashboard/';
 }
 
 function cancelMfa() {
+  console.log('[CFIS Auth] MFA cancelled by user');
   tempMfaData = null;
   document.getElementById('login-form-fields').style.display = 'block';
   document.getElementById('mfa-form-fields').style.display = 'none';
@@ -390,17 +425,23 @@ function cancelMfa() {
 }
 
 function logout() {
+  console.log('[CFIS Auth] logout triggered');
   TOKEN = '';
-  localStorage.removeItem('cfis_token');
+  try {
+    localStorage.removeItem('cfis_token');
+  } catch (e) {
+    console.warn('[CFIS] Could not remove token from localStorage:', e.message);
+  }
   // Clear cookie
   document.cookie = "cfis_token=; path=/; max-age=0; SameSite=Lax";
   window.location.href = '/login';
 }
 
 // Auto-login or redirect based on authentication state
+console.log('[CFIS Auth] Initializing auth state. Token exists:', !!TOKEN);
 if (TOKEN) {
   if (window.location.pathname === '/login' || window.location.pathname === '/login/') {
-    window.location.href = '/dashboard';
+    window.location.href = '/dashboard/';
   } else {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
@@ -408,7 +449,7 @@ if (TOKEN) {
     loadNotificationCount();
   }
 } else {
-  if (window.location.pathname === '/dashboard' || window.location.pathname === '/dashboard/') {
+  if (window.location.pathname.startsWith('/dashboard')) {
     window.location.href = '/login';
   }
 }
