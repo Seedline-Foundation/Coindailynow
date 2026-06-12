@@ -121,7 +121,13 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       id: 'cfis-finance',
       label: 'CFIS Finance',
       icon: DollarSign,
-      href: '/admin/finance',
+      href: '/super-admin/finance',
+    },
+    {
+      id: 'fraud-alerts',
+      label: 'Fraud Alerts',
+      icon: AlertTriangle,
+      href: '/super-admin/fraud-alerts',
     },
     {
       id: 'today-todo',
@@ -163,6 +169,8 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
         { id: 'content-automation', label: 'Content Automation', icon: Bot, href: '/super-admin/content-automation', badge: 'NEW', badgeColor: 'bg-green-500 text-white' },
         { id: 'translations', label: 'Translations', icon: Globe, href: '/super-admin/translations', badge: 'NEW', badgeColor: 'bg-cyan-500 text-white' },
         { id: 'moderation', label: 'Moderation', icon: Shield, href: '/super-admin/content/moderation' },
+        { id: 'emergency-moderation', label: 'Emergency Moderation', icon: AlertTriangle, href: '/super-admin/content/moderation/emergency' },
+        { id: 'marquees', label: 'Marquee Ticker', icon: Monitor, href: '/super-admin/marquees', badge: 'NEW', badgeColor: 'bg-yellow-500 text-white' },
         { id: 'categories', label: 'Categories', icon: BookOpen, href: '/super-admin/content/categories' },
         { id: 'blog', label: 'Blog Management', icon: FileText, href: '/super-admin/blog', badge: 'NEW', badgeColor: 'bg-orange-500 text-white' },
       ]

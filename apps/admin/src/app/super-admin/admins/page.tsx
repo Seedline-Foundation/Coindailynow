@@ -5,7 +5,7 @@
 
 'use client';
 
-import { getAccessToken, clearSession } from '@/lib/auth';
+import { getAccessToken, clearSession, getAuthHeaders } from '@/lib/auth';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -70,7 +70,9 @@ export default function AdminManagementPage() {
 
   const loadAdmins = async () => {
     try {
-      const response = await fetch('/api/super-admin/admins');
+      const response = await fetch('/api/super-admin/admins', {
+        headers: getAuthHeaders()
+      });
       const data = await response.json();
       setAdmins(Array.isArray(data.admins) ? data.admins : []);
     } catch (error) {
@@ -83,7 +85,9 @@ export default function AdminManagementPage() {
 
   const loadRoles = async () => {
     try {
-      const response = await fetch('/api/super-admin/roles');
+      const response = await fetch('/api/super-admin/roles', {
+        headers: getAuthHeaders()
+      });
       const data = await response.json();
       // Ensure roles is always an array
       setRoles(Array.isArray(data) ? data : (Array.isArray(data.roles) ? data.roles : []));
@@ -419,7 +423,10 @@ function CreateAdminModal({ roles, onClose, onSuccess }: {
     try {
       const response = await fetch('/api/super-admin/admins', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
         body: JSON.stringify(formData)
       });
 

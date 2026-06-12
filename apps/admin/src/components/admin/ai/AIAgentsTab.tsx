@@ -45,9 +45,11 @@ import {
   Eye,
   ChevronDown,
   ChevronUp,
+  Settings,
 } from 'lucide-react';
 import { aiManagementService, AIAgent, AITask } from '@/services/aiManagementService';
 import { aiWebSocketService } from '@/services/aiWebSocketService';
+import AIConfigurationTab from './AIConfigurationTab';
 import {
   LineChart,
   Line,
@@ -114,6 +116,7 @@ export default function AIAgentsTab() {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(Object.keys(AGENT_CATEGORIES))
   );
+  const [showConfigModal, setShowConfigModal] = useState(false);
 
   // ============================================================================
   // Data Loading
@@ -245,11 +248,10 @@ export default function AIAgentsTab() {
     }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      return (
-        agent.name.toLowerCase().includes(q) ||
-        (agent.category || agent.type).toLowerCase().includes(q) ||
-        agent.description.toLowerCase().includes(q)
-      );
+      const name = agent.name ? agent.name.toLowerCase() : '';
+      const cat = (agent.category || agent.type || '').toLowerCase();
+      const desc = agent.description ? agent.description.toLowerCase() : '';
+      return name.includes(q) || cat.includes(q) || desc.includes(q);
     }
     return true;
   });
@@ -624,6 +626,14 @@ export default function AIAgentsTab() {
           >
             <RefreshCw className="h-4 w-4" />
             Refresh
+          </button>
+
+          <button
+            onClick={() => setShowConfigModal(true)}
+            className="px-4 py-2 bg-red-650 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Configure
           </button>
         </div>
 
@@ -1036,6 +1046,27 @@ export default function AIAgentsTab() {
                   <TaskTable tasks={agentHistoryTasks} title="task history" />
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ===== AI Configuration Modal ===== */}
+      {showConfigModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 z-10 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Configure AI Settings</h2>
+              <button
+                onClick={() => setShowConfigModal(false)}
+                className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+              >
+                ✕
+              </button>
+            </div>
+            {/* Modal Body */}
+            <div className="p-6">
+              <AIConfigurationTab />
             </div>
           </div>
         </div>

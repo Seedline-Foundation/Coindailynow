@@ -4,13 +4,15 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import SuperAdminSidebar from '@/components/super-admin/SuperAdminSidebar';
 import SuperAdminHeader from '@/components/super-admin/SuperAdminHeader';
 import { SuperAdminProvider } from '@/contexts/SuperAdminContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAccessToken, clearSession } from '@/lib/auth';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
+import SessionTimeoutWarning from '@/components/SessionTimeoutWarning';
 
 interface SuperAdminLayoutProps {
   children: React.ReactNode;
@@ -27,7 +29,18 @@ export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
   const pathname = usePathname();
   const { user, isLoading: authLoading, logout } = useAuth();
 
+  const handleLogout = useCallback(() => {
+    clearSession();
+    logout();
+    router.push('/auth/sadmin');
+  }, [router, logout]);
+
   const isLoginPage = pathname === '/super-admin/login';
+
+  const { showWarning, secondsRemaining, extendSession, isRefreshing } = useSessionTimeout({
+    onLogout: handleLogout,
+    enabled: verified && !isLoginPage,
+  });
 
   useEffect(() => {
     setMounted(true);
@@ -110,6 +123,13 @@ export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
           <main className={`flex-1 overflow-auto p-6 pt-20 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}>{children}</main>
         </div>
       </div>
+      {showWarning && (
+        <SessionTimeoutWarning
+          secondsRemaining={secondsRemaining}
+          onExtend={extendSession}
+          isRefreshing={isRefreshing}
+        />
+      )}
     </SuperAdminProvider>
   );
 }

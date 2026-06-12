@@ -126,6 +126,7 @@ const MarqueeAdmin: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [previewMarquee, setPreviewMarquee] = useState<MarqueeData | null>(null);
+  const [tempStyles, setTempStyles] = useState<MarqueeStyle | null>(null);
 
   // Form data
   const [formData, setFormData] = useState<MarqueeFormData>({
@@ -143,6 +144,33 @@ const MarqueeAdmin: React.FC = () => {
   useEffect(() => {
     loadMarquees();
   }, []);
+
+  const openStyleEditor = () => {
+    setTempStyles({
+      ...defaultStyle,
+      ...formData.styles
+    });
+    setShowStyleEditor(true);
+  };
+
+  const handleStyleChange = (key: keyof MarqueeStyle, value: any) => {
+    if (tempStyles) {
+      setTempStyles({
+        ...tempStyles,
+        [key]: value
+      });
+    }
+  };
+
+  const saveStyles = () => {
+    if (tempStyles) {
+      setFormData({
+        ...formData,
+        styles: { ...tempStyles }
+      });
+    }
+    setShowStyleEditor(false);
+  };
 
   // Load all marquees
   const loadMarquees = async () => {
@@ -607,7 +635,7 @@ const MarqueeAdmin: React.FC = () => {
                 <div>
                   <button
                     type="button"
-                    onClick={() => setShowStyleEditor(true)}
+                    onClick={openStyleEditor}
                     className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200"
                   >
                     <Cog6ToothIcon className="w-5 h-5" />
@@ -681,6 +709,440 @@ const MarqueeAdmin: React.FC = () => {
                     <strong>Status:</strong> {previewMarquee.isActive ? 'Active' : 'Inactive'} / {previewMarquee.isPublished ? 'Published' : 'Draft'}
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Style Editor Modal */}
+      {showStyleEditor && tempStyles && (
+        <div className="fixed inset-0 bg-black bg-opacity-65 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6 border-b pb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Configure Marquee Styles</h2>
+                  <p className="text-sm text-gray-500 mt-1">Customize visual styles and animation parameters</p>
+                </div>
+                <button
+                  onClick={() => setShowStyleEditor(false)}
+                  className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Visual Preview Banner */}
+                <div className="p-4 rounded border mb-6" style={{
+                  backgroundColor: tempStyles.backgroundColor || '#1f2937',
+                  color: tempStyles.textColor || '#ffffff',
+                  fontSize: tempStyles.fontSize || '14px',
+                  fontWeight: tempStyles.fontWeight || 'normal',
+                  height: tempStyles.height || '48px',
+                  borderRadius: tempStyles.borderRadius || '0px',
+                  borderWidth: tempStyles.borderWidth || '0px',
+                  borderColor: tempStyles.borderColor || 'transparent',
+                  borderStyle: 'solid',
+                  boxShadow: tempStyles.shadowColor && tempStyles.shadowBlur ? `0 0 ${tempStyles.shadowBlur} ${tempStyles.shadowColor}` : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingLeft: tempStyles.paddingHorizontal || '16px',
+                  paddingRight: tempStyles.paddingHorizontal || '16px',
+                  paddingTop: tempStyles.paddingVertical || '12px',
+                  paddingBottom: tempStyles.paddingVertical || '12px',
+                  background: tempStyles.gradient || undefined,
+                }}>
+                  <div className="flex items-center gap-2">
+                    {tempStyles.showIcons && (
+                      <span style={{ color: tempStyles.iconColor || '#f59e0b', fontSize: tempStyles.iconSize || '20px' }}>★</span>
+                    )}
+                    <span>Sample Marquee Item</span>
+                  </div>
+                  <div className="flex items-center gap-2" style={{ marginLeft: tempStyles.itemSpacing || '32px' }}>
+                    {tempStyles.showIcons && (
+                      <span style={{ color: tempStyles.iconColor || '#f59e0b', fontSize: tempStyles.iconSize || '20px' }}>🔥</span>
+                    )}
+                    <span>BTC $68,540 (+2.4%)</span>
+                  </div>
+                  <div className="flex items-center gap-2" style={{ marginLeft: tempStyles.itemSpacing || '32px' }}>
+                    {tempStyles.showIcons && (
+                      <span style={{ color: tempStyles.iconColor || '#f59e0b', fontSize: tempStyles.iconSize || '20px' }}>⚡</span>
+                    )}
+                    <span>Breaking News: CoinDaily AI Launch!</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Left Column: Animation & Dimensions */}
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-gray-900 border-b pb-2">Animation & Spacing</h3>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Speed (pixels/sec): {tempStyles.speed}
+                      </label>
+                      <input
+                        type="range"
+                        min="10"
+                        max="200"
+                        value={tempStyles.speed}
+                        onChange={(e) => handleStyleChange('speed', parseInt(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Direction
+                        </label>
+                        <select
+                          value={tempStyles.direction}
+                          onChange={(e) => handleStyleChange('direction', e.target.value)}
+                          className="w-full p-2.5 border border-gray-300 rounded-lg"
+                        >
+                          <option value="left">Left</option>
+                          <option value="right">Right</option>
+                        </select>
+                      </div>
+
+                      <div className="flex items-center pt-6">
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={tempStyles.pauseOnHover}
+                            onChange={(e) => handleStyleChange('pauseOnHover', e.target.checked)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-sm text-gray-700 font-medium">Pause on Hover</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Height
+                        </label>
+                        <input
+                          type="text"
+                          value={tempStyles.height}
+                          onChange={(e) => handleStyleChange('height', e.target.value)}
+                          placeholder="48px"
+                          className="w-full p-2.5 border border-gray-300 rounded-lg"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Item Spacing
+                        </label>
+                        <input
+                          type="text"
+                          value={tempStyles.itemSpacing}
+                          onChange={(e) => handleStyleChange('itemSpacing', e.target.value)}
+                          placeholder="32px"
+                          className="w-full p-2.5 border border-gray-300 rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Padding Vertical
+                        </label>
+                        <input
+                          type="text"
+                          value={tempStyles.paddingVertical}
+                          onChange={(e) => handleStyleChange('paddingVertical', e.target.value)}
+                          placeholder="12px"
+                          className="w-full p-2.5 border border-gray-300 rounded-lg"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Padding Horizontal
+                        </label>
+                        <input
+                          type="text"
+                          value={tempStyles.paddingHorizontal}
+                          onChange={(e) => handleStyleChange('paddingHorizontal', e.target.value)}
+                          placeholder="16px"
+                          className="w-full p-2.5 border border-gray-300 rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Colors & Typography */}
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-gray-900 border-b pb-2">Colors & Typography</h3>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Background Color
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={tempStyles.backgroundColor?.startsWith('#') && tempStyles.backgroundColor.length === 7 ? tempStyles.backgroundColor : '#1f2937'}
+                            onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
+                            className="p-1 w-10 h-10 border rounded cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={tempStyles.backgroundColor}
+                            onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Text Color
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={tempStyles.textColor?.startsWith('#') && tempStyles.textColor.length === 7 ? tempStyles.textColor : '#ffffff'}
+                            onChange={(e) => handleStyleChange('textColor', e.target.value)}
+                            className="p-1 w-10 h-10 border rounded cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={tempStyles.textColor}
+                            onChange={(e) => handleStyleChange('textColor', e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Font Size
+                        </label>
+                        <select
+                          value={tempStyles.fontSize}
+                          onChange={(e) => handleStyleChange('fontSize', e.target.value)}
+                          className="w-full p-2.5 border border-gray-300 rounded-lg"
+                        >
+                          <option value="12px">12px (Small)</option>
+                          <option value="14px">14px (Medium)</option>
+                          <option value="16px">16px (Large)</option>
+                          <option value="18px">18px (Extra Large)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Font Weight
+                        </label>
+                        <select
+                          value={tempStyles.fontWeight}
+                          onChange={(e) => handleStyleChange('fontWeight', e.target.value)}
+                          className="w-full p-2.5 border border-gray-300 rounded-lg"
+                        >
+                          <option value="normal">Normal</option>
+                          <option value="medium">Medium</option>
+                          <option value="semibold">Semibold</option>
+                          <option value="bold">Bold</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                      <div className="flex items-center pt-2">
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={tempStyles.showIcons}
+                            onChange={(e) => handleStyleChange('showIcons', e.target.checked)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-sm text-gray-700 font-medium">Show Icons</span>
+                        </label>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Icon Color
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={tempStyles.iconColor?.startsWith('#') && tempStyles.iconColor.length === 7 ? tempStyles.iconColor : '#f59e0b'}
+                            onChange={(e) => handleStyleChange('iconColor', e.target.value)}
+                            className="p-1 w-10 h-10 border rounded cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={tempStyles.iconColor}
+                            onChange={(e) => handleStyleChange('iconColor', e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Icon Size
+                        </label>
+                        <input
+                          type="text"
+                          value={tempStyles.iconSize}
+                          onChange={(e) => handleStyleChange('iconSize', e.target.value)}
+                          placeholder="20px"
+                          className="w-full p-2.5 border border-gray-300 rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Borders & Shadows & Custom CSS */}
+                <div className="space-y-4 border-t pt-4">
+                  <h3 className="font-semibold text-gray-900 border-b pb-2">Borders, Shadows & Advanced CSS</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Border Width
+                      </label>
+                      <select
+                        value={tempStyles.borderWidth}
+                        onChange={(e) => handleStyleChange('borderWidth', e.target.value)}
+                        className="w-full p-2.5 border border-gray-300 rounded-lg"
+                      >
+                        <option value="0px">0px</option>
+                        <option value="1px">1px</option>
+                        <option value="2px">2px</option>
+                        <option value="3px">3px</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Border Color
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={tempStyles.borderColor?.startsWith('#') && tempStyles.borderColor.length === 7 ? tempStyles.borderColor : '#ffffff'}
+                          onChange={(e) => handleStyleChange('borderColor', e.target.value)}
+                          className="p-1 w-10 h-10 border rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={tempStyles.borderColor}
+                          onChange={(e) => handleStyleChange('borderColor', e.target.value)}
+                          className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Border Radius
+                      </label>
+                      <input
+                        type="text"
+                        value={tempStyles.borderRadius}
+                        onChange={(e) => handleStyleChange('borderRadius', e.target.value)}
+                        placeholder="0px"
+                        className="w-full p-2.5 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Shadow Color
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={tempStyles.shadowColor?.startsWith('#') && tempStyles.shadowColor.length === 7 ? tempStyles.shadowColor : '#000000'}
+                          onChange={(e) => handleStyleChange('shadowColor', e.target.value)}
+                          className="p-1 w-10 h-10 border rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={tempStyles.shadowColor}
+                          onChange={(e) => handleStyleChange('shadowColor', e.target.value)}
+                          className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Shadow Blur
+                      </label>
+                      <input
+                        type="text"
+                        value={tempStyles.shadowBlur}
+                        onChange={(e) => handleStyleChange('shadowBlur', e.target.value)}
+                        placeholder="0px"
+                        className="w-full p-2.5 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Gradient (e.g. `linear-gradient(90deg, #1f2937, #111827)`)
+                      </label>
+                      <input
+                        type="text"
+                        value={tempStyles.gradient || ''}
+                        onChange={(e) => handleStyleChange('gradient', e.target.value)}
+                        placeholder="linear-gradient(...)"
+                        className="w-full p-2.5 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Custom CSS
+                      </label>
+                      <textarea
+                        value={tempStyles.customCSS || ''}
+                        onChange={(e) => handleStyleChange('customCSS', e.target.value)}
+                        placeholder="e.g. text-transform: uppercase;"
+                        className="w-full p-2.5 border border-gray-300 rounded-lg h-12"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex justify-end gap-4 mt-6 border-t pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowStyleEditor(false)}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={saveStyles}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+                >
+                  Apply Styles
+                </button>
               </div>
             </div>
           </div>

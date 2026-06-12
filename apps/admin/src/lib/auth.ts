@@ -110,9 +110,5 @@ export function clearSession() {
 }
 
 export function getPostLoginPath(role: string): string {
-  if (role === 'SUPER_ADMIN') return '/super-admin/dashboard';
-  if (['ADMIN', 'CONTENT_ADMIN', 'TECH_ADMIN', 'MARKETING_ADMIN'].includes(role)) {
-    return '/admin';
-  }
-  return '/admin';
+  return '/super-admin/dashboard';
 }

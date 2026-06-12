@@ -60,9 +60,36 @@ export function useSessionTimeout({
   enabled = true,
 }: UseSessionTimeoutOptions): UseSessionTimeoutReturn {
   const [showWarning, setShowWarning] = useState(false);
-  const [secondsRemaining, setSecondsRemaining] = useState(Infinity);
+  const [secondsRemaining, setSecondsRemaining] = useState(600);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const lastRefreshAttempt = useRef(0);
+  const lastActivity = useRef(Date.now());
+  const isIdle = useRef(false);
+  const warningStart = useRef<number | null>(null);
+
+  // ---- Activity detection ----
+  useEffect(() => {
+    if (!enabled) return;
+
+    const handleActivity = () => {
+      // Do not reset activity if currently displaying the idle warning modal
+      if (!isIdle.current) {
+        lastActivity.current = Date.now();
+      }
+    };
+
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    window.addEventListener('click', handleActivity);
+    window.addEventListener('scroll', handleActivity);
+
+    return () => {
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('click', handleActivity);
+      window.removeEventListener('scroll', handleActivity);
+    };
+  }, [enabled]);
 
   // ---- Token refresh (SPEC-ADM-1) ----
   const extendSession = useCallback(async (): Promise<boolean> => {
@@ -108,7 +135,14 @@ export function useSessionTimeout({
       if (result?.success && result.tokens) {
         localStorage.setItem(accessTokenKey, result.tokens.accessToken);
         localStorage.setItem(refreshTokenKey, result.tokens.refreshToken);
+        
+        // Reset idle tracking
+        isIdle.current = false;
+        warningStart.current = null;
+        lastActivity.current = Date.now();
         setShowWarning(false);
+        setSecondsRemaining(600);
+        
         return true;
       } else {
         // Refresh token invalid/expired — force logout
@@ -157,51 +191,55 @@ export function useSessionTimeout({
     };
   }, [enabled, extendSession, accessTokenKey]);
 
-  // ---- Countdown timer (SPEC-ADM-2) ----
+  // ---- Countdown and Background Refresh timer ----
   useEffect(() => {
     if (!enabled) return;
 
     const tick = () => {
-      const token = localStorage.getItem(accessTokenKey);
-      if (!token) {
-        setSecondsRemaining(0);
-        setShowWarning(false);
-        return;
-      }
+      const now = Date.now();
 
-      const payload = decodeJwtPayload(token);
-      if (!payload?.exp) {
-        // Can't determine expiry — don't show warning
-        setSecondsRemaining(Infinity);
-        setShowWarning(false);
-        return;
-      }
-
-      const nowSec = Math.floor(Date.now() / 1000);
-      const remaining = Math.max(0, payload.exp - nowSec);
-      setSecondsRemaining(remaining);
-
-      if (remaining === 0) {
-        // Token expired — try one last refresh, then logout
-        extendSession().then((ok) => {
-          if (!ok) onLogout();
-        });
-      } else if (remaining <= WARNING_LEAD_SECONDS) {
-        setShowWarning(true);
+      if (!isIdle.current) {
+        // Check if idle for 10 minutes (10 * 60 * 1000 ms)
+        if (now - lastActivity.current >= 10 * 60 * 1000) {
+          isIdle.current = true;
+          warningStart.current = now;
+          setShowWarning(true);
+          setSecondsRemaining(600);
+        } else {
+          // While active, auto-refresh JWT in the background if close to expiry
+          const token = localStorage.getItem(accessTokenKey);
+          if (token) {
+            const payload = decodeJwtPayload(token);
+            if (payload?.exp) {
+              const nowSec = Math.floor(now / 1000);
+              const remaining = payload.exp - nowSec;
+              if (remaining <= 60) {
+                extendSession();
+              }
+            }
+          }
+        }
       } else {
-        setShowWarning(false);
+        // Warning is active - countdown from 10 minutes (600 seconds)
+        const elapsedSeconds = Math.floor((now - (warningStart.current || now)) / 1000);
+        const remaining = Math.max(0, 600 - elapsedSeconds);
+        setSecondsRemaining(remaining);
+
+        if (remaining === 0) {
+          // Warning countdown finished - automatically log out
+          onLogout();
+        }
       }
     };
 
-    // Run immediately, then every second
-    tick();
+    // Tick every second
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [enabled, accessTokenKey, onLogout, extendSession]);
+  }, [enabled, onLogout, extendSession, accessTokenKey]);
 
   return {
     showWarning,
-    secondsRemaining: secondsRemaining === Infinity ? 0 : secondsRemaining,
+    secondsRemaining,
     extendSession,
     isRefreshing,
   };

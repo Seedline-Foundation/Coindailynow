@@ -399,6 +399,63 @@ const DEFAULT_ROLES = [
     isDefault: true,
     isSystem: false,
   },
+  {
+    id: 'role_compliance_officer',
+    name: 'COMPLIANCE_OFFICER',
+    displayName: 'Compliance Officer',
+    description: 'Audit financial logs, handle GDPR and privacy compliance, and verify user credentials.',
+    permissions: [
+      'USER_READ', 'USER_EXPORT_DATA', 'USER_GDPR_REQUEST', 'FINANCE_WE_WALLET_AUDIT',
+      'FINANCE_TRACE_PAYMENTS', 'FINANCE_VIEW_TRANSACTIONS', 'FINANCE_USER_AUDIT',
+      'FINANCE_EXPORT_REPORTS', 'SYSTEM_MONITOR',
+    ],
+    adminCount: 0,
+    isDefault: true,
+    isSystem: false,
+  },
+  {
+    id: 'role_security_specialist',
+    name: 'SECURITY_SPECIALIST',
+    displayName: 'Security Specialist',
+    description: 'DDoS monitoring, security settings, audit trail review, and API rate-limiting rules.',
+    permissions: [
+      'SYSTEM_MONITOR', 'SYSTEM_BACKUP', 'SYSTEM_MAINTENANCE_MODE', 'SECURITY_VIEW_LOGS',
+      'SECURITY_MANAGE_2FA', 'SECURITY_IP_WHITELIST', 'SECURITY_IP_BLACKLIST',
+      'SECURITY_AUDIT_LOGS', 'SECURITY_GDPR_COMPLIANCE',
+    ],
+    adminCount: 0,
+    isDefault: true,
+    isSystem: false,
+  },
+  {
+    id: 'role_ad_manager',
+    name: 'AD_MANAGER',
+    displayName: 'Advertising & Ads Manager',
+    description: 'Configure ad slots, review ad analytics, track publisher payouts, and coordinate sponsorships.',
+    permissions: [
+      'ANALYTICS_VIEW', 'ANALYTICS_EXPORT', 'MARKETING_ADS_MANAGE', 'MARKETING_ANALYTICS',
+    ],
+    adminCount: 0,
+    isDefault: true,
+    isSystem: false,
+  },
+  {
+    id: 'role_editorial_director',
+    name: 'EDITORIAL_DIRECTOR',
+    displayName: 'Editorial Director',
+    description: 'Manage all publications, publish/unpublish content, configure auto-translation pipelines, and emergency unpublishing.',
+    permissions: [
+      'CONTENT_CREATE', 'CONTENT_READ', 'CONTENT_UPDATE', 'CONTENT_DELETE', 'CONTENT_PUBLISH',
+      'CONTENT_UNPUBLISH', 'CONTENT_SCHEDULE', 'CONTENT_TRANSLATE', 'CONTENT_MODERATE',
+      'CONTENT_APPROVE', 'CONTENT_REJECT', 'CONTENT_FLAG', 'CONTENT_PIN', 'CONTENT_FEATURE',
+      'CATEGORY_CREATE', 'CATEGORY_UPDATE', 'CATEGORY_DELETE', 'TAG_CREATE', 'TAG_UPDATE',
+      'TAG_DELETE', 'TAG_MANAGE_TRENDING', 'CATEGORY_REORDER', 'AI_APPROVE_CONTENT',
+      'AI_QUALITY_REVIEW',
+    ],
+    adminCount: 0,
+    isDefault: true,
+    isSystem: false,
+  },
 ];
 
 // In-memory store for custom roles (persists across requests during server lifetime)

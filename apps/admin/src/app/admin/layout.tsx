@@ -165,10 +165,15 @@ export default function AdminSectionLayout({
   }, [router, pathname, isAdminLoginRoute]);
 
   const handleLogout = useCallback(() => {
+    const role = admin?.role;
     clearSession();
     authLogout();
-    router.push('/login');
-  }, [router, authLogout]);
+    if (role === 'SUPER_ADMIN' || role === 'CEO') {
+      router.push('/auth/sadmin');
+    } else {
+      router.push('/login');
+    }
+  }, [router, authLogout, admin?.role]);
 
   // Session timeout warning (SPEC-ADM-2) + auto-refresh on 401 (SPEC-ADM-1)
   const { showWarning, secondsRemaining, extendSession, isRefreshing } = useSessionTimeout({
