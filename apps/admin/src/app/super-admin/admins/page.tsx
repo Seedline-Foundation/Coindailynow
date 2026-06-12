@@ -47,7 +47,7 @@ interface AdminRole {
   id: string;
   name: string;
   description: string;
-  permissions: string[];
+  permissions: string | string[];
   adminCount: number;
   isDefault: boolean;
 }
@@ -672,6 +672,21 @@ function RoleManagementModal({ roles, onClose, onSuccess }: {
     }
   };
 
+  const parsePermissions = (permissions: string | string[]): string[] => {
+    if (Array.isArray(permissions)) {
+      return permissions;
+    }
+    if (typeof permissions === 'string') {
+      try {
+        const parsed = JSON.parse(permissions);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
   if (showCreateForm) {
     return (
       <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -783,7 +798,7 @@ function RoleManagementModal({ roles, onClose, onSuccess }: {
                   {role.description}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {role.permissions.map(permission => (
+                  {parsePermissions(role.permissions).map(permission => (
                     <span
                       key={permission}
                       className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-xs rounded-full"
