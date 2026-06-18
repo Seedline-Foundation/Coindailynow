@@ -191,6 +191,35 @@ module.exports = {
     },
 
     // ============================================
+    // CFIS (Finance System) - cabfi.xyz
+    // Hosted on cabfi.xyz, communicates with backend.sygn.live via HMAC.
+    // Deploy target: /var/www/coindaily-cfis (build output of finance-system/).
+    // ============================================
+    {
+      name: 'coindaily-cfis',
+      cwd: '/var/www/coindaily-cfis',
+      script: 'dist/index.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3005,
+        BACKEND_API_URL: 'https://backend.sygn.live',
+        CFIS_PUBLIC_HOST: 'cabfi.xyz',
+        CFIS_CORS_ORIGINS: 'https://cabfi.xyz,https://jet.sygn.live,https://app.sygn.live,https://press.sygn.live'
+      },
+      error_file: '/var/log/coindaily/cfis-error.log',
+      out_file: '/var/log/coindaily/cfis-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      max_memory_restart: '512M',
+      autorestart: true,
+      watch: false,
+      max_restarts: 10,
+      min_uptime: '10s'
+    },
+
+    // ============================================
     // TOKEN LANDING - token.sygn.live (Already deployed)
     // Port moved from 3005 → 3006 to avoid conflict with CFIS (finance-system)
     // which has occupied :3005 since launch. Update token.sygn.live nginx
