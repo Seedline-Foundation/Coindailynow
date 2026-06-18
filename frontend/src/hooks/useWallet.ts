@@ -27,8 +27,8 @@ const walletConnectConfig = {
   metadata: {
     name: 'CoinDaily Africa',
     description: 'African cryptocurrency news platform',
-    url: 'https://coindaily.africa',
-    icons: ['https://coindaily.africa/icon-192x192.png']
+    url: 'https://sygn.live',
+    icons: ['https://sygn.live/icon-192x192.png']
   }
 };
 

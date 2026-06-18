@@ -4,7 +4,7 @@
  * Install: https://k6.io/docs/get-started/installation/
  * Run:
  *   k6 run infrastructure/load-tests/k6-launch.js
- *   BASE_URL=https://coindaily.online API_URL=https://app.coindaily.online k6 run ...
+ *   BASE_URL=https://sygn.live API_URL=https://app.sygn.live k6 run ...
  *
  * Target: P95 < 800ms at 500 VUs (mixed traffic).
  */
@@ -15,8 +15,8 @@ import { Trend } from 'k6/metrics';
 
 const p95 = new Trend('custom_p95', true);
 
-const BASE = __ENV.BASE_URL || 'https://coindaily.online';
-const API = __ENV.API_URL || 'https://app.coindaily.online';
+const BASE = __ENV.BASE_URL || 'https://sygn.live';
+const API = __ENV.API_URL || 'https://app.sygn.live';
 
 export const options = {
   scenarios: {

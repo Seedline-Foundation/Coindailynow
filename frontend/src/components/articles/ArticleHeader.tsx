@@ -202,7 +202,7 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
             '@context': 'https://schema.org',
             '@type': 'Person',
             name: authorName,
-            url: `https://coindaily.africa/authors/${article.author.username}`,
+            url: `https://sygn.live/authors/${article.author.username}`,
             image: article.author.avatarUrl,
             jobTitle: 'Cryptocurrency Journalist',
             worksFor: {

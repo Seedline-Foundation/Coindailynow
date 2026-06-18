@@ -75,7 +75,7 @@ router.post('/api/indexnow/ping-sitemaps', async (req: Request, res: Response) =
  */
 router.post('/api/indexnow/websub', async (req: Request, res: Response) => {
   try {
-    const topicUrl = (req.body?.topicUrl as string) || `${process.env.SITE_URL || 'https://coindaily.online'}/rss.xml`;
+    const topicUrl = (req.body?.topicUrl as string) || `${process.env.SITE_URL || 'https://sygn.live'}/rss.xml`;
     const results = await indexNowService.publishWebSub(topicUrl);
     res.json({ success: true, topicUrl, results });
   } catch (error) {

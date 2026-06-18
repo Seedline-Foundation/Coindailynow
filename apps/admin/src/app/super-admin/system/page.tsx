@@ -649,7 +649,7 @@ export default function SystemHealthPage() {
                                   </p>
                                   <div className="flex items-center space-x-4 text-sm">
                                     <a
-                                      href={`mailto:tech-team@coindaily.africa?subject=CRITICAL: ${issue.title}&body=Issue ID: ${issue.id}%0D%0ADetected: ${issue.detectedAt}%0D%0A%0D%0A${issue.description}`}
+                                      href={`mailto:tech-team@sygn.live?subject=CRITICAL: ${issue.title}&body=Issue ID: ${issue.id}%0D%0ADetected: ${issue.detectedAt}%0D%0A%0D%0A${issue.description}`}
                                       className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
                                     >
                                       <ExternalLink className="h-4 w-4" />

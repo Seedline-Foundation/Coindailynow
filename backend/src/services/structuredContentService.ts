@@ -39,7 +39,7 @@ function slugify(input: string): string {
 }
 
 export class StructuredContentService {
-  private readonly siteUrl = process.env.SITE_URL || 'https://coindaily.online';
+  private readonly siteUrl = process.env.SITE_URL || 'https://sygn.live';
 
   async getStructuredContent(params: ContentQueryParams): Promise<any> {
     const page = clampNumber(params.page || 1, 1, 10000);

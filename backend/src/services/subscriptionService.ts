@@ -454,7 +454,7 @@ export class SubscriptionService {
       await axios.post(
         'https://api.postmarkapp.com/email',
         {
-          From: process.env.RECEIPT_FROM_EMAIL || 'billing@coindaily.online',
+          From: process.env.RECEIPT_FROM_EMAIL || 'billing@sygn.live',
           To: user.email,
           Subject: `Receipt ${record.invoiceNumber}`,
           HtmlBody: html,

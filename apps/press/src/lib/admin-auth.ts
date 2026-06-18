@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const ADMIN_EMAILS = [
-  'admin@coindaily.online',
-  'super@coindaily.online',
-  'ndifree@coindaily.online',
+  'admin@sygn.live',
+  'super@sygn.live',
+  'ndifree@sygn.live',
 ];
 
 /**

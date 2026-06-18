@@ -58,7 +58,7 @@ const sections = [
   {
     title: '11. Data Protection & Privacy',
     content:
-      'We process personal data in accordance with our Privacy Policy (coindaily.online/privacy), the Nigeria Data Protection Act (NDPA), the EU General Data Protection Regulation (GDPR), the South Africa Protection of Personal Information Act (POPIA), and the Kenya Data Protection Act (DPA). You have the right to access, rectify, port, and delete your personal data. Account deletion requests can be submitted from your account settings; personal data will be anonymised within 30 days of the request.',
+      'We process personal data in accordance with our Privacy Policy (sygn.live/privacy), the Nigeria Data Protection Act (NDPA), the EU General Data Protection Regulation (GDPR), the South Africa Protection of Personal Information Act (POPIA), and the Kenya Data Protection Act (DPA). You have the right to access, rectify, port, and delete your personal data. Account deletion requests can be submitted from your account settings; personal data will be anonymised within 30 days of the request.',
   },
   {
     title: '12. Cookies',
@@ -93,7 +93,7 @@ const sections = [
   {
     title: '18. Contact',
     content:
-      'For questions about these Terms, contact us at legal@coindaily.online. For data protection inquiries, contact privacy@coindaily.online.',
+      'For questions about these Terms, contact us at legal@sygn.live. For data protection inquiries, contact privacy@sygn.live.',
   },
 ];
 

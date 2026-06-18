@@ -8,7 +8,7 @@ async function main() {
   console.log('Testing direct login for superadmin...');
   try {
     const result = await authService.login({
-      email: 'admin@coindaily.africa',
+      email: 'admin@sygn.live',
       password: 'Admin@2024!',
     });
     console.log('Login succeeded! Result user:', result.user);

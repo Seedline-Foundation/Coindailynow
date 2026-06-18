@@ -246,8 +246,8 @@ function SuperAdminSettingsPage() {
     general: {
       siteName: 'CoinDaily',
       siteDescription: "Africa's Premier Cryptocurrency News Platform",
-      primaryDomain: 'https://coindaily.online',
-      supportEmail: 'support@coindaily.online',
+      primaryDomain: 'https://sygn.live',
+      supportEmail: 'support@sygn.live',
       maintenanceMode: false,
       registrationEnabled: true,
       maxUsersPerDay: 1000,
@@ -258,7 +258,7 @@ function SuperAdminSettingsPage() {
       sessionTimeout: 60,
       maxLoginAttempts: 5,
       ipWhitelist: [],
-      corsOrigins: ['https://coindaily.online'],
+      corsOrigins: ['https://sygn.live'],
     },
     ai: {
       models: defaultAIModels,
@@ -272,7 +272,7 @@ function SuperAdminSettingsPage() {
       smtpPort: 587,
       smtpUsername: '',
       smtpPassword: '',
-      fromEmail: 'noreply@coindaily.online',
+      fromEmail: 'noreply@sygn.live',
       fromName: 'CoinDaily',
     },
     storage: {
@@ -1017,7 +1017,7 @@ function SuperAdminSettingsPage() {
                     value={config.email.fromEmail}
                     onChange={(e) => updateConfig('email', 'fromEmail', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="noreply@coindaily.online"
+                    placeholder="noreply@sygn.live"
                   />
                 </div>
                 <div>

@@ -6,17 +6,17 @@ const nextConfig = {
   
   // Environment-specific configurations
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://app.coindaily.online',
-    NEXT_PUBLIC_AI_URL: process.env.NEXT_PUBLIC_AI_URL || 'https://ai.coindaily.online',
-    NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'wss://app.coindaily.online',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://app.sygn.live',
+    NEXT_PUBLIC_AI_URL: process.env.NEXT_PUBLIC_AI_URL || 'https://ai.sygn.live',
+    NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'wss://app.sygn.live',
   },
 
   // Image domains
   images: {
     domains: [
-      'coindaily.online',
-      'app.coindaily.online',
-      'cdn.coindaily.online',
+      'sygn.live',
+      'app.sygn.live',
+      'cdn.sygn.live',
       'images.unsplash.com',
     ],
   },
@@ -41,12 +41,12 @@ const nextConfig = {
     return [
       {
         source: '/admin/:path*',
-        destination: 'https://jet.coindaily.online/admin/:path*',
+        destination: 'https://jet.sygn.live/admin/:path*',
         permanent: true,
       },
       {
         source: '/super-admin/:path*',
-        destination: 'https://jet.coindaily.online/admin/:path*',
+        destination: 'https://jet.sygn.live/admin/:path*',
         permanent: true,
       },
       // Missing pages - redirect to home until built

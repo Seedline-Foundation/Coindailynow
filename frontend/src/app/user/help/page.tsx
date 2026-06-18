@@ -40,11 +40,11 @@ import {
 import { HELP_CATEGORIES, getCategoriesByRegion, HelpCategory } from '../../../lib/helpData';
 
 const DEPARTMENT_EMAILS = {
-  technical: { name: 'Technical Support', email: 'support@coindaily.online', icon: '🔧' },
-  billing: { name: 'Billing & Payments', email: 'billing@coindaily.online', icon: '💳' },
-  partnerships: { name: 'Partnerships', email: 'partnerships@coindaily.online', icon: '🤝' },
-  editorial: { name: 'Editorial & Press', email: 'editorial@coindaily.online', icon: '📰' },
-  general: { name: 'General Inquiries', email: 'hello@coindaily.online', icon: '💬' }
+  technical: { name: 'Technical Support', email: 'support@sygn.live', icon: '🔧' },
+  billing: { name: 'Billing & Payments', email: 'billing@sygn.live', icon: '💳' },
+  partnerships: { name: 'Partnerships', email: 'partnerships@sygn.live', icon: '🤝' },
+  editorial: { name: 'Editorial & Press', email: 'editorial@sygn.live', icon: '📰' },
+  general: { name: 'General Inquiries', email: 'hello@sygn.live', icon: '💬' }
 };
 
 export default function HelpCenterPage() {

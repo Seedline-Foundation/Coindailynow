@@ -40,13 +40,13 @@ const AMPArticle: React.FC<AMPArticleProps> = ({ article }) => {
       "name": "CoinDaily Africa",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://coindaily.africa/images/logo.png"
+        "url": "https://sygn.live/images/logo.png"
       }
     },
     "description": article.excerpt,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://coindaily.africa/amp/news/${article.slug}`
+      "@id": `https://sygn.live/amp/news/${article.slug}`
     }
   };
 
@@ -71,7 +71,7 @@ const AMPArticle: React.FC<AMPArticleProps> = ({ article }) => {
         />
 
         {/* Canonical URL */}
-        <link rel="canonical" href={`https://coindaily.africa/news/${article.slug}`} />
+        <link rel="canonical" href={`https://sygn.live/news/${article.slug}`} />
         
         {/* AMP CSS */}
         <style amp-custom>{`
@@ -309,26 +309,26 @@ const AMPArticle: React.FC<AMPArticleProps> = ({ article }) => {
                 width="45"
                 height="33"
                 data-param-text={article.title}
-                data-param-url={`https://coindaily.africa/news/${article.slug}`}
+                data-param-url={`https://sygn.live/news/${article.slug}`}
               />
               <amp-social-share
                 type="facebook"
                 width="45"
                 height="33"
-                data-param-href={`https://coindaily.africa/news/${article.slug}`}
+                data-param-href={`https://sygn.live/news/${article.slug}`}
               />
               <amp-social-share
                 type="linkedin"
                 width="45"
                 height="33"
-                data-param-url={`https://coindaily.africa/news/${article.slug}`}
+                data-param-url={`https://sygn.live/news/${article.slug}`}
                 data-param-title={article.title}
               />
               <amp-social-share
                 type="whatsapp"
                 width="45"
                 height="33"
-                data-param-text={`${article.title} - https://coindaily.africa/news/${article.slug}`}
+                data-param-text={`${article.title} - https://sygn.live/news/${article.slug}`}
               />
             </div>
           </div>

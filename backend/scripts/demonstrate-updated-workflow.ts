@@ -38,7 +38,7 @@ async function demonstrateUpdatedWorkflow() {
     await prisma.user.create({
       data: {
         id: 'demo-author',
-        email: 'author@coindaily.com',
+        email: 'author@sygn.live',
         username: 'demo_author',
         passwordHash: 'demo-hash',
         subscriptionTier: 'Premium',
@@ -50,7 +50,7 @@ async function demonstrateUpdatedWorkflow() {
     await prisma.user.create({
       data: {
         id: 'demo-reviewer',
-        email: 'reviewer@coindaily.com',
+        email: 'reviewer@sygn.live',
         username: 'demo_reviewer',
         passwordHash: 'demo-hash',
         subscriptionTier: 'Enterprise',

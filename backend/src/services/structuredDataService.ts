@@ -272,7 +272,7 @@ export class StructuredDataService {
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: 'CoinDaily',
-      url: process.env.FRONTEND_URL || 'https://coindaily.com',
+      url: process.env.FRONTEND_URL || 'https://sygn.live',
       logo: {
         '@type': 'ImageObject',
         url: `${process.env.FRONTEND_URL}/logo.png`,
@@ -288,7 +288,7 @@ export class StructuredDataService {
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'Customer Service',
-        email: 'contact@coindaily.com',
+        email: 'contact@sygn.live',
       },
     };
   }
@@ -572,7 +572,7 @@ export class StructuredDataService {
    * Generate BreadcrumbList schema for navigation context (rich results)
    */
   generateBreadcrumbSchema(breadcrumbs: Array<{ name: string; url: string }>): object {
-    const siteUrl = process.env.FRONTEND_URL || 'https://coindaily.online';
+    const siteUrl = process.env.FRONTEND_URL || 'https://sygn.live';
     return {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
@@ -631,7 +631,7 @@ export class StructuredDataService {
       author: {
         '@type': 'Organization',
         name: params.reviewerName || 'CoinDaily Fact Check',
-        url: process.env.FRONTEND_URL || 'https://coindaily.online',
+        url: process.env.FRONTEND_URL || 'https://sygn.live',
       },
       reviewRating: {
         '@type': 'Rating',
@@ -651,7 +651,7 @@ export class StructuredDataService {
    */
   async generateFullArticleSchemaBundle(articleId: string): Promise<object[]> {
     const schemas: object[] = [];
-    const siteUrl = process.env.FRONTEND_URL || 'https://coindaily.online';
+    const siteUrl = process.env.FRONTEND_URL || 'https://sygn.live';
 
     // 1. NewsArticle
     const newsArticle = await this.generateNewsArticleSchema(articleId);

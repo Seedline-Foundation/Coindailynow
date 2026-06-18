@@ -26,7 +26,7 @@ export default function EditorialStandardsPage() {
     publisher: {
       '@type': 'Organization',
       name: 'CoinDaily Africa',
-      url: 'https://coindaily.online',
+      url: 'https://sygn.live',
     },
   };
 
@@ -109,8 +109,8 @@ export default function EditorialStandardsPage() {
               </p>
               <p className="text-gray-600 leading-relaxed mt-3">
                 To report an error or request a correction, contact{' '}
-                <a href="mailto:corrections@coindaily.online" className="text-blue-600 hover:underline">
-                  corrections@coindaily.online
+                <a href="mailto:corrections@sygn.live" className="text-blue-600 hover:underline">
+                  corrections@sygn.live
                 </a>.
               </p>
             </section>

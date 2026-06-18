@@ -15,7 +15,7 @@ import { useAuth } from '@/lib/auth-context';
 import { fetchPartnerSite, fetchSitePositions } from '@/lib/api';
 
 /**
- * Partner Positions Page - press.coindaily.online/partner/positions
+ * Partner Positions Page - press.sygn.live/partner/positions
  *
  * Partners manage the ad/PR positions on their site.
  * Each position has a selector/slug, display type, and a price in JOY

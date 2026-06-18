@@ -49,7 +49,7 @@ export async function generateArticleWithImo(params: {
   keywords: string[];
   category: string;
   urgency: 'breaking' | 'high' | 'medium' | 'low';
-  targetAudience?: 'beginner' | 'intermediate' | 'expert';
+  targetAudience?: 'beginner' | 'intermediate' | 'expert' | 'general';
 }) {
   // Initialize Imo Orchestrator
   await imoOrchestrator.initialize();
@@ -312,8 +312,8 @@ export async function runFullContentPipelineWithImo(params: {
     // STAGE 5: Generate Social Posts
     console.log('\n✍️ STAGE 5: Social Media Posts');
     const socialPosts = await Promise.all([
-      imoContentAgent.generateSocialPost(params.topic, 'twitter', `https://coindaily.africa/articles/${article.slug}`),
-      imoContentAgent.generateSocialPost(params.topic, 'linkedin', `https://coindaily.africa/articles/${article.slug}`)
+      imoContentAgent.generateSocialPost(params.topic, 'twitter', `https://sygn.live/articles/${article.slug}`),
+      imoContentAgent.generateSocialPost(params.topic, 'linkedin', `https://sygn.live/articles/${article.slug}`)
     ]);
 
     const totalTime = Date.now() - startTime;

@@ -9,9 +9,9 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://coindaily.online/.well-known/openapi.yaml"
+    "url": "https://sygn.live/.well-known/openapi.yaml"
   },
-  "logo_url": "https://coindaily.online/images/logo.svg",
-  "contact_email": "support@coindaily.online",
-  "legal_info_url": "https://coindaily.online/terms"
+  "logo_url": "https://sygn.live/images/logo.svg",
+  "contact_email": "support@sygn.live",
+  "legal_info_url": "https://sygn.live/terms"
 }

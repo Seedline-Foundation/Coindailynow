@@ -19,7 +19,7 @@ const getAutomationService = (): SEOAutomationService => {
       googleSearchConsole: {
         enabled: process.env.GSC_ENABLED === 'true',
         apiKey: process.env.GSC_API_KEY || '',
-        siteUrl: process.env.SITE_URL || 'https://coindaily.com',
+        siteUrl: process.env.SITE_URL || 'https://sygn.live',
       },
       ahrefs: {
         enabled: process.env.AHREFS_ENABLED === 'true',

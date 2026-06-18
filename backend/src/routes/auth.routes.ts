@@ -14,12 +14,12 @@ router.get('/verify-email/:token', async (req: Request, res: Response) => {
     const { token } = req.params;
 
     if (!token || token.length < 32) {
-      const frontendUrl = process.env.FRONTEND_URL || 'https://coindaily.com';
+      const frontendUrl = process.env.FRONTEND_URL || 'https://sygn.live';
       return res.redirect(`${frontendUrl}/auth/verify-email?status=error&message=Invalid+verification+link`);
     }
 
     const result = await authService.verifyEmail(token);
-    const frontendUrl = process.env.FRONTEND_URL || 'https://coindaily.com';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://sygn.live';
 
     if (result.success) {
       return res.redirect(`${frontendUrl}/auth/verify-email?status=success&message=${encodeURIComponent(result.message)}`);
@@ -28,7 +28,7 @@ router.get('/verify-email/:token', async (req: Request, res: Response) => {
     }
   } catch (error) {
     logger.error('Email verification route error:', error);
-    const frontendUrl = process.env.FRONTEND_URL || 'https://coindaily.com';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://sygn.live';
     return res.redirect(`${frontendUrl}/auth/verify-email?status=error&message=Verification+failed`);
   }
 });

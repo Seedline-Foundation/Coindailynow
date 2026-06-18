@@ -94,7 +94,7 @@ const pressOrderLimiter = rateLimit({
 
 // CORS — LOCKED to known origins only (financial system must not be open)
 const ALLOWED_ORIGINS = new Set(
-  (process.env.CFIS_CORS_ORIGINS || 'https://jet.coindaily.online,https://app.coindaily.online,https://press.coindaily.online').split(',').map(o => o.trim())
+  (process.env.CFIS_CORS_ORIGINS || 'https://cabfi.xyz,https://jet.sygn.live,https://app.sygn.live,https://press.sygn.live').split(',').map(o => o.trim())
 );
 if (process.env.NODE_ENV === 'development') {
   ALLOWED_ORIGINS.add('http://localhost:3000');
@@ -166,7 +166,7 @@ app.post('/api/internal/receive', verifyInternalHMAC, async (req, res) => {
 });
 
 // ─── Public Press Order Routes (HMAC-signed by SENDPRESS) ────
-// Users place PR orders via press.coindaily.online → SENDPRESS calls these endpoints
+// Users place PR orders via press.sygn.live → SENDPRESS calls these endpoints
 // → CFIS creates escrow → Super Admin sees it in dashboard immediately
 app.use('/api/press-orders', pressOrderLimiter, pressPublicRoutes);
 app.use('/api/subscriptions', pressOrderLimiter, subscriptionsWebhookRoutes);

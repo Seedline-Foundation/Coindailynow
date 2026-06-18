@@ -9,7 +9,8 @@
     "frontend",
     "backend",
     "ai-system",
-    "Iengine"
+    "Iengine",
+    "finance-system"
   ],
   "scripts": {
     "dev": "turbo run dev",

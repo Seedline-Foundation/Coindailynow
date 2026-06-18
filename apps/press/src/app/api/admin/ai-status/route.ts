@@ -8,7 +8,7 @@ import { requireAdmin } from '@/lib/admin-auth';
 export async function GET(request: NextRequest) {
   const authError = await requireAdmin(request);
   if (authError) return authError;
-  const aiUrl = process.env.NEXT_PUBLIC_AI_URL || 'https://ai.coindaily.online';
+  const aiUrl = process.env.NEXT_PUBLIC_AI_URL || 'https://ai.sygn.live';
   const services = [
     { name: 'Ollama3 (Content)', endpoint: `${aiUrl}/api/tags`, key: 'ollama' },
     { name: 'Image Generator', endpoint: `${aiUrl}/api/generate-image`, key: 'image' },

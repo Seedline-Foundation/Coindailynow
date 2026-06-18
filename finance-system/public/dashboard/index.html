@@ -170,7 +170,7 @@ tr:hover td{background:rgba(245,158,11,.03);color:var(--text)}
     
     <div id="login-form-fields">
       <label>Email</label>
-      <input type="email" id="login-email" placeholder="admin@coindaily.online" value="admin@coindaily.online">
+      <input type="email" id="login-email" placeholder="admin@sygn.live" value="admin@sygn.live">
       <label>Password</label>
       <input type="password" id="login-password" placeholder="Enter password">
       <button onclick="handleLogin()">Sign In to CFIS</button>
@@ -715,7 +715,7 @@ async function renderPress(el) {
   
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-      <div><h2 class="page-title">Press Escrow</h2><p class="page-subtitle">Users order PR packages at press.coindaily.online → payments held in escrow here → AI verify → Release or Refund (minus gas fees)</p></div>
+      <div><h2 class="page-title">Press Escrow</h2><p class="page-subtitle">Users order PR packages at press.sygn.live → payments held in escrow here → AI verify → Release or Refund (minus gas fees)</p></div>
       <div class="btn-group">
         <button class="btn btn-secondary" onclick="showCreateEscrowModal()">📝 Manual Entry</button>
         <button class="btn btn-primary" onclick="processReleasable()">🔄 Process Releasable</button>
@@ -723,7 +723,7 @@ async function renderPress(el) {
     </div>
     <div class="card" style="margin-bottom:16px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px">
       <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--muted)">
-        <span>🟢 <b>SENDPRESS</b> = User placed order at press.coindaily.online</span>
+        <span>🟢 <b>SENDPRESS</b> = User placed order at press.sygn.live</span>
         <span>🟡 <b>MANUAL</b> = Admin created via CFIS dashboard</span>
         <span>⛽ Refunds deduct <b>${'${GAS_FEE}'}%</b> gas fee (sent to treasury)</span>
       </div>
@@ -763,7 +763,7 @@ async function renderPress(el) {
 function showCreateEscrowModal() {
   openModal('📝 Manual Press Escrow Entry', `
     <div style="background:#2a2a0a;border:1px solid #444;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#cca">
-      ⚠️ <b>Manual entry only.</b> Normal flow: Users place PR orders at <b>press.coindaily.online</b> → escrow is created here automatically.<br>
+      ⚠️ <b>Manual entry only.</b> Normal flow: Users place PR orders at <b>press.sygn.live</b> → escrow is created here automatically.<br>
       Use this form only for manually processing escrows outside the SENDPRESS system.
     </div>
     <div class="form-row">

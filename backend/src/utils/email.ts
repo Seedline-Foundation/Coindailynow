@@ -14,7 +14,7 @@ import nodemailer from 'nodemailer';
 // ============================================================================
 
 const EMAIL_PROVIDER = process.env.EMAIL_SERVICE_PROVIDER || 'nodemailer';
-const EMAIL_FROM = process.env.EMAIL_FROM_ADDRESS || 'noreply@coindaily.com';
+const EMAIL_FROM = process.env.EMAIL_FROM_ADDRESS || 'noreply@sygn.live';
 
 // ============================================================================
 // TYPES

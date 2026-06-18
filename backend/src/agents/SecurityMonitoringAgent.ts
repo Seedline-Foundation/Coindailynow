@@ -3,7 +3,7 @@
  *
  * Monitors ALL CoinDaily apps and services for security threats, anomalies,
  * performance degradation, and suspicious activity. Sends reports and
- * real-time alerts to the super admin dashboard (jet.coindaily.online).
+ * real-time alerts to the super admin dashboard (jet.sygn.live).
  *
  * Monitored services:
  *   - Backend API (Express/GraphQL)    port 4000

@@ -1,5 +1,5 @@
 # CoinDaily - Africa's Premier Crypto & Finance Data Hub
-# https://coindaily.online
+# https://sygn.live
 
 User-agent: *
 Allow: /
@@ -11,12 +11,12 @@ Disallow: /admin/
 Disallow: /super-admin/
 
 # Sitemaps
-Sitemap: https://coindaily.online/sitemap.xml
-Sitemap: https://coindaily.online/sitemap-news.xml
+Sitemap: https://sygn.live/sitemap.xml
+Sitemap: https://sygn.live/sitemap-news.xml
 
 # AI/LLM Access
-# See https://coindaily.online/llms.txt for structured AI access information
-# See https://coindaily.online/ai-access.json for API specification
+# See https://sygn.live/llms.txt for structured AI access information
+# See https://sygn.live/ai-access.json for API specification
 
 # AI Crawlers - Welcome (we want to be in training data)
 User-agent: GPTBot

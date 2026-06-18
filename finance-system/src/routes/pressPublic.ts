@@ -14,7 +14,7 @@ const router = Router();
  * from the press system (service-to-service auth).
  *
  * Flow:
- * 1. User logs into press.coindaily.online/dashboard
+ * 1. User logs into press.sygn.live/dashboard
  * 2. User writes PR content, selects sites, sets budget
  * 3. User pays in JOY tokens → SENDPRESS backend calls THIS endpoint
  * 4. CFIS creates escrow → Super Admin sees it instantly in CFIS dashboard

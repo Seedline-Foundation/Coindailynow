@@ -503,7 +503,7 @@ export class AIImageService {
       // In production, upload these to cloud storage (Backblaze, S3, etc.)
       // For now, we'll simulate the URLs
       const timestamp = Date.now();
-      const baseUrl = process.env.CDN_URL || 'https://cdn.coindaily.com';
+      const baseUrl = process.env.CDN_URL || 'https://cdn.sygn.live';
 
       return {
         url: imageUrl, // Original DALL-E URL

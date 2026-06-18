@@ -8,7 +8,7 @@
 #   ./manage-whitelist.sh list
 #   ./manage-whitelist.sh test <ip>
 
-NGINX_CONF="/etc/nginx/sites-available/jet.coindaily.online.conf"
+NGINX_CONF="/etc/nginx/sites-available/jet.sygn.live.conf"
 WHITELIST_LOG="/var/log/coindaily/ip-whitelist.log"
 
 RED='\033[0;31m'
@@ -78,7 +78,7 @@ remove_ip() {
 }
 
 list_ips() {
-    echo -e "${GREEN}Whitelisted IPs for jet.coindaily.online:${NC}"
+    echo -e "${GREEN}Whitelisted IPs for jet.sygn.live:${NC}"
     echo "========================================"
     grep -E "^\s+[0-9]" $NGINX_CONF | grep -v "default" | while read line; do
         IP=$(echo $line | awk '{print $1}')

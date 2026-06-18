@@ -82,7 +82,7 @@ export default function RichSnippetPreview({
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             {/* Breadcrumb */}
             <div className="flex items-center text-xs text-gray-600 mb-1">
-              <span>coindaily.com › news › bitcoin-reaches-new-high</span>
+              <span>sygn.live › news › bitcoin-reaches-new-high</span>
             </div>
 
             {/* Title (with blue link color like Google) */}

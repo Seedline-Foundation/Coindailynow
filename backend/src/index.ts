@@ -305,12 +305,12 @@ export async function setupApp() {
   // Dynamic CORS — allow all CoinDaily subdomains and dev origins
   const ALLOWED_ORIGINS = [
     // Production domains
-    'https://coindaily.online',
-    'https://www.coindaily.online',
-    'https://app.coindaily.online',
-    'https://jet.coindaily.online',
-    'https://press.coindaily.online',
-    'https://ai.coindaily.online',
+    'https://sygn.live',
+    'https://www.sygn.live',
+    'https://app.sygn.live',
+    'https://jet.sygn.live',
+    'https://press.sygn.live',
+    'https://ai.sygn.live',
     // Dev origins
     'http://localhost:3000',
     'http://localhost:3001',
@@ -334,7 +334,7 @@ export async function setupApp() {
       // Allow requests with no origin (server-to-server, curl, health checks)
       if (!origin) return callback(null, true);
       if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-      // Also allow any *.coindaily.online subdomain (HTTPS only in production)
+      // Also allow any *.sygn.live subdomain (HTTPS only in production)
       const subdomainRegex = process.env.NODE_ENV === 'production'
         ? /^https:\/\/([a-z0-9-]+\.)?coindaily\.online$/
         : /^https?:\/\/([a-z0-9-]+\.)?coindaily\.online$/;

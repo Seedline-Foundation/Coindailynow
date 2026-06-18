@@ -503,7 +503,7 @@ router.post('/wire/alerts', async (req: Request, res: Response) => {
       .post(
         'https://api.postmarkapp.com/email',
         {
-          From: process.env.WIRE_ALERT_FROM || 'wire@coindaily.online',
+          From: process.env.WIRE_ALERT_FROM || 'wire@sygn.live',
           To: email,
           Subject: 'CoinDaily Wire alerts enabled',
           TextBody: `You will receive alerts for: ${(sources || []).join(', ') || 'all sources'}.`,

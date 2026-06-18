@@ -3,14 +3,14 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://press.coindaily.online'),
+  metadataBase: new URL('https://press.sygn.live'),
   title: 'SENDPRESS - PR Distribution Network by CoinDaily',
   description: 'Africa\'s largest automated PR distribution network. Distribute press releases to targeted websites with blockchain payments and AI verification.',
   keywords: ['PR', 'press release', 'distribution', 'crypto', 'JOY token', 'blockchain', 'Africa', 'SENDPRESS'],
   openGraph: {
     title: 'SENDPRESS - PR Distribution Network',
     description: 'Instant PR distribution to targeted websites. Automated payments via JOY token. AI-powered verification.',
-    url: 'https://press.coindaily.online',
+    url: 'https://press.sygn.live',
     siteName: 'SENDPRESS',
     type: 'website',
   },

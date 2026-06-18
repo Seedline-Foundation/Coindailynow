@@ -58,7 +58,7 @@ export async function sendEmailAlert(
   email: string,
   pr: PressReleasePayload,
 ): Promise<boolean> {
-  const siteUrl = process.env.SITE_URL || 'https://coindaily.online';
+  const siteUrl = process.env.SITE_URL || 'https://sygn.live';
   const pressUrl = pr.slug ? `${siteUrl}/press/${pr.slug}` : siteUrl;
 
   const html = `
@@ -97,7 +97,7 @@ export async function sendEmailAlert(
         await axios.post(
           'https://api.postmarkapp.com/email',
           {
-            From: process.env.WIRE_ALERT_FROM || 'wire@coindaily.online',
+            From: process.env.WIRE_ALERT_FROM || 'wire@sygn.live',
             To: email,
             Subject: `Wire: ${pr.title.slice(0, 80)}`,
             TextBody: textBody,
@@ -126,7 +126,7 @@ export async function sendTelegramAlert(
     return false;
   }
 
-  const siteUrl = process.env.SITE_URL || 'https://coindaily.online';
+  const siteUrl = process.env.SITE_URL || 'https://sygn.live';
   const pressUrl = pr.slug ? `${siteUrl}/press/${pr.slug}` : siteUrl;
 
   const text = [

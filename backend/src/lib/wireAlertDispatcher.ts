@@ -51,9 +51,9 @@ export async function notifyWireSubscribers(item: WireAlertPayload): Promise<voi
     return;
   }
 
-  const text = `New on CoinDaily Wire: ${item.headline}\n${item.company ? `Company: ${item.company}\n` : ''}Published: ${item.publishedAt}\n\nView: https://press.coindaily.online/wire/${item.id}`;
+  const text = `New on CoinDaily Wire: ${item.headline}\n${item.company ? `Company: ${item.company}\n` : ''}Published: ${item.publishedAt}\n\nView: https://press.sygn.live/wire/${item.id}`;
 
-  const itemUrl = `https://press.coindaily.online/wire/${item.id}`;
+  const itemUrl = `https://press.sygn.live/wire/${item.id}`;
   const html = `
     <!DOCTYPE html>
     <html><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:#0d1117;color:#e6edf3;">
@@ -69,7 +69,7 @@ export async function notifyWireSubscribers(item: WireAlertPayload): Promise<voi
         <a href="${itemUrl}" style="display:inline-block;margin-top:20px;padding:10px 18px;background:#f97316;color:#0d1117;font-weight:600;text-decoration:none;border-radius:6px;font-size:13px;">Read full release →</a>
         <p style="margin-top:24px;font-size:11px;color:#6e7681;line-height:1.5;">
           You are subscribed to CoinDaily Wire alerts.
-          <a href="https://press.coindaily.online/wire/unsubscribe" style="color:#7d8590;">Unsubscribe</a>.
+          <a href="https://press.sygn.live/wire/unsubscribe" style="color:#7d8590;">Unsubscribe</a>.
         </p>
       </div>
     </body></html>
@@ -101,7 +101,7 @@ export async function notifyWireSubscribers(item: WireAlertPayload): Promise<voi
             .post(
               'https://api.postmarkapp.com/email',
               {
-                From: process.env.WIRE_ALERT_FROM || 'wire@coindaily.online',
+                From: process.env.WIRE_ALERT_FROM || 'wire@sygn.live',
                 To: email,
                 Subject: `Wire: ${item.headline.slice(0, 80)}`,
                 HtmlBody: html,

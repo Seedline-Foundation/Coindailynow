@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-t
 
 // Hardcoded super admin credentials (match backend seed)
 const SUPER_ADMIN = {
-  email: 'admin@coindaily.africa',
+  email: 'admin@sygn.live',
   // Hash for "Admin@2024!" and "Admin@2024"
   passwordHashes: [
     '$2a$10$6PqDxQNVLpUYPSGSLVQ8uOJGJx8qVYxvXKxQN8jQxOxQx8qVYxvXK', // Admin@2024!

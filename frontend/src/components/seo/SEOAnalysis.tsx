@@ -216,7 +216,7 @@ export default function SEOAnalysis({
               <Input
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://coindaily.africa/article/example"
+                placeholder="https://sygn.live/article/example"
               />
             </div>
             <div>

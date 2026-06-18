@@ -36,15 +36,15 @@ done
 
 echo ""
 echo "=== Expected Express CORS origins (backend/src/index.ts) ==="
-echo "  https://coindaily.online, app, jet, press, ai + *.coindaily.online"
+echo "  https://sygn.live, app, jet, press, ai + *.sygn.live"
 echo "  Optional: CORS_ORIGINS env (comma-separated)"
 echo ""
 echo "=== Cloudflare checklist (manual in dashboard) ==="
 echo "  [ ] SSL/TLS: Full (strict)"
 echo "  [ ] Cache: Bypass for /api/*, /graphql, /health"
 echo "  [ ] Cache: Respect origin for /_next/static (long TTL)"
-echo "  [ ] Page Rules or Cache Rules for coindaily.online static assets"
-echo "  [ ] No 'Add CORS headers' Transform Rules on app.coindaily.online"
-echo "  [ ] WebSocket enabled for wss://app.coindaily.online/graphql"
+echo "  [ ] Page Rules or Cache Rules for sygn.live static assets"
+echo "  [ ] No 'Add CORS headers' Transform Rules on app.sygn.live"
+echo "  [ ] WebSocket enabled for wss://app.sygn.live/graphql"
 
 exit $FAILED

@@ -106,7 +106,7 @@ const NAV_MENUS = [
       { tKey: 'affiliate', href: '/paid-services/affiliate', icon: UserGroupIcon },
       { tKey: 'dataInsight', href: '/paid-services/data-insight', icon: CpuChipIcon },
       { tKey: 'newsSubscription', href: '/paid-services/news-subscription', icon: RssIcon },
-      { tKey: 'pressRelease', href: 'https://press.coindaily.online', icon: NewspaperIcon, external: true },
+      { tKey: 'pressRelease', href: 'https://press.sygn.live', icon: NewspaperIcon, external: true },
     ],
   },
 ];

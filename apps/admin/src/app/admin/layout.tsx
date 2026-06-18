@@ -1,5 +1,5 @@
 /**
- * Admin Section Layout (jet.coindaily.online/admin)
+ * Admin Section Layout (jet.sygn.live/admin)
  * Super admin dashboard with full platform management
  */
 

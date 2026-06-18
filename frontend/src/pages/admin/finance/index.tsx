@@ -197,7 +197,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const user = {
       id: '1',
-      email: 'admin@coindaily.com',
+      email: 'admin@sygn.live',
       role: 'SUPER_ADMIN',
     };
 

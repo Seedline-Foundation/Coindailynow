@@ -9,18 +9,18 @@ const nextConfig = {
   
   // Environment-specific configurations
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL !== undefined ? process.env.NEXT_PUBLIC_API_URL : 'https://app.coindaily.online',
-    NEXT_PUBLIC_AI_URL: process.env.NEXT_PUBLIC_AI_URL || 'https://ai.coindaily.online',
-    NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'wss://app.coindaily.online',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL !== undefined ? process.env.NEXT_PUBLIC_API_URL : 'https://app.sygn.live',
+    NEXT_PUBLIC_AI_URL: process.env.NEXT_PUBLIC_AI_URL || 'https://ai.sygn.live',
+    NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'wss://app.sygn.live',
     NEXT_PUBLIC_ADMIN_MODE: 'true',
   },
 
   // Image domains
   images: {
     domains: [
-      'coindaily.online',
-      'app.coindaily.online',
-      'cdn.coindaily.online',
+      'sygn.live',
+      'app.sygn.live',
+      'cdn.sygn.live',
     ],
   },
 
@@ -28,7 +28,7 @@ const nextConfig = {
   async headers() {
     const isProd = process.env.NODE_ENV === 'production';
     const connectSrc = isProd
-      ? "connect-src 'self' https://app.coindaily.online wss://app.coindaily.online;"
+      ? "connect-src 'self' https://app.sygn.live wss://app.sygn.live;"
       : "connect-src 'self' http://localhost:4000 ws://localhost:4000 http://127.0.0.1:4000 ws://127.0.0.1:4000 http://localhost:3002 ws://localhost:3002 http://127.0.0.1:3002 ws://127.0.0.1:3002 http://localhost:3010 ws://localhost:3010 http://127.0.0.1:3010 ws://127.0.0.1:3010;";
 
     const scriptSrc = isProd

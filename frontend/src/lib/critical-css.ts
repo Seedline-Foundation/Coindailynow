@@ -141,13 +141,13 @@ export class CriticalCSSManager {
       // DNS prefetch for external domains
       '<link rel="dns-prefetch" href="//fonts.googleapis.com">',
       '<link rel="dns-prefetch" href="//fonts.gstatic.com">',
-      '<link rel="dns-prefetch" href="//api.coindaily.africa">',
-      '<link rel="dns-prefetch" href="//cdn.coindaily.africa">',
+      '<link rel="dns-prefetch" href="//api.sygn.live">',
+      '<link rel="dns-prefetch" href="//cdn.sygn.live">',
       
       // Preconnect for critical resources
       '<link rel="preconnect" href="//fonts.googleapis.com" crossorigin>',
       '<link rel="preconnect" href="//fonts.gstatic.com" crossorigin>',
-      '<link rel="preconnect" href="//api.coindaily.africa" crossorigin>',
+      '<link rel="preconnect" href="//api.sygn.live" crossorigin>',
       
       // Prefetch for likely next pages
       '<link rel="prefetch" href="/news">',

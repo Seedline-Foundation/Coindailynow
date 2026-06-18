@@ -7,11 +7,11 @@
 export const CDN_CONFIG = {
   // Base URLs
   baseUrl: process.env.NODE_ENV === 'production' 
-    ? 'https://cdn.coindaily.africa'
+    ? 'https://cdn.sygn.live'
     : 'http://localhost:3000',
   
   apiUrl: process.env.NODE_ENV === 'production'
-    ? 'https://api.coindaily.africa'
+    ? 'https://api.sygn.live'
     : 'http://localhost:4000',
 
   // African optimization settings

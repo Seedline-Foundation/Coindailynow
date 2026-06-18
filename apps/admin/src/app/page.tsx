@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { Shield, LogIn, Lock } from 'lucide-react';
 
 /**
- * Staff Landing Page - jet.coindaily.online
+ * Staff Landing Page - jet.sygn.live
  * 
  * This is the page staff see when they:
- * - Navigate to jet.coindaily.online
+ * - Navigate to jet.sygn.live
  * - Log out from the admin panel
  * 
  * Contains the login button to access the admin portal.

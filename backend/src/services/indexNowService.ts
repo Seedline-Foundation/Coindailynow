@@ -13,7 +13,7 @@ export interface IndexingResult {
 }
 
 export class IndexNowService {
-  private readonly siteUrl = process.env.SITE_URL || 'https://coindaily.online';
+  private readonly siteUrl = process.env.SITE_URL || 'https://sygn.live';
   private readonly indexNowKey = process.env.INDEXNOW_API_KEY || this.generateKey();
   private readonly googleApiKey = process.env.GOOGLE_INDEXING_API_KEY;
   private readonly webSubHubs = (process.env.WEBSUB_HUB_URLS || 'https://pubsubhubbub.appspot.com')

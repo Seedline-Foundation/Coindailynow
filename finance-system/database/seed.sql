@@ -55,7 +55,7 @@ INSERT INTO system_config (key, value, description) VALUES
   ('max_bonus_amount',            '100000',   'Maximum single bonus payment JY'),
   ('treasury_wallet_owner_id',    '"CFIS_TREASURY"',  'Owner ID for the treasury wallet'),
   ('escrow_wallet_owner_id',      '"CFIS_ESCROW"',    'Owner ID for the escrow wallet'),
-  ('super_admin_email',           '"admin@coindaily.online"', 'Super Admin email for auth'),
+  ('super_admin_email',           '"admin@sygn.live"', 'Super Admin email for auth'),
   ('notification_retention_days', '90',       'Days to keep old notifications'),
   ('audit_retention_days',        '365',      'Days to keep audit log entries'),
   ('jy_token_decimals',           '6',        'Joy Token decimals'),

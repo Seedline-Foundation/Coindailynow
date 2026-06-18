@@ -1,5 +1,5 @@
 /**
- * AI System Dashboard - ai.coindaily.online
+ * AI System Dashboard - ai.sygn.live
  * Central hub for AI agent orchestration and monitoring
  * Staff can independently work with AI models
  */

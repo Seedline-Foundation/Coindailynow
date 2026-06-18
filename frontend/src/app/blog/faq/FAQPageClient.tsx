@@ -213,7 +213,7 @@ export default function FAQPageClient() {
             '@type': 'FAQPage',
             name: 'Cryptocurrency FAQ for Africa',
             description: 'Comprehensive cryptocurrency FAQ answered for the African market.',
-            url: 'https://coindaily.online/blog/faq',
+            url: 'https://sygn.live/blog/faq',
             mainEntity: FAQ_ITEMS.map(faq => ({
               '@type': 'Question',
               name: faq.question,
@@ -233,9 +233,9 @@ export default function FAQPageClient() {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://coindaily.online' },
-              { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://coindaily.online/blog' },
-              { '@type': 'ListItem', position: 3, name: 'FAQ', item: 'https://coindaily.online/blog/faq' },
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://sygn.live' },
+              { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://sygn.live/blog' },
+              { '@type': 'ListItem', position: 3, name: 'FAQ', item: 'https://sygn.live/blog/faq' },
             ],
           }),
         }}

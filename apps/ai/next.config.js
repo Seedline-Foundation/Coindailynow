@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // AI System runs on port 3004
-  // Domain: ai.coindaily.online
+  // Domain: ai.sygn.live
   
   reactStrictMode: true,
   swcMinify: true,

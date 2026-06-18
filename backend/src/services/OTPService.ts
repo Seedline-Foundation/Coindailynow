@@ -402,7 +402,7 @@ async function sendOTPEmail(
           </div>
           <div class="footer">
             <p>© 2025 CoinDaily. All rights reserved.</p>
-            <p>If you have questions, contact us at support@coindaily.com</p>
+            <p>If you have questions, contact us at support@sygn.live</p>
           </div>
         </div>
       </body>

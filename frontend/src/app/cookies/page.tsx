@@ -69,7 +69,7 @@ export default function CookiePolicyPage() {
           <h2>4. Contact</h2>
           <p>
             For questions about our cookie practices, contact us at{' '}
-            <a href="mailto:support@coindaily.online">support@coindaily.online</a>.
+            <a href="mailto:support@sygn.live">support@sygn.live</a>.
           </p>
         </div>
 

@@ -116,7 +116,7 @@ export default function MembershipPage() {
 
   const handleSubscribe = async (planId: string) => {
     if (planId === 'enterprise') {
-      window.location.href = 'mailto:sales@coindaily.africa?subject=Enterprise%20Membership%20Inquiry';
+      window.location.href = 'mailto:sales@sygn.live?subject=Enterprise%20Membership%20Inquiry';
       return;
     }
     setSelectedPlan(planId);

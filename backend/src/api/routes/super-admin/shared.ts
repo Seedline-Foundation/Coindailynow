@@ -21,7 +21,7 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction): 
   if (process.env.NODE_ENV !== 'production' && token && token.startsWith('mock_super_admin_token_')) {
     req.user = {
       id: 'dev-super-admin',
-      email: 'admin@coindaily.online',
+      email: 'admin@sygn.live',
       username: 'superadmin',
       role: 'SUPER_ADMIN',
       subscriptionTier: 'ENTERPRISE',

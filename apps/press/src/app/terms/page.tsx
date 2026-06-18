@@ -84,7 +84,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">13. Contact</h2>
-            <p>For questions about these Terms, contact us at: <a href="mailto:legal@coindaily.online" className="text-primary-500 hover:text-primary-400">legal@coindaily.online</a> or via our <a href="https://discord.gg/coindaily" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-400">Discord Help Center</a>.</p>
+            <p>For questions about these Terms, contact us at: <a href="mailto:legal@sygn.live" className="text-primary-500 hover:text-primary-400">legal@sygn.live</a> or via our <a href="https://discord.gg/coindaily" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-400">Discord Help Center</a>.</p>
           </section>
         </div>
       </main>

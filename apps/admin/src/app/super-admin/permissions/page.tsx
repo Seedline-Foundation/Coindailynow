@@ -79,13 +79,13 @@ export default function PermissionsPage() {
           grantedTo: {
             id: '2',
             username: 'content_admin_01',
-            email: 'content@coindaily.com',
+            email: 'content@sygn.live',
             role: 'CONTENT_ADMIN'
           },
           grantedBy: {
             id: '1',
             username: 'super_admin',
-            email: 'admin@coindaily.com'
+            email: 'admin@sygn.live'
           },
           status: 'ACTIVE',
           grantedAt: new Date('2024-01-15'),
@@ -101,13 +101,13 @@ export default function PermissionsPage() {
           grantedTo: {
             id: '3',
             username: 'editor_01',
-            email: 'editor@coindaily.com',
+            email: 'editor@sygn.live',
             role: 'CONTENT_ADMIN'
           },
           grantedBy: {
             id: '1',
             username: 'super_admin',
-            email: 'admin@coindaily.com'
+            email: 'admin@sygn.live'
           },
           status: 'ACTIVE',
           grantedAt: new Date('2024-02-01'),
@@ -123,13 +123,13 @@ export default function PermissionsPage() {
           grantedTo: {
             id: '4',
             username: 'marketing_admin',
-            email: 'marketing@coindaily.com',
+            email: 'marketing@sygn.live',
             role: 'MARKETING_ADMIN'
           },
           grantedBy: {
             id: '1',
             username: 'super_admin',
-            email: 'admin@coindaily.com'
+            email: 'admin@sygn.live'
           },
           status: 'EXPIRED',
           grantedAt: new Date('2023-12-01'),

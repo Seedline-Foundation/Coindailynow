@@ -69,9 +69,7 @@
       "@/constants/*": ["./src/constants/*"],
       "@/contexts/*": ["./src/contexts/*"],
       "@/store/*": ["./src/store/*"],
-      "@/public/*": ["./public/*"],
-      "@admin/*": ["../apps/admin/src/*"],
-      "@admin-components/*": ["../apps/admin/src/components/*"]
+      "@/public/*": ["./public/*"]
     }
   },
   "include": [
@@ -88,6 +86,13 @@
     "out",
     "dist",
     "build",
-    "src/app/api/**/*"
+    "src/app/api/**/*",
+    "src/app/news/src/**",
+    "src/app/news/_deprecated/**",
+    "src/pages/admin/**",
+    "src/pages/*-demo.tsx",
+    "src/pages/demo/**",
+    "tests/**",
+    "scripts/**"
   ]
 }

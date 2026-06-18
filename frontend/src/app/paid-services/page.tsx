@@ -149,8 +149,8 @@ export default function PaidServicesPage() {
             We work with Africa&apos;s top exchanges, fintechs, and blockchain projects. Let us put together a bespoke
             advertising, API, or content package that fits your goals and budget.
           </p>
-          <a href="mailto:sales@coindaily.africa" className="inline-block px-8 py-3 bg-white text-orange-600 font-bold rounded-xl hover:bg-orange-50 transition-all">
-            Contact Sales — sales@coindaily.africa
+          <a href="mailto:sales@sygn.live" className="inline-block px-8 py-3 bg-white text-orange-600 font-bold rounded-xl hover:bg-orange-50 transition-all">
+            Contact Sales — sales@sygn.live
           </a>
         </div>
 
@@ -161,7 +161,7 @@ export default function PaidServicesPage() {
             {[
               { q: 'What payment methods do you accept?', a: 'We accept Visa, Mastercard, PayPal, bank transfers, M-Pesa, Orange Money, and crypto (BTC, ETH, USDT).' },
               { q: 'Can I upgrade or switch plans anytime?', a: 'Yes. You can upgrade, downgrade, or switch any subscription at any time. The prorated difference is applied to your next billing cycle.' },
-              { q: 'Do you offer discounts for African startups?', a: 'Absolutely. We have special pricing for early-stage African crypto companies. Contact sales@coindaily.africa for startup rates.' },
+              { q: 'Do you offer discounts for African startups?', a: 'Absolutely. We have special pricing for early-stage African crypto companies. Contact sales@sygn.live for startup rates.' },
               { q: 'Is there an annual billing discount?', a: 'Yes, most subscriptions offer 20% off when billed annually. Check individual pricing pages for details.' },
             ].map((faq, i) => (
               <details key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">

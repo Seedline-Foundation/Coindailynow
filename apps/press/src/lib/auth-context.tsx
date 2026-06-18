@@ -33,9 +33,9 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 // Admin email whitelist (super admins)
 const ADMIN_EMAILS = [
-  'admin@coindaily.online',
-  'super@coindaily.online',
-  'ndifree@coindaily.online',
+  'admin@sygn.live',
+  'super@sygn.live',
+  'ndifree@sygn.live',
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {

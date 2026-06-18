@@ -210,7 +210,7 @@ export function ForgotPasswordForm({
         <div className="text-center">
           <p className="text-xs text-neutral-500">
             🔒 Password reset links expire after 1 hour for security<br />
-            Having trouble? Contact support at support@coindaily.africa
+            Having trouble? Contact support at support@sygn.live
           </p>
         </div>
       </div>

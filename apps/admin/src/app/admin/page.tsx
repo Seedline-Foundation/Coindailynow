@@ -23,7 +23,7 @@ import {
 import { fetchPlatformStats, fetchAlerts, fetchAIHealth } from '@/lib/api';
 
 /**
- * Staff Admin Portal - jet.coindaily.online/admin
+ * Staff Admin Portal - jet.sygn.live/admin
  * 
  * Main dashboard for staff members. Shows:
  * - System overview

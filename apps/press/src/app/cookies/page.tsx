@@ -39,7 +39,7 @@ export default function CookiesPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">Managing Cookies</h2>
-            <p>You can manage cookie preferences through your browser settings. Note that disabling essential cookies may prevent the platform from functioning correctly. For questions, contact <a href="mailto:privacy@coindaily.online" className="text-primary-500 hover:text-primary-400">privacy@coindaily.online</a>.</p>
+            <p>You can manage cookie preferences through your browser settings. Note that disabling essential cookies may prevent the platform from functioning correctly. For questions, contact <a href="mailto:privacy@sygn.live" className="text-primary-500 hover:text-primary-400">privacy@sygn.live</a>.</p>
           </section>
         </div>
       </main>

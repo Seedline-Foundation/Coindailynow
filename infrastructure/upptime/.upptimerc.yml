@@ -3,52 +3,52 @@ repo: coindaily-status
 
 sites:
   - name: CoinDaily News
-    url: https://coindaily.online
+    url: https://sygn.live
     expectedStatusCodes:
       - 200
       - 301
       - 302
 
   - name: CoinDaily API
-    url: https://api.coindaily.online/health
+    url: https://api.sygn.live/health
     expectedStatusCodes:
       - 200
 
   - name: CoinDaily Admin
-    url: https://jet.coindaily.online
+    url: https://jet.sygn.live
     expectedStatusCodes:
       - 200
       - 301
       - 302
 
   - name: CoinDaily Press
-    url: https://press.coindaily.online
+    url: https://press.sygn.live
     expectedStatusCodes:
       - 200
       - 301
       - 302
 
   - name: CoinDaily AI
-    url: https://ai.coindaily.online
+    url: https://ai.sygn.live
     expectedStatusCodes:
       - 200
       - 301
       - 302
 
 status-website:
-  cname: status.coindaily.online
+  cname: status.sygn.live
   name: CoinDaily Status
   theme: dark
-  logoUrl: https://coindaily.online/og-image.png
+  logoUrl: https://sygn.live/og-image.png
   navbar:
     - title: CoinDaily
-      href: https://coindaily.online
+      href: https://sygn.live
     - title: News
-      href: https://coindaily.online/news
+      href: https://sygn.live/news
 
 notifications:
   - type: email
-    address: admin@coindaily.online
+    address: admin@sygn.live
   # Uncomment after Telegram bot is set up:
   # - type: telegram
   #   botToken: $TELEGRAM_BOT_TOKEN

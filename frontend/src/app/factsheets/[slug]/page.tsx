@@ -70,7 +70,7 @@ function JsonLd({ entity }: { entity: (typeof factsheets)[number] }) {
           '@type': 'Country',
           name: entity.name,
           description: entity.overview,
-          url: `https://coindaily.online/factsheets/${entity.slug}`,
+          url: `https://sygn.live/factsheets/${entity.slug}`,
         }
       : entity.type === 'exchange' || entity.type === 'company'
         ? {
@@ -88,7 +88,7 @@ function JsonLd({ entity }: { entity: (typeof factsheets)[number] }) {
             name: entity.name,
             alternateName: entity.ticker,
             description: entity.overview,
-            url: `https://coindaily.online/factsheets/${entity.slug}`,
+            url: `https://sygn.live/factsheets/${entity.slug}`,
           };
 
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />;

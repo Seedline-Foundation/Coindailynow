@@ -76,8 +76,9 @@ const productionConfig: SecurityHeadersConfig = {
         "'self'",
         'https://api.coingecko.com',
         'https://www.google-analytics.com',
-        'wss://*.coindaily.com', // WebSocket connections
-        'https://*.coindaily.com'
+        'wss://*.sygn.live', // WebSocket connections (news + admin)
+        'https://*.sygn.live',
+        'https://cabfi.xyz' // CFIS (finance-system) cross-origin calls
       ],
       frameSrc: [
         "'self'",

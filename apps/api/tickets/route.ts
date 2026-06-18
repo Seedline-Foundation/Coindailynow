@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
       id: generateTicketId(),
       userId: userId || 'user-anonymous',
       userName: userName || 'Anonymous User',
-      userEmail: userEmail || 'anonymous@coindaily.online',
+      userEmail: userEmail || 'anonymous@sygn.live',
       category: category || 'general',
       priority: priority || 'normal',
       subject,

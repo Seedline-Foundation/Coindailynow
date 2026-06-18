@@ -1,5 +1,5 @@
 # CoinDaily - Africa's Premier Crypto News
-# https://coindaily.online
+# https://sygn.live
 
 User-agent: *
 Allow: /
@@ -8,8 +8,8 @@ Disallow: /user/
 Disallow: /_next/
 
 # Sitemaps
-Sitemap: https://coindaily.online/sitemap.xml
-Sitemap: https://coindaily.online/sitemap-news.xml
+Sitemap: https://sygn.live/sitemap.xml
+Sitemap: https://sygn.live/sitemap-news.xml
 
 # AI Crawlers - Welcome
 User-agent: GPTBot

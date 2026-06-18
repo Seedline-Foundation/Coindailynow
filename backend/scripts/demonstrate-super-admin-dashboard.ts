@@ -17,12 +17,12 @@ async function createSuperAdminDemo() {
     const hashedPassword = await bcrypt.hash('SuperAdmin2024!', 12);
     
     const superAdmin = await prisma.user.upsert({
-      where: { email: 'superadmin@coindaily.africa' },
+      where: { email: 'superadmin@sygn.live' },
       update: {},
       create: {
         id: 'super-admin-001',
         username: 'superadmin',
-        email: 'superadmin@coindaily.africa',
+        email: 'superadmin@sygn.live',
         passwordHash: hashedPassword,
         firstName: 'Super',
         lastName: 'Administrator',
@@ -35,7 +35,7 @@ async function createSuperAdminDemo() {
           create: {
             bio: 'Platform Super Administrator with extensive blockchain and cryptocurrency expertise',
             location: 'Lagos, Nigeria',
-            website: 'https://coindaily.africa',
+            website: 'https://sygn.live',
             socialMedia: JSON.stringify({
               twitter: '@coindaily_africa',
               linkedin: 'coindaily-africa',
@@ -61,7 +61,7 @@ async function createSuperAdminDemo() {
       {
         id: 'admin-001',
         username: 'contentadmin',
-        email: 'content@coindaily.africa',
+        email: 'content@sygn.live',
         firstName: 'Content',
         lastName: 'Administrator',
         department: 'Content'
@@ -69,7 +69,7 @@ async function createSuperAdminDemo() {
       {
         id: 'admin-002',
         username: 'marketingadmin',
-        email: 'marketing@coindaily.africa',
+        email: 'marketing@sygn.live',
         firstName: 'Marketing',
         lastName: 'Administrator',
         department: 'Marketing'
@@ -77,7 +77,7 @@ async function createSuperAdminDemo() {
       {
         id: 'admin-003',
         username: 'techadmin',
-        email: 'tech@coindaily.africa',
+        email: 'tech@sygn.live',
         firstName: 'Technical',
         lastName: 'Administrator',
         department: 'Technology'
@@ -104,7 +104,7 @@ async function createSuperAdminDemo() {
             create: {
               bio: `${adminData.department} team administrator`,
               location: 'Nigeria',
-              website: `https://coindaily.africa/team/${adminData.username}`,
+              website: `https://sygn.live/team/${adminData.username}`,
               socialMedia: JSON.stringify({
                 twitter: `@${adminData.username}`,
                 linkedin: adminData.username
@@ -343,14 +343,14 @@ async function createSuperAdminDemo() {
     console.log('Super Admin Login:');
     console.log('  URL: /super-admin/login');
     console.log('  Username: superadmin');
-    console.log('  Email: superadmin@coindaily.africa');
+    console.log('  Email: superadmin@sygn.live');
     console.log('  Password: SuperAdmin2024!');
     console.log('  2FA Code: Any 6-digit number (demo mode)');
     console.log('');
     console.log('Regular Admin Logins:');
-    console.log('  Content Admin: content@coindaily.africa / Admin2024!');
-    console.log('  Marketing Admin: marketing@coindaily.africa / Admin2024!');
-    console.log('  Tech Admin: tech@coindaily.africa / Admin2024!');
+    console.log('  Content Admin: content@sygn.live / Admin2024!');
+    console.log('  Marketing Admin: marketing@sygn.live / Admin2024!');
+    console.log('  Tech Admin: tech@sygn.live / Admin2024!');
     console.log('');
     console.log('Features Demonstrated:');
     console.log('  ✅ Complete Super Admin Dashboard');

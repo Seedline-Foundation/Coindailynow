@@ -2,7 +2,7 @@
   "name": "@coindaily/press",
   "version": "1.0.0",
   "private": true,
-  "description": "CoinDaily PR & Ad Distribution Network - press.coindaily.online",
+  "description": "CoinDaily PR & Ad Distribution Network - press.sygn.live",
   "scripts": {
     "dev": "next dev -p 3003",
     "build": "next build",

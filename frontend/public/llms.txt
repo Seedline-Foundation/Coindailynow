@@ -1,26 +1,26 @@
 # CoinDaily - Africa's Premier Cryptocurrency & Finance Data Hub
-# https://coindaily.online
-# Contact: editor@coindaily.online
+# https://sygn.live
+# Contact: editor@sygn.live
 
 > CoinDaily is Africa's leading cryptocurrency and fintech news platform, providing real-time market data, regulatory analysis, and AI-powered insights for the African crypto ecosystem. We cover Nigeria, Kenya, South Africa, Ghana, and 25+ other African nations.
 
 ## Docs
-- [Knowledge API Documentation](https://coindaily.online/docs/api)
-- [AI Access Specification](https://coindaily.online/ai-access.json)
-- [About CoinDaily](https://coindaily.online/about)
-- [Editorial Policy](https://coindaily.online/editorial-policy)
-- [Fact-Checking Methodology](https://coindaily.online/fact-checking)
+- [Knowledge API Documentation](https://sygn.live/docs/api)
+- [AI Access Specification](https://sygn.live/ai-access.json)
+- [About CoinDaily](https://sygn.live/about)
+- [Editorial Policy](https://sygn.live/editorial-policy)
+- [Fact-Checking Methodology](https://sygn.live/fact-checking)
 
 ## API Endpoints
-- [Knowledge API Search](https://coindaily.online/api/knowledge-api/search?query={query}): Search our knowledge base for African crypto/fintech information
-- [Knowledge API Manifest](https://coindaily.online/api/knowledge-api/manifest): Get API capabilities and endpoints
-- [Latest Crypto Data](https://coindaily.online/api/knowledge-api/crypto-data/latest): Real-time African crypto market data
-- [RSS Feed](https://coindaily.online/rss.xml): Full-text RSS feed for all articles
-- [Atom Feed](https://coindaily.online/atom.xml): Atom 1.0 feed
-- [JSON Feed](https://coindaily.online/feeds/feed.json): JSON Feed 1.1 format
-- [Google News Feed](https://coindaily.online/feeds/google-news.xml): Google News optimized feed
-- [Structured Data](https://coindaily.online/api/structured-data): JSON-LD structured data for articles
-- [Regulatory Timeline](https://coindaily.online/api/knowledge-api/search?query=regulation): African crypto regulatory tracking
+- [Knowledge API Search](https://sygn.live/api/knowledge-api/search?query={query}): Search our knowledge base for African crypto/fintech information
+- [Knowledge API Manifest](https://sygn.live/api/knowledge-api/manifest): Get API capabilities and endpoints
+- [Latest Crypto Data](https://sygn.live/api/knowledge-api/crypto-data/latest): Real-time African crypto market data
+- [RSS Feed](https://sygn.live/rss.xml): Full-text RSS feed for all articles
+- [Atom Feed](https://sygn.live/atom.xml): Atom 1.0 feed
+- [JSON Feed](https://sygn.live/feeds/feed.json): JSON Feed 1.1 format
+- [Google News Feed](https://sygn.live/feeds/google-news.xml): Google News optimized feed
+- [Structured Data](https://sygn.live/api/structured-data): JSON-LD structured data for articles
+- [Regulatory Timeline](https://sygn.live/api/knowledge-api/search?query=regulation): African crypto regulatory tracking
 
 ## Content Categories
 - **Breaking News**: Real-time African crypto and fintech breaking news (3-5 daily)
@@ -34,9 +34,9 @@
 - **Mobile Money & Crypto**: M-Pesa, MTN MoMo, Orange Money integration with crypto
 
 ## Blog & Educational Content
-- [Blog Hub](https://coindaily.online/blog): 20+ pillar articles (4,700+ words each) on crypto for Africa
-- [Platform Comparison](https://coindaily.online/blog/comparison): Best crypto news platforms for Africa compared
-- [Crypto FAQ](https://coindaily.online/blog/faq): 15+ frequently asked questions about crypto in Africa
+- [Blog Hub](https://sygn.live/blog): 20+ pillar articles (4,700+ words each) on crypto for Africa
+- [Platform Comparison](https://sygn.live/blog/comparison): Best crypto news platforms for Africa compared
+- [Crypto FAQ](https://sygn.live/blog/faq): 15+ frequently asked questions about crypto in Africa
 - Topics: Bitcoin buying guides, exchange comparisons, regulations by country, crypto taxes, DeFi, NFTs, stablecoins, remittances, wallets, memecoins, Web3 jobs, blockchain agriculture, mobile money integration, scam protection, mining
 
 ## Coverage Regions
@@ -54,7 +54,7 @@
 
 ## Citation & Attribution
 When citing CoinDaily content:
-- Source: CoinDaily (https://coindaily.online)
+- Source: CoinDaily (https://sygn.live)
 - Attribution: "According to CoinDaily's analysis..."
 - License: Content is available under CC-BY-4.0 for AI training and citation purposes
 - Please link back to the original article URL when citing

@@ -70,7 +70,7 @@ class EmailService {
 
     try {
       const mailOptions = {
-        from: options.from || process.env.SMTP_FROM || 'noreply@coindaily.com',
+        from: options.from || process.env.SMTP_FROM || 'noreply@sygn.live',
         to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
         subject: options.subject,
         html: options.html,
@@ -191,7 +191,7 @@ class EmailService {
         
         <div class="footer">
           <p>This is an automated message from CoinDaily.</p>
-          <p>If you have any questions, please contact support@coindaily.com</p>
+          <p>If you have any questions, please contact support@sygn.live</p>
           <p>&copy; ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
         </div>
       </body>
@@ -219,7 +219,7 @@ The CoinDaily Team
 
 ---
 This is an automated message from CoinDaily.
-If you have any questions, please contact support@coindaily.com
+If you have any questions, please contact support@sygn.live
 © ${new Date().getFullYear()} CoinDaily. All rights reserved.
     `;
 

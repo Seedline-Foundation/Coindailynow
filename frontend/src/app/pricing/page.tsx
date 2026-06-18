@@ -89,7 +89,7 @@ const tiers: PricingTier[] = [
       'SSO / SAML integration',
     ],
     cta: 'Contact Sales',
-    ctaHref: 'mailto:enterprise@coindaily.online?subject=Enterprise%20Inquiry',
+    ctaHref: 'mailto:enterprise@sygn.live?subject=Enterprise%20Inquiry',
   },
 ];
 

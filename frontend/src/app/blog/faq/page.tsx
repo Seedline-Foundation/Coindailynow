@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Cryptocurrency FAQ for Africa – All Your Questions Answered',
     description: 'Comprehensive crypto FAQ for Africans. Bitcoin, exchanges, regulations, taxes, DeFi, wallets, and more.',
-    url: 'https://coindaily.online/blog/faq',
+    url: 'https://sygn.live/blog/faq',
     siteName: 'CoinDaily',
     type: 'website',
     locale: 'en_US',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     description: 'All your crypto questions answered — tailored for the African market.',
     creator: '@CoinDailyOnline',
   },
-  alternates: { canonical: 'https://coindaily.online/blog/faq' },
+  alternates: { canonical: 'https://sygn.live/blog/faq' },
   robots: { index: true, follow: true },
 };
 

@@ -147,7 +147,7 @@ export class DataRetentionService {
         notificationRules: [
           {
             type: 'before_deletion',
-            recipients: ['admin@coindaily.com'],
+            recipients: ['admin@sygn.live'],
             leadTime: 7,
             template: 'retention_warning',
             channels: ['email']
@@ -226,7 +226,7 @@ export class DataRetentionService {
         notificationRules: [
           {
             type: 'before_deletion',
-            recipients: ['marketing@coindaily.com'],
+            recipients: ['marketing@sygn.live'],
             leadTime: 30,
             template: 'marketing_data_retention',
             channels: ['email']
@@ -271,13 +271,13 @@ export class DataRetentionService {
             ],
             extendedRetention: 1825, // 5 additional years
             requiresApproval: true,
-            approver: 'compliance@coindaily.com'
+            approver: 'compliance@sygn.live'
           }
         ],
         notificationRules: [
           {
             type: 'before_deletion',
-            recipients: ['compliance@coindaily.com', 'finance@coindaily.com'],
+            recipients: ['compliance@sygn.live', 'finance@sygn.live'],
             leadTime: 90,
             template: 'financial_data_retention',
             channels: ['email', 'slack']

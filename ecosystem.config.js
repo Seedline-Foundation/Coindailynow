@@ -3,18 +3,19 @@
  * CoinDaily Platform - All Applications
  * 
  * Domains:
- * - coindaily.online (News) - Port 3000
- * - jet.coindaily.online (Admin) - Port 3002
- * - press.coindaily.online (PR) - Port 3003
- * - ai.coindaily.online (AI) - Port 3004
- * - app.coindaily.online (Backend) - Port 4000
- * - token.coindaily.online (MVP) - Deployed separately
+ * - sygn.live (News) - Port 3000
+ * - jet.sygn.live (Admin) - Port 3002
+ * - press.sygn.live (PR) - Port 3003
+ * - ai.sygn.live (AI) - Port 3004
+ * - cabfi.xyz (CFIS / finance-system) - Port 3005
+ * - app.sygn.live (Backend) - Port 4000
+ * - token.sygn.live (MVP / token landing) - Port 3006 (deployed separately)
  */
 
 module.exports = {
   apps: [
     // ============================================
-    // BACKEND API - app.coindaily.online
+    // BACKEND API - app.sygn.live
     // ============================================
     {
       name: 'coindaily-backend',
@@ -41,7 +42,7 @@ module.exports = {
     },
 
     // ============================================
-    // NEWS APP - coindaily.online
+    // NEWS APP - sygn.live
     // The main public news site lives in ./frontend (Next.js 14).
     // There is intentionally NO ./apps/news directory — frontend/ IS the news app.
     // If you ever split it into apps/news, update this cwd in lockstep.
@@ -56,9 +57,9 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        NEXT_PUBLIC_API_URL: 'https://app.coindaily.online',
-        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.coindaily.online/graphql',
-        NEXT_PUBLIC_WS_URL: 'wss://app.coindaily.online/graphql'
+        NEXT_PUBLIC_API_URL: 'https://app.sygn.live',
+        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.sygn.live/graphql',
+        NEXT_PUBLIC_WS_URL: 'wss://app.sygn.live/graphql'
       },
       error_file: './logs/news-error.log',
       out_file: './logs/news-out.log',
@@ -72,7 +73,7 @@ module.exports = {
     },
 
     // ============================================
-    // ADMIN PORTAL - jet.coindaily.online
+    // ADMIN PORTAL - jet.sygn.live
     // ============================================
     {
       name: 'coindaily-admin',
@@ -84,9 +85,9 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3002,
-        NEXT_PUBLIC_API_URL: 'https://app.coindaily.online',
-        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.coindaily.online/graphql',
-        NEXT_PUBLIC_WS_URL: 'wss://app.coindaily.online/graphql'
+        NEXT_PUBLIC_API_URL: 'https://app.sygn.live',
+        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.sygn.live/graphql',
+        NEXT_PUBLIC_WS_URL: 'wss://app.sygn.live/graphql'
       },
       error_file: './logs/admin-error.log',
       out_file: './logs/admin-out.log',
@@ -100,7 +101,7 @@ module.exports = {
     },
 
     // ============================================
-    // PR & AD NETWORK - press.coindaily.online
+    // PR & AD NETWORK - press.sygn.live
     // ============================================
     {
       name: 'coindaily-press',
@@ -112,9 +113,11 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3003,
-        NEXT_PUBLIC_API_URL: 'https://app.coindaily.online',
-        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.coindaily.online/graphql',
-        NEXT_PUBLIC_WS_URL: 'wss://app.coindaily.online/graphql'
+        NEXT_PUBLIC_API_URL: 'https://app.sygn.live',
+        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.sygn.live/graphql',
+        NEXT_PUBLIC_WS_URL: 'wss://app.sygn.live/graphql',
+        // Press orders forward to CFIS on cabfi.xyz (HMAC-signed)
+        CFIS_URL: 'https://cabfi.xyz'
       },
       error_file: './logs/press-error.log',
       out_file: './logs/press-out.log',
@@ -128,7 +131,7 @@ module.exports = {
     },
 
     // ============================================
-    // AI SYSTEM - ai.coindaily.online
+    // AI SYSTEM - ai.sygn.live
     // ============================================
     {
       name: 'coindaily-ai',
@@ -140,9 +143,9 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3004,
-        NEXT_PUBLIC_API_URL: 'https://app.coindaily.online',
-        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.coindaily.online/graphql',
-        NEXT_PUBLIC_WS_URL: 'wss://app.coindaily.online/graphql'
+        NEXT_PUBLIC_API_URL: 'https://app.sygn.live',
+        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.sygn.live/graphql',
+        NEXT_PUBLIC_WS_URL: 'wss://app.sygn.live/graphql'
       },
       error_file: './logs/ai-error.log',
       out_file: './logs/ai-out.log',
@@ -218,6 +221,36 @@ module.exports = {
       max_restarts: 5,
       min_uptime: '30s',
       restart_delay: 5000
+    },
+
+    // ============================================
+    // CFIS (Finance System) - cabfi.xyz
+    // Hosted on cabfi.xyz, communicates with backend on sygn.live via HMAC.
+    // ============================================
+    {
+      name: 'coindaily-cfis',
+      cwd: './finance-system',
+      script: 'dist/index.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3005,
+        // CFIS receives signed webhooks from press.sygn.live and posts receipts back
+        // to the news backend on sygn.live.
+        BACKEND_API_URL: 'https://backend.sygn.live',
+        CFIS_PUBLIC_HOST: 'cabfi.xyz',
+        CFIS_CORS_ORIGINS: 'https://cabfi.xyz,https://jet.sygn.live,https://app.sygn.live,https://press.sygn.live'
+      },
+      error_file: './logs/cfis-error.log',
+      out_file: './logs/cfis-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      max_memory_restart: '512M',
+      autorestart: true,
+      watch: false,
+      max_restarts: 10,
+      min_uptime: '10s'
     },
 
     // ============================================

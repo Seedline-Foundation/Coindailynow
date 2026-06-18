@@ -63,7 +63,7 @@ export function loadConfig(): IengineConfig {
     },
     cdn: {
       provider: process.env.CDN_PROVIDER || 'backblaze-b2',
-      publicUrl: process.env.CDN_URL || process.env.CFIS_PUBLIC_MEDIA_BASE || 'https://cdn.coindaily.online',
+      publicUrl: process.env.CDN_URL || process.env.CFIS_PUBLIC_MEDIA_BASE || 'https://cdn.sygn.live',
       bucket: process.env.CDN_BUCKET || 'coindaily-media',
     },
     generation: {

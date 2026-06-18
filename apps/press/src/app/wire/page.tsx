@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: 'SENDPRESS Wire — Real-Time Press Releases',
     description:
       'Live wire feed of crypto and fintech press releases across Africa.',
-    url: 'https://press.coindaily.online/wire',
+    url: 'https://press.sygn.live/wire',
     siteName: 'SENDPRESS',
     type: 'website',
   },

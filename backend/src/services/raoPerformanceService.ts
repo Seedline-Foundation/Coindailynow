@@ -450,7 +450,7 @@ export async function applyAutomaticAdaptations(recommendations: AdaptationRecom
                 name: 'CoinDaily',
                 logo: {
                   '@type': 'ImageObject',
-                  url: process.env.LOGO_URL || 'https://coindaily.com/logo.png',
+                  url: process.env.LOGO_URL || 'https://sygn.live/logo.png',
                 },
               },
             };

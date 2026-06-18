@@ -1,7 +1,7 @@
 /**
  * Security Monitoring API Routes
  *
- * Provides endpoints for the super-admin dashboard (jet.coindaily.online)
+ * Provides endpoints for the super-admin dashboard (jet.sygn.live)
  * to access security reports, service health, and threat data.
  *
  * All routes require SUPER_ADMIN authentication.

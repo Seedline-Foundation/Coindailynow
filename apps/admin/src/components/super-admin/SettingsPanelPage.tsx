@@ -31,7 +31,7 @@ const PAGE_FIELDS: Record<string, FieldDef[]> = {
   api: [
     { key: 'backendUrl', label: 'Backend URL', type: 'text', placeholder: 'http://localhost:4000', helpText: 'Base URL that the frontend proxies to.' },
     { key: 'rateLimitPerMinute', label: 'Global Rate Limit (req/min)', type: 'number', placeholder: '100', helpText: 'Max API requests per IP per minute.' },
-    { key: 'allowedOrigins', label: 'Allowed CORS Origins', type: 'textarea', placeholder: 'https://coindaily.africa\nhttps://app.coindaily.africa', helpText: 'One origin per line. Empty = all origins allowed.' },
+    { key: 'allowedOrigins', label: 'Allowed CORS Origins', type: 'textarea', placeholder: 'https://sygn.live\nhttps://app.sygn.live', helpText: 'One origin per line. Empty = all origins allowed.' },
     { key: 'apiVersion', label: 'API Version', type: 'text', placeholder: 'v1', helpText: 'Current API version identifier.' },
   ],
   localization: [

@@ -8,7 +8,7 @@ const BACKEND_JWT_SECRET = process.env.BACKEND_JWT_SECRET || 'dev_jwt_secret_key
 // Separate secret for short-lived pre-auth tokens (password verified, TOTP pending)
 const TEMP_TOKEN_SECRET = JWT_SECRET + ':totp-pending';
 
-const SUPER_ADMIN_EMAILS = (process.env.SUPER_ADMIN_EMAILS || 'admin@coindaily.online').split(',').map(e => e.trim());
+const SUPER_ADMIN_EMAILS = (process.env.SUPER_ADMIN_EMAILS || 'admin@sygn.live').split(',').map(e => e.trim());
 
 export interface AuthenticatedRequest extends Request {
   admin?: {

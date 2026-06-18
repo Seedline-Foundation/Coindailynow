@@ -205,7 +205,7 @@ export default function RegionalContentWidget() {
 
         {/* Visit Regional Site */}
         <a
-          href={`https://${userRegion.subdomain}.coindaily.africa`}
+          href={`https://${userRegion.subdomain}.sygn.live`}
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full px-4 py-2 bg-blue-600 text-white text-center text-sm font-medium rounded-lg hover:bg-blue-700 transition"
