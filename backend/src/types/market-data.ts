@@ -256,7 +256,7 @@ export interface ResponseMetadata {
 export interface CacheInfo {
   hit: boolean;
   ttl: number; // seconds remaining
-  source: 'MEMORY' | 'REDIS' | 'DATABASE';
+  source: 'MEMORY' | 'REDIS' | 'DATABASE' | 'MOCK';
 }
 
 export interface PerformanceInfo {

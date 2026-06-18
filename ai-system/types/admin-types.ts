@@ -56,6 +56,10 @@ export interface ImageOutcome {
   alt_text: string;
   theme_match_score: number;
   quality_score: number;
+  prompt_used?: string;
+  negative_prompt_used?: string;
+  model?: string;
+  processing_time_ms?: number;
 }
 
 export interface TranslationOutcome {

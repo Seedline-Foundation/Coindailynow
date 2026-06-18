@@ -92,7 +92,7 @@ interface TranslationOutcome {
   tone_consistency_score: number;
 }
 
-interface AdminQueueItem {
+export interface AdminQueueItem {
   id: string;
   article_id: string;
   status: 'pending_approval' | 'approved' | 'edit_requested' | 'published';

@@ -131,7 +131,9 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       images: article.featuredImageUrl ? [{ url: article.featuredImageUrl, alt: article.title }] : [],
       publishedTime: article.publishedAt || undefined,
       modifiedTime: article.updatedAt || undefined,
-      authors: article.author ? [`${article.author.firstName || ''} ${article.author.lastName || ''}`.trim() || article.author.username || undefined] : undefined,
+      authors: article.author
+        ? [`${article.author.firstName || ''} ${article.author.lastName || ''}`.trim() || article.author.username || ''].filter(Boolean) as string[]
+        : undefined,
     },
     twitter: {
       card: 'summary_large_image',

@@ -94,7 +94,7 @@ const pressOrderLimiter = rateLimit({
 
 // CORS — LOCKED to known origins only (financial system must not be open)
 const ALLOWED_ORIGINS = new Set(
-  (process.env.CFIS_CORS_ORIGINS || 'https://jet.sygn.live,https://app.sygn.live,https://press.sygn.live,https://cabfi.xyz').split(',').map(o => o.trim())
+  (process.env.CFIS_CORS_ORIGINS || 'https://cabfi.xyz,https://jet.sygn.live,https://app.sygn.live,https://press.sygn.live').split(',').map(o => o.trim())
 );
 if (process.env.NODE_ENV === 'development') {
   ALLOWED_ORIGINS.add('http://localhost:3000');

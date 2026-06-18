@@ -7,8 +7,9 @@
  * - jet.sygn.live (Admin) - Port 3002
  * - press.sygn.live (PR) - Port 3003
  * - ai.sygn.live (AI) - Port 3004
+ * - cabfi.xyz (CFIS / finance-system) - Port 3005
  * - app.sygn.live (Backend) - Port 4000
- * - token.sygn.live (MVP) - Deployed separately
+ * - token.sygn.live (MVP / token landing) - Port 3006 (deployed separately)
  */
 
 module.exports = {
@@ -114,7 +115,9 @@ module.exports = {
         PORT: 3003,
         NEXT_PUBLIC_API_URL: 'https://app.sygn.live',
         NEXT_PUBLIC_GRAPHQL_URL: 'https://app.sygn.live/graphql',
-        NEXT_PUBLIC_WS_URL: 'wss://app.sygn.live/graphql'
+        NEXT_PUBLIC_WS_URL: 'wss://app.sygn.live/graphql',
+        // Press orders forward to CFIS on cabfi.xyz (HMAC-signed)
+        CFIS_URL: 'https://cabfi.xyz'
       },
       error_file: './logs/press-error.log',
       out_file: './logs/press-out.log',
@@ -218,6 +221,36 @@ module.exports = {
       max_restarts: 5,
       min_uptime: '30s',
       restart_delay: 5000
+    },
+
+    // ============================================
+    // CFIS (Finance System) - cabfi.xyz
+    // Hosted on cabfi.xyz, communicates with backend on sygn.live via HMAC.
+    // ============================================
+    {
+      name: 'coindaily-cfis',
+      cwd: './finance-system',
+      script: 'dist/index.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3005,
+        // CFIS receives signed webhooks from press.sygn.live and posts receipts back
+        // to the news backend on sygn.live.
+        BACKEND_API_URL: 'https://backend.sygn.live',
+        CFIS_PUBLIC_HOST: 'cabfi.xyz',
+        CFIS_CORS_ORIGINS: 'https://cabfi.xyz,https://jet.sygn.live,https://app.sygn.live,https://press.sygn.live'
+      },
+      error_file: './logs/cfis-error.log',
+      out_file: './logs/cfis-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      max_memory_restart: '512M',
+      autorestart: true,
+      watch: false,
+      max_restarts: 10,
+      min_uptime: '10s'
     },
 
     // ============================================

@@ -49,7 +49,7 @@ export async function generateArticleWithImo(params: {
   keywords: string[];
   category: string;
   urgency: 'breaking' | 'high' | 'medium' | 'low';
-  targetAudience?: 'beginner' | 'intermediate' | 'expert';
+  targetAudience?: 'beginner' | 'intermediate' | 'expert' | 'general';
 }) {
   // Initialize Imo Orchestrator
   await imoOrchestrator.initialize();

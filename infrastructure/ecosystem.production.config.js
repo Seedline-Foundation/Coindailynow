@@ -7,7 +7,8 @@
  * - Admin Portal (jet.sygn.live) - Port 3002
  * - PR System (press.sygn.live) - Port 3003
  * - AI Dashboard (ai.sygn.live) - Port 3004
- * - Token Landing (token.sygn.live) - Port 3005
+ * - CFIS (cabfi.xyz, finance-system) - Port 3005
+ * - Token Landing (token.sygn.live) - Port 3006
  */
 
 module.exports = {
@@ -191,6 +192,9 @@ module.exports = {
 
     // ============================================
     // TOKEN LANDING - token.sygn.live (Already deployed)
+    // Port moved from 3005 → 3006 to avoid conflict with CFIS (finance-system)
+    // which has occupied :3005 since launch. Update token.sygn.live nginx
+    // upstream to 127.0.0.1:3006.
     // ============================================
     {
       name: 'coindaily-token',
@@ -201,7 +205,7 @@ module.exports = {
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3005
+        PORT: 3006
       },
       error_file: '/var/log/coindaily/token-error.log',
       out_file: '/var/log/coindaily/token-out.log',

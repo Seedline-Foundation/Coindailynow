@@ -41,7 +41,7 @@ const withPWA = require('next-pwa')({
     },
     {
       // API Responses (/api/v1/*): NetworkFirst — 3-second timeout, 5-minute cache fallback, 50 entry limit
-      urlPattern: /^https?:\/\/(api\.sygn\.live|localhost:4000)\/api\/v1\/.*/i,
+      urlPattern: /^https?:\/\/(api\.sygn\.live|app\.sygn\.live|localhost:4000)\/api\/v1\/.*/i,
       handler: 'NetworkFirst',
       options: {
         cacheName: 'api-cache',
