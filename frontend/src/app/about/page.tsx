@@ -21,7 +21,7 @@ export default function AboutPage() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'CoinDaily Africa',
-    url: 'https://coindaily.online',
+    url: 'https://sygn.live',
     description:
       'Independent cryptocurrency, blockchain, and financial market intelligence for Africa and the global diaspora.',
     foundingDate: '2025',
@@ -108,8 +108,8 @@ export default function AboutPage() {
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Contact</h2>
               <p className="text-gray-600 leading-relaxed">
                 For press inquiries, corrections, or partnership opportunities, contact us at{' '}
-                <a href="mailto:editorial@coindaily.online" className="text-blue-600 hover:underline">
-                  editorial@coindaily.online
+                <a href="mailto:editorial@sygn.live" className="text-blue-600 hover:underline">
+                  editorial@sygn.live
                 </a>.
               </p>
             </section>

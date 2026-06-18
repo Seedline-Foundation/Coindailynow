@@ -25,7 +25,7 @@ async function main() {
     await prisma.user.create({
       data: {
         id: 'super-admin-id',
-        email: 'admin@coindaily.online',
+        email: 'admin@sygn.live',
         username: 'superadmin',
         passwordHash,
         role: 'SUPER_ADMIN',
@@ -35,14 +35,14 @@ async function main() {
         emailVerified: true
       }
     });
-    console.log('Seeded super admin user: admin@coindaily.online / adminpassword');
+    console.log('Seeded super admin user: admin@sygn.live / adminpassword');
 
     // Create demo user
     const userPasswordHash = await bcrypt.hash('User@2024', 10);
     await prisma.user.create({
       data: {
         id: 'demo-user-id',
-        email: 'user@coindaily.africa',
+        email: 'user@sygn.live',
         username: 'demouser',
         passwordHash: userPasswordHash,
         role: 'USER',
@@ -52,14 +52,14 @@ async function main() {
         emailVerified: true
       }
     });
-    console.log('Seeded demo user: user@coindaily.africa / User@2024');
+    console.log('Seeded demo user: user@sygn.live / User@2024');
 
     // Create demo editor
     const editorPasswordHash = await bcrypt.hash('Editor@2024', 10);
     await prisma.user.create({
       data: {
         id: 'demo-editor-id',
-        email: 'editor@coindaily.africa',
+        email: 'editor@sygn.live',
         username: 'demoeditor',
         passwordHash: editorPasswordHash,
         role: 'EDITOR',
@@ -69,7 +69,7 @@ async function main() {
         emailVerified: true
       }
     });
-    console.log('Seeded demo editor: editor@coindaily.africa / Editor@2024');
+    console.log('Seeded demo editor: editor@sygn.live / Editor@2024');
 
     console.log('Database seeding completed successfully!');
   } catch (error) {

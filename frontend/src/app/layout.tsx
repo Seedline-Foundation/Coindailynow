@@ -34,7 +34,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 // SEO and PWA Metadata
 export const metadata: Metadata = {
-  metadataBase: new URL('https://coindaily.online'),
+  metadataBase: new URL('https://sygn.live'),
   title: {
     default: 'CoinDaily Africa - Premier Cryptocurrency News Platform',
     template: '%s | CoinDaily Africa'
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     'm-pesa crypto',
     'mobile money cryptocurrency'
   ],
-  authors: [{ name: 'CoinDaily Africa Team', url: 'https://coindaily.africa' }],
+  authors: [{ name: 'CoinDaily Africa Team', url: 'https://sygn.live' }],
   creator: 'CoinDaily Africa',
   publisher: 'CoinDaily Africa',
   applicationName: 'CoinDaily Africa',
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     siteName: 'CoinDaily Africa',
     title: 'CoinDaily Africa - Premier Cryptocurrency News Platform',
     description: 'Africa\'s premier cryptocurrency news platform with real-time market data and AI-driven content',
-    url: 'https://coindaily.africa',
+    url: 'https://sygn.live',
     countryName: 'Nigeria',
     images: [
       {
@@ -182,7 +182,7 @@ export default function RootLayout({
         {/* Preconnect to important domains for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://api.coindaily.africa" />
+        <link rel="preconnect" href="https://api.sygn.live" />
         
         {/* PWA Icons */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -196,8 +196,8 @@ export default function RootLayout({
         <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png" />
         
         {/* Performance hints */}
-        <link rel="dns-prefetch" href="https://api.coindaily.africa" />
-        <link rel="dns-prefetch" href="https://cdn.coindaily.africa" />
+        <link rel="dns-prefetch" href="https://api.sygn.live" />
+        <link rel="dns-prefetch" href="https://cdn.sygn.live" />
         
         {/* Structured data for search engines */}
         <script
@@ -208,17 +208,17 @@ export default function RootLayout({
               '@type': 'WebSite',
               name: 'CoinDaily',
               alternateName: ['CoinDaily Africa', 'CoinDaily Online'],
-              url: 'https://coindaily.online',
+              url: 'https://sygn.live',
               description: 'Africa\'s premier cryptocurrency news platform with AI-powered content in 15+ African languages',
               inLanguage: ['en', 'sw', 'ha', 'yo', 'am', 'zu', 'ig', 'af', 'so', 'rw', 'sn', 'lg', 'wo', 'om', 'ti'],
               isAccessibleForFree: true,
               publisher: {
                 '@type': 'Organization',
                 name: 'CoinDaily',
-                url: 'https://coindaily.online',
+                url: 'https://sygn.live',
                 logo: {
                   '@type': 'ImageObject',
-                  url: 'https://coindaily.online/images/logo.svg'
+                  url: 'https://sygn.live/images/logo.svg'
                 },
                 sameAs: [
                   'https://twitter.com/coindailyafrica',
@@ -237,7 +237,7 @@ export default function RootLayout({
                 '@type': 'SearchAction',
                 target: {
                   '@type': 'EntryPoint',
-                  urlTemplate: 'https://coindaily.online/search?q={search_term_string}'
+                  urlTemplate: 'https://sygn.live/search?q={search_term_string}'
                 },
                 'query-input': 'required name=search_term_string'
               }

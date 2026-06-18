@@ -255,12 +255,12 @@ export const ArticleReader: React.FC<ArticleReaderProps> = ({
             author: {
               '@type': 'Person',
               name: `${article.author.firstName} ${article.author.lastName}`.trim() || article.author.username,
-              url: `https://coindaily.africa/authors/${article.author.username}`
+              url: `https://sygn.live/authors/${article.author.username}`
             },
             publisher: {
               '@type': 'Organization',
               name: 'CoinDaily Africa',
-              logo: 'https://coindaily.africa/logo.png'
+              logo: 'https://sygn.live/logo.png'
             },
             datePublished: article.publishedAt,
             dateModified: article.updatedAt,

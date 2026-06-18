@@ -36,7 +36,7 @@ import {
 } from '@/lib/api';
 
 /**
- * Publisher Dashboard - press.coindaily.online/dashboard
+ * Publisher Dashboard - press.sygn.live/dashboard
  *
  * Main dashboard for PR publishers (buyers) to:
  * - Distribute press releases across the SENDPRESS network

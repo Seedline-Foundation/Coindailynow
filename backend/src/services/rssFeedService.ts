@@ -13,7 +13,7 @@ export interface RSSFeedOptions {
 }
 
 export class RSSFeedService {
-  private readonly siteUrl = process.env.SITE_URL || 'https://coindaily.online';
+  private readonly siteUrl = process.env.SITE_URL || 'https://sygn.live';
   private readonly siteName = 'CoinDaily';
   private readonly siteDescription = "Africa's Premier Cryptocurrency & Finance News Platform";
 
@@ -68,8 +68,8 @@ export class RSSFeedService {
     <description>${this.escapeXml(this.siteDescription)}</description>
     <language>${language || 'en'}</language>
     <copyright>Copyright ${new Date().getFullYear()} ${this.siteName}. All rights reserved.</copyright>
-    <managingEditor>editor@coindaily.online (CoinDaily Editorial)</managingEditor>
-    <webMaster>tech@coindaily.online (CoinDaily Tech)</webMaster>
+    <managingEditor>editor@sygn.live (CoinDaily Editorial)</managingEditor>
+    <webMaster>tech@sygn.live (CoinDaily Tech)</webMaster>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
     <sy:updatePeriod>hourly</sy:updatePeriod>
     <sy:updateFrequency>1</sy:updateFrequency>
@@ -84,7 +84,7 @@ export class RSSFeedService {
 
     for (const article of articles) {
       const authorName = article.User ? `${article.User.firstName || ''} ${article.User.lastName || ''}`.trim() || 'CoinDaily Staff' : 'CoinDaily Staff';
-      const authorEmail = article.User?.email || 'editor@coindaily.online';
+      const authorEmail = article.User?.email || 'editor@sygn.live';
       const pubDate = new Date(article.publishedAt || article.createdAt).toUTCString();
       const articleUrl = `${this.siteUrl}/news/${article.slug}`;
       const tagList = this.parseTags(article.tags);

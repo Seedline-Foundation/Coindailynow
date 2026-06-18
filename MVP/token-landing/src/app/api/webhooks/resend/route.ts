@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma';
  * 
  * Setup in Resend Dashboard:
  * 1. Go to Settings → Webhooks
- * 2. Add endpoint: https://token.coindaily.online/api/webhooks/resend
+ * 2. Add endpoint: https://token.sygn.live/api/webhooks/resend
  * 3. Copy signing secret to .env as RESEND_WEBHOOK_SECRET
  * 4. Select events: email.sent, email.delivered, email.opened, email.clicked, email.bounced, etc.
  */

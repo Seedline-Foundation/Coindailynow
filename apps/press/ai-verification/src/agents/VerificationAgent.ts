@@ -433,9 +433,9 @@ Estimated Earnings:
 Based on your Domain Height score, you could earn $${this.getEstimatedEarnings(site.tier)}/month passively.
 
 Get Started:
-Visit https://press.coindaily.online/signup?ref=${site.id}
+Visit https://press.sygn.live/signup?ref=${site.id}
 
-Questions? Reply to this email or visit our FAQ at https://press.coindaily.online/faq
+Questions? Reply to this email or visit our FAQ at https://press.sygn.live/faq
 
 Best regards,
 The SENDPRESS Team

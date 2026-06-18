@@ -97,7 +97,7 @@ async function demonstrateTask17() {
         // Create sample user
         const sampleUser = await prisma.user.create({
           data: {
-            email: 'demo@coindaily.com',
+            email: 'demo@sygn.live',
             username: 'demo_user',
             passwordHash: 'demo_hash',
             firstName: 'Demo',

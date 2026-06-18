@@ -15,10 +15,10 @@ info:
   version: 1.0.0
   contact:
     name: CoinDaily Support
-    email: support@coindaily.online
-    url: https://coindaily.online
+    email: support@sygn.live
+    url: https://sygn.live
 servers:
-  - url: https://coindaily.online/api
+  - url: https://sygn.live/api
     description: Production API
 
 paths:

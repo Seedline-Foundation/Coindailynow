@@ -53,4 +53,4 @@ ENDSSH
 rm ai-deploy.tar.gz
 
 echo "✅ Deployment complete!"
-echo "🌐 Access at: https://ai.coindaily.online"
+echo "🌐 Access at: https://ai.sygn.live"

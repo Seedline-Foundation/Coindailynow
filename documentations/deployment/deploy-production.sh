@@ -54,14 +54,14 @@ cd ../..
 # Step 7: Setup nginx (first time only)
 echo ""
 echo "[7/8] Setting up nginx configs..."
-sudo cp nginx-app.coindaily.online.conf /etc/nginx/sites-available/app.coindaily.online
-sudo cp nginx-coindaily.online.conf /etc/nginx/sites-available/coindaily.online
-sudo cp nginx-jet.coindaily.online.conf /etc/nginx/sites-available/jet.coindaily.online
+sudo cp nginx-app.sygn.live.conf /etc/nginx/sites-available/app.sygn.live
+sudo cp nginx-sygn.live.conf /etc/nginx/sites-available/sygn.live
+sudo cp nginx-jet.sygn.live.conf /etc/nginx/sites-available/jet.sygn.live
 
 # Enable sites (create symlinks)
-sudo ln -sf /etc/nginx/sites-available/app.coindaily.online /etc/nginx/sites-enabled/
-sudo ln -sf /etc/nginx/sites-available/coindaily.online /etc/nginx/sites-enabled/
-sudo ln -sf /etc/nginx/sites-available/jet.coindaily.online /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/app.sygn.live /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/sygn.live /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/jet.sygn.live /etc/nginx/sites-enabled/
 
 # Test and reload nginx
 sudo nginx -t && sudo systemctl reload nginx
@@ -86,9 +86,9 @@ echo "=========================================="
 echo "  Deployment Complete!"
 echo "=========================================="
 echo ""
-echo "  Backend API:  https://app.coindaily.online"
-echo "  News App:     https://coindaily.online"
-echo "  Admin Panel:  https://jet.coindaily.online"
+echo "  Backend API:  https://app.sygn.live"
+echo "  News App:     https://sygn.live"
+echo "  Admin Panel:  https://jet.sygn.live"
 echo ""
 echo "  Check status: pm2 status"
 echo "  View logs:    pm2 logs"

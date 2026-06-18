@@ -100,7 +100,7 @@ export class SitemapService {
 
   constructor(config?: Partial<SitemapConfig>) {
     this.config = {
-      baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://coindaily.com',
+      baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://sygn.live',
       changeFrequency: 'daily',
       defaultPriority: 0.5,
       maxUrlsPerSitemap: 50000,
@@ -430,7 +430,7 @@ export class SitemapService {
     const xml = create({ version: '1.0', encoding: 'UTF-8' })
       .ele('urlset', {
         xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9',
-        'xmlns:rao': 'http://coindaily.com/schemas/rao/1.0',
+        'xmlns:rao': 'http://sygn.live/schemas/rao/1.0',
       });
 
     raoEntries.forEach((entry) => {

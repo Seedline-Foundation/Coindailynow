@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 /**
- * Staff Login Page - jet.coindaily.online/login
+ * Staff Login Page - jet.sygn.live/login
  * 
  * Secure login page for staff members.
  * Features:
@@ -237,7 +237,7 @@ function StaffLoginContent() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full pl-10 pr-4 py-3 bg-dark-800 border border-dark-700 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500"
-                    placeholder="staff@coindaily.online"
+                    placeholder="staff@sygn.live"
                   />
                 </div>
               </div>
@@ -353,7 +353,7 @@ function StaffLoginContent() {
           <div className="mt-6 pt-6 border-t border-dark-700">
             <div className="flex items-center justify-center text-sm mb-4">
               <a 
-                href="mailto:support@coindaily.africa"
+                href="mailto:support@sygn.live"
                 className="text-dark-400 hover:text-white transition-colors"
               >
                 Need Help? Contact Support

@@ -126,37 +126,37 @@ export default function ContactPage() {
             <div>
               <p className="text-sm text-gray-500 mb-2">Partnerships & Advertising</p>
               <a
-                href="mailto:partnerships@coindaily.online"
+                href="mailto:partnerships@sygn.live"
                 className="text-primary-400 hover:text-primary-300 font-mono text-lg transition-colors"
               >
-                partnerships@coindaily.online
+                partnerships@sygn.live
               </a>
             </div>
             <div>
               <p className="text-sm text-gray-500 mb-2">Career Opportunities</p>
               <a
-                href="mailto:careers@coindaily.online"
+                href="mailto:careers@sygn.live"
                 className="text-accent-400 hover:text-accent-300 font-mono text-lg transition-colors"
               >
-                careers@coindaily.online
+                careers@sygn.live
               </a>
             </div>
             <div>
               <p className="text-sm text-gray-500 mb-2">Press & Media</p>
               <a
-                href="mailto:press@coindaily.online"
+                href="mailto:press@sygn.live"
                 className="text-primary-400 hover:text-primary-300 font-mono text-lg transition-colors"
               >
-                press@coindaily.online
+                press@sygn.live
               </a>
             </div>
             <div>
               <p className="text-sm text-gray-500 mb-2">General Support</p>
               <a
-                href="mailto:support@coindaily.online"
+                href="mailto:support@sygn.live"
                 className="text-accent-400 hover:text-accent-300 font-mono text-lg transition-colors"
               >
-                support@coindaily.online
+                support@sygn.live
               </a>
             </div>
           </div>

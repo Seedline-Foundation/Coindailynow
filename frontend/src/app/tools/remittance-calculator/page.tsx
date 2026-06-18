@@ -211,7 +211,7 @@ export default function RemittanceCalculatorPage() {
         await navigator.share({
           title: 'CoinDaily Remittance Comparison',
           text: summary,
-          url: typeof window !== 'undefined' ? window.location.href : 'https://coindaily.online/tools/remittance-calculator',
+          url: typeof window !== 'undefined' ? window.location.href : 'https://sygn.live/tools/remittance-calculator',
         });
       } else {
         await navigator.clipboard.writeText(summary);
@@ -475,7 +475,7 @@ export default function RemittanceCalculatorPage() {
             <h3 className="font-bold text-gray-900 dark:text-white mb-2">🔗 Embed This Calculator</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">Add the Stablecoin Remittance Calculator to your website:</p>
             <code className="block bg-white dark:bg-gray-800 p-3 rounded-lg text-xs text-gray-800 dark:text-gray-300 break-all">
-              {`<iframe src="https://coindaily.online/embed/remittance-calculator" width="100%" height="600" frameborder="0"></iframe>`}
+              {`<iframe src="https://sygn.live/embed/remittance-calculator" width="100%" height="600" frameborder="0"></iframe>`}
             </code>
           </div>
         </div>
@@ -486,7 +486,7 @@ export default function RemittanceCalculatorPage() {
           applicationCategory: 'FinanceApplication',
           operatingSystem: 'Web',
           description: 'Compare stablecoin remittances vs traditional providers for African corridors',
-          url: 'https://coindaily.online/tools/remittance-calculator'
+          url: 'https://sygn.live/tools/remittance-calculator'
         })}} />
       </main>
       <Footer />

@@ -207,7 +207,7 @@ export default function PrivacyPage() {
 
             <h3 className="text-xl font-bold text-primary-400 mb-4">7.3 How to Exercise Rights</h3>
             <p className="text-gray-300">
-              To exercise any of these rights, contact us at <a href="mailto:privacy@coindaily.online" className="text-primary-400 hover:underline">privacy@coindaily.online</a>. 
+              To exercise any of these rights, contact us at <a href="mailto:privacy@sygn.live" className="text-primary-400 hover:underline">privacy@sygn.live</a>. 
               We will respond within 30 days (or as required by law). You may need to verify your identity before we process requests.
             </p>
           </Section>
@@ -254,7 +254,7 @@ export default function PrivacyPage() {
             <p className="text-gray-300 mb-4">
               Our Services are <strong>NOT</strong> intended for users under 18 years old. We do not knowingly 
               collect personal information from children. If you believe we have inadvertently collected information 
-              from a minor, contact us immediately at <a href="mailto:privacy@coindaily.online" className="text-primary-400 hover:underline">privacy@coindaily.online</a>.
+              from a minor, contact us immediately at <a href="mailto:privacy@sygn.live" className="text-primary-400 hover:underline">privacy@sygn.live</a>.
             </p>
             <p className="text-gray-300">
               You must be at least 18 years old (or the age of majority in your jurisdiction) to participate in 
@@ -286,8 +286,8 @@ export default function PrivacyPage() {
               please contact us:
             </p>
             <div className="p-6 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-300 mb-2"><strong className="text-white">Email:</strong> privacy@coindaily.online</p>
-              <p className="text-gray-300 mb-2"><strong className="text-white">Data Protection Officer:</strong> dpo@coindaily.online</p>
+              <p className="text-gray-300 mb-2"><strong className="text-white">Email:</strong> privacy@sygn.live</p>
+              <p className="text-gray-300 mb-2"><strong className="text-white">Data Protection Officer:</strong> dpo@sygn.live</p>
               <p className="text-gray-300 mb-2"><strong className="text-white">Mailing Address:</strong></p>
               <p className="text-gray-400 ml-4">
                 Joy Token Foundation<br />

@@ -243,7 +243,7 @@ export default function ApiPricingPage() {
         <div className="bg-gray-900 rounded-2xl shadow-lg p-6 mb-12 text-white">
           <h3 className="text-lg font-bold mb-4">Quick Start Example</h3>
           <pre className="text-sm overflow-x-auto text-green-400"><code>{`// Fetch live BTC price across African exchanges
-const response = await fetch('https://api.coindaily.africa/v1/prices?coin=BTC', {
+const response = await fetch('https://api.sygn.live/v1/prices?coin=BTC', {
   headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
 });
 

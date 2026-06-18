@@ -24,7 +24,7 @@ export default function PrivacyPage() {
         <div className="prose-dark space-y-8 text-dark-300 leading-relaxed">
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">1. Introduction</h2>
-            <p>CoinDaily Technologies Ltd. (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) operates the SENDPRESS platform at press.coindaily.online. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service. By using SENDPRESS, you consent to the practices described herein.</p>
+            <p>CoinDaily Technologies Ltd. (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) operates the SENDPRESS platform at press.sygn.live. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service. By using SENDPRESS, you consent to the practices described herein.</p>
           </section>
 
           <section>
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">8. Your Rights</h2>
-            <p>Depending on your jurisdiction, you may have the right to: (a) access, correct, or delete your personal data; (b) object to or restrict data processing; (c) request data portability; (d) withdraw consent for non-essential data processing; (e) lodge a complaint with a data protection authority. To exercise these rights, contact us at <a href="mailto:privacy@coindaily.online" className="text-primary-500 hover:text-primary-400">privacy@coindaily.online</a>. Note that blockchain transaction data cannot be deleted due to the immutable nature of blockchain technology.</p>
+            <p>Depending on your jurisdiction, you may have the right to: (a) access, correct, or delete your personal data; (b) object to or restrict data processing; (c) request data portability; (d) withdraw consent for non-essential data processing; (e) lodge a complaint with a data protection authority. To exercise these rights, contact us at <a href="mailto:privacy@sygn.live" className="text-primary-500 hover:text-primary-400">privacy@sygn.live</a>. Note that blockchain transaction data cannot be deleted due to the immutable nature of blockchain technology.</p>
           </section>
 
           <section>
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">13. Contact Us</h2>
-            <p>For privacy-related inquiries: <a href="mailto:privacy@coindaily.online" className="text-primary-500 hover:text-primary-400">privacy@coindaily.online</a> or via our <a href="https://discord.gg/coindaily" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-400">Discord Help Center</a>.</p>
+            <p>For privacy-related inquiries: <a href="mailto:privacy@sygn.live" className="text-primary-500 hover:text-primary-400">privacy@sygn.live</a> or via our <a href="https://discord.gg/coindaily" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-400">Discord Help Center</a>.</p>
             <p className="mt-2">Data Protection Officer: CoinDaily Technologies Ltd., Lagos, Nigeria.</p>
           </section>
         </div>

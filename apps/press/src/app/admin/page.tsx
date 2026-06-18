@@ -42,7 +42,7 @@ import {
 import { useAuth } from '@/lib/auth-context';
 
 /**
- * Super Admin Dashboard — jet.coindaily.online / /admin
+ * Super Admin Dashboard — jet.sygn.live / /admin
  *
  * Central control panel that coordinates both Publisher and Partner dashboards.
  * NOW CONNECTED: Fetches data from Supabase via API routes and performs real actions.
@@ -202,7 +202,7 @@ export default function SuperAdminDashboard() {
             <Shield className="w-8 h-8 text-red-500" />
             <div>
               <span className="font-display font-bold text-lg text-white block leading-tight">JET ADMIN</span>
-              <span className="text-[10px] text-dark-500 leading-tight">jet.coindaily.online</span>
+              <span className="text-[10px] text-dark-500 leading-tight">jet.sygn.live</span>
             </div>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 text-dark-400 hover:text-white">
@@ -291,7 +291,7 @@ export default function SuperAdminDashboard() {
           {/* Title */}
           <div className="mb-8">
             <h1 className="text-2xl font-display font-bold text-white mb-1">Platform Overview</h1>
-            <p className="text-dark-400 text-sm">Super Admin control panel — jet.coindaily.online</p>
+            <p className="text-dark-400 text-sm">Super Admin control panel — jet.sygn.live</p>
           </div>
 
           {/* ═══ Stats Grid ═══ */}

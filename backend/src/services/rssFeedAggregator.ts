@@ -124,7 +124,7 @@ async function fetchSingleFeed(source: NewsSource): Promise<FeedItem[]> {
   try {
     const res = await fetch(source.url, {
       headers: {
-        'User-Agent': 'CoinDaily-Bot/1.0 (https://coindaily.online)',
+        'User-Agent': 'CoinDaily-Bot/1.0 (https://sygn.live)',
         'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*',
       },
       signal: controller.signal,

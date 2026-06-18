@@ -168,7 +168,7 @@ export const PILLAR_ARTICLES: BlogArticle[] = [
     internalLinks: ['/tools/exchange-rates', '/blog/best-cryptocurrency-news-platforms-africa', '/blog/crypto-exchanges-africa-compared'],
     relatedArticles: ['best-crypto-news-africa', 'crypto-exchanges-africa-compared', 'mobile-money-crypto-africa'],
     faqItems: [
-      { question: 'How do I check Bitcoin price in Naira?', answer: 'Use CoinDaily\'s Exchange Rates tool at coindaily.online/tools/exchange-rates for real-time BTC/NGN prices from multiple exchanges. You can also check Luno, Binance P2P, or use the CoinDaily mobile app for price alerts.' },
+      { question: 'How do I check Bitcoin price in Naira?', answer: 'Use CoinDaily\'s Exchange Rates tool at sygn.live/tools/exchange-rates for real-time BTC/NGN prices from multiple exchanges. You can also check Luno, Binance P2P, or use the CoinDaily mobile app for price alerts.' },
       { question: 'What is the best crypto price tracker for Africa?', answer: 'CoinDaily offers the best Africa-focused price tracker with prices in NGN, KES, ZAR, GHS, and other African currencies. It also shows P2P premiums and mobile money rates which most global trackers don\'t cover.' },
     ],
     sections: [
@@ -653,7 +653,7 @@ export const COMPARISON_ITEMS: ComparisonItem[] = [
     pros: ['15+ African language support', 'AI-powered news aggregation', 'Real-time African exchange data', 'Mobile money price tracking', 'Free regulatory alerts', 'Scam protection tools'],
     cons: ['Newer platform (launched 2025)', 'Mobile app in development'],
     features: { africanCoverage: true, languages: '15+', aiPowered: true, realTimeData: true, mobileMoneyIntegration: true, communityFeatures: true, freeAccess: true },
-    url: 'https://coindaily.online',
+    url: 'https://sygn.live',
     pricing: 'Free / $4.99/mo Premium',
     founded: '2025',
     languages: '15+ African',

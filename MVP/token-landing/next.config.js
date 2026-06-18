@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['coindaily.online'],
+    domains: ['sygn.live'],
   },
 };
 

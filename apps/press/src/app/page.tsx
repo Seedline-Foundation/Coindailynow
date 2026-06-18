@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 /**
- * SENDPRESS Landing Page - press.coindaily.online
+ * SENDPRESS Landing Page - press.sygn.live
  *
  * Two audiences:
  *   1. Site Owners (Partners) — submit their site, earn JOY
@@ -102,7 +102,7 @@ const BUYER_FEATURES = [
   {
     icon: Bot,
     title: 'AI-Written Press Releases',
-    description: 'Don\'t have a press release? Our Ollama3 AI (at ai.coindaily.online) writes professional, SEO-optimized PRs in minutes. Just provide your project details.',
+    description: 'Don\'t have a press release? Our Ollama3 AI (at ai.sygn.live) writes professional, SEO-optimized PRs in minutes. Just provide your project details.',
   },
   {
     icon: Eye,
@@ -663,7 +663,7 @@ export default function PressLandingPage() {
                     Help Center (Discord) <ExternalLink className="w-3 h-3" />
                   </a>
                 </li>
-                <li><a href="mailto:press@coindaily.online" className="text-dark-400 hover:text-white transition-colors">press@coindaily.online</a></li>
+                <li><a href="mailto:press@sygn.live" className="text-dark-400 hover:text-white transition-colors">press@sygn.live</a></li>
                 <li>
                   <a href="https://imaswap.online" target="_blank" rel="noopener noreferrer" className="text-dark-400 hover:text-white transition-colors flex items-center gap-1.5">
                     Buy JOY Token <ExternalLink className="w-3 h-3" />

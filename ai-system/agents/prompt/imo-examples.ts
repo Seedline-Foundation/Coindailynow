@@ -165,7 +165,7 @@ async function exampleSocialContent() {
   const result = await imoContentAgent.generateSocialPost(
     'Solana hits new all-time high as African traders pile in',
     'twitter',
-    'https://coindaily.africa/solana-ath'
+    'https://sygn.live/solana-ath'
   );
 
   console.log('Generated Tweet:', result.post);

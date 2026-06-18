@@ -416,9 +416,9 @@ export const technicalSeoService = {
         data: {
           hasRobotsTxt,
           robotsTxtValid,
-          robotsTxtContent: 'User-agent: *\nAllow: /\nSitemap: https://coindaily.africa/sitemap.xml',
+          robotsTxtContent: 'User-agent: *\nAllow: /\nSitemap: https://sygn.live/sitemap.xml',
           hasSitemap,
-          sitemapUrl: 'https://coindaily.africa/sitemap.xml',
+          sitemapUrl: 'https://sygn.live/sitemap.xml',
           sitemapValid,
           sitemapUrlCount,
           crawlablePages,
@@ -672,7 +672,7 @@ export const technicalSeoService = {
             hasNoFollow: false,
             metaRobotsContent: hasNoIndex ? 'noindex, nofollow' : 'index, follow',
             hasCanonical,
-            canonicalUrl: hasCanonical ? `https://coindaily.africa${page.url}` : null,
+            canonicalUrl: hasCanonical ? `https://sygn.live${page.url}` : null,
             canonicalSelfRef,
             hasStructuredData,
             structuredDataTypes: hasStructuredData ? 

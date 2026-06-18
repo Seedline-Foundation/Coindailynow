@@ -24,11 +24,11 @@ PROCS=(
 )
 
 URLS=(
-  "https://app.coindaily.online/health"
-  "https://coindaily.online/"
-  "https://jet.coindaily.online/"
-  "https://press.coindaily.online/"
-  "https://ai.coindaily.online/"
+  "https://app.sygn.live/health"
+  "https://sygn.live/"
+  "https://jet.sygn.live/"
+  "https://press.sygn.live/"
+  "https://ai.sygn.live/"
 )
 
 echo "=== PM2 smoke test (timeout ${TIMEOUT_SEC}s) ==="
@@ -80,7 +80,7 @@ for URL in "${URLS[@]}"; do
 done
 
 # API health body
-HEALTH=$(curl -sS --max-time 10 "https://app.coindaily.online/health" || echo "")
+HEALTH=$(curl -sS --max-time 10 "https://app.sygn.live/health" || echo "")
 if echo "$HEALTH" | grep -qi 'healthy\|ok\|status'; then
   echo -e "${GREEN}✓ API health payload looks valid${NC}"
 else

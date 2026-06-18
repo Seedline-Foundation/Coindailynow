@@ -9,7 +9,7 @@
  *   npx ts-node scripts/setup-admin.ts <email> <password>
  *
  * Example:
- *   npx ts-node scripts/setup-admin.ts admin@coindaily.online MyStr0ngP@ss!
+ *   npx ts-node scripts/setup-admin.ts admin@sygn.live MyStr0ngP@ss!
  *
  * After running:
  *   1. The script prints a TOTP URI — add it to your authenticator app
@@ -42,7 +42,7 @@ async function main() {
     console.error('Usage: npx ts-node scripts/setup-admin.ts <email> <password>');
     console.error('');
     console.error('Example:');
-    console.error('  npx ts-node scripts/setup-admin.ts admin@coindaily.online MyStr0ngP@ss!');
+    console.error('  npx ts-node scripts/setup-admin.ts admin@sygn.live MyStr0ngP@ss!');
     console.error('');
     process.exit(1);
   }

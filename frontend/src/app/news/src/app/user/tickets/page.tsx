@@ -119,7 +119,7 @@ export default function UserTicketsPage() {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           subject, message, category, priority,
-          userId: 'user-001', userName: 'Demo User', userEmail: 'demo@coindaily.online',
+          userId: 'user-001', userName: 'Demo User', userEmail: 'demo@sygn.live',
         }),
       });
       const data = await res.json();

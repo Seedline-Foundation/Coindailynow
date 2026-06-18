@@ -139,8 +139,8 @@ export default function LoginPage() {
           <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
             <p className="text-xs font-semibold text-orange-800 mb-2">Demo Credentials</p>
             <div className="space-y-1 text-xs text-orange-700">
-              <p>User &nbsp;&nbsp;&nbsp;— <span className="font-mono">user@coindaily.africa</span> / <span className="font-mono">User@2024</span></p>
-              <p>Editor — <span className="font-mono">editor@coindaily.africa</span> / <span className="font-mono">Editor@2024</span></p>
+              <p>User &nbsp;&nbsp;&nbsp;— <span className="font-mono">user@sygn.live</span> / <span className="font-mono">User@2024</span></p>
+              <p>Editor — <span className="font-mono">editor@sygn.live</span> / <span className="font-mono">Editor@2024</span></p>
             </div>
           </div>
         </div>

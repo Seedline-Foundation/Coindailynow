@@ -41,7 +41,7 @@ const withPWA = require('next-pwa')({
     },
     {
       // API Responses (/api/v1/*): NetworkFirst — 3-second timeout, 5-minute cache fallback, 50 entry limit
-      urlPattern: /^https?:\/\/(api\.coindaily\.africa|localhost:4000)\/api\/v1\/.*/i,
+      urlPattern: /^https?:\/\/(api\.sygn\.live|localhost:4000)\/api\/v1\/.*/i,
       handler: 'NetworkFirst',
       options: {
         cacheName: 'api-cache',
@@ -82,7 +82,7 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    domains: ['localhost', 'api.coindaily.africa', 'cdn.coindaily.africa'],
+    domains: ['localhost', 'api.sygn.live', 'cdn.sygn.live'],
     loader: 'custom',
     loaderFile: './src/utils/cdn-image-loader.js'
   },
@@ -135,7 +135,7 @@ const nextConfig = {
       {
         source: '/api/:path*',
         destination: process.env.NODE_ENV === 'production' 
-          ? 'https://api.coindaily.africa/:path*'
+          ? 'https://api.sygn.live/:path*'
           : 'http://localhost:4000/:path*'
       }
     ];
@@ -193,7 +193,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://eu.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://app.coindaily.online https://eu.i.posthog.com wss://app.coindaily.online; frame-ancestors 'self';"
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://eu.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://app.sygn.live https://eu.i.posthog.com wss://app.sygn.live; frame-ancestors 'self';"
           },
         ]
       },

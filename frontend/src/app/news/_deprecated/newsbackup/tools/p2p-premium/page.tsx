@@ -152,14 +152,14 @@ export default function P2PPremiumPage() {
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">🔗 Embed This Widget</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Add the P2P Premium widget to your website.</p>
             <code className="block bg-gray-100 dark:bg-gray-900 p-3 rounded-lg text-xs text-gray-800 dark:text-gray-300 break-all">
-              {`<iframe src="https://coindaily.online/embed/p2p-premium" width="100%" height="400" frameborder="0"></iframe>`}
+              {`<iframe src="https://sygn.live/embed/p2p-premium" width="100%" height="400" frameborder="0"></iframe>`}
             </code>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">📡 API Access</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Integrate P2P premium data into your app.</p>
             <code className="block bg-gray-100 dark:bg-gray-900 p-3 rounded-lg text-xs text-gray-800 dark:text-gray-300 break-all">
-              GET https://api.coindaily.online/v1/p2p-premium?country=NG&asset=USDT
+              GET https://api.sygn.live/v1/p2p-premium?country=NG&asset=USDT
             </code>
             <Link href="/services/api" className="inline-block mt-3 text-orange-600 text-sm font-medium hover:underline">
               View API Docs →

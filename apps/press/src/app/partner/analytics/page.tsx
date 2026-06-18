@@ -6,7 +6,7 @@ import { fetchPartnerSite, fetchSitePositions, fetchSiteVerifications } from '@/
 import { BarChart3, TrendingUp, Users, Eye, MousePointer, Clock, DollarSign, FileText } from 'lucide-react';
 
 /**
- * Partner Analytics Page - press.coindaily.online/partner/analytics
+ * Partner Analytics Page - press.sygn.live/partner/analytics
  *
  * Shows real metrics from site positions and verifications.
  */

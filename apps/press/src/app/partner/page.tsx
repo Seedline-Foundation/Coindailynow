@@ -18,7 +18,7 @@ import { useAuth } from '@/lib/auth-context';
 import { fetchPartnerSite, fetchSitePositions, fetchSiteVerifications } from '@/lib/api';
 
 /**
- * Partner Dashboard Overview - press.coindaily.online/partner
+ * Partner Dashboard Overview - press.sygn.live/partner
  *
  * Shows partner site stats: DH score, tier, earnings, active PRs,
  * site health, and recent activity. Partners are distributing sites

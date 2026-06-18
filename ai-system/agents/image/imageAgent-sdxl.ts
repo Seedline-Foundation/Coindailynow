@@ -243,7 +243,7 @@ export class ImageAgent {
   private getPlaceholderImage(article: ArticleOutcome): ImageOutcome {
     return {
       id: `placeholder_${Date.now()}`,
-      url: 'https://cdn.coindaily.africa/placeholders/crypto-news.png',
+      url: 'https://cdn.sygn.live/placeholders/crypto-news.png',
       alt_text: `Placeholder image for "${article.title}"`,
       theme_match_score: 50,
       quality_score: 70,

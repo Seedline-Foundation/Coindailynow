@@ -220,7 +220,7 @@ const mockApplications: AffiliateApplication[] = [
       { url: 'https://ethtrader.eg', type: 'newsletter' },
       { url: 'https://twitter.com/ahmedcrypto', type: 'twitter' },
     ],
-    status: 'approved', appliedAt: '2026-02-18T10:00:00Z', reviewedAt: '2026-02-19T14:30:00Z', reviewedBy: 'admin@coindaily.africa',
+    status: 'approved', appliedAt: '2026-02-18T10:00:00Z', reviewedAt: '2026-02-19T14:30:00Z', reviewedBy: 'admin@sygn.live',
   },
   {
     id: 'APP-007', name: 'Spam Bot Account', email: 'bot@fakesites.xyz', country: 'Other', audienceSize: '<1000', promotionMethod: 'other',
@@ -228,7 +228,7 @@ const mockApplications: AffiliateApplication[] = [
     sites: [
       { url: 'https://get-rich-crypto.xyz', type: 'website' },
     ],
-    status: 'rejected', appliedAt: '2026-02-17T03:12:00Z', reviewedAt: '2026-02-17T09:00:00Z', reviewedBy: 'admin@coindaily.africa', notes: 'Spam/low-quality application',
+    status: 'rejected', appliedAt: '2026-02-17T03:12:00Z', reviewedAt: '2026-02-17T09:00:00Z', reviewedBy: 'admin@sygn.live', notes: 'Spam/low-quality application',
   },
 ];
 
@@ -363,14 +363,14 @@ export default function AffiliateManagementPage() {
 
   // ---- Application Actions ----
   const handleApproveApp = (id: string) => {
-    setApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'approved' as const, reviewedAt: new Date().toISOString(), reviewedBy: 'admin@coindaily.africa' } : a));
+    setApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'approved' as const, reviewedAt: new Date().toISOString(), reviewedBy: 'admin@sygn.live' } : a));
     setStats(prev => ({ ...prev, pendingApplications: prev.pendingApplications - 1, activeAffiliates: prev.activeAffiliates + 1, totalAffiliates: prev.totalAffiliates + 1 }));
     showNotify('success', `Application approved — affiliate account created`);
     setShowConfirmModal(null);
   };
 
   const handleRejectApp = (id: string, notes?: string) => {
-    setApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' as const, reviewedAt: new Date().toISOString(), reviewedBy: 'admin@coindaily.africa', notes: notes || 'Application rejected' } : a));
+    setApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' as const, reviewedAt: new Date().toISOString(), reviewedBy: 'admin@sygn.live', notes: notes || 'Application rejected' } : a));
     setStats(prev => ({ ...prev, pendingApplications: prev.pendingApplications - 1 }));
     showNotify('success', `Application rejected`);
     setShowConfirmModal(null);

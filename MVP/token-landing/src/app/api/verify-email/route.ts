@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://token.coindaily.online';
+    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://token.sygn.live';
     const WHITELIST_FORM_URL = process.env.NEXT_PUBLIC_WHITELIST_FORM_URL;
 
     // Verify token from database
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     });
 
     const welcomeResponse = await resend.emails.send({
-      from: 'Joy Token Team <noreply@coindaily.online>',
+      from: 'Joy Token Team <noreply@sygn.live>',
       to: subscriber.email,
       subject: welcomeEmail.subject,
       html: welcomeEmail.html,

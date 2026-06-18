@@ -374,8 +374,8 @@ export default function JobsPage() {
         <div className="text-center mb-8">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Don&apos;t See Your Role?</h3>
           <p className="text-gray-500 mb-4">We&apos;re always looking for talented people. Send your CV and we&apos;ll reach out.</p>
-          <a href="mailto:jobs@coindaily.online" className="px-8 py-3 bg-gray-900 dark:bg-gray-700 text-white rounded-xl font-bold hover:bg-gray-800 transition-all inline-block">
-            Send Open Application → jobs@coindaily.online
+          <a href="mailto:jobs@sygn.live" className="px-8 py-3 bg-gray-900 dark:bg-gray-700 text-white rounded-xl font-bold hover:bg-gray-800 transition-all inline-block">
+            Send Open Application → jobs@sygn.live
           </a>
         </div>
       </main>

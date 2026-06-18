@@ -217,24 +217,24 @@ export default function SuperAdminHeader({ sidebarOpen, setSidebarOpen }: SuperA
                     Portals
                   </p>
                   <a
-                    href="https://jet.coindaily.online/super-admin/login"
+                    href="https://jet.sygn.live/super-admin/login"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
                   >
                     <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
                     Staff / Super Admin
-                    <span className="ml-auto text-[10px] text-gray-400">jet.coindaily.online</span>
+                    <span className="ml-auto text-[10px] text-gray-400">jet.sygn.live</span>
                   </a>
                   <a
-                    href="https://coindaily.online/user"
+                    href="https://sygn.live/user"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
                   >
                     <span className="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0" />
                     User Dashboard
-                    <span className="ml-auto text-[10px] text-gray-400">coindaily.online</span>
+                    <span className="ml-auto text-[10px] text-gray-400">sygn.live</span>
                   </a>
                   {/* CEO Dashboard link removed — CEO uses super-admin with SUPER_ADMIN role */}
                 </div>

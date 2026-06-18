@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: SENDPRESS by Coindaily
- * Plugin URI: https://press.coindaily.online
+ * Plugin URI: https://press.sygn.live
  * Description: Integrate SENDPRESS PR distribution SDK into your WordPress site. Earn JOY tokens by displaying PRs.
  * Version: 1.0.0
  * Author: Coindaily
- * Author URI: https://coindaily.online
+ * Author URI: https://sygn.live
  * License: MIT
  * Text Domain: sendpress
  */
@@ -23,8 +23,8 @@ if (!defined('ABSPATH')) {
 define('SENDPRESS_VERSION', '1.0.0');
 define('SENDPRESS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SENDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('SENDPRESS_API_URL', 'https://api.press.coindaily.online');
-define('SENDPRESS_SDK_URL', 'https://cdn.press.coindaily.online/sdk/sendpress.min.js');
+define('SENDPRESS_API_URL', 'https://api.press.sygn.live');
+define('SENDPRESS_SDK_URL', 'https://cdn.press.sygn.live/sdk/sendpress.min.js');
 
 class SendPress_Plugin {
     private static $instance = null;

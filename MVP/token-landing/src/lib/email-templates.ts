@@ -20,7 +20,7 @@ export interface TemplateParams {
  * Email Verification Template
  */
 export function getVerificationEmailTemplate(params: TemplateParams): EmailTemplate {
-  const { email, verificationUrl, siteUrl = 'https://token.coindaily.online' } = params;
+  const { email, verificationUrl, siteUrl = 'https://token.sygn.live' } = params;
 
   return {
     subject: '✅ Verify Your Email - Joy Token Whitelist',
@@ -131,7 +131,7 @@ export function getVerificationEmailTemplate(params: TemplateParams): EmailTempl
  * Welcome Email Template (Day 0 - After Verification)
  */
 export function getWelcomeEmailTemplate(params: TemplateParams): EmailTemplate {
-  const { siteUrl = 'https://token.coindaily.online' } = params;
+  const { siteUrl = 'https://token.sygn.live' } = params;
   const whitelistFormUrl = 'https://forms.gle/YrgdEfMSeL9TWGYG9';
 
   return {

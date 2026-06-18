@@ -316,7 +316,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: Check the `specs/` directory
 - **Issues**: Use GitHub Issues for bugs and feature requests
 - **Discussions**: Join our development Discord
-- **Email**: support@coindaily.africa
+- **Email**: support@sygn.live
 
 ---
 

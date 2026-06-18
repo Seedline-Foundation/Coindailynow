@@ -93,7 +93,7 @@ async function testUserCreation() {
     const superAdmin = await prisma.user.findFirst({
       where: { 
         role: 'SUPER_ADMIN',
-        email: 'admin@coindaily.africa'
+        email: 'admin@sygn.live'
       }
     });
 
@@ -385,7 +385,7 @@ async function generateReport() {
   if (failed === 0) {
     console.log(`${colors.green}✅ All Phase 1 tests passed! Ready for Phase 2.${colors.reset}\n`);
     console.log(`${colors.cyan}Test Credentials:${colors.reset}`);
-    console.log(`  Email: admin@coindaily.africa`);
+    console.log(`  Email: admin@sygn.live`);
     console.log(`  Password: Admin@2024!`);
     console.log(`  Login URL: http://localhost:3000/super-admin/login\n`);
   } else {

@@ -40,7 +40,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
   children
 }) => {
   const router = useRouter();
-  const currentUrl = `https://coindaily.africa${router.asPath}`;
+  const currentUrl = `https://sygn.live${router.asPath}`;
   const finalCanonicalUrl = canonicalUrl || currentUrl;
 
   // Generate structured data based on type
@@ -56,7 +56,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
         "name": "CoinDaily Africa",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://coindaily.africa/images/logo.png"
+          "url": "https://sygn.live/images/logo.png"
         }
       }
     };
@@ -71,7 +71,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
         },
         "datePublished": publishedAt,
         "dateModified": modifiedAt || publishedAt,
-        "image": image || "https://coindaily.africa/images/og-default.png",
+        "image": image || "https://sygn.live/images/og-default.png",
         "articleSection": category,
         "keywords": [...keywords, ...articleTags].join(', '),
         "wordCount": readTime ? readTime * 200 : undefined, // Estimate 200 words per minute
@@ -136,7 +136,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
         <meta property="og:description" content={seoDescription} />
         <meta property="og:url" content={finalCanonicalUrl} />
         <meta property="og:site_name" content="CoinDaily Africa" />
-        <meta property="og:image" content={image || 'https://coindaily.africa/images/og-default.png'} />
+        <meta property="og:image" content={image || 'https://sygn.live/images/og-default.png'} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={title} />
@@ -161,7 +161,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
         <meta name="twitter:creator" content="@coindailyafrica" />
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={seoDescription} />
-        <meta name="twitter:image" content={image || 'https://coindaily.africa/images/og-default.png'} />
+        <meta name="twitter:image" content={image || 'https://sygn.live/images/og-default.png'} />
 
         {/* Additional Meta Tags */}
         <meta httpEquiv="x-ua-compatible" content="IE=edge" />
@@ -188,7 +188,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
         {/* Preconnect to External Domains */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://api.coindaily.africa" />
+        <link rel="preconnect" href="https://api.sygn.live" />
 
         {/* Language Alternates */}
         <link rel="alternate" hrefLang="en" href={finalCanonicalUrl} />
@@ -213,8 +213,8 @@ export const SEOComponent: React.FC<SEOProps> = ({
         {/* Performance Hints */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
-        <link rel="dns-prefetch" href="//api.coindaily.africa" />
-        <link rel="dns-prefetch" href="//cdn.coindaily.africa" />
+        <link rel="dns-prefetch" href="//api.sygn.live" />
+        <link rel="dns-prefetch" href="//cdn.sygn.live" />
 
         {children}
       </Head>
@@ -274,7 +274,7 @@ export const ArticleSEO: React.FC<{
     articleTags={article.tags}
     category={article.category}
     readTime={article.readTime}
-    canonicalUrl={`https://coindaily.africa/news/${article.slug}`}
+    canonicalUrl={`https://sygn.live/news/${article.slug}`}
     type="article"
   />
 );

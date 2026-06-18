@@ -220,7 +220,7 @@ function SuperAdminLoginContent() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full pl-10 pr-4 py-3 bg-dark-800 border border-dark-700 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500"
-                    placeholder="admin@coindaily.online"
+                    placeholder="admin@sygn.live"
                   />
                 </div>
               </div>

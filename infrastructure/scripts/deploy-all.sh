@@ -104,11 +104,11 @@ echo -e "${YELLOW}[8/10] Deploying Nginx configs...${NC}"
 scp ${LOCAL_DIR}/infrastructure/nginx/*.conf ${SERVER_USER}@${SERVER_IP}:/etc/nginx/sites-available/
 ssh ${SERVER_USER}@${SERVER_IP} << 'EOF'
 # Enable all sites
-ln -sf /etc/nginx/sites-available/coindaily.online.conf /etc/nginx/sites-enabled/
-ln -sf /etc/nginx/sites-available/backend.coindaily.online.conf /etc/nginx/sites-enabled/
-ln -sf /etc/nginx/sites-available/jet.coindaily.online.conf /etc/nginx/sites-enabled/
-ln -sf /etc/nginx/sites-available/pr.coindaily.online.conf /etc/nginx/sites-enabled/
-ln -sf /etc/nginx/sites-available/ai.coindaily.online.conf /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/sygn.live.conf /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/backend.sygn.live.conf /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/jet.sygn.live.conf /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/pr.sygn.live.conf /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/ai.sygn.live.conf /etc/nginx/sites-enabled/
 
 # Test nginx config
 nginx -t
@@ -168,14 +168,14 @@ echo -e "${GREEN}   Deployment Complete!${NC}"
 echo -e "${GREEN}============================================${NC}"
 echo ""
 echo -e "Services deployed:"
-echo -e "  ${BLUE}• coindaily.online${NC} - News Platform"
-echo -e "  ${BLUE}• backend.coindaily.online${NC} - Backend API"
-echo -e "  ${BLUE}• jet.coindaily.online${NC} - Admin Portal (IP Restricted)"
-echo -e "  ${BLUE}• pr.coindaily.online${NC} - PR System"
-echo -e "  ${BLUE}• ai.coindaily.online${NC} - AI Services"
+echo -e "  ${BLUE}• sygn.live${NC} - News Platform"
+echo -e "  ${BLUE}• backend.sygn.live${NC} - Backend API"
+echo -e "  ${BLUE}• jet.sygn.live${NC} - Admin Portal (IP Restricted)"
+echo -e "  ${BLUE}• pr.sygn.live${NC} - PR System"
+echo -e "  ${BLUE}• ai.sygn.live${NC} - AI Services"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
-echo "1. Add SSL certificates: certbot --nginx -d coindaily.online -d backend.coindaily.online -d jet.coindaily.online -d pr.coindaily.online -d ai.coindaily.online"
+echo "1. Add SSL certificates: certbot --nginx -d sygn.live -d backend.sygn.live -d jet.sygn.live -d pr.sygn.live -d ai.sygn.live"
 echo "2. Configure DNS A records for all subdomains"
-echo "3. Add whitelisted IPs to jet.coindaily.online.conf"
+echo "3. Add whitelisted IPs to jet.sygn.live.conf"
 echo "4. Test all endpoints"

@@ -2,18 +2,18 @@
  * CoinDaily Platform - PM2 Ecosystem Configuration
  * 
  * Services:
- * - Backend API (app.coindaily.online) - Port 4000
- * - News Frontend (coindaily.online) - Port 3000
- * - Admin Portal (jet.coindaily.online) - Port 3002
- * - PR System (press.coindaily.online) - Port 3003
- * - AI Dashboard (ai.coindaily.online) - Port 3004
- * - Token Landing (token.coindaily.online) - Port 3005
+ * - Backend API (app.sygn.live) - Port 4000
+ * - News Frontend (sygn.live) - Port 3000
+ * - Admin Portal (jet.sygn.live) - Port 3002
+ * - PR System (press.sygn.live) - Port 3003
+ * - AI Dashboard (ai.sygn.live) - Port 3004
+ * - Token Landing (token.sygn.live) - Port 3005
  */
 
 module.exports = {
   apps: [
     // ============================================
-    // BACKEND API - app.coindaily.online
+    // BACKEND API - app.sygn.live
     // ============================================
     {
       name: 'coindaily-backend',
@@ -40,7 +40,7 @@ module.exports = {
     },
 
     // ============================================
-    // NEWS FRONTEND - coindaily.online
+    // NEWS FRONTEND - sygn.live
     // ============================================
     {
       name: 'coindaily-news',
@@ -52,10 +52,10 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        NEXT_PUBLIC_API_URL: 'https://app.coindaily.online',
-        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.coindaily.online/graphql',
-        NEXT_PUBLIC_WS_URL: 'wss://app.coindaily.online/graphql',
-        NEXT_PUBLIC_AI_URL: 'https://ai.coindaily.online'
+        NEXT_PUBLIC_API_URL: 'https://app.sygn.live',
+        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.sygn.live/graphql',
+        NEXT_PUBLIC_WS_URL: 'wss://app.sygn.live/graphql',
+        NEXT_PUBLIC_AI_URL: 'https://ai.sygn.live'
       },
       error_file: '/var/log/coindaily/news-error.log',
       out_file: '/var/log/coindaily/news-out.log',
@@ -69,7 +69,7 @@ module.exports = {
     },
 
     // ============================================
-    // ADMIN PORTAL - jet.coindaily.online
+    // ADMIN PORTAL - jet.sygn.live
     // ============================================
     {
       name: 'coindaily-admin',
@@ -81,10 +81,10 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3002,
-        NEXT_PUBLIC_API_URL: 'https://app.coindaily.online',
-        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.coindaily.online/graphql',
-        NEXT_PUBLIC_WS_URL: 'wss://app.coindaily.online/graphql',
-        NEXT_PUBLIC_AI_URL: 'https://ai.coindaily.online',
+        NEXT_PUBLIC_API_URL: 'https://app.sygn.live',
+        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.sygn.live/graphql',
+        NEXT_PUBLIC_WS_URL: 'wss://app.sygn.live/graphql',
+        NEXT_PUBLIC_AI_URL: 'https://ai.sygn.live',
         ADMIN_MODE: 'true'
       },
       error_file: '/var/log/coindaily/admin-error.log',
@@ -99,7 +99,7 @@ module.exports = {
     },
 
     // ============================================
-    // PR SYSTEM - press.coindaily.online
+    // PR SYSTEM - press.sygn.live
     // ============================================
     {
       name: 'coindaily-press',
@@ -111,9 +111,9 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3003,
-        NEXT_PUBLIC_API_URL: 'https://app.coindaily.online',
-        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.coindaily.online/graphql',
-        NEXT_PUBLIC_AI_URL: 'https://ai.coindaily.online',
+        NEXT_PUBLIC_API_URL: 'https://app.sygn.live',
+        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.sygn.live/graphql',
+        NEXT_PUBLIC_AI_URL: 'https://ai.sygn.live',
         PR_MODE: 'true'
       },
       error_file: '/var/log/coindaily/pr-error.log',
@@ -128,7 +128,7 @@ module.exports = {
     },
 
     // ============================================
-    // AI DASHBOARD - ai.coindaily.online
+    // AI DASHBOARD - ai.sygn.live
     // ============================================
     {
       name: 'coindaily-ai',
@@ -140,8 +140,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3004,
-        NEXT_PUBLIC_API_URL: 'https://app.coindaily.online',
-        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.coindaily.online/graphql',
+        NEXT_PUBLIC_API_URL: 'https://app.sygn.live',
+        NEXT_PUBLIC_GRAPHQL_URL: 'https://app.sygn.live/graphql',
         OLLAMA_API_URL: 'http://localhost:11434',
         NLLB_API_ENDPOINT: 'http://localhost:8080',
         SDXL_API_ENDPOINT: 'http://localhost:7860',
@@ -190,7 +190,7 @@ module.exports = {
     },
 
     // ============================================
-    // TOKEN LANDING - token.coindaily.online (Already deployed)
+    // TOKEN LANDING - token.sygn.live (Already deployed)
     // ============================================
     {
       name: 'coindaily-token',

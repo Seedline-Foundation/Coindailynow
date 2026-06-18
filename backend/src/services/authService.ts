@@ -514,7 +514,7 @@ export class AuthService {
 
       // Send password reset email
       const emailService = (await import('./emailService')).default;
-      const resetUrl = `${process.env.FRONTEND_URL || 'https://coindaily.com'}/auth/reset-password?token=${resetToken}`;
+      const resetUrl = `${process.env.FRONTEND_URL || 'https://sygn.live'}/auth/reset-password?token=${resetToken}`;
       
       const emailSent = await emailService.sendPasswordResetEmail(user.email, {
         username: user.username,
@@ -802,7 +802,7 @@ export class AuthService {
       });
 
       // Send verification email
-      const frontendUrl = process.env.FRONTEND_URL || 'https://coindaily.com';
+      const frontendUrl = process.env.FRONTEND_URL || 'https://sygn.live';
       const verificationUrl = `${frontendUrl}/auth/verify-email?token=${verificationToken}`;
 
       const emailService = (await import('./emailService')).default;
@@ -979,7 +979,7 @@ export class AuthService {
         return { success: false, message: 'Admin accounts cannot self-delete. Contact a super-admin to demote the account first.' };
       }
 
-      const anonymizedEmail = `deleted-${crypto.randomBytes(8).toString('hex')}@deleted.coindaily.local`;
+      const anonymizedEmail = `deleted-${crypto.randomBytes(8).toString('hex')}@deleted.sygn.local`;
       const anonymizedUsername = `deleted-user-${crypto.randomBytes(6).toString('hex')}`;
       const deletionTimestamp = new Date();
 

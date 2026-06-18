@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 /**
- * Partner Dashboard Layout - press.coindaily.online/partner
+ * Partner Dashboard Layout - press.sygn.live/partner
  *
  * Sidebar layout for distributing-site partners who earn JOY
  * by hosting press releases on their websites.

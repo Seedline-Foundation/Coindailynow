@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
     const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
-    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://token.coindaily.online';
+    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://token.sygn.live';
     const WHITELIST_FORM_URL = process.env.NEXT_PUBLIC_WHITELIST_FORM_URL;
 
     if (!RESEND_API_KEY || !AUDIENCE_ID) {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     // Step 2: Send welcome email with whitelist form link immediately
     const emailResponse = await resend.emails.send({
-      from: 'Joy Token Team <noreply@coindaily.online>',
+      from: 'Joy Token Team <noreply@sygn.live>',
       to: email,
       subject: '🎉 Welcome to Joy Token - Complete Your Whitelist Application',
       html: `

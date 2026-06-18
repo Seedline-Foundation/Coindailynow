@@ -9,7 +9,7 @@ async function main() {
   try {
     console.log('1. Calling findUnique...');
     const user = await prisma.user.findUnique({ 
-      where: { email: 'admin@coindaily.africa' },
+      where: { email: 'admin@sygn.live' },
       include: { Subscription: true }
     });
     console.log('2. User found:', !!user);

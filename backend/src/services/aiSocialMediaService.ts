@@ -1018,7 +1018,7 @@ export class AISocialMediaService {
   }
 
   private generatePostUrl(platform: string, articleSlug: string): string {
-    const baseUrl = process.env.SOCIAL_MEDIA_BASE_URL || 'https://coindaily.africa';
+    const baseUrl = process.env.SOCIAL_MEDIA_BASE_URL || 'https://sygn.live';
     
     switch (platform) {
       case 'TWITTER':

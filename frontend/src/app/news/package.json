@@ -2,7 +2,7 @@
   "name": "@coindaily/news",
   "version": "1.0.0",
   "private": true,
-  "description": "CoinDaily News System - coindaily.online",
+  "description": "CoinDaily News System - sygn.live",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",

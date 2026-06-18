@@ -151,10 +151,10 @@ const Footer: React.FC = () => {
       links: [
         { label: 'Platform Comparison', href: '/blog/comparison' },
         { label: 'Crypto FAQ', href: '/blog/faq' },
-        { label: 'Press Release', href: 'https://press.coindaily.online/', external: true },
+        { label: 'Press Release', href: 'https://press.sygn.live/', external: true },
         { label: 'Swap Token', href: 'https://imaswap.online', external: true },
         { label: 'Stake Your Token', href: 'https://stake.imaswap.online', external: true },
-        { label: 'Joy Token', href: 'https://token.coindaily.online', external: true },
+        { label: 'Joy Token', href: 'https://token.sygn.live', external: true },
       ]
     },
   ];
@@ -384,7 +384,7 @@ const Footer: React.FC = () => {
                 <div className="space-y-2 text-sm text-gray-300">
                   <div className="flex items-center space-x-2">
                     <EnvelopeIcon className="h-4 w-4" />
-                    <span>contact@coindaily.africa</span>
+                    <span>contact@sygn.live</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <PhoneIcon className="h-4 w-4" />

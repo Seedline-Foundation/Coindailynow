@@ -644,7 +644,7 @@ export default function DistributionPage() {
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Username / API Key</label>
-                <input type="text" defaultValue="postmaster@mg.coindaily.africa" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+                <input type="text" defaultValue="postmaster@mg.sygn.live" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Password</label>
@@ -656,7 +656,7 @@ export default function DistributionPage() {
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">From Address</label>
-                <input type="email" defaultValue="news@coindaily.africa" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+                <input type="email" defaultValue="news@sygn.live" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
               </div>
             </div>
           </div>
@@ -699,7 +699,7 @@ export default function DistributionPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-gray-400 mb-1">Main Feed URL</label>
-                  <input type="url" defaultValue="https://coindaily.africa/feed.xml" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
+                  <input type="url" defaultValue="https://sygn.live/feed.xml" className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm text-gray-400 mb-1">Items per Feed</label>

@@ -13,7 +13,7 @@ import { useAuth } from '@/lib/auth-context';
 import { fetchPartnerSite, fetchSiteVerifications } from '@/lib/api';
 
 /**
- * Partner Earnings Page - press.coindaily.online/partner/earnings
+ * Partner Earnings Page - press.sygn.live/partner/earnings
  *
  * Detailed breakdown of JOY earnings from hosting press releases.
  * Shows monthly totals, per-release earnings, and withdrawal options.

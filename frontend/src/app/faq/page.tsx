@@ -72,7 +72,7 @@ const FAQ_DATA: FAQItem[] = [
     category: 'Content & Editorial',
     question: 'How do I report an error or request a correction?',
     answer:
-      'Contact corrections@coindaily.online with the article URL and a description of the error. We review and correct factual errors promptly, with a transparent correction notice added to the article.',
+      'Contact corrections@sygn.live with the article URL and a description of the error. We review and correct factual errors promptly, with a transparent correction notice added to the article.',
   },
 
   // Markets & Data
@@ -100,19 +100,19 @@ const FAQ_DATA: FAQItem[] = [
     category: 'Press & Business',
     question: 'How can I submit a press release?',
     answer:
-      'Use our press wire service at press.coindaily.online to submit press releases for distribution. Releases are reviewed by editors before publication and distributed to our readership via the website, newsletter, and RSS feeds.',
+      'Use our press wire service at press.sygn.live to submit press releases for distribution. Releases are reviewed by editors before publication and distributed to our readership via the website, newsletter, and RSS feeds.',
   },
   {
     category: 'Press & Business',
     question: 'Does CoinDaily Africa accept advertising?',
     answer:
-      'Yes, we accept display advertising and sponsored content from vetted partners. All sponsored content is clearly labeled and separated from editorial content. We maintain a strict firewall between advertising and editorial. Contact editorial@coindaily.online for advertising inquiries.',
+      'Yes, we accept display advertising and sponsored content from vetted partners. All sponsored content is clearly labeled and separated from editorial content. We maintain a strict firewall between advertising and editorial. Contact editorial@sygn.live for advertising inquiries.',
   },
   {
     category: 'Press & Business',
     question: 'How do I contact CoinDaily Africa?',
     answer:
-      'For press inquiries and partnerships: editorial@coindaily.online. For corrections: corrections@coindaily.online. For technical issues: support@coindaily.online.',
+      'For press inquiries and partnerships: editorial@sygn.live. For corrections: corrections@sygn.live. For technical issues: support@sygn.live.',
   },
 ];
 
@@ -187,10 +187,10 @@ export default function FAQPage() {
             <p className="text-gray-600 text-sm mb-4">
               Still have questions? Reach out to{' '}
               <a
-                href="mailto:editorial@coindaily.online"
+                href="mailto:editorial@sygn.live"
                 className="text-blue-600 hover:underline"
               >
-                editorial@coindaily.online
+                editorial@sygn.live
               </a>.
             </p>
             <div className="flex flex-wrap gap-4">

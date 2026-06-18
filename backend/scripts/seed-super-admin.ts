@@ -15,7 +15,7 @@ async function seedSuperAdmin() {
     // Check if super admin already exists
     const existingAdmin = await prisma.user.findFirst({
       where: {
-        email: 'admin@coindaily.africa'
+        email: 'admin@sygn.live'
       }
     });
 
@@ -30,7 +30,7 @@ async function seedSuperAdmin() {
     const superAdmin = await prisma.user.create({
       data: {
         id: 'super_admin_001',
-        email: 'admin@coindaily.africa',
+        email: 'admin@sygn.live',
         username: 'superadmin_africa',
         passwordHash: hashedPassword,
         role: 'SUPER_ADMIN',
@@ -57,7 +57,7 @@ async function seedSuperAdmin() {
     const contentAdmin = await prisma.user.create({
       data: {
         id: 'content_admin_001',
-        email: 'content@coindaily.africa',
+        email: 'content@sygn.live',
         username: 'contentadmin',
         passwordHash: await bcrypt.hash('Content@2024!', 10),
         role: 'CONTENT_ADMIN',
@@ -74,7 +74,7 @@ async function seedSuperAdmin() {
     const marketingAdmin = await prisma.user.create({
       data: {
         id: 'marketing_admin_001',
-        email: 'marketing@coindaily.africa',
+        email: 'marketing@sygn.live',
         username: 'marketingadmin',
         passwordHash: await bcrypt.hash('Marketing@2024!', 10),
         role: 'MARKETING_ADMIN',
@@ -91,7 +91,7 @@ async function seedSuperAdmin() {
     const techAdmin = await prisma.user.create({
       data: {
         id: 'tech_admin_001',
-        email: 'tech@coindaily.africa',
+        email: 'tech@sygn.live',
         username: 'techadmin',
         passwordHash: await bcrypt.hash('Tech@2024!', 10),
         role: 'TECH_ADMIN',

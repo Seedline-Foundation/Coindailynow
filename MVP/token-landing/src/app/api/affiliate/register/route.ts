@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     
     try {
       const result = await resend.emails.send({
-        from: 'JOY Token Affiliate <noreply@coindaily.online>',
+        from: 'JOY Token Affiliate <noreply@sygn.live>',
         to: email,
         subject: 'Verify Your Affiliate Account - JOY Token',
         html: `

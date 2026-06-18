@@ -1,0 +1,750 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1.5rem 0;max-width:700px}
+.phase-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;cursor:pointer;user-select:none}
+.phase-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.phase-title{font-size:17px;font-weight:500;color:var(--color-text-primary)}
+.phase-subtitle{font-size:13px;color:var(--color-text-secondary);margin-top:2px}
+.chevron{font-size:18px;color:var(--color-text-secondary);margin-left:auto;transition:transform 0.2s}
+.phase-body{display:none;margin-bottom:1.5rem}
+.phase-body.open{display:block}
+.phase-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:0.75rem}
+.card-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-tertiary);margin-bottom:0.5rem}
+.card-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:0.5rem}
+.card-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:0.6rem}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;border:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary)}
+.tag.blue{background:#E6F1FB;color:#0C447C;border-color:#85B7EB}
+.tag.amber{background:#FAEEDA;color:#633806;border-color:#EF9F27}
+.tag.teal{background:#E1F5EE;color:#085041;border-color:#5DCAA5}
+.tag.purple{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC}
+.tag.coral{background:#FAECE7;color:#712B13;border-color:#F0997B}
+.tag.green{background:#EAF3DE;color:#27500A;border-color:#97C459}
+.phase-divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:1.25rem 0}
+.sla-row{display:flex;gap:16px;margin-top:0.75rem;flex-wrap:wrap}
+.sla-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;flex:1;min-width:120px}
+.sla-box .sla-label{font-size:11px;color:var(--color-text-tertiary)}
+.sla-box .sla-val{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-top:2px}
+.file-block{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem 1rem;margin-top:0.6rem;font-size:12px;font-family:var(--font-mono);color:var(--color-text-secondary);line-height:1.8}
+.progress-bar{height:3px;background:var(--color-background-secondary);border-radius:4px;margin:0.5rem 0 1rem}
+.progress-fill{height:100%;border-radius:4px;transition:width 0.3s}
+.phase-wrap{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:1rem;overflow:hidden}
+.phase-header-bg{background:var(--color-background-secondary);padding:0.85rem 1.1rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.phase-header-bg.open{border-bottom:0.5px solid var(--color-border-tertiary)}
+.phase-body-inner{padding:1rem 1.1rem}
+@media(prefers-color-scheme:dark){
+  .tag.blue{background:#0C447C;color:#B5D4F4;border-color:#185FA5}
+  .tag.amber{background:#633806;color:#FAC775;border-color:#BA7517}
+  .tag.teal{background:#085041;color:#9FE1CB;border-color:#0F6E56}
+  .tag.purple{background:#3C3489;color:#CECBF6;border-color:#534AB7}
+  .tag.coral{background:#712B13;color:#F5C4B3;border-color:#993C1D}
+  .tag.green{background:#27500A;color:#C0DD97;border-color:#3B6D11}
+}
+</style>
+
+<h2 class="sr-only">AI Visual Journalism Infrastructure — Phased Implementation Plan for Coders</h2>
+
+<div class="wrap">
+
+<div style="margin-bottom:1.5rem">
+  <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.6">8 phases, ordered from foundation to scale. Each phase is independently shippable. Click to expand.</p>
+</div>
+
+<!-- PHASE 1 -->
+<div class="phase-wrap">
+  <div class="phase-header-bg" onclick="toggle('p1')" style="cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="phase-badge" style="background:#EEEDFE;color:#3C3489;border:0.5px solid #AFA9EC">Phase 1</span>
+      <div>
+        <div class="phase-title">Visual Bible — Data Layer</div>
+        <div class="phase-subtitle">Brand governance files + color/camera/lighting constants</div>
+      </div>
+      <i class="ti ti-chevron-down chevron" id="p1-chev" aria-hidden="true" style="margin-left:auto"></i>
+    </div>
+  </div>
+  <div class="phase-body" id="p1">
+    <div class="phase-body-inner">
+
+      <div class="phase-card">
+        <div class="card-label">Goal</div>
+        <div class="card-desc">Create the static data layer that every other system reads from. No logic yet — just the canonical rules in JSON. This is the single source of truth for aesthetics across the entire platform.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">File structure to create</div>
+        <div class="file-block">
+/visual-bible<br>
+  /camera<br>
+  &nbsp;&nbsp;crypto.json<br>
+  &nbsp;&nbsp;tradfi.json<br>
+  &nbsp;&nbsp;ai.json<br>
+  &nbsp;&nbsp;breaking-news.json<br>
+  /lighting<br>
+  &nbsp;&nbsp;crypto.json<br>
+  &nbsp;&nbsp;ai.json<br>
+  &nbsp;&nbsp;cybercrime.json<br>
+  &nbsp;&nbsp;africa-tech.json<br>
+  /color<br>
+  &nbsp;&nbsp;crypto.json<br>
+  &nbsp;&nbsp;tradfi.json<br>
+  &nbsp;&nbsp;african-futurism.json<br>
+  /symbolism<br>
+  &nbsp;&nbsp;crypto.json<br>
+  &nbsp;&nbsp;ai.json<br>
+  &nbsp;&nbsp;regulation.json<br>
+  &nbsp;&nbsp;african-tech.json<br>
+  /negative-rules<br>
+  &nbsp;&nbsp;global.json<br>
+  /regions<br>
+  &nbsp;&nbsp;africa.json<br>
+  &nbsp;&nbsp;global.json
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Each JSON structure</div>
+        <div class="card-desc">Each file exports a consistent shape: <code>palette[]</code>, <code>camera[]</code>, <code>lighting[]</code>, <code>symbolism[]</code>, <code>avoid[]</code>. Keep them flat — no nested inheritance yet.</div>
+        <div class="tag-row">
+          <span class="tag blue">JSON only</span>
+          <span class="tag teal">No code logic</span>
+          <span class="tag amber">Committed to git</span>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Deliverable</div>
+        <div class="card-desc">A <code>visualBible.js</code> loader that reads these files and exposes <code>getStyle(category, field)</code>. Minimal — just a getter. Tests: assert every category returns valid, non-empty values for palette, camera, lighting, symbolism, and avoid fields.</div>
+      </div>
+
+      <div class="sla-row">
+        <div class="sla-box"><div class="sla-label">Effort</div><div class="sla-val">2–3 days</div></div>
+        <div class="sla-box"><div class="sla-label">Dependencies</div><div class="sla-val">None</div></div>
+        <div class="sla-box"><div class="sla-label">Output</div><div class="sla-val">Static JSON + loader</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase-wrap">
+  <div class="phase-header-bg" onclick="toggle('p2')" style="cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="phase-badge" style="background:#E1F5EE;color:#085041;border:0.5px solid #5DCAA5">Phase 2</span>
+      <div>
+        <div class="phase-title">Story Intelligence Engine</div>
+        <div class="phase-subtitle">Fast rule-based topic, urgency + region detection</div>
+      </div>
+      <i class="ti ti-chevron-down chevron" id="p2-chev" aria-hidden="true" style="margin-left:auto"></i>
+    </div>
+  </div>
+  <div class="phase-body" id="p2">
+    <div class="phase-body-inner">
+
+      <div class="phase-card">
+        <div class="card-label">Goal</div>
+        <div class="card-desc">Build a cheap, fast classifier that takes a headline string and returns structured metadata without touching the LLM. This runs on every article before anything expensive fires.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Three sub-engines to build</div>
+
+        <div style="border-left:2px solid #AFA9EC;padding-left:12px;margin:0.75rem 0">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Topic Engine</div>
+          <div class="card-desc">Keyword maps + regex. Input: headline string. Output: <code>{ topic: "crypto" | "ai" | "tradfi" | "cybercrime" | "regulation" | "startup-vc" }</code>. Build a keyword dictionary per topic. Use OR-matching, not AI.</div>
+        </div>
+
+        <div style="border-left:2px solid #5DCAA5;padding-left:12px;margin:0.75rem 0">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Urgency Engine</div>
+          <div class="card-desc">Pattern matching on trigger words: "crash", "hack", "SEC", "ETF approval", "breaking", "emergency". Output: <code>{ urgency: "breaking" | "high" | "medium" | "low" }</code>. Also parse publication timestamp delta for recency signals.</div>
+        </div>
+
+        <div style="border-left:2px solid #F0997B;padding-left:12px;margin:0.75rem 0">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Region Detector</div>
+          <div class="card-desc">Named entity + geo-keyword matching. Flags Africa, Asia, Europe, US. Outputs <code>{ region: "africa" | "global" | "us" | "asia" }</code>. African region flag activates Afrofuturism visual track.</div>
+        </div>
+
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">File output</div>
+        <div class="file-block">
+/core<br>
+  narrativeEngine.js   ← orchestrates all three<br>
+  topicClassifier.js<br>
+  urgencyDetector.js<br>
+  regionDetector.js<br>
+/data<br>
+  topicKeywords.json<br>
+  urgencyTriggers.json<br>
+  regionEntities.json
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Output contract</div>
+        <div class="card-desc">Every function returns a single clean object: <code>{ topic, urgency, region, confidence }</code>. Downstream systems rely on this shape — do not change it after Phase 2 ships.</div>
+        <div class="tag-row">
+          <span class="tag blue">No LLM calls here</span>
+          <span class="tag teal">Unit tested</span>
+          <span class="tag amber">Must run in &lt;5ms</span>
+        </div>
+      </div>
+
+      <div class="sla-row">
+        <div class="sla-box"><div class="sla-label">Effort</div><div class="sla-val">3–4 days</div></div>
+        <div class="sla-box"><div class="sla-label">Depends on</div><div class="sla-val">Phase 1</div></div>
+        <div class="sla-box"><div class="sla-label">Output</div><div class="sla-val">Narrative metadata JSON</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase-wrap">
+  <div class="phase-header-bg" onclick="toggle('p3')" style="cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="phase-badge" style="background:#FAEEDA;color:#633806;border:0.5px solid #EF9F27">Phase 3</span>
+      <div>
+        <div class="phase-title">LLM Scene Planner</div>
+        <div class="phase-subtitle">Cinematic direction, symbolism + emotional framing via Claude API</div>
+      </div>
+      <i class="ti ti-chevron-down chevron" id="p3-chev" aria-hidden="true" style="margin-left:auto"></i>
+    </div>
+  </div>
+  <div class="phase-body" id="p3">
+    <div class="phase-body-inner">
+
+      <div class="phase-card">
+        <div class="card-label">Goal</div>
+        <div class="card-desc">Call the LLM only for what rule-based systems cannot do: narrative abstraction, emotional tone, symbolism selection, cinematic direction. This layer outputs structured JSON — not image prompts. The LLM never writes the final prompt directly.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Input to the LLM</div>
+        <div class="card-desc">Pass the headline + narrative metadata from Phase 2 + relevant Visual Bible rules for the detected category. Include a strict system prompt: "You are a cinematic art director. Return only valid JSON. Never write image generation prompts."</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Output schema (enforce strictly)</div>
+        <div class="file-block">
+{<br>
+  "story_type": "",<br>
+  "urgency": "",<br>
+  "narrative": "",<br>
+  "emotion": "",<br>
+  "camera": {<br>
+  &nbsp;&nbsp;"angle": "",<br>
+  &nbsp;&nbsp;"lens": "",<br>
+  &nbsp;&nbsp;"movement": "",<br>
+  &nbsp;&nbsp;"depth": ""<br>
+  },<br>
+  "environment": {<br>
+  &nbsp;&nbsp;"location": "",<br>
+  &nbsp;&nbsp;"time": "",<br>
+  &nbsp;&nbsp;"weather": "",<br>
+  &nbsp;&nbsp;"architecture": ""<br>
+  },<br>
+  "subjects": [],<br>
+  "lighting": { "primary": "", "secondary": "" },<br>
+  "motion": { "style": "", "speed": "" },<br>
+  "symbolism": [],<br>
+  "composition": { "style": "" },<br>
+  "workflow": "",<br>
+  "style_profile": "",<br>
+  "regional_profile": ""<br>
+}
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Implementation notes</div>
+        <div class="card-desc">Validate the LLM output with a JSON schema validator before passing downstream. If validation fails: retry once, then fall back to a rule-based default scene. Log all failures. Never let a bad LLM response reach the image generator.</div>
+        <div class="tag-row">
+          <span class="tag purple">LLM call here only</span>
+          <span class="tag blue">JSON schema validation</span>
+          <span class="tag coral">Fallback on failure</span>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">File output</div>
+        <div class="file-block">
+/core<br>
+  scenePlanner.js      ← calls LLM, validates response<br>
+  sceneDefaults.js     ← fallback scenes per category<br>
+  sceneSchema.json     ← JSON schema for validation
+        </div>
+      </div>
+
+      <div class="sla-row">
+        <div class="sla-box"><div class="sla-label">Effort</div><div class="sla-val">3–5 days</div></div>
+        <div class="sla-box"><div class="sla-label">Depends on</div><div class="sla-val">Phases 1 + 2</div></div>
+        <div class="sla-box"><div class="sla-label">SLA target</div><div class="sla-val">&lt;3 sec LLM call</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 4 -->
+<div class="phase-wrap">
+  <div class="phase-header-bg" onclick="toggle('p4')" style="cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="phase-badge" style="background:#FAECE7;color:#712B13;border:0.5px solid #F0997B">Phase 4</span>
+      <div>
+        <div class="phase-title">Prompt Composer + ComfyUI Injector</div>
+        <div class="phase-subtitle">Scene JSON → diffusion prompt → ComfyUI workflow execution</div>
+      </div>
+      <i class="ti ti-chevron-down chevron" id="p4-chev" aria-hidden="true" style="margin-left:auto"></i>
+    </div>
+  </div>
+  <div class="phase-body" id="p4">
+    <div class="phase-body-inner">
+
+      <div class="phase-card">
+        <div class="card-label">Goal</div>
+        <div class="card-desc">Convert the scene planner's JSON into a final positive/negative diffusion prompt string using deterministic composition logic — no LLM. Then inject those strings into the correct ComfyUI workflow JSON and submit to the API.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Prompt Composer logic</div>
+        <div class="card-desc">Build ordered prompt segments: environment → subjects → lighting → camera → style modifiers → quality boosters → negative rules. Each segment pulls from Visual Bible JSON. Compose them with comma separation. Run a de-duplication pass. Cap at 200 tokens positive, 80 tokens negative.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Workflow Router — routing table</div>
+        <div class="file-block">
+urgency === "breaking"    → workflows/breaking/<br>
+&nbsp;&nbsp;model: SDXL Lightning<br>
+&nbsp;&nbsp;steps: 20, cfg: 5, res: 768px<br>
+&nbsp;&nbsp;SLA: 2–10 seconds<br>
+<br>
+story_type === "feature"  → workflows/premium/<br>
+&nbsp;&nbsp;model: JuggernautXL v9<br>
+&nbsp;&nbsp;steps: 40, cfg: 7, res: 1024px<br>
+&nbsp;&nbsp;+ IPAdapter + ControlNet depth<br>
+&nbsp;&nbsp;SLA: 30–90 seconds<br>
+<br>
+topic === "cybercrime"    → workflows/cybercrime/<br>
+&nbsp;&nbsp;+ glitch overlay node<br>
+&nbsp;&nbsp;+ corrupted UI node<br>
+<br>
+region === "africa"       → workflows/afrofuturism/<br>
+&nbsp;&nbsp;+ warm LUT post-process<br>
+&nbsp;&nbsp;+ regional LoRA (if trained)
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">ComfyUI Injector function</div>
+        <div class="card-desc">Read the workflow JSON from disk. Inject: <code>node["6"].inputs.text</code> (positive prompt), <code>node["7"].inputs.text</code> (negative), width/height into the KSampler node, steps, cfg, seed. Return the mutated workflow object. Submit via <code>POST /prompt</code> to the ComfyUI API. Poll websocket for completion.</div>
+        <div class="tag-row">
+          <span class="tag blue">Node IDs are workflow-specific</span>
+          <span class="tag amber">Map them per workflow type</span>
+          <span class="tag teal">Seed = random UUID int</span>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">File output</div>
+        <div class="file-block">
+/core<br>
+  promptComposer.js<br>
+  workflowRouter.js<br>
+/comfy<br>
+  injectWorkflow.js<br>
+  queuePrompt.js<br>
+  websocketClient.js<br>
+/workflows<br>
+  breaking/workflow.json<br>
+  premium/workflow.json<br>
+  cybercrime/workflow.json<br>
+  afrofuturism/workflow.json
+        </div>
+      </div>
+
+      <div class="sla-row">
+        <div class="sla-box"><div class="sla-label">Effort</div><div class="sla-val">4–6 days</div></div>
+        <div class="sla-box"><div class="sla-label">Depends on</div><div class="sla-val">Phases 1–3</div></div>
+        <div class="sla-box"><div class="sla-label">First images</div><div class="sla-val">End of this phase</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 5 -->
+<div class="phase-wrap">
+  <div class="phase-header-bg" onclick="toggle('p5')" style="cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="phase-badge" style="background:#E6F1FB;color:#0C447C;border:0.5px solid #85B7EB">Phase 5</span>
+      <div>
+        <div class="phase-title">Redis + BullMQ Orchestration</div>
+        <div class="phase-subtitle">Async queue infrastructure, priority lanes + GPU workers</div>
+      </div>
+      <i class="ti ti-chevron-down chevron" id="p5-chev" aria-hidden="true" style="margin-left:auto"></i>
+    </div>
+  </div>
+  <div class="phase-body" id="p5">
+    <div class="phase-body-inner">
+
+      <div class="phase-card">
+        <div class="card-label">Goal</div>
+        <div class="card-desc">Generation must never be synchronous. Every image request enters a priority queue. GPU workers pull from that queue. This decouples the API layer from generation time and enables horizontal scaling.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Queue architecture</div>
+        <div class="file-block">
+Queue name              Priority<br>
+─────────────────────── ────────<br>
+breaking-priority       10 (highest)<br>
+premium-priority        7<br>
+thumbnail-fast          5<br>
+upscale                 4<br>
+quality-check           3<br>
+retry-failed            1 (lowest)
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">GPU Worker responsibilities</div>
+        <div class="card-desc">Each worker: (1) pulls job from BullMQ, (2) calls workflowRouter to get workflow path, (3) calls injectWorkflow with scene data, (4) submits to ComfyUI API, (5) monitors websocket until <code>execution_complete</code>, (6) fetches image binary from ComfyUI <code>/view</code> endpoint, (7) uploads to S3/R2, (8) emits job completion event with CDN URL and metadata.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Job payload shape</div>
+        <div class="file-block">
+{<br>
+  "jobId": "uuid",<br>
+  "headline": "...",<br>
+  "scenePlan": { ... },<br>
+  "workflowType": "breaking",<br>
+  "priority": 10,<br>
+  "requestedAt": "ISO8601",<br>
+  "callbackUrl": "https://..."<br>
+}
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">File output</div>
+        <div class="file-block">
+/queues<br>
+  redis.js<br>
+  bullmq.js<br>
+/workers<br>
+  gpuWorker.js<br>
+  upscaleWorker.js<br>
+/storage<br>
+  s3.js<br>
+  cloudflareR2.js
+        </div>
+        <div class="tag-row">
+          <span class="tag blue">Redis 7+</span>
+          <span class="tag teal">BullMQ v4+</span>
+          <span class="tag amber">RTX 4090 Phase 1 GPU</span>
+          <span class="tag purple">Multi-GPU Phase 2</span>
+        </div>
+      </div>
+
+      <div class="sla-row">
+        <div class="sla-box"><div class="sla-label">Effort</div><div class="sla-val">3–4 days</div></div>
+        <div class="sla-box"><div class="sla-label">Depends on</div><div class="sla-val">Phase 4</div></div>
+        <div class="sla-box"><div class="sla-label">Output</div><div class="sla-val">Async job system</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 6 -->
+<div class="phase-wrap">
+  <div class="phase-header-bg" onclick="toggle('p6')" style="cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="phase-badge" style="background:#EAF3DE;color:#27500A;border:0.5px solid #97C459">Phase 6</span>
+      <div>
+        <div class="phase-title">Automated Quality Scoring</div>
+        <div class="phase-subtitle">CLIP + aesthetic ranker + artifact detection before publish</div>
+      </div>
+      <i class="ti ti-chevron-down chevron" id="p6-chev" aria-hidden="true" style="margin-left:auto"></i>
+    </div>
+  </div>
+  <div class="phase-body" id="p6">
+    <div class="phase-body-inner">
+
+      <div class="phase-card">
+        <div class="card-label">Goal</div>
+        <div class="card-desc">No generated image reaches the CMS without passing automated quality gates. This runs as a BullMQ <code>quality-check</code> job immediately after generation and before upscaling or delivery.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Quality pipeline steps</div>
+
+        <div style="counter-reset:step">
+          <div style="display:flex;gap:10px;margin:0.6rem 0;align-items:flex-start">
+            <span style="background:#EAF3DE;color:#27500A;font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-top:1px">Step 1</span>
+            <div class="card-desc"><strong style="color:var(--color-text-primary)">CLIP scoring</strong> — compute cosine similarity between the final prompt and the generated image embedding. Reject if score &lt; 0.75.</div>
+          </div>
+          <div style="display:flex;gap:10px;margin:0.6rem 0;align-items:flex-start">
+            <span style="background:#EAF3DE;color:#27500A;font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-top:1px">Step 2</span>
+            <div class="card-desc"><strong style="color:var(--color-text-primary)">LAION Aesthetic Predictor</strong> — run the LAION aesthetic model (Python subprocess or REST). Reject if aesthetic score &lt; 6.5.</div>
+          </div>
+          <div style="display:flex;gap:10px;margin:0.6rem 0;align-items:flex-start">
+            <span style="background:#EAF3DE;color:#27500A;font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-top:1px">Step 3</span>
+            <div class="card-desc"><strong style="color:var(--color-text-primary)">Artifact detection</strong> — check blur (Laplacian variance), text artifact presence (lightweight OCR pass), and extreme brightness/darkness thresholds.</div>
+          </div>
+          <div style="display:flex;gap:10px;margin:0.6rem 0;align-items:flex-start">
+            <span style="background:#EAF3DE;color:#27500A;font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-top:1px">Step 4</span>
+            <div class="card-desc"><strong style="color:var(--color-text-primary)">Brand alignment</strong> — compute color distribution match against the expected palette for this story type. Reject if dominant hue is outside the brand palette range.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Score output contract</div>
+        <div class="file-block">
+{<br>
+  "clip_score": 0.92,<br>
+  "aesthetic_score": 8.7,<br>
+  "artifact_score": 0.03,<br>
+  "brand_alignment": 0.88,<br>
+  "approved": true,<br>
+  "rejection_reason": null<br>
+}
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">On rejection</div>
+        <div class="card-desc">Automatically re-queue with a new random seed. Max 3 retries. On 3rd failure: flag for human review, serve the best-scoring candidate with a review watermark. Never silently fail.</div>
+        <div class="tag-row">
+          <span class="tag blue">Python subprocess for CLIP/LAION</span>
+          <span class="tag teal">Node wraps via child_process</span>
+          <span class="tag coral">Max 3 retries</span>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">File output</div>
+        <div class="file-block">
+/quality<br>
+  clipScore.js<br>
+  aestheticRanker.js<br>
+  artifactDetector.js<br>
+  brandAlignment.js<br>
+  qualityJudge.js      ← orchestrates all four
+        </div>
+      </div>
+
+      <div class="sla-row">
+        <div class="sla-box"><div class="sla-label">Effort</div><div class="sla-val">4–5 days</div></div>
+        <div class="sla-box"><div class="sla-label">Depends on</div><div class="sla-val">Phase 5</div></div>
+        <div class="sla-box"><div class="sla-label">Threshold tuning</div><div class="sla-val">1 extra week</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 7 -->
+<div class="phase-wrap">
+  <div class="phase-header-bg" onclick="toggle('p7')" style="cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="phase-badge" style="background:#FBEAF0;color:#72243E;border:0.5px solid #ED93B1">Phase 7</span>
+      <div>
+        <div class="phase-title">Thumbnail Intelligence</div>
+        <div class="phase-subtitle">CTR-optimized crops, saliency detection + platform variants</div>
+      </div>
+      <i class="ti ti-chevron-down chevron" id="p7-chev" aria-hidden="true" style="margin-left:auto"></i>
+    </div>
+  </div>
+  <div class="phase-body" id="p7">
+    <div class="phase-body-inner">
+
+      <div class="phase-card">
+        <div class="card-label">Goal</div>
+        <div class="card-desc">Hero images and thumbnails are generated separately. A thumbnail is not a cropped hero — it's a different composition optimized for one focal point, high contrast, and emotional clarity at small sizes.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Two generation tracks</div>
+
+        <div style="border-left:2px solid #ED93B1;padding-left:12px;margin:0.75rem 0">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Track A — Dedicated thumbnail generation</div>
+          <div class="card-desc">Run a separate 16-step ComfyUI job at 512px with a thumbnail-specific scene plan (simplified composition, single subject, high contrast rules). This is the preferred track for new articles.</div>
+        </div>
+
+        <div style="border-left:2px solid #AFA9EC;padding-left:12px;margin:0.75rem 0">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Track B — Smart crop from hero</div>
+          <div class="card-desc">Use saliency detection (e.g. <code>basnet</code> or <code>u2net</code>) to find the dominant focal point in the hero image. Apply focal-aware smart crop. Only use this as a fallback.</div>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Platform variant output</div>
+        <div class="file-block">
+x-twitter:   1200×628px<br>
+youtube:     1280×720px<br>
+telegram:    1200×628px<br>
+homepage-banner: 1920×600px<br>
+mobile-card: 400×300px<br>
+og-image:    1200×630px
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Thumbnail schema</div>
+        <div class="file-block">
+{<br>
+  "focal_subject": "bitcoin hologram",<br>
+  "emotion": "market panic",<br>
+  "crop_focus": "center",<br>
+  "contrast": "high",<br>
+  "mobile_visibility": true<br>
+}
+        </div>
+        <div class="tag-row">
+          <span class="tag blue">Sharp.js for resizing</span>
+          <span class="tag teal">u2net for saliency</span>
+          <span class="tag amber">Spawn as separate worker</span>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">File output</div>
+        <div class="file-block">
+/workers<br>
+  thumbnailWorker.js<br>
+/core<br>
+  thumbnailPlanner.js  ← simplified scene for thumbs<br>
+  smartCrop.js         ← saliency + crop logic<br>
+  platformVariants.js  ← resizes to all formats
+        </div>
+      </div>
+
+      <div class="sla-row">
+        <div class="sla-box"><div class="sla-label">Effort</div><div class="sla-val">3–4 days</div></div>
+        <div class="sla-box"><div class="sla-label">Depends on</div><div class="sla-val">Phases 4 + 5</div></div>
+        <div class="sla-box"><div class="sla-label">SLA</div><div class="sla-val">&lt;5 sec per variant set</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 8 -->
+<div class="phase-wrap">
+  <div class="phase-header-bg" onclick="toggle('p8')" style="cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="phase-badge" style="background:#F1EFE8;color:#444441;border:0.5px solid #B4B2A9">Phase 8</span>
+      <div>
+        <div class="phase-title">Regional Visual Identities</div>
+        <div class="phase-subtitle">African Futurism visual system — the competitive moat</div>
+      </div>
+      <i class="ti ti-chevron-down chevron" id="p8-chev" aria-hidden="true" style="margin-left:auto"></i>
+    </div>
+  </div>
+  <div class="phase-body" id="p8">
+    <div class="phase-body-inner">
+
+      <div class="phase-card">
+        <div class="card-label">Goal</div>
+        <div class="card-desc">Build a fully differentiated African Futurism visual track. Most crypto media ignores African architecture, traders, and fintech aesthetics. This becomes the platform's strongest visual signature — recognizable at a glance.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Visual profile to encode</div>
+        <div class="file-block">
+/styles/regions/africa.json<br>
+{<br>
+  "palette": ["#FFB703", "#1D3557", "#FF7F50", "#D4A373"],<br>
+  "lighting": ["warm amber neon", "humid cinematic glow",<br>
+               "sunset gold gradients", "electric urban glow"],<br>
+  "environments": ["Lagos fintech district", "Nairobi startup hub",<br>
+                   "Lagos marina skyline", "mobile money kiosk street"],<br>
+  "subjects": ["African youth traders", "mobile fintech devices",<br>
+               "pan-African data networks", "solar-tech infrastructure"],<br>
+  "camera": ["street-level realism", "human-centric",<br>
+             "movement-heavy", "optimism-focused framing"],<br>
+  "mood": ["digital renaissance", "emerging power", "urban innovation"]<br>
+}
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">LoRA training (optional but high-impact)</div>
+        <div class="card-desc">Train a regional LoRA on curated reference images of Lagos, Nairobi, Accra environments. Use ~200–400 images. Name it <code>afrofuturism-v1.safetensors</code>. Inject at weight 0.6–0.8 in the Afrofuturism workflow. This becomes an unforkable competitive asset.</div>
+        <div class="tag-row">
+          <span class="tag amber">LoRA training optional Phase 1</span>
+          <span class="tag teal">High moat value</span>
+          <span class="tag purple">~1 week GPU training time</span>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">Additional regional profiles to add later</div>
+        <div class="card-desc">After Africa ships: build Asia-Pacific (Singapore, Hong Kong, Seoul) and MENA (Dubai, Riyadh) regional profiles. Same structure, different Visual Bible entries. Region detection from Phase 2 already handles routing.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="card-label">File output</div>
+        <div class="file-block">
+/styles/regions<br>
+  africa.json<br>
+  global.json<br>
+  asia-pacific.json  (future)<br>
+/workflows<br>
+  afrofuturism/workflow.json<br>
+  afrofuturism/lora-config.json
+        </div>
+      </div>
+
+      <div class="sla-row">
+        <div class="sla-box"><div class="sla-label">Effort</div><div class="sla-val">4–6 days</div></div>
+        <div class="sla-box"><div class="sla-label">Depends on</div><div class="sla-val">Phases 1–5</div></div>
+        <div class="sla-box"><div class="sla-label">LoRA training</div><div class="sla-val">+1 week optional</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Summary -->
+<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-top:0.5rem">
+  <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:500">Total timeline estimate</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
+    <div style="background:var(--color-background-primary);border-radius:var(--border-radius-md);padding:10px 12px;border:0.5px solid var(--color-border-tertiary)">
+      <div style="font-size:11px;color:var(--color-text-tertiary)">MVP (Phases 1–4)</div>
+      <div style="font-size:16px;font-weight:500;color:var(--color-text-primary);margin-top:2px">3–4 weeks</div>
+    </div>
+    <div style="background:var(--color-background-primary);border-radius:var(--border-radius-md);padding:10px 12px;border:0.5px solid var(--color-border-tertiary)">
+      <div style="font-size:11px;color:var(--color-text-tertiary)">Full system (1–8)</div>
+      <div style="font-size:16px;font-weight:500;color:var(--color-text-primary);margin-top:2px">8–12 weeks</div>
+    </div>
+    <div style="background:var(--color-background-primary);border-radius:var(--border-radius-md);padding:10px 12px;border:0.5px solid var(--color-border-tertiary)">
+      <div style="font-size:11px;color:var(--color-text-tertiary)">First images live</div>
+      <div style="font-size:16px;font-weight:500;color:var(--color-text-primary);margin-top:2px">End of Phase 4</div>
+    </div>
+    <div style="background:var(--color-background-primary);border-radius:var(--border-radius-md);padding:10px 12px;border:0.5px solid var(--color-border-tertiary)">
+      <div style="font-size:11px;color:var(--color-text-tertiary)">Stack</div>
+      <div style="font-size:15px;font-weight:500;color:var(--color-text-primary);margin-top:2px">Node.js + Python + Redis</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function toggle(id){
+  const body=document.getElementById(id);
+  const chev=document.getElementById(id+'-chev');
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chev.style.transform=isOpen?'':'rotate(180deg)';
+}
+</script>

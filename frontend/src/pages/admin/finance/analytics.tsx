@@ -69,7 +69,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // In production, verify JWT and check role
     const user = {
       id: '1',
-      email: 'admin@coindaily.com',
+      email: 'admin@sygn.live',
       role: 'SUPER_ADMIN',
     };
 

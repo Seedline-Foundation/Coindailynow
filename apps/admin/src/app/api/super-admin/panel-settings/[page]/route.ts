@@ -26,7 +26,7 @@ const DEFAULT_SETTINGS: Record<string, Record<string, string>> = {
   api: {
     backendUrl: 'http://localhost:4000',
     rateLimitPerMinute: '100',
-    allowedOrigins: 'https://coindaily.africa\nhttps://app.coindaily.africa',
+    allowedOrigins: 'https://sygn.live\nhttps://app.sygn.live',
     apiVersion: 'v1',
   },
   localization: {

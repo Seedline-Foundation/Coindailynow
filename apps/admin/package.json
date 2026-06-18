@@ -2,7 +2,7 @@
   "name": "@coindaily/admin",
   "version": "1.0.0",
   "private": true,
-  "description": "CoinDaily Super Admin System - jet.coindaily.online (IP WHITELISTED)",
+  "description": "CoinDaily Super Admin System - jet.sygn.live (IP WHITELISTED)",
   "scripts": {
     "dev": "node scripts/next-cli.cjs dev -p 3002",
     "build": "node scripts/next-cli.cjs build",

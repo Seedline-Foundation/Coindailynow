@@ -315,7 +315,7 @@ export default function RegulationTrackerPage() {
               '@type': 'Dataset',
               name: 'Africa Crypto Regulation Tracker',
               description: 'Real-time tracking of cryptocurrency regulations across 12 African countries',
-              url: 'https://coindaily.online/regulation',
+              url: 'https://sygn.live/regulation',
               creator: { '@type': 'Organization', name: 'CoinDaily Africa' },
               temporalCoverage: '2024/..',
               spatialCoverage: { '@type': 'Place', name: 'Africa' }

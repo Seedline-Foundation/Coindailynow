@@ -25,8 +25,8 @@ log_step() { echo -e "${BLUE}[STEP]${NC} $1"; }
 #===============================================================================
 
 # Domains
-DOMAIN_MAIN="coindailynow.com"
-DOMAIN_AI="ai.coindailynow.com"
+DOMAIN_MAIN="sygn.live"
+DOMAIN_AI="ai.sygn.live"
 
 # Directories
 WEB_ROOT="/var/www"
@@ -1453,7 +1453,7 @@ EOF
 # Main CoinDaily Site
 server {
     listen 80;
-    server_name coindailynow.com www.coindailynow.com;
+    server_name sygn.live www.sygn.live;
     
     root /var/www/Coindailynow;
     index index.html index.htm index.php;
@@ -1503,7 +1503,7 @@ server {
 # Token Landing Page
 server {
     listen 80;
-    server_name token.coindailynow.com;
+    server_name token.sygn.live;
     
     root /var/www/token-landing;
     index index.html;
@@ -1521,7 +1521,7 @@ server {
 # AI Services (Internal Only - Protected)
 server {
     listen 80;
-    server_name ai.coindailynow.com;
+    server_name ai.sygn.live;
     
     # Allow only internal IPs
     allow 127.0.0.1;
@@ -2482,7 +2482,7 @@ phase17_summary() {
     echo "Next Steps:"
     echo "  1. Run: /opt/coindaily/test-ai.sh"
     echo "  2. Access Grafana: http://YOUR_IP:3001"
-    echo "  3. Configure SSL: certbot --nginx -d coindailynow.com"
+    echo "  3. Configure SSL: certbot --nginx -d sygn.live"
     echo "  4. Update your application to use the new endpoints"
     echo ""
     echo "=============================================="

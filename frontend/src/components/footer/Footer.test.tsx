@@ -104,7 +104,7 @@ describe('Footer Component', () => {
       render(<Footer />);
       
       expect(screen.getByText('Contact Us')).toBeInTheDocument();
-      expect(screen.getByText('contact@coindaily.africa')).toBeInTheDocument();
+      expect(screen.getByText('contact@sygn.live')).toBeInTheDocument();
       expect(screen.getByText('+234 (0) 812 345 6789')).toBeInTheDocument();
       expect(screen.getByText('Lagos, Nigeria | Cape Town, South Africa')).toBeInTheDocument();
     });

@@ -233,7 +233,7 @@ export default function BlogArticleClient({ article }: { article: BlogArticle })
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">Share:</span>
                 <a
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(`https://coindaily.online/blog/${article.slug}`)}`}
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(`https://sygn.live/blog/${article.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 bg-white rounded-full border border-gray-200 hover:bg-gray-50"
@@ -241,7 +241,7 @@ export default function BlogArticleClient({ article }: { article: BlogArticle })
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </a>
                 <a
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://coindaily.online/blog/${article.slug}`)}`}
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://sygn.live/blog/${article.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 bg-white rounded-full border border-gray-200 hover:bg-gray-50"
@@ -285,19 +285,19 @@ export default function BlogArticleClient({ article }: { article: BlogArticle })
             '@type': 'BlogPosting',
             headline: article.title,
             description: article.metaDescription,
-            url: `https://coindaily.online/blog/${article.slug}`,
+            url: `https://sygn.live/blog/${article.slug}`,
             datePublished: article.publishedAt,
             dateModified: article.updatedAt,
             author: { '@type': 'Person', name: article.author },
             publisher: {
               '@type': 'Organization',
               name: 'CoinDaily',
-              url: 'https://coindaily.online',
-              logo: { '@type': 'ImageObject', url: 'https://coindaily.online/images/logo.svg' },
+              url: 'https://sygn.live',
+              logo: { '@type': 'ImageObject', url: 'https://sygn.live/images/logo.svg' },
             },
             mainEntityOfPage: {
               '@type': 'WebPage',
-              '@id': `https://coindaily.online/blog/${article.slug}`,
+              '@id': `https://sygn.live/blog/${article.slug}`,
             },
             wordCount: article.wordCount,
             articleSection: article.category,
@@ -334,9 +334,9 @@ export default function BlogArticleClient({ article }: { article: BlogArticle })
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://coindaily.online' },
-              { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://coindaily.online/blog' },
-              { '@type': 'ListItem', position: 3, name: article.title, item: `https://coindaily.online/blog/${article.slug}` },
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://sygn.live' },
+              { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://sygn.live/blog' },
+              { '@type': 'ListItem', position: 3, name: article.title, item: `https://sygn.live/blog/${article.slug}` },
             ],
           }),
         }}

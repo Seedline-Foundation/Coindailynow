@@ -5356,7 +5356,7 @@ function SupportTab({ user }: { user: User }) {
       description: 'Send us an email for detailed support',
       icon: MailIcon,
       available: supportAccess.email,
-      action: () => window.open('mailto:support@coindaily.africa', '_blank'),
+      action: () => window.open('mailto:support@sygn.live', '_blank'),
       responseTime: '4-24 hours'
     },
     {

@@ -276,7 +276,7 @@ describe('LanguageSwitcher Component', () => {
 describe('SocialShareMenu Component', () => {
   const shareData = {
     title: mockArticle.title,
-    url: `https://coindaily.africa/articles/${mockArticle.slug}`,
+    url: `https://sygn.live/articles/${mockArticle.slug}`,
     text: mockArticle.excerpt
   };
 
@@ -482,7 +482,7 @@ describe('Accessibility Tests', () => {
       <SocialShareMenu
         shareData={{
           title: mockArticle.title,
-          url: `https://coindaily.africa/articles/${mockArticle.slug}`,
+          url: `https://sygn.live/articles/${mockArticle.slug}`,
           text: mockArticle.excerpt
         }}
         onShare={mockOnShare}

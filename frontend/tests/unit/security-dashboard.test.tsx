@@ -43,7 +43,7 @@ const mockSecurityData = {
 
 const mockUser = {
   id: 'user-1',
-  email: 'admin@coindaily.com',
+  email: 'admin@sygn.live',
   role: 'SUPER_ADMIN',
   name: 'Test Admin'
 };

@@ -17,7 +17,7 @@ import { fetchPartnerSite } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
 /**
- * Partner Settings Page - press.coindaily.online/partner/settings
+ * Partner Settings Page - press.sygn.live/partner/settings
  *
  * Configure site details, wallet address, notification preferences,
  * SDK integration keys, and webhook endpoints.

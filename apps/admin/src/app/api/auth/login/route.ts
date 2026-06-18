@@ -37,10 +37,10 @@ const LOGIN_MUTATION = `mutation Login($input: LoginInput!) {
 
 // Demo users — work even when the database/backend is unreachable
 const DEMO_USERS: Record<string, { id: string; name: string; role: string; password: string }> = {
-  'user@coindaily.africa': { id: 'demo_user_001', name: 'Demo User', role: 'USER', password: 'User@2024' },
-  'editor@coindaily.africa': { id: 'demo_editor_001', name: 'Demo Editor', role: 'EDITOR', password: 'Editor@2024' },
-  'staff@coindaily.africa': { id: 'demo_staff_001', name: 'Staff Member', role: 'STAFF', password: 'Staff@2024' },
-  'admin@coindaily.africa': { id: 'demo_admin_001', name: 'Admin User', role: 'ADMIN', password: 'Admin@2024' },
+  'user@sygn.live': { id: 'demo_user_001', name: 'Demo User', role: 'USER', password: 'User@2024' },
+  'editor@sygn.live': { id: 'demo_editor_001', name: 'Demo Editor', role: 'EDITOR', password: 'Editor@2024' },
+  'staff@sygn.live': { id: 'demo_staff_001', name: 'Staff Member', role: 'STAFF', password: 'Staff@2024' },
+  'admin@sygn.live': { id: 'demo_admin_001', name: 'Admin User', role: 'ADMIN', password: 'Admin@2024' },
 };
 
 export async function POST(request: NextRequest) {

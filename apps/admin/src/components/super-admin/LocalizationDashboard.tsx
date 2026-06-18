@@ -447,7 +447,7 @@ function RegionsTab({
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Subdomain:</span>
-                <span className="font-medium text-blue-600">{region.subdomain}.coindaily.africa</span>
+                <span className="font-medium text-blue-600">{region.subdomain}.sygn.live</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Currency:</span>

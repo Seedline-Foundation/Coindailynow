@@ -645,9 +645,9 @@ export class FinanceVersionManager {
           'Error rate > 10%',
         ],
         notificationList: [
-          'admin@coindaily.com',
-          'ops@coindaily.com',
-          'security@coindaily.com',
+          'admin@sygn.live',
+          'ops@sygn.live',
+          'security@sygn.live',
         ],
         status: 'SCHEDULED',
       };

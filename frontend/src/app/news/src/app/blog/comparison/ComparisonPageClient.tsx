@@ -278,7 +278,7 @@ export default function ComparisonPageClient() {
             '@type': 'WebPage',
             name: 'Best Cryptocurrency News Platforms in Africa 2025 – Comparison',
             description: 'Compare Africa\'s top crypto news platforms side-by-side.',
-            url: 'https://coindaily.online/blog/comparison',
+            url: 'https://sygn.live/blog/comparison',
             mainEntity: {
               '@type': 'ItemList',
               itemListElement: [coindaily, ...others].map((p, i) => ({
@@ -302,9 +302,9 @@ export default function ComparisonPageClient() {
             breadcrumb: {
               '@type': 'BreadcrumbList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://coindaily.online' },
-                { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://coindaily.online/blog' },
-                { '@type': 'ListItem', position: 3, name: 'Comparison', item: 'https://coindaily.online/blog/comparison' },
+                { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://sygn.live' },
+                { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://sygn.live/blog' },
+                { '@type': 'ListItem', position: 3, name: 'Comparison', item: 'https://sygn.live/blog/comparison' },
               ],
             },
           }),

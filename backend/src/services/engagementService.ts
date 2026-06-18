@@ -7,7 +7,7 @@ import webpush from 'web-push';
 
 // Initialize web-push with VAPID keys
 webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT || 'mailto:admin@coindaily.com',
+  process.env.VAPID_SUBJECT || 'mailto:admin@sygn.live',
   process.env.VAPID_PUBLIC_KEY || '',
   process.env.VAPID_PRIVATE_KEY || ''
 );

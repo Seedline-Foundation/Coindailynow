@@ -3,8 +3,8 @@
 
 set -euo pipefail
 
-BASE_URL="${BASE_URL:-https://coindaily.online}"
-API_URL="${API_URL:-https://app.coindaily.online}"
+BASE_URL="${BASE_URL:-https://sygn.live}"
+API_URL="${API_URL:-https://app.sygn.live}"
 REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 K6_SCRIPT="${REPO_ROOT}/infrastructure/load-tests/k6-launch.js"
 

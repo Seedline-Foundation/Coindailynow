@@ -500,7 +500,7 @@ export default function ApiLicensingPage() {
               <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">JavaScript / Node.js</span>
             </div>
             <pre className="text-xs text-emerald-300 font-mono leading-relaxed overflow-x-auto whitespace-pre">{`const response = await fetch(
-  'https://api.coindaily.africa/api/v1/prices/BTC',
+  'https://api.sygn.live/api/v1/prices/BTC',
   { headers: { 'Authorization': 'Bearer cd_live_YOUR_API_KEY' } }
 );
 const { price, change_24h, volume } = await response.json();

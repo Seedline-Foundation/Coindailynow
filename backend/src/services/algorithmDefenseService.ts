@@ -520,7 +520,7 @@ export class AlgorithmDefenseService {
         name: 'CoinDaily',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://coindaily.com/logo.png'
+          url: 'https://sygn.live/logo.png'
         }
       };
     }

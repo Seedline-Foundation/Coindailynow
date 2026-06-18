@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Best Cryptocurrency News Platforms in Africa 2025 – Comparison',
     description: 'Compare Africa\'s top crypto news platforms side-by-side. Features, pricing, African coverage, and language support.',
-    url: 'https://coindaily.online/blog/comparison',
+    url: 'https://sygn.live/blog/comparison',
     siteName: 'CoinDaily',
     type: 'website',
     locale: 'en_US',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     description: 'Compare Africa\'s top crypto news platforms. CoinDaily vs CoinDesk vs CoinTelegraph and more.',
     creator: '@CoinDailyOnline',
   },
-  alternates: { canonical: 'https://coindaily.online/blog/comparison' },
+  alternates: { canonical: 'https://sygn.live/blog/comparison' },
   robots: { index: true, follow: true },
 };
 

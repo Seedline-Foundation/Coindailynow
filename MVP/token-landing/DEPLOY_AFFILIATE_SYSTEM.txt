@@ -6,7 +6,7 @@ STEP 1: SSH INTO CONTABO SERVER
 ─────────────────────────────────────────────────────────────
 ssh root@your-server-ip
 # OR if you have a domain:
-ssh root@token.coindaily.online
+ssh root@token.sygn.live
 
 
 STEP 2: NAVIGATE TO PROJECT & PULL LATEST CODE
@@ -82,7 +82,7 @@ pm2 logs token-landing
 journalctl -u token-landing -f
 
 # Test the endpoints:
-curl -X POST https://token.coindaily.online/api/affiliate/register \
+curl -X POST https://token.sygn.live/api/affiliate/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"TestPass123!","name":"Test"}'
 
@@ -90,9 +90,9 @@ curl -X POST https://token.coindaily.online/api/affiliate/register \
 STEP 9: TEST IN BROWSER
 ─────────────────────────────────────────────────────────────
 Visit these URLs:
-✓ https://token.coindaily.online/affiliate/register
-✓ https://token.coindaily.online/affiliate/login
-✓ https://token.coindaily.online/dashboard (check Affiliate tab)
+✓ https://token.sygn.live/affiliate/register
+✓ https://token.sygn.live/affiliate/login
+✓ https://token.sygn.live/dashboard (check Affiliate tab)
 
 
 ═══════════════════════════════════════════════════════════════
@@ -170,7 +170,7 @@ chmod +x deploy-affiliate.sh
 
 If you need to update Nginx config:
 
-sudo nano /etc/nginx/sites-available/token.coindaily.online
+sudo nano /etc/nginx/sites-available/token.sygn.live
 
 # Ensure these locations are included:
 location /affiliate {

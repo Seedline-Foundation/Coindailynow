@@ -15,7 +15,7 @@ import { useAuth } from '@/lib/auth-context';
 import { fetchPartnerSite, fetchSiteVerifications } from '@/lib/api';
 
 /**
- * Partner Press Releases Page - press.coindaily.online/partner/releases
+ * Partner Press Releases Page - press.sygn.live/partner/releases
  *
  * Lists all press releases distributed to this partner site.
  * Shows verification status, earnings, and publisher info.

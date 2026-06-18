@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 /**
- * CEO Portal - jet.coindaily.online/admin/CEO
+ * CEO Portal - jet.sygn.live/admin/CEO
  * 
  * ⚠️ CEO-ONLY ACCESS
  * 

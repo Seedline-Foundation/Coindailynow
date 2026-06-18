@@ -113,7 +113,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
     };
   }
 
-  const siteUrl = 'https://coindaily.online';
+  const siteUrl = 'https://sygn.live';
   const articleUrl = `${siteUrl}/news/${params.slug}`;
 
   return {

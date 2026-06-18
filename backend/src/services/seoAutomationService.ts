@@ -350,7 +350,7 @@ export class RankTrackingService {
       if (this.ahrefsService) {
         const ahrefsResults = await this.ahrefsService.getRankings(
           keywordStrings,
-          process.env.SITE_DOMAIN || 'coindaily.com'
+          process.env.SITE_DOMAIN || 'sygn.live'
         );
         allResults.push(...ahrefsResults);
       }
@@ -358,7 +358,7 @@ export class RankTrackingService {
       if (this.semrushService) {
         const semrushResults = await this.semrushService.getKeywordRankings(
           keywordStrings,
-          process.env.SITE_DOMAIN || 'coindaily.com'
+          process.env.SITE_DOMAIN || 'sygn.live'
         );
         allResults.push(...semrushResults);
       }

@@ -234,7 +234,7 @@ class PRFull extends HTMLElement {
         if (!prId) return;
         
         try {
-            const response = await fetch(`https://press.coindaily.online/api/press/prs/${prId}`);
+            const response = await fetch(`https://press.sygn.live/api/press/prs/${prId}`);
             if (!response.ok) throw new Error('Failed to load PR');
             
             const data = await response.json();

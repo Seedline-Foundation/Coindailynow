@@ -94,7 +94,7 @@ const FALLBACK_STATS: PlatformStats = {
 const FALLBACK_USER: SuperAdminUser = {
   id: 'super_admin_1',
   username: 'superadmin',
-  email: 'admin@coindaily.africa',
+  email: 'admin@sygn.live',
   role: 'super_admin',
   permissions: ['ALL'],
   lastLogin: new Date(),
@@ -198,7 +198,7 @@ export function SuperAdminProvider({ children }: SuperAdminProviderProps) {
       const currentUser: SuperAdminUser = {
         id: tokenPayload.sub || 'unknown',
         username: tokenPayload.username || 'admin',
-        email: tokenPayload.email || 'admin@coindaily.africa',
+        email: tokenPayload.email || 'admin@sygn.live',
         role: 'super_admin',
         permissions: ['ALL'],
         lastLogin: new Date(tokenPayload.iat * 1000),

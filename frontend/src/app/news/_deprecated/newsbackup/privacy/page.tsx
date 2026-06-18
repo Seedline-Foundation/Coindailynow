@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">5. Your Rights</h2>
-              <p className="text-gray-600 leading-relaxed">You have the right to access, correct, delete, or export your personal data. You may also opt out of marketing communications at any time. To exercise these rights, contact us at privacy@coindaily.africa.</p>
+              <p className="text-gray-600 leading-relaxed">You have the right to access, correct, delete, or export your personal data. You may also opt out of marketing communications at any time. To exercise these rights, contact us at privacy@sygn.live.</p>
             </section>
 
             <section>
@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">7. Contact Us</h2>
-              <p className="text-gray-600 leading-relaxed">For privacy-related inquiries, contact our Data Protection Officer at <a href="mailto:privacy@coindaily.africa" className="text-blue-600 hover:underline">privacy@coindaily.africa</a> or write to: CoinDaily Africa, Lagos, Nigeria.</p>
+              <p className="text-gray-600 leading-relaxed">For privacy-related inquiries, contact our Data Protection Officer at <a href="mailto:privacy@sygn.live" className="text-blue-600 hover:underline">privacy@sygn.live</a> or write to: CoinDaily Africa, Lagos, Nigeria.</p>
             </section>
           </div>
 

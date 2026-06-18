@@ -143,7 +143,7 @@ export async function sendScheduledEmail(params: {
 }): Promise<{ success: boolean; emailId?: string; error?: any }> {
   try {
     const response = await resend.emails.send({
-      from: params.from || 'Joy Token Team <noreply@coindaily.online>',
+      from: params.from || 'Joy Token Team <noreply@sygn.live>',
       to: params.to,
       subject: params.subject,
       html: params.html,
@@ -232,7 +232,7 @@ export async function processPendingEmails(): Promise<{
 
         // Send via Resend
         const response = await resend.emails.send({
-          from: 'Joy Token Team <noreply@coindaily.online>',
+          from: 'Joy Token Team <noreply@sygn.live>',
           to: scheduledEmail.subscriber.email,
           subject: scheduledEmail.subject,
           html: emailHtml
@@ -373,7 +373,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p>And we're launching something HUGE: <strong>Joy Token ($JY)</strong> - our native token that will power the entire CoinDaily ecosystem!</p>
             
-            <center><a href="https://token.coindaily.online" class="cta-button">Learn About Joy Token →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Learn About Joy Token →</a></center>
             
             <p>Tomorrow, I'll tell you exactly why Joy Token could be the opportunity of the year.</p>
             
@@ -418,7 +418,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             <h4>5. 👥 Community Power</h4>
             <p>Join a movement of African crypto believers building wealth together.</p>
             
-            <center><a href="https://token.coindaily.online" class="cta-button">Explore Joy Token →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Explore Joy Token →</a></center>
             
             <p>Tomorrow: I'll share why missing this could be your biggest regret. No exaggeration.</p>
             
@@ -467,7 +467,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               Presale slots are limited. When they're gone, they're GONE.
             </div>
             
-            <center><a href="https://token.coindaily.online" class="cta-button">Secure Your Position →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Secure Your Position →</a></center>
             
             <p>Tomorrow: I'll break down the tokenomics and show you EXACTLY how $JY can grow your wealth.</p>
             
@@ -520,7 +520,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               <p style="margin: 5px 0;">If it hits $0.10, your $100 becomes <strong>$10,000</strong></p>
             </div>
             
-            <center><a href="https://token.coindaily.online" class="cta-button">Secure Your Allocation →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Secure Your Allocation →</a></center>
             
             <p>Tomorrow: Step-by-step guide on exactly how to participate in the presale.</p>
             
@@ -555,7 +555,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFD700;">
               <h4 style="margin: 0 0 10px 0;">🔹 Step 3: Connect to Joy Token Presale</h4>
-              <p style="margin: 0;">Visit <a href="https://token.coindaily.online" style="color: #FFA500; font-weight: bold;">token.coindaily.online</a></p>
+              <p style="margin: 0;">Visit <a href="https://token.sygn.live" style="color: #FFA500; font-weight: bold;">token.sygn.live</a></p>
               <p style="margin: 5px 0 0 0;">Click "Connect Wallet" and select your wallet</p>
             </div>
             
@@ -579,7 +579,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               Don't miss out on free money.
             </div>
             
-            <center><a href="https://token.coindaily.online" class="cta-button">Start Buying Now →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Start Buying Now →</a></center>
             
             <p>Tomorrow: Meet the community that's building wealth together.</p>
             
@@ -644,7 +644,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: bold;">We're building generational wealth for Africa.</p>
             </div>
             
-            <center><a href="https://token.coindaily.online" class="cta-button">Become a Holder →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Become a Holder →</a></center>
             
             <p>Tomorrow: The final countdown begins. Presale launching soon!</p>
             
@@ -696,7 +696,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             <ul>
               <li>✅ Wallet ready (MetaMask or Trust Wallet)</li>
               <li>✅ Funds available (USDT, ETH, or BNB)</li>
-              <li>✅ Bookmark <a href="https://token.coindaily.online" style="color: #FFA500;">token.coindaily.online</a></li>
+              <li>✅ Bookmark <a href="https://token.sygn.live" style="color: #FFA500;">token.sygn.live</a></li>
               <li>✅ Join our Telegram for launch announcement</li>
               <li>✅ Set alarm for launch time</li>
             </ul>
@@ -706,7 +706,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               <p style="margin: 10px 0 0 0; font-size: 16px; text-align: center;">Will you be an early believer or a spectator?</p>
             </div>
             
-            <center><a href="https://token.coindaily.online" class="cta-button">Get Ready for Launch →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Get Ready for Launch →</a></center>
             
             <p>Tomorrow: Real stories from early crypto believers who changed their lives.</p>
             
@@ -763,7 +763,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               <li>💎 <strong>Real Utility:</strong> $JY powers actual platform features</li>
             </ul>
             
-            <center><a href="https://token.coindaily.online" class="cta-button">Write Your Success Story →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Write Your Success Story →</a></center>
             
             <p>Tomorrow: FINAL email. Join our team or earn 100 $JY for referrals!</p>
             
@@ -808,7 +808,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p><strong>Perks:</strong> Competitive salary + $JY token bonuses + Remote work + Be part of Africa's crypto revolution</p>
             
-            <center><a href="https://coindaily.online/careers" class="cta-button">View Open Positions →</a></center>
+            <center><a href="https://sygn.live/careers" class="cta-button">View Open Positions →</a></center>
             
             <h3>Option 2: Earn 100 $JY Tokens! 💰</h3>
             <p>Not ready to join the team? Earn FREE tokens by referring friends!</p>
@@ -831,7 +831,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               <li>You earn $JY tokens automatically!</li>
             </ol>
             
-            <center><a href="https://token.coindaily.online/affiliate" class="cta-button">Get My Referral Link →</a></center>
+            <center><a href="https://token.sygn.live/affiliate" class="cta-button">Get My Referral Link →</a></center>
             
             <h3>Thank You for This Journey</h3>
             <p>Over the past 9 days, you've learned:</p>
@@ -853,7 +853,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p><strong>Presale launches in [X HOURS].</strong></p>
             
-            <center><a href="https://token.coindaily.online" class="cta-button">Secure My Joy Tokens →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Secure My Joy Tokens →</a></center>
             
             <p>To your success,</p>
             <p><strong>The CoinDaily Team</strong></p>
@@ -873,7 +873,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
           <div class="content">
             <h2>Hi ${name},</h2>
             <p>Important update about Joy Token...</p>
-            <center><a href="https://token.coindaily.online" class="cta-button">Visit Joy Token →</a></center>
+            <center><a href="https://token.sygn.live" class="cta-button">Visit Joy Token →</a></center>
             <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
           </div>
           ${footer}

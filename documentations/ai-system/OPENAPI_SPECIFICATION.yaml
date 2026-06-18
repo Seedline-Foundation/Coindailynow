@@ -10,8 +10,8 @@ info:
     market analysis, social media automation, and more.
     
     ## Base URL
-    - Production: `https://api.coindaily.com`
-    - Staging: `https://staging-api.coindaily.com`
+    - Production: `https://api.sygn.live`
+    - Staging: `https://staging-api.sygn.live`
     - Development: `http://localhost:4000`
     
     ## Authentication
@@ -41,16 +41,16 @@ info:
     
   contact:
     name: CoinDaily API Support
-    email: api@coindaily.com
-    url: https://docs.coindaily.com
+    email: api@sygn.live
+    url: https://docs.sygn.live
   license:
     name: Proprietary
-    url: https://coindaily.com/license
+    url: https://sygn.live/license
 
 servers:
-  - url: https://api.coindaily.com
+  - url: https://api.sygn.live
     description: Production server
-  - url: https://staging-api.coindaily.com
+  - url: https://staging-api.sygn.live
     description: Staging server
   - url: http://localhost:4000
     description: Development server

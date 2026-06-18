@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'CoinDaily Blog — Africa\'s #1 Crypto Knowledge Hub',
     description: 'Expert cryptocurrency insights, guides, and analysis for the African market. 20+ pillar articles covering Bitcoin, DeFi, exchanges, regulations, and more.',
-    url: 'https://coindaily.online/blog',
+    url: 'https://sygn.live/blog',
     siteName: 'CoinDaily',
     type: 'website',
     images: [{ url: '/images/og/blog.webp', width: 1200, height: 630, alt: 'CoinDaily Blog' }],
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description: 'Expert cryptocurrency insights, guides, and analysis for the African market.',
   },
   alternates: {
-    canonical: 'https://coindaily.online/blog',
+    canonical: 'https://sygn.live/blog',
   },
 };
 

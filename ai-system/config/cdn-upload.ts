@@ -6,7 +6,7 @@
  *   B2_APPLICATION_KEY     – S3-compatible application key
  *   B2_BUCKET_NAME         – target bucket name
  *   B2_ENDPOINT            – S3-compatible endpoint (e.g. https://s3.us-west-004.backblazeb2.com)
- *   CDN_BASE_URL           – public CDN base (default: https://cdn.coindaily.online)
+ *   CDN_BASE_URL           – public CDN base (default: https://cdn.sygn.live)
  *   LOCAL_UPLOAD_URL       – base URL returned for local fallback files
  */
 
@@ -18,7 +18,7 @@ import path from 'path';
 const CDN_BASE_URL = (
   process.env.CDN_BASE_URL ||
   process.env.CLOUDFLARE_CDN_URL ||
-  'https://cdn.coindaily.online'
+  'https://cdn.sygn.live'
 ).replace(/\/$/, '');
 
 let _s3: S3Client | null = null;

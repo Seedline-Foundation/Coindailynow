@@ -6,8 +6,8 @@
  * @license MIT
  */
 
-const API_BASE = 'https://press.coindaily.online/api';
-const WS_BASE = 'wss://press.coindaily.online/ws';
+const API_BASE = 'https://press.sygn.live/api';
+const WS_BASE = 'wss://press.sygn.live/ws';
 
 class CoindailySDK {
     constructor(siteId, config = {}) {

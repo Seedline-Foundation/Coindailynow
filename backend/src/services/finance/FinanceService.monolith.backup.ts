@@ -8332,7 +8332,7 @@ export class FinanceService {
 
       // Generate unique payment link
       const linkId = customSlug || `PL_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const paymentUrl = `${process.env.FRONTEND_URL || 'https://coindaily.com'}/pay/${linkId}`;
+      const paymentUrl = `${process.env.FRONTEND_URL || 'https://sygn.live'}/pay/${linkId}`;
 
       // Create payment link record
       // You would need a PaymentLink model for this
@@ -8468,8 +8468,8 @@ export class FinanceService {
         currency: currency || 'USD',
         status: 'UNPAID',
         dueDate: dueDate || null,
-        downloadUrl: `${process.env.FRONTEND_URL || 'https://coindaily.com'}/invoices/${invoiceId}/download`,
-        paymentUrl: `${process.env.FRONTEND_URL || 'https://coindaily.com'}/invoices/${invoiceId}/pay`,
+        downloadUrl: `${process.env.FRONTEND_URL || 'https://sygn.live'}/invoices/${invoiceId}/download`,
+        paymentUrl: `${process.env.FRONTEND_URL || 'https://sygn.live'}/invoices/${invoiceId}/pay`,
         message: 'Invoice generated successfully',
       };
     } catch (error) {

@@ -14,7 +14,7 @@ import { useAuth } from '@/lib/auth-context';
 import { fetchPartnerSite } from '@/lib/api';
 
 /**
- * Partner Site Health Page - press.coindaily.online/partner/health
+ * Partner Site Health Page - press.sygn.live/partner/health
  *
  * Powered by the Virus Agent (24/7/365).
  * Monitors tech stack, security threats, outdated modules,

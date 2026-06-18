@@ -17,7 +17,7 @@ const mockAuditData = {
       timestamp: 'Oct 6, 2025 10:45 AM',
       userId: 'user-1',
       userName: 'Kwame Osei',
-      userEmail: 'kwame@coindaily.com',
+      userEmail: 'kwame@sygn.live',
       action: 'User Login',
       category: 'authentication',
       resource: '/api/auth/login',

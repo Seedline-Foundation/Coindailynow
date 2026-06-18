@@ -17,7 +17,7 @@ export interface WireItem {
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   process.env.NEXT_PUBLIC_BACKEND_URL ||
-  'https://api.coindaily.online';
+  'https://api.sygn.live';
 
 function mapSupabaseRow(r: Record<string, unknown>): WireItem {
   const publisher = r.publisher as { company_name?: string } | null | undefined;

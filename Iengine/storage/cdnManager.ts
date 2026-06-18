@@ -36,7 +36,7 @@ export class CDNManager {
       bucket: process.env.CDN_BUCKET || 'coindaily-media',
       region: process.env.CDN_REGION || 'us-west-001',
       endpoint: process.env.CDN_ENDPOINT,
-      publicUrl: process.env.CDN_URL || process.env.CFIS_PUBLIC_MEDIA_BASE || 'https://cdn.coindaily.online',
+      publicUrl: process.env.CDN_URL || process.env.CFIS_PUBLIC_MEDIA_BASE || 'https://cdn.sygn.live',
       ...config,
     };
 

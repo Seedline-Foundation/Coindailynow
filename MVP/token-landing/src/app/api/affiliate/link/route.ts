@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate affiliate link
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://token.coindaily.online';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://token.sygn.live';
     const affiliateLink = `${baseUrl}?ref=${affiliate.affiliateCode}`;
 
     return NextResponse.json(

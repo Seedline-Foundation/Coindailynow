@@ -43,7 +43,7 @@ import { notifyCfisPressOrder } from '@/lib/cfisPressOrder';
  * 4. Review & launch campaign
  *
  * Features:
- * - Inline AI content generation via Ollama3 at ai.coindaily.online
+ * - Inline AI content generation via Ollama3 at ai.sygn.live
  * - AI image generation + file upload for featured images
  * - 5000 word maximum on content
  * - Real-time word count
@@ -51,8 +51,8 @@ import { notifyCfisPressOrder } from '@/lib/cfisPressOrder';
 
 const STEPS = ['Content', 'Network', 'Budget', 'Review'];
 const MAX_WORDS = 5000;
-const OLLAMA_API = 'https://ai.coindaily.online/api/generate';
-const OLLAMA_IMAGE_API = 'https://ai.coindaily.online/api/generate-image';
+const OLLAMA_API = 'https://ai.sygn.live/api/generate';
+const OLLAMA_IMAGE_API = 'https://ai.sygn.live/api/generate-image';
 
 interface PartnerSite {
   id: string;
@@ -156,7 +156,7 @@ export default function DistributePage() {
         throw new Error('No content returned from AI');
       }
     } catch (err: any) {
-      setAiError(err.message || 'Failed to connect to Ollama3 AI. Make sure ai.coindaily.online is running.');
+      setAiError(err.message || 'Failed to connect to Ollama3 AI. Make sure ai.sygn.live is running.');
     } finally {
       setAiGenerating(false);
     }
@@ -302,7 +302,7 @@ export default function DistributePage() {
                 <div className="flex items-center gap-2 mb-2">
                   <Wand2 className="w-5 h-5 text-purple-400" />
                   <h3 className="text-white font-semibold">Ollama3 AI Content Writer</h3>
-                  <span className="text-xs text-dark-500 ml-auto">Powered by ai.coindaily.online</span>
+                  <span className="text-xs text-dark-500 ml-auto">Powered by ai.sygn.live</span>
                 </div>
 
                 {/* Quick Prompts */}

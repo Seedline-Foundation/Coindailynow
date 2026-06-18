@@ -22,7 +22,7 @@ export interface MockUserOptions {
  */
 export const createMockUser = (overrides?: MockUserOptions): User => ({
   id: overrides?.id || 'test-user-id',
-  email: overrides?.email || 'test@coindaily.com',
+  email: overrides?.email || 'test@sygn.live',
   username: overrides?.username || 'testuser',
   passwordHash: '$2a$12$abcdefghijklmnopqrstuvwxyz1234567890', // Mock bcrypt hash
   role: overrides?.role || UserRole.USER,
@@ -51,7 +51,7 @@ export const createMockAdmin = (overrides?: MockUserOptions): User =>
   createMockUser({
     ...overrides,
     role: UserRole.ADMIN,
-    email: overrides?.email || 'admin@coindaily.com',
+    email: overrides?.email || 'admin@sygn.live',
     username: overrides?.username || 'admin',
   });
 
@@ -62,7 +62,7 @@ export const createMockContentAdmin = (overrides?: MockUserOptions): User =>
   createMockUser({
     ...overrides,
     role: UserRole.CONTENT_ADMIN,
-    email: overrides?.email || 'content@coindaily.com',
+    email: overrides?.email || 'content@sygn.live',
     username: overrides?.username || 'contentadmin',
   });
 
@@ -73,7 +73,7 @@ export const createMockSuperAdmin = (overrides?: MockUserOptions): User =>
   createMockUser({
     ...overrides,
     role: UserRole.SUPER_ADMIN,
-    email: overrides?.email || 'superadmin@coindaily.com',
+    email: overrides?.email || 'superadmin@sygn.live',
     username: overrides?.username || 'superadmin',
   });
 
@@ -104,7 +104,7 @@ export const createMockUsers = (count: number, overrides?: MockUserOptions): Use
     createMockUser({
       ...overrides,
       id: `test-user-${i}`,
-      email: `test${i}@coindaily.com`,
+      email: `test${i}@sygn.live`,
       username: `testuser${i}`,
     })
   );

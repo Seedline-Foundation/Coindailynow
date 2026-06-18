@@ -1,7 +1,7 @@
 # CoinDaily API Reference
 
 ## Base URL
-- **Production**: `https://app.coindaily.online`
+- **Production**: `https://app.sygn.live`
 - **Development**: `http://localhost:4000`
 
 ## Authentication

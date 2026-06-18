@@ -88,7 +88,7 @@ These block launch. Anything not done here = launch slips or breaks.
 - [ ] **Run the PM2 smoke-test script** — [../guides/PM2_SMOKE_TEST.md](../guides/PM2_SMOKE_TEST.md) · `pm2-smoke-test.sh --restart`. All **7** processes online within 90s.
 - [x] **Wire Sentry** (free tier: 5k errors/month) ✅ Added `@sentry/node` v9 to backend with `lib/sentry.ts` init module (loaded before all other imports in `index.ts`), wired into `errorHandler.ts` middleware (captures 5xx only) and `unhandledRejection` handler. Added `@sentry/nextjs` v9 to frontend with `sentry.client.config.ts` (10% trace sampling, 1% replay, 100% on-error replay), `sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation.ts`, `global-error.tsx`. Wrapped `next.config.js` with `withSentryConfig`. Privacy: strips auth/cookie headers, filters bots, no PII. Env vars already in `.env.production.example`.
 - [x] **Wire UptimeRobot** (free tier: 50 monitors at 5-min interval) ✅ Created `infrastructure/monitoring/UPTIMEROBOT_SETUP.md` with 5-monitor config (frontend, API health, admin, press, AI), alert channels (email + Telegram + SMS), status page setup, and API health keyword monitoring. Manual 5-min setup task for founder. Complements existing Upptime GitHub-hosted status page.
-- [ ] **Verify CDN cache rules at Cloudflare** — checklist in `verify-nginx-cors.sh` output + [PRELAUNCH_INFRA_RUNBOOK.md](../guides/PRELAUNCH_INFRA_RUNBOOK.md). Nginx must NOT set CORS on API (`app.coindaily.online.conf` — Express only).
+- [ ] **Verify CDN cache rules at Cloudflare** — checklist in `verify-nginx-cors.sh` output + [PRELAUNCH_INFRA_RUNBOOK.md](../guides/PRELAUNCH_INFRA_RUNBOOK.md). Nginx must NOT set CORS on API (`app.sygn.live.conf` — Express only).
 - [x] **Set up nightly Postgres backup** — `infrastructure/db/scripts/backup-nightly.sh`. **Founder:** B2 creds in `.env`, `b2` CLI, crontab `0 2 * * *`, test restore once (see runbook §5).
 - [ ] **Load-test the news app** — `run-load-test.sh` or `k6 run infrastructure/load-tests/k6-launch.js`. Target: 500 VUs, P95 < 800ms.
 - [x] **Document one fixed deploy script** — `infrastructure/scripts/deploy-all.sh` exists: 10-step rsync-based deployment covering backend, 3 frontends, AI system, nginx configs, PM2 ecosystem. Also `deploy.sh` for single-service deploys. Both under 15 minutes.
@@ -110,7 +110,7 @@ These block launch. Anything not done here = launch slips or breaks.
 ### Press app (for funding)
 - [ ] **Decide press app monetization model** before launch: per-release pricing? Subscription for PR agencies? Bundled with crypto-project listings?
 - [ ] **Wire payment provider on press app**: YellowCard (Africa) is in `.env.example` — actually integrate the SDK on the press checkout flow.
-- [ ] **Smoke test press release end-to-end**: agency signs up → submits release → pays → editor approves → published to coindaily.online + distributed via RSS.
+- [ ] **Smoke test press release end-to-end**: agency signs up → submits release → pays → editor approves → published to sygn.live + distributed via RSS.
 - [x] **Press wire UX polish** ✅ 2026-05-20 — Email/Telegram alert delivery now real: `WireAlertModal` replaces window.prompt with proper subscribe form (email + Telegram); `wireAlertDispatcher` sends Bloomberg-styled HTML email via Postmark and HTML-formatted Telegram messages with release URLs; admin replay endpoint at `/api/v1/press/wire/replay/:releaseId` (capability-gated to `ARTICLE_PUBLISH`). E2E with real releases is founder-offline test.
 
 ### SEO surface (launch-essential only)
@@ -188,7 +188,7 @@ These block launch. Anything not done here = launch slips or breaks.
 - [x] **AI-3-3: Add PM2 process for ai-system** — Added `coindaily-ai-pipeline` entry to both `ecosystem.config.js` (dev) and `infrastructure/ecosystem.production.config.js` (prod). Points to `dist/orchestrator/index.js`. Added `start` script to ai-system package.json.
 
 **Sev-1 — pre-launch if AI content is active at launch:**
-- [x] **AI-1-2: Image CDN upload** ✅ Both image agents now upload to Backblaze B2 via backend `/api/media/upload`. The primary `imageAgent.ts` was already wired; the SDXL variant `imageAgent-sdxl.ts` had a TODO stub fabricating cdn.coindaily.africa URLs — fixed 2026-05-20 to call the same upload path with proper data-URL fallback only on genuine failure.
+- [x] **AI-1-2: Image CDN upload** ✅ Both image agents now upload to Backblaze B2 via backend `/api/media/upload`. The primary `imageAgent.ts` was already wired; the SDXL variant `imageAgent-sdxl.ts` had a TODO stub fabricating cdn.sygn.live URLs — fixed 2026-05-20 to call the same upload path with proper data-URL fallback only on genuine failure.
 - [x] **AI-1-3: Translation self-hosted default** — Fixed `translationAgentForReview.ts` to use `NLLB_API_ENDPOINT` env var / MODEL_CONFIG (localhost:8080) instead of HuggingFace cloud. Added `healthCheck()` method.
 - [x] **AI-1-4: Content moderation agent** — `ContentModerationAgent` in ai-system registry; `/api/moderation/scan` combines agent + Perspective; admin queue **approve** blocked on moderation failure. 2026-05-16.
 
@@ -282,7 +282,7 @@ These block launch. Anything not done here = launch slips or breaks.
 - [x] **Hype/fear language ban** — Added `EDITORIAL_TONE_CONSTRAINT` static property to `ImoPromptAgent` with banned word list (moon, rocket, crash, doom, WAGMI, etc.). Applied to article, SEO, and research prompts. Enforces Bloomberg-tier neutral tone + Africa-first framing.
 
 ### Communications & launch ops
-- [x] **Status page config** — Upptime configuration at `infrastructure/upptime/.upptimerc.yml` monitoring all 5 public domains (news, API health, admin, press, AI) every 5 minutes. Setup guide at `infrastructure/upptime/SETUP.md`. **Founder TODO:** create `nicefacer/coindaily-status` GitHub repo from Upptime template, copy config, add CNAME `status.coindaily.online`, add `GH_PAT` secret. ~15 minutes.
+- [x] **Status page config** — Upptime configuration at `infrastructure/upptime/.upptimerc.yml` monitoring all 5 public domains (news, API health, admin, press, AI) every 5 minutes. Setup guide at `infrastructure/upptime/SETUP.md`. **Founder TODO:** create `nicefacer/coindaily-status` GitHub repo from Upptime template, copy config, add CNAME `status.sygn.live`, add `GH_PAT` secret. ~15 minutes.
 - [ ] **Telegram + Twitter/X launch announcement** drafted and scheduled.
 - [x] **3am runbook** — Written at `documentations/guides/RUNBOOK_3AM.md`. Covers: situational awareness (60s), PM2 crashes, database failures, Redis down, nginx 502, disk full, high CPU, SSL cert expired, DNS issues. Pinned-tab ready for launch week.
 - [ ] **Founder on-call schedule**: you're on-call 100% of launch week. Set a 2nd phone number forward for friends-and-family who shouldn't call during incidents.
@@ -355,7 +355,7 @@ Stabilize before adding. New feature work resumes mid-June at the earliest.
 **Features (from new features.md + finance.md):**
 - [ ] **SPEC-NEW-1: Live provider API integrations** — v1Onramp and v1Remittance routes return fallback/hardcoded data. Wire actual YellowCard SDK, Binance P2P API, and mobile money APIs for production use. 8-12h.
 - [ ] **SPEC-NEW-3: CoinDaily embeddable news widget** — JavaScript widget for third-party sites to embed CoinDaily news by category (breaking, press releases, viewpoints). Widget builder page + embed script. 6-8h.
-- [x] **SPEC-SEO-1: ai-access.json manifest** — File already existed at `frontend/public/ai-access.json`. Fixed domain URLs from `coindaily.ai` → `coindaily.online`, aligned rate limits with pricing page tiers (Free 100/day, Pro 10K/day, Enterprise unlimited), updated timestamp. Referenced in both `robots.txt` and `llms.txt`.
+- [x] **SPEC-SEO-1: ai-access.json manifest** — File already existed at `frontend/public/ai-access.json`. Fixed domain URLs from `coindaily.ai` → `sygn.live`, aligned rate limits with pricing page tiers (Free 100/day, Pro 10K/day, Enterprise unlimited), updated timestamp. Referenced in both `robots.txt` and `llms.txt`.
 
 ### AI system Wave 1 (from [AI_SYSTEM_AUDIT.md](AI_SYSTEM_AUDIT.md))
 - [ ] **AI-0-4: Test coverage for AI pipeline** — Zero test files. Add tests for content pipeline (research → article → translation validation), BaseAgent task queue, mock mode detection. 8-12h.

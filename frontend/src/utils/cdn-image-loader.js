@@ -5,7 +5,7 @@
 
 export default function cdnImageLoader({ src, width, quality }) {
   // Don't optimize already optimized URLs
-  if (src.startsWith('/api/cdn/') || src.includes('cdn.coindaily.africa')) {
+  if (src.startsWith('/api/cdn/') || src.includes('cdn.sygn.live')) {
     return src;
   }
 
@@ -29,7 +29,7 @@ export default function cdnImageLoader({ src, width, quality }) {
 
   // Use local CDN endpoint for development, real CDN for production
   const baseUrl = process.env.NODE_ENV === 'production' 
-    ? 'https://cdn.coindaily.africa'
+    ? 'https://cdn.sygn.live'
     : '';
 
   return `${baseUrl}/api/cdn/optimize?${params.toString()}`;

@@ -115,7 +115,7 @@ function isRoleAllowed(pathname: string, role: string | undefined): boolean {
 }
 
 const FRONTEND_USER_BASE =
-  process.env.NEXT_PUBLIC_FRONTEND_URL?.replace(/\/$/, '') || 'https://coindaily.online';
+  process.env.NEXT_PUBLIC_FRONTEND_URL?.replace(/\/$/, '') || 'https://sygn.live';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

@@ -29,7 +29,7 @@ const sampleConversation = [
   { role: 'user', text: 'What\'s happening with Bitcoin in Nigeria today?' },
   { role: 'bot', text: 'Here\'s your Nigeria crypto summary:\n\n📈 BTC/NGN is trading at ₦67.8M on Binance P2P (+2.3% today)\n📰 SEC Nigeria released new VASP guidelines requiring quarterly compliance reports\n💱 P2P premium is at 7.28% — slightly above weekly average\n\nWant more details on any of these?' },
   { role: 'user', text: 'Tell me more about the SEC guidelines' },
-  { role: 'bot', text: 'SEC Nigeria\'s new VASP guidelines (published Feb 14, 2026):\n\n1. All Virtual Asset Service Providers must submit quarterly compliance reports\n2. Customer fund segregation now mandatory\n3. New minimum capital requirements: ₦500M for exchanges\n4. 90-day grace period for existing operators\n\n📎 Read full article: coindaily.online/news/sec-vasp-guidelines-2026\n\nShould I translate this to Yoruba or Hausa?' },
+  { role: 'bot', text: 'SEC Nigeria\'s new VASP guidelines (published Feb 14, 2026):\n\n1. All Virtual Asset Service Providers must submit quarterly compliance reports\n2. Customer fund segregation now mandatory\n3. New minimum capital requirements: ₦500M for exchanges\n4. 90-day grace period for existing operators\n\n📎 Read full article: sygn.live/news/sec-vasp-guidelines-2026\n\nShould I translate this to Yoruba or Hausa?' },
 ];
 
 export default function AISummarizerPage() {

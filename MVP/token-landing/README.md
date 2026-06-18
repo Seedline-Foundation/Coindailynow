@@ -44,8 +44,8 @@ NEXT_PUBLIC_BREVO_API_KEY=your_brevo_api_key_here
 NEXT_PUBLIC_BREVO_LIST_ID=your_list_id_here
 
 # Site Configuration
-NEXT_PUBLIC_SITE_URL=https://token.coindaily.online
-NEXT_PUBLIC_MAIN_SITE_URL=https://coindaily.online
+NEXT_PUBLIC_SITE_URL=https://token.sygn.live
+NEXT_PUBLIC_MAIN_SITE_URL=https://sygn.live
 
 # Presale Configuration
 NEXT_PUBLIC_PRESALE_START_DATE=2026-01-15T00:00:00Z
@@ -145,7 +145,7 @@ vercel
 ```
 
 ### Subdomain Setup
-Configure your DNS to point `token.coindaily.online` to your deployment:
+Configure your DNS to point `token.sygn.live` to your deployment:
 - Add CNAME record: `token` → your-deployment-url
 
 ## 🔒 Security
@@ -172,8 +172,8 @@ Proprietary - CoinDaily Platform
 ## 🆘 Support
 
 For issues or questions:
-- Email: support@coindaily.online
-- Documentation: https://coindaily.online/docs
+- Email: support@sygn.live
+- Documentation: https://sygn.live/docs
 
 ---
 

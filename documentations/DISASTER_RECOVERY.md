@@ -43,4 +43,4 @@ This document outlines recovery procedures for the CoinDaily platform.
 
 ## Contact
 - **On-call**: Seedline Foundation engineering team
-- **Email**: support@coindaily.online
+- **Email**: support@sygn.live

@@ -22,8 +22,8 @@ export default function PrivacyPolicyPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">1. Data Controller</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa operates the website coindaily.online and related subdomains. For privacy-related inquiries, contact us at{' '}
-                <a href="mailto:privacy@coindaily.online" className="text-blue-600 hover:underline">privacy@coindaily.online</a>.
+                CoinDaily Africa operates the website sygn.live and related subdomains. For privacy-related inquiries, contact us at{' '}
+                <a href="mailto:privacy@sygn.live" className="text-blue-600 hover:underline">privacy@sygn.live</a>.
               </p>
             </section>
 
@@ -119,7 +119,7 @@ export default function PrivacyPolicyPage() {
               </ul>
               <p className="text-gray-600 leading-relaxed mt-3">
                 To exercise any of these rights, email{' '}
-                <a href="mailto:privacy@coindaily.online" className="text-blue-600 hover:underline">privacy@coindaily.online</a>.
+                <a href="mailto:privacy@sygn.live" className="text-blue-600 hover:underline">privacy@sygn.live</a>.
                 We will respond within 30 days.
               </p>
             </section>

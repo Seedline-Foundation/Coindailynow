@@ -669,10 +669,10 @@ const slides = [
           <div className="p-6 bg-gray-800/50 rounded-lg">
             <h4 className="text-xl font-bold mb-4 text-primary-400">Contact Information</h4>
             <div className="space-y-3 text-gray-300">
-              <p>📧 Email: <a href="mailto:partnerships@coindaily.online" className="text-primary-400 hover:underline">partnerships@coindaily.online</a></p>
+              <p>📧 Email: <a href="mailto:partnerships@sygn.live" className="text-primary-400 hover:underline">partnerships@sygn.live</a></p>
               <p>🐦 Twitter: <a href="https://twitter.com/coindaily001" className="text-primary-400 hover:underline">@coindaily001</a></p>
               <p>💬 Telegram: <a href="https://t.me/coindailynewz" className="text-primary-400 hover:underline">t.me/coindailynewz</a></p>
-              <p>🌐 Website: <a href="https://coindaily.online" className="text-primary-400 hover:underline">coindaily.online</a></p>
+              <p>🌐 Website: <a href="https://sygn.live" className="text-primary-400 hover:underline">sygn.live</a></p>
               <p>💻 GitHub: <a href="https://github.com/seedline_foundation/coindaily" className="text-primary-400 hover:underline">seedline_foundation/coindaily</a></p>
             </div>
           </div>
@@ -683,7 +683,7 @@ const slides = [
               <LinkButton href="/whitepaper" label="📄 Technical Whitepaper" />
               <LinkButton href="/presale" label="🚀 Join Presale" />
               <LinkButton href="https://github.com/seedline_foundation/coindaily" label="💻 GitHub" external />
-              <LinkButton href="https://coindaily.online" label="🏠 Main Platform" external />
+              <LinkButton href="https://sygn.live" label="🏠 Main Platform" external />
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# Deploy Admin System - jet.coindaily.online
+# Deploy Admin System - jet.sygn.live
 # ⚠️ SECURED DEPLOYMENT - ADMIN ONLY
 # =============================================================================
 

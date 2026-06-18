@@ -116,7 +116,7 @@ export default async function ArticlePage({ params }: Props) {
       <div className="flex items-center gap-4 mt-10 pt-8 border-t border-dark-800">
         <span className="text-sm text-gray-500">Share:</span>
         <a
-          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(`https://coindaily.online/article/${article.slug}`)}`}
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(`https://sygn.live/article/${article.slug}`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="px-4 py-2 bg-dark-800 hover:bg-dark-700 text-gray-300 text-sm rounded-lg transition-colors"
@@ -124,7 +124,7 @@ export default async function ArticlePage({ params }: Props) {
           Twitter / X
         </a>
         <a
-          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://coindaily.online/article/${article.slug}`)}`}
+          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://sygn.live/article/${article.slug}`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="px-4 py-2 bg-dark-800 hover:bg-dark-700 text-gray-300 text-sm rounded-lg transition-colors"

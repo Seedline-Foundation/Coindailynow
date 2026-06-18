@@ -16,7 +16,7 @@ test.describe('Security & Compliance - E2E Tests', () => {
     test('should complete threat detection and blocking workflow', async () => {
       // Step 1: Login as Super Admin
       await page.goto('/login');
-      await page.fill('[name="email"]', 'superadmin@coindaily.com');
+      await page.fill('[name="email"]', 'superadmin@sygn.live');
       await page.fill('[name="password"]', 'SecureP@ss123');
       await page.click('button[type="submit"]');
       

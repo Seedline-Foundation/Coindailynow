@@ -254,7 +254,7 @@ export class ResearchAgent {
       }
 
       const freshSources: Source[] = freshArticles.slice(0, 8).map((a: any) => ({
-        url: a.url || a.link || `https://coindaily.online/news/${a.id || 'item'}`,
+        url: a.url || a.link || `https://sygn.live/news/${a.id || 'item'}`,
         title: a.title || 'Untitled',
         published_at: new Date(a.publishedAt || a.published_at || Date.now()),
         credibility_score: Math.min(99, 70 + (a.sourceCredibility || 0) * 30),
@@ -600,7 +600,7 @@ export class ResearchAgent {
   // =========================================================================
 
   private normalizeUrl(a: RawArticle): string {
-    return a.url || a.link || `https://coindaily.online/news/${a.id || 'item'}`;
+    return a.url || a.link || `https://sygn.live/news/${a.id || 'item'}`;
   }
 
   private extractDomain(a: RawArticle): string {
