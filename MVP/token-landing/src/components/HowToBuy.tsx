@@ -70,7 +70,7 @@ export default function HowToBuy() {
           </a>
           <p className="text-gray-400 mt-4">
             Need help? Visit{' '}
-            <a href="https://coindaily.online" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">
+            <a href="https://sygn.live" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">
               CoinDaily.online
             </a>{' '}
             for guides

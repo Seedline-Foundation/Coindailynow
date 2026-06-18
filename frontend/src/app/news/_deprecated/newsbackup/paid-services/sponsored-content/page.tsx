@@ -12,7 +12,7 @@ const contentPackages = [
     description: 'Get your announcement in front of Africa\'s crypto audience',
     turnaround: '24–48 hours',
     features: [
-      'Published on CoinDaily.africa',
+      'Published on sygn.live',
       '500–1,500 word article',
       'Indexed on Google News',
       'Shared to 45K newsletter subscribers',

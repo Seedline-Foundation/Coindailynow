@@ -69,5 +69,5 @@ ssh "${ServerUser}@${ServerHost}" $deployScript
 Remove-Item $archiveName -ErrorAction SilentlyContinue
 
 Write-Host "`n✅ Deployment complete!" -ForegroundColor Green
-Write-Host "🌐 Access at: https://ai.coindaily.online" -ForegroundColor Cyan
-Write-Host "🔍 Health check: https://ai.coindaily.online/api/health" -ForegroundColor Cyan
+Write-Host "🌐 Access at: https://ai.sygn.live" -ForegroundColor Cyan
+Write-Host "🔍 Health check: https://ai.sygn.live/api/health" -ForegroundColor Cyan

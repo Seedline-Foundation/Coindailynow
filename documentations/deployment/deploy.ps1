@@ -69,7 +69,7 @@ function Deploy-Nginx {
     scp "$LocalDir\infrastructure\nginx\*.conf" "${ServerUser}@${ServerIP}:/etc/nginx/sites-available/"
     
     # Enable sites
-    $sites = @("coindaily.online", "backend.coindaily.online", "jet.coindaily.online", "pr.coindaily.online", "ai.coindaily.online")
+    $sites = @("sygn.live", "backend.sygn.live", "jet.sygn.live", "pr.sygn.live", "ai.sygn.live")
     foreach ($site in $sites) {
         ssh ${ServerUser}@${ServerIP} "ln -sf /etc/nginx/sites-available/$site.conf /etc/nginx/sites-enabled/"
     }
@@ -132,9 +132,9 @@ switch ($Action.ToLower()) {
         Deploy-Backend
     }
     "frontend" {
-        Deploy-Frontend -Target "news" -Port "3000" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.coindaily.online"
-        Deploy-Frontend -Target "admin" -Port "3002" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.coindaily.online`nNEXT_PUBLIC_ADMIN_MODE=true"
-        Deploy-Frontend -Target "pr" -Port "3003" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.coindaily.online`nNEXT_PUBLIC_PR_MODE=true"
+        Deploy-Frontend -Target "news" -Port "3000" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.sygn.live"
+        Deploy-Frontend -Target "admin" -Port "3002" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.sygn.live`nNEXT_PUBLIC_ADMIN_MODE=true"
+        Deploy-Frontend -Target "pr" -Port "3003" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.sygn.live`nNEXT_PUBLIC_PR_MODE=true"
     }
     "nginx" {
         Deploy-Nginx
@@ -150,9 +150,9 @@ switch ($Action.ToLower()) {
     }
     "all" {
         Deploy-Backend
-        Deploy-Frontend -Target "news" -Port "3000" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.coindaily.online"
-        Deploy-Frontend -Target "admin" -Port "3002" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.coindaily.online`nNEXT_PUBLIC_ADMIN_MODE=true"
-        Deploy-Frontend -Target "pr" -Port "3003" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.coindaily.online`nNEXT_PUBLIC_PR_MODE=true"
+        Deploy-Frontend -Target "news" -Port "3000" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.sygn.live"
+        Deploy-Frontend -Target "admin" -Port "3002" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.sygn.live`nNEXT_PUBLIC_ADMIN_MODE=true"
+        Deploy-Frontend -Target "pr" -Port "3003" -EnvVars "NEXT_PUBLIC_API_URL=https://backend.sygn.live`nNEXT_PUBLIC_PR_MODE=true"
         Deploy-AI
         Deploy-Nginx
         Deploy-PM2
@@ -169,8 +169,8 @@ Write-Host "   Deployment Complete!" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "URLs:" -ForegroundColor Cyan
-Write-Host "  • https://coindaily.online          - News Platform" -ForegroundColor White
-Write-Host "  • https://backend.coindaily.online  - Backend API" -ForegroundColor White
-Write-Host "  • https://jet.coindaily.online      - Admin Portal (IP Restricted)" -ForegroundColor White
-Write-Host "  • https://pr.coindaily.online       - PR System" -ForegroundColor White
-Write-Host "  • https://ai.coindaily.online       - AI Services" -ForegroundColor White
+Write-Host "  • https://sygn.live          - News Platform" -ForegroundColor White
+Write-Host "  • https://backend.sygn.live  - Backend API" -ForegroundColor White
+Write-Host "  • https://jet.sygn.live      - Admin Portal (IP Restricted)" -ForegroundColor White
+Write-Host "  • https://pr.sygn.live       - PR System" -ForegroundColor White
+Write-Host "  • https://ai.sygn.live       - AI Services" -ForegroundColor White

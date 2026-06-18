@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
     const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
-    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://token.coindaily.online';
+    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://token.sygn.live';
 
     if (!RESEND_API_KEY || !AUDIENCE_ID) {
       console.error('Resend API key or Audience ID not configured');
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     });
 
     const emailResponse = await resend.emails.send({
-      from: 'Joy Token Team <noreply@coindaily.online>',
+      from: 'Joy Token Team <noreply@sygn.live>',
       to: email,
       subject: verificationEmail.subject,
       html: verificationEmail.html,

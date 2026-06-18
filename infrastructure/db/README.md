@@ -141,16 +141,16 @@ pm2 status
 
 curl -s http://127.0.0.1:4000/health
 curl -s "http://127.0.0.1:4000/api/v1/content?per_page=1" | head -c 500
-curl -I https://app.coindaily.online/health
+curl -I https://app.sygn.live/health
 ```
 
 Smoke-check the public sites:
 
 ```bash
-curl -I https://coindaily.online
-curl -I https://jet.coindaily.online
-curl -I https://press.coindaily.online
-curl -I https://ai.coindaily.online
+curl -I https://sygn.live
+curl -I https://jet.sygn.live
+curl -I https://press.sygn.live
+curl -I https://ai.sygn.live
 ```
 
 ## 10. Post-cutover hygiene

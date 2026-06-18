@@ -74,7 +74,7 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4 mb-4">
               <li>The Joy Token website at joytoken.io</li>
-              <li>The CoinDaily platform at coindaily.online</li>
+              <li>The CoinDaily platform at sygn.live</li>
               <li>Joy Token ($JY) utility tokens</li>
               <li>All associated services, tools, and features (collectively, the "Services")</li>
             </ul>
@@ -390,7 +390,7 @@ export default function TermsPage() {
           <Section title="11. Dispute Resolution and Arbitration">
             <h3 className="text-xl font-bold text-accent-400 mb-4">11.1 Informal Resolution</h3>
             <p className="text-gray-300 mb-4">
-              Before filing legal claims, you agree to contact us at legal@coindaily.online and attempt to resolve 
+              Before filing legal claims, you agree to contact us at legal@sygn.live and attempt to resolve 
               disputes informally for 60 days.
             </p>
 
@@ -465,9 +465,9 @@ export default function TermsPage() {
               <p className="text-gray-300 mb-4">
                 For questions, disputes, or legal inquiries:
               </p>
-              <p className="text-gray-300 mb-2"><strong className="text-white">Legal Department:</strong> legal@coindaily.online</p>
-              <p className="text-gray-300 mb-2"><strong className="text-white">Support:</strong> support@coindaily.online</p>
-              <p className="text-gray-300 mb-2"><strong className="text-white">Compliance:</strong> compliance@coindaily.online</p>
+              <p className="text-gray-300 mb-2"><strong className="text-white">Legal Department:</strong> legal@sygn.live</p>
+              <p className="text-gray-300 mb-2"><strong className="text-white">Support:</strong> support@sygn.live</p>
+              <p className="text-gray-300 mb-2"><strong className="text-white">Compliance:</strong> compliance@sygn.live</p>
               <p className="text-gray-300 mt-4"><strong className="text-white">Mailing Address:</strong></p>
               <p className="text-gray-400 ml-4">
                 Joy Token Foundation<br />

@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/affiliate/verify?token=${verificationToken}`;
     
     await resend.emails.send({
-      from: 'JOY Token Affiliate <noreply@coindaily.online>',
+      from: 'JOY Token Affiliate <noreply@sygn.live>',
       to: email,
       subject: 'Verify Your Affiliate Account',
       html: `

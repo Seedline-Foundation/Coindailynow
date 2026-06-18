@@ -170,7 +170,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL || 'https://backend.coindaily.online' }}
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL || 'https://backend.sygn.live' }}
 
   # ── Deploy to Production (Contabo VPS) ────────────────────────
   deploy:

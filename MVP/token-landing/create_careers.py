@@ -254,7 +254,7 @@ export default function CareersPage() {
 
                     <div className="flex gap-3">
                       <a
-                        href={`mailto:careers@coindaily.online?subject=Application: ${role.title}`}
+                        href={`mailto:careers@sygn.live?subject=Application: ${role.title}`}
                         className="flex-1 text-center bg-gradient-to-r from-primary-500 to-accent-500 text-white px-6 py-3 rounded-full font-bold hover:shadow-lg hover:shadow-primary-500/50 transition-all"
                       >
                         Apply Now →
@@ -283,8 +283,8 @@ export default function CareersPage() {
           <div className="max-w-3xl mx-auto text-gray-300 space-y-4">
             <p>
               Send your application to{' '}
-              <a href="mailto:careers@coindaily.online" className="text-primary-500 font-bold hover:underline">
-                careers@coindaily.online
+              <a href="mailto:careers@sygn.live" className="text-primary-500 font-bold hover:underline">
+                careers@sygn.live
               </a>
             </p>
             <p className="font-semibold">Include:</p>
@@ -374,7 +374,7 @@ export default function CareersPage() {
 
               <div className="flex gap-4">
                 <a
-                  href={`mailto:careers@coindaily.online?subject=Application: ${selectedRole.title}`}
+                  href={`mailto:careers@sygn.live?subject=Application: ${selectedRole.title}`}
                   className="flex-1 text-center bg-gradient-to-r from-primary-500 to-accent-500 text-white px-6 py-4 rounded-full font-bold hover:shadow-lg hover:shadow-primary-500/50 transition-all"
                 >
                   Apply Now →

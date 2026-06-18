@@ -19,14 +19,14 @@ echo "     Adding all subdomains to Let's Encrypt cert"
 
 # Stop nginx temporarily for standalone verification (or use --nginx plugin)
 sudo certbot certonly --nginx \
-  -d coindaily.online \
-  -d www.coindaily.online \
-  -d app.coindaily.online \
-  -d jet.coindaily.online \
-  -d ai.coindaily.online \
-  -d press.coindaily.online \
-  -d pr.coindaily.online \
-  -d backend.coindaily.online \
+  -d sygn.live \
+  -d www.sygn.live \
+  -d app.sygn.live \
+  -d jet.sygn.live \
+  -d ai.sygn.live \
+  -d press.sygn.live \
+  -d pr.sygn.live \
+  -d backend.sygn.live \
   --non-interactive --agree-tos --expand
 
 # Update nginx configs to point to the new cert
@@ -68,15 +68,15 @@ else
 fi
 
 # Test CORS
-echo "     Testing CORS for jet.coindaily.online..."
+echo "     Testing CORS for jet.sygn.live..."
 CORS_RESULT=$(curl -sI -X OPTIONS http://localhost:4000/graphql \
-    -H "Origin: https://jet.coindaily.online" \
+    -H "Origin: https://jet.sygn.live" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Content-Type,Authorization" 2>/dev/null \
     | grep "Access-Control-Allow-Origin")
 
-if echo "$CORS_RESULT" | grep -q "jet.coindaily.online"; then
-    echo "     [OK] CORS correctly allows jet.coindaily.online"
+if echo "$CORS_RESULT" | grep -q "jet.sygn.live"; then
+    echo "     [OK] CORS correctly allows jet.sygn.live"
 else
     echo "     [WARN] CORS still showing: $CORS_RESULT"
 fi
@@ -121,10 +121,10 @@ echo "  Final Verification"
 echo "============================================"
 
 declare -A CHECKS=(
-    ["coindaily.online"]="https://coindaily.online"
-    ["jet.coindaily.online"]="https://jet.coindaily.online"
-    ["ai.coindaily.online"]="https://ai.coindaily.online"
-    ["app.coindaily.online"]="https://app.coindaily.online/health"
+    ["sygn.live"]="https://sygn.live"
+    ["jet.sygn.live"]="https://jet.sygn.live"
+    ["ai.sygn.live"]="https://ai.sygn.live"
+    ["app.sygn.live"]="https://app.sygn.live/health"
 )
 
 for domain in "${!CHECKS[@]}"; do

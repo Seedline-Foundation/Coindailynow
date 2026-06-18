@@ -50,7 +50,7 @@ export default function AboutPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Contact</h2>
               <p className="text-gray-600 leading-relaxed">
-                Email: <a href="mailto:contact@coindaily.africa" className="text-blue-600 hover:underline">contact@coindaily.africa</a><br />
+                Email: <a href="mailto:contact@sygn.live" className="text-blue-600 hover:underline">contact@sygn.live</a><br />
                 Lagos, Nigeria | Cape Town, South Africa
               </p>
             </section>

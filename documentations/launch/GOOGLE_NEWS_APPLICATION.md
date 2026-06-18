@@ -4,7 +4,7 @@
 
 ## Prerequisites (all done)
 
-- [x] Live website at `coindaily.online`
+- [x] Live website at `sygn.live`
 - [x] Google News XML sitemap at `/api/sitemap/news` (last 2 days of articles)
 - [x] Article structured data (JSON-LD `NewsArticle` schema)
 - [x] Unique, original content (AI-generated but human-reviewed)
@@ -12,7 +12,7 @@
 - [x] Published date + updated date on all articles
 - [x] About page at `/about`
 - [x] Editorial Standards page at `/editorial-standards`
-- [x] Contact information (editorial@coindaily.online)
+- [x] Contact information (editorial@sygn.live)
 - [x] Privacy Policy at `/privacy`
 - [x] Terms of Service at `/terms`
 
@@ -21,7 +21,7 @@
 1. **Go to** https://publishercenter.google.com
 2. **Add publication:**
    - Publication name: `CoinDaily Africa`
-   - Website URL: `https://coindaily.online`
+   - Website URL: `https://sygn.live`
    - Language: English (primary)
    - Country: Nigeria (primary market)
 3. **Content settings:**
@@ -33,8 +33,8 @@
      - `/za/news/` (South Africa)
      - `/gh/news/` (Ghana)
 4. **Feed configuration:**
-   - RSS feed: `https://coindaily.online/api/rss` (if exists)
-   - News sitemap: `https://api.coindaily.online/api/sitemap/news`
+   - RSS feed: `https://sygn.live/api/rss` (if exists)
+   - News sitemap: `https://api.sygn.live/api/sitemap/news`
 5. **Visual branding:**
    - Upload logo (SVG or PNG, min 1000x1000)
    - Set brand colors: `#f97316` (orange)

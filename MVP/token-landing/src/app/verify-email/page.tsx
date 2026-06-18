@@ -92,8 +92,8 @@ function VerifyEmailContent() {
             <div className="mt-8 pt-6 border-t border-gray-700">
               <p className="text-gray-400 text-sm">
                 Questions? Email us at{' '}
-                <a href="mailto:support@coindaily.online" className="text-indigo-400 hover:text-indigo-300">
-                  support@coindaily.online
+                <a href="mailto:support@sygn.live" className="text-indigo-400 hover:text-indigo-300">
+                  support@sygn.live
                 </a>
               </p>
             </div>

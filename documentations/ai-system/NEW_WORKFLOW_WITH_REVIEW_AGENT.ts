@@ -239,7 +239,7 @@
  * │           ▼                                                             │
  * │  ┌──────────────────────────────────────────────────────────────┐      │
  * │  │ ImageOutcome {                                               │      │
- * │  │   url: "https://cdn.coindaily.com/..."                       │      │
+ * │  │   url: "https://cdn.sygn.live/..."                       │      │
  * │  │   alt_text: "Bitcoin chart with Nigerian flag..."           │      │
  * │  │   theme_match_score: 92/100                                  │      │
  * │  │   quality_score: 95/100                                      │      │

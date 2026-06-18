@@ -50,7 +50,30 @@ export async function proxyToBackend(
     const response = await fetch(url, fetchOptions);
     clearTimeout(timeoutId);
 
-    const data = await response.json();
+    const contentType = response.headers.get('content-type') || '';
+    let data;
+    if (contentType.includes('application/json')) {
+      try {
+        data = await response.json();
+      } catch (err) {
+        const text = await response.text();
+        console.error(`Failed to parse JSON response from backend: ${url} (status: ${response.status})`, text.substring(0, 1000));
+        throw err;
+      }
+    } else {
+      const text = await response.text();
+      console.error(`Received non-JSON response from backend: ${url} (status: ${response.status})`, text.substring(0, 1000));
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid response format',
+          message: `Expected JSON but received ${contentType}`,
+          status: response.status,
+          body: text.substring(0, 500)
+        },
+        { status: response.status }
+      );
+    }
 
     return NextResponse.json(data, {
       status: response.status,

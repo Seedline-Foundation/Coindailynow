@@ -979,7 +979,7 @@ export class AuthService {
         return { success: false, message: 'Admin accounts cannot self-delete. Contact a super-admin to demote the account first.' };
       }
 
-      const anonymizedEmail = `deleted-${crypto.randomBytes(8).toString('hex')}@deleted.coindaily.local`;
+      const anonymizedEmail = `deleted-${crypto.randomBytes(8).toString('hex')}@deleted.sygn.local`;
       const anonymizedUsername = `deleted-user-${crypto.randomBytes(6).toString('hex')}`;
       const deletionTimestamp = new Date();
 

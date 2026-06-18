@@ -36,7 +36,7 @@ const hasPostgresTestDb = /^postgres(ql)?:\/\//i.test(process.env.DATABASE_URL |
     const testUser = await prisma.user.create({
       data: {
         id: 'test-user-id',
-        email: 'test-api@coindaily.com',
+        email: 'test-api@sygn.live',
         username: 'testapi',
         passwordHash: 'hashed_password',
         role: UserRole.USER,
@@ -49,7 +49,7 @@ const hasPostgresTestDb = /^postgres(ql)?:\/\//i.test(process.env.DATABASE_URL |
     const adminUser = await prisma.user.create({
       data: {
         id: 'admin-user-id',
-        email: 'admin-api@coindaily.com',
+        email: 'admin-api@sygn.live',
         username: 'adminapi',
         passwordHash: 'hashed_password',
         role: UserRole.ADMIN,
@@ -64,7 +64,7 @@ const hasPostgresTestDb = /^postgres(ql)?:\/\//i.test(process.env.DATABASE_URL |
 
   afterAll(async () => {
     await prisma.user.deleteMany({
-      where: { email: { in: ['test-api@coindaily.com', 'admin-api@coindaily.com'] } },
+      where: { email: { in: ['test-api@sygn.live', 'admin-api@sygn.live'] } },
     });
     await prisma.$disconnect();
   });

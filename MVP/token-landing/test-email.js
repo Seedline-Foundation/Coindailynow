@@ -14,7 +14,7 @@ async function testEmail() {
   console.log('- API Key:', process.env.RESEND_API_KEY?.substring(0, 10) + '...');
   console.log('- Audience ID:', process.env.RESEND_AUDIENCE_ID);
   console.log('- Whitelist Form:', process.env.NEXT_PUBLIC_WHITELIST_FORM_URL);
-  console.log('- Site URL:', process.env.NEXT_PUBLIC_SITE_URL || 'https://token.coindaily.online');
+  console.log('- Site URL:', process.env.NEXT_PUBLIC_SITE_URL || 'https://token.sygn.live');
   console.log('\n---\n');
 
   const testEmail = 'test@example.com'; // Replace with your actual email for testing
@@ -42,7 +42,7 @@ async function testEmail() {
     // Step 2: Send welcome email
     console.log('\nStep 2: Sending welcome email...');
     const emailResponse = await resend.emails.send({
-      from: 'Joy Token Team <noreply@coindaily.online>',
+      from: 'Joy Token Team <noreply@sygn.live>',
       to: testEmail,
       subject: '🎉 Welcome to Joy Token - Complete Your Whitelist Application',
       html: `

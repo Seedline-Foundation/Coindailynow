@@ -302,7 +302,7 @@ export async function setupApp() {
     crossOriginEmbedderPolicy: false,
   }));
 
-  // Dynamic CORS — allow all CoinDaily subdomains and dev origins
+  // Dynamic CORS — allow all sygn.live subdomains and dev origins
   const ALLOWED_ORIGINS = [
     // Production domains
     'https://sygn.live',
@@ -336,8 +336,8 @@ export async function setupApp() {
       if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
       // Also allow any *.sygn.live subdomain (HTTPS only in production)
       const subdomainRegex = process.env.NODE_ENV === 'production'
-        ? /^https:\/\/([a-z0-9-]+\.)?coindaily\.online$/
-        : /^https?:\/\/([a-z0-9-]+\.)?coindaily\.online$/;
+        ? /^https:\/\/([a-z0-9-]+\.)?sygn\.live$/
+        : /^https?:\/\/([a-z0-9-]+\.)?sygn\.live$/;
       if (subdomainRegex.test(origin)) return callback(null, true);
       logger.warn(`CORS blocked origin: ${origin}`);
       callback(new Error(`Origin ${origin} not allowed by CORS`));

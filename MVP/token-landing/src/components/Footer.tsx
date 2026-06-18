@@ -21,7 +21,7 @@ export default function Footer() {
     resources: [
       { name: 'About Us', href: '/about' },
       { name: 'How to Buy', href: '/#how-to-buy' },
-      { name: 'CoinDaily Platform', href: 'https://coindaily.online' },
+      { name: 'CoinDaily Platform', href: 'https://sygn.live' },
       { name: 'FAQs', href: '/faq' },
       { name: 'Contact', href: '/contact' },
     ],

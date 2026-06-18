@@ -294,7 +294,7 @@ volumes:
     driver: local
 
   # ============================================================================
-  # AI DASHBOARD - Next.js Web Interface (ai.coindaily.online)
+  # AI DASHBOARD - Next.js Web Interface (ai.sygn.live)
   # ============================================================================
   ai-dashboard:
     build:

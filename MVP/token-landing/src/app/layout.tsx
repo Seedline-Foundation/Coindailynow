@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Joy Token ($JY) - Don\'t Miss the Presale',
     description: 'Limited supply. Real utility. Up to 70% staking APR. Join Africa\'s crypto revolution.',
-    url: 'https://token.coindaily.online',
+    url: 'https://token.sygn.live',
     siteName: 'Joy Token',
     images: [
       {

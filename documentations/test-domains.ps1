@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 # =============================================================================
 # CoinDaily Platform - Domain Connectivity Test Suite
-# Tests: coindaily.online, jet.coindaily.online, ai.coindaily.online, app.coindaily.online
+# Tests: sygn.live, jet.sygn.live, ai.sygn.live, app.sygn.live
 # Compatible with PowerShell 5.1+
 # =============================================================================
 
@@ -38,7 +38,7 @@ function Test-Result($name, $status, $detail) {
 # 1. DNS Resolution
 # =============================================================================
 Write-Host "1. DNS Resolution" -ForegroundColor White
-$domains = @("coindaily.online", "jet.coindaily.online", "ai.coindaily.online", "app.coindaily.online")
+$domains = @("sygn.live", "jet.sygn.live", "ai.sygn.live", "app.sygn.live")
 $expectedIP = "167.86.99.97"
 
 foreach ($domain in $domains) {
@@ -76,7 +76,7 @@ foreach ($domain in $domains) {
         $covers = $false
         if ($subject -match "CN=$([regex]::Escape($domain))") { $covers = $true }
         if ($sanList -match [regex]::Escape($domain)) { $covers = $true }
-        if ($sanList -match "\*\.coindaily\.online") { $covers = $true }
+        if ($sanList -match "\*\.sygn\.live") { $covers = $true }
         
         if ($covers -and $expiry -gt (Get-Date)) {
             Test-Result "SSL: $domain" "PASS" "Valid until $($expiry.ToString('yyyy-MM-dd'))"
@@ -99,12 +99,12 @@ foreach ($domain in $domains) {
 Write-Host "`n3. HTTP/HTTPS Connectivity" -ForegroundColor White
 
 $endpoints = @(
-    @{Name="coindaily.online HTTPS"; URL="https://coindaily.online"; Expect="200"},
-    @{Name="jet.coindaily.online HTTPS"; URL="https://jet.coindaily.online"; Expect="200"},
-    @{Name="ai.coindaily.online HTTPS (-k)"; URL="https://ai.coindaily.online"; Expect="200"},
-    @{Name="ai.coindaily.online HTTP"; URL="http://ai.coindaily.online"; Expect="200"},
-    @{Name="app.coindaily.online /health HTTPS (-k)"; URL="https://app.coindaily.online/health"; Expect="200"},
-    @{Name="app.coindaily.online /health HTTP"; URL="http://app.coindaily.online/health"; Expect="200"}
+    @{Name="sygn.live HTTPS"; URL="https://sygn.live"; Expect="200"},
+    @{Name="jet.sygn.live HTTPS"; URL="https://jet.sygn.live"; Expect="200"},
+    @{Name="ai.sygn.live HTTPS (-k)"; URL="https://ai.sygn.live"; Expect="200"},
+    @{Name="ai.sygn.live HTTP"; URL="http://ai.sygn.live"; Expect="200"},
+    @{Name="app.sygn.live /health HTTPS (-k)"; URL="https://app.sygn.live/health"; Expect="200"},
+    @{Name="app.sygn.live /health HTTP"; URL="http://app.sygn.live/health"; Expect="200"}
 )
 
 foreach ($ep in $endpoints) {
@@ -131,10 +131,10 @@ foreach ($ep in $endpoints) {
 # =============================================================================
 # 4. Backend API Health & Features
 # =============================================================================
-Write-Host "`n4. Backend API (app.coindaily.online)" -ForegroundColor White
+Write-Host "`n4. Backend API (app.sygn.live)" -ForegroundColor White
 
 try {
-    $healthRaw = (curl.exe -sS --max-time 10 "http://app.coindaily.online/health" 2>&1) -join ""
+    $healthRaw = (curl.exe -sS --max-time 10 "http://app.sygn.live/health" 2>&1) -join ""
     $health = $healthRaw | ConvertFrom-Json
     
     if ($health.status -eq "healthy") {
@@ -154,7 +154,7 @@ try {
 
 # GraphQL endpoint
 try {
-    $gqlRaw = (curl.exe -sS --max-time 10 "http://app.coindaily.online/graphql" -H "Content-Type: application/json" -d '{\"query\":\"{ __typename }\"}' 2>&1) -join ""
+    $gqlRaw = (curl.exe -sS --max-time 10 "http://app.sygn.live/graphql" -H "Content-Type: application/json" -d '{\"query\":\"{ __typename }\"}' 2>&1) -join ""
     if ($gqlRaw -match "AUTHENTICATION_REQUIRED") {
         Test-Result "GraphQL Endpoint" "PASS" "Active (auth required)"
     } elseif ($gqlRaw -match "__typename") {
@@ -172,15 +172,15 @@ try {
 Write-Host "`n5. CORS: Subdomain -> Backend API" -ForegroundColor White
 
 $corsOrigins = @(
-    @{Name="coindaily.online"; Origin="https://coindaily.online"},
-    @{Name="jet.coindaily.online"; Origin="https://jet.coindaily.online"},
-    @{Name="ai.coindaily.online"; Origin="https://ai.coindaily.online"},
-    @{Name="press.coindaily.online"; Origin="https://press.coindaily.online"}
+    @{Name="sygn.live"; Origin="https://sygn.live"},
+    @{Name="jet.sygn.live"; Origin="https://jet.sygn.live"},
+    @{Name="ai.sygn.live"; Origin="https://ai.sygn.live"},
+    @{Name="press.sygn.live"; Origin="https://press.sygn.live"}
 )
 
 foreach ($cors in $corsOrigins) {
     try {
-        $corsHeaders = curl.exe -sI --max-time 10 -X OPTIONS "http://app.coindaily.online/graphql" `
+        $corsHeaders = curl.exe -sI --max-time 10 -X OPTIONS "http://app.sygn.live/graphql" `
             -H "Origin: $($cors.Origin)" `
             -H "Access-Control-Request-Method: POST" `
             -H "Access-Control-Request-Headers: Content-Type,Authorization" 2>&1
@@ -206,25 +206,25 @@ foreach ($cors in $corsOrigins) {
 # =============================================================================
 Write-Host "`n6. Frontend Pages" -ForegroundColor White
 
-# coindaily.online
+# sygn.live
 try {
-    $page = (curl.exe -ksSL --max-time 15 "https://coindaily.online" 2>&1) -join ""
+    $page = (curl.exe -ksSL --max-time 15 "https://sygn.live" 2>&1) -join ""
     if ($page -match "CoinDaily") { Test-Result "News Site: Branding" "PASS" "" }
     else { Test-Result "News Site: Branding" "WARN" "CoinDaily not in HTML" }
     if ($page -match "_next") { Test-Result "News Site: Next.js" "PASS" "" }
     else { Test-Result "News Site: Next.js" "FAIL" "Missing Next.js assets" }
 } catch { Test-Result "News Site" "FAIL" "Could not load" }
 
-# jet.coindaily.online
+# jet.sygn.live
 try {
-    $page = (curl.exe -ksSL --max-time 15 "https://jet.coindaily.online" 2>&1) -join ""
+    $page = (curl.exe -ksSL --max-time 15 "https://jet.sygn.live" 2>&1) -join ""
     if ($page -match "_next|CoinDaily|admin") { Test-Result "Admin (jet): Loaded" "PASS" "" }
     else { Test-Result "Admin (jet)" "WARN" "Expected content missing" }
 } catch { Test-Result "Admin (jet)" "FAIL" "Could not load" }
 
-# ai.coindaily.online
+# ai.sygn.live
 try {
-    $page = (curl.exe -ksSL --max-time 15 "https://ai.coindaily.online" 2>&1) -join ""
+    $page = (curl.exe -ksSL --max-time 15 "https://ai.sygn.live" 2>&1) -join ""
     if ($page -match "_next|AI|CoinDaily|dashboard") { 
         Test-Result "AI Dashboard: Loaded" "PASS" "" 
     } elseif ($page -match "404|not found|Error|Cannot GET") {
@@ -240,9 +240,9 @@ try {
 Write-Host "`n7. Response Times (target <500ms API, <2s pages)" -ForegroundColor White
 
 $perfUrls = @(
-    @{Name="coindaily.online"; URL="https://coindaily.online"; Target=2000},
-    @{Name="jet.coindaily.online"; URL="https://jet.coindaily.online"; Target=2000},
-    @{Name="app.coindaily.online /health"; URL="http://app.coindaily.online/health"; Target=500}
+    @{Name="sygn.live"; URL="https://sygn.live"; Target=2000},
+    @{Name="jet.sygn.live"; URL="https://jet.sygn.live"; Target=2000},
+    @{Name="app.sygn.live /health"; URL="http://app.sygn.live/health"; Target=500}
 )
 
 foreach ($p in $perfUrls) {
@@ -287,20 +287,20 @@ if ($failed -gt 0 -or $warnings -gt 0) {
     
     if ($sslFailed) {
         Write-Host "`n[1] FIX SSL CERTIFICATES" -ForegroundColor Red
-        Write-Host "    Current cert covers: coindaily.online + www.coindaily.online ONLY" -ForegroundColor White
-        Write-Host "    Missing: app.coindaily.online, ai.coindaily.online" -ForegroundColor White
+        Write-Host "    Current cert covers: sygn.live + www.sygn.live ONLY" -ForegroundColor White
+        Write-Host "    Missing: app.sygn.live, ai.sygn.live" -ForegroundColor White
         Write-Host "    SSH into 167.86.99.97 and run:" -ForegroundColor Gray
         Write-Host '    sudo certbot certonly --nginx \' -ForegroundColor Gray
-        Write-Host '      -d coindaily.online -d www.coindaily.online \' -ForegroundColor Gray
-        Write-Host '      -d app.coindaily.online -d jet.coindaily.online \' -ForegroundColor Gray
-        Write-Host '      -d ai.coindaily.online -d press.coindaily.online \' -ForegroundColor Gray
-        Write-Host '      -d pr.coindaily.online -d backend.coindaily.online' -ForegroundColor Gray
+        Write-Host '      -d sygn.live -d www.sygn.live \' -ForegroundColor Gray
+        Write-Host '      -d app.sygn.live -d jet.sygn.live \' -ForegroundColor Gray
+        Write-Host '      -d ai.sygn.live -d press.sygn.live \' -ForegroundColor Gray
+        Write-Host '      -d pr.sygn.live -d backend.sygn.live' -ForegroundColor Gray
         Write-Host '    sudo nginx -t && sudo systemctl reload nginx' -ForegroundColor Gray
         Write-Host ""
         Write-Host '    OR use Cloudflare wildcard cert:' -ForegroundColor Gray
         Write-Host '    sudo certbot certonly --dns-cloudflare \' -ForegroundColor Gray
         Write-Host '      --dns-cloudflare-credentials /etc/cloudflare.ini \' -ForegroundColor Gray
-        Write-Host '      -d "*.coindaily.online" -d coindaily.online' -ForegroundColor Gray
+        Write-Host '      -d "*.sygn.live" -d sygn.live' -ForegroundColor Gray
     }
     
     if ($corsFailed) {
@@ -316,7 +316,7 @@ if ($failed -gt 0 -or $warnings -gt 0) {
     
     if ($aiFailed) {
         Write-Host "`n[3] FIX AI DASHBOARD" -ForegroundColor Yellow
-        Write-Host "    ai.coindaily.online is not serving content properly." -ForegroundColor White
+        Write-Host "    ai.sygn.live is not serving content properly." -ForegroundColor White
         Write-Host "    Check if the app is running:" -ForegroundColor Gray
         Write-Host "    pm2 status coindaily-ai" -ForegroundColor Gray
         Write-Host "    pm2 logs coindaily-ai --lines 50" -ForegroundColor Gray

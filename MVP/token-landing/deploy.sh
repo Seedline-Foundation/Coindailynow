@@ -1,13 +1,13 @@
 #!/bin/bash
-# Deployment script for token.coindaily.online on Contabo
+# Deployment script for token.sygn.live on Contabo
 # Run this script ON THE CONTABO SERVER after uploading files
 
 set -e
 
-echo "🚀 Starting deployment for token.coindaily.online..."
+echo "🚀 Starting deployment for token.sygn.live..."
 
 # Variables
-DOMAIN="token.coindaily.online"
+DOMAIN="token.sygn.live"
 APP_DIR="/var/www/token-landing"
 NODE_VERSION="18"
 
@@ -46,8 +46,8 @@ echo "🔐 Setting up environment variables..."
 if [ ! -f "$APP_DIR/.env.local" ]; then
     cat > $APP_DIR/.env.local << 'EOF'
 # Site Configuration
-NEXT_PUBLIC_SITE_URL=https://token.coindaily.online
-NEXT_PUBLIC_MAIN_SITE_URL=https://coindaily.online
+NEXT_PUBLIC_SITE_URL=https://token.sygn.live
+NEXT_PUBLIC_MAIN_SITE_URL=https://sygn.live
 
 # Resend API Configuration
 RESEND_API_KEY=re_9ZZbMhkr_4Dy4dW6mbXY3tbvr29ZTuLas
@@ -89,7 +89,7 @@ sudo tee /etc/nginx/sites-available/$DOMAIN > /dev/null << 'EOF'
 server {
     listen 80;
     listen [::]:80;
-    server_name token.coindaily.online;
+    server_name token.sygn.live;
 
     location / {
         proxy_pass http://localhost:3001;

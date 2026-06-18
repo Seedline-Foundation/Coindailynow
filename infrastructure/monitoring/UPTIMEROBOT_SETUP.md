@@ -9,11 +9,11 @@ Free tier: 50 monitors, 5-minute intervals.
 
 | Monitor Name | URL | Type | Interval |
 |---|---|---|---|
-| CoinDaily Frontend | `https://coindaily.online` | HTTP(s) | 5 min |
-| CoinDaily API Health | `https://api.coindaily.online/health` | HTTP(s) - keyword "healthy" | 5 min |
-| CoinDaily Admin | `https://jet.coindaily.online` | HTTP(s) | 5 min |
-| CoinDaily Press | `https://press.coindaily.online` | HTTP(s) | 5 min |
-| CoinDaily AI | `https://ai.coindaily.online` | HTTP(s) | 5 min |
+| CoinDaily Frontend | `https://sygn.live` | HTTP(s) | 5 min |
+| CoinDaily API Health | `https://api.sygn.live/health` | HTTP(s) - keyword "healthy" | 5 min |
+| CoinDaily Admin | `https://jet.sygn.live` | HTTP(s) | 5 min |
+| CoinDaily Press | `https://press.sygn.live` | HTTP(s) | 5 min |
+| CoinDaily AI | `https://ai.sygn.live` | HTTP(s) | 5 min |
 
 3. Configure alerts:
    - **Email**: your founder email
@@ -22,7 +22,7 @@ Free tier: 50 monitors, 5-minute intervals.
 
 4. Create a status page:
    - Dashboard → My Settings → Status Pages → Create
-   - Custom domain: `status.coindaily.online`
+   - Custom domain: `status.sygn.live`
    - Select all 5 monitors
    - Set brand colors: `#f97316` (orange)
 

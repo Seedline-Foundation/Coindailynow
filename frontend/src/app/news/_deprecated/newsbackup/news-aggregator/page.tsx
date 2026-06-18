@@ -147,7 +147,7 @@ export default function RSSAggregatorPage() {
               <h3 className="font-bold text-gray-900 dark:text-white text-xl mb-4">📦 Embed Widget</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Add the African crypto news feed to your website with a simple embed code:</p>
               <code className="block bg-gray-100 dark:bg-gray-900 p-4 rounded-lg text-xs text-gray-800 dark:text-gray-300 break-all">
-                {`<iframe src="https://coindaily.online/embed/news-feed?category=all&country=all" width="100%" height="600" frameborder="0"></iframe>`}
+                {`<iframe src="https://sygn.live/embed/news-feed?category=all&country=all" width="100%" height="600" frameborder="0"></iframe>`}
               </code>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">

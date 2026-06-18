@@ -177,7 +177,7 @@ Proprietary - All rights reserved by Seedline Foundation
 
 ## 📞 Contact
 
-For inquiries: support@coindaily.online
+For inquiries: support@sygn.live
 
 ---
 

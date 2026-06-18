@@ -11,7 +11,7 @@
 ┌──────────────────────────────────────────────────────────────────┐
 │ 🔐 LOGIN CREDENTIALS                                             │
 ├──────────────────────────────────────────────────────────────────┤
-│ Email:    admin@coindaily.africa                                 │
+│ Email:    admin@sygn.live                                 │
 │ Password: Admin@2024      ← Primary                              │
 │       OR: Admin@2024!     ← Also works                           │
 │                                                                  │
@@ -72,7 +72,7 @@
 │     method: 'POST',                                              │
 │     headers: { 'Content-Type': 'application/json' },             │
 │     body: JSON.stringify({                                       │
-│       email: 'admin@coindaily.africa',                           │
+│       email: 'admin@sygn.live',                           │
 │       password: 'Admin@2024'                                     │
 │     })                                                           │
 │   }).then(r => r.json()).then(console.log)                       │

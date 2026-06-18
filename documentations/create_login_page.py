@@ -37,7 +37,7 @@ export default function SuperAdminLoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 border rounded-lg"
-              placeholder="admin@coindaily.africa"
+              placeholder="admin@sygn.live"
               required
             />
           </div>
@@ -60,7 +60,7 @@ export default function SuperAdminLoginPage() {
           </button>
         </form>
         <p className="text-center text-sm text-gray-600 mt-4">
-          Demo: admin@coindaily.africa / Admin@2024
+          Demo: admin@sygn.live / Admin@2024
         </p>
       </div>
     </div>
