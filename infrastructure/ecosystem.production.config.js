@@ -45,9 +45,9 @@ module.exports = {
     // ============================================
     {
       name: 'coindaily-news',
-      cwd: '/var/www/coindaily',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3000',
+      cwd: '/var/www/coindaily-news',
+      script: 'npm',
+      args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
@@ -75,8 +75,8 @@ module.exports = {
     {
       name: 'coindaily-admin',
       cwd: '/var/www/coindaily-admin',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3002',
+      script: 'npm',
+      args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
@@ -105,8 +105,8 @@ module.exports = {
     {
       name: 'coindaily-press',
       cwd: '/var/www/coindaily-press',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3003',
+      script: 'npm',
+      args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
@@ -134,8 +134,8 @@ module.exports = {
     {
       name: 'coindaily-ai',
       cwd: '/var/www/coindaily-ai',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3004',
+      script: 'npm',
+      args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
