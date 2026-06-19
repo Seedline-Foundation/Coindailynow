@@ -7,7 +7,7 @@
  * - Admin Portal (jet.sygn.live) - Port 3002
  * - PR System (press.sygn.live) - Port 3003
  * - AI Dashboard (ai.sygn.live) - Port 3004
- * - CFIS (cabfi.xyz, finance-system) - Port 3005
+ * - CFIS (cabfi.xyz, finance-system) - Port 3007 (3005 held by section8)
  * - Token Landing (token.sygn.live) - Port 3006
  */
 
@@ -194,6 +194,7 @@ module.exports = {
     // CFIS (Finance System) - cabfi.xyz
     // Hosted on cabfi.xyz, communicates with backend.sygn.live via HMAC.
     // Deploy target: /var/www/coindaily-cfis (build output of finance-system/).
+    // Port 3007 (was 3005 — section8 is holding 3005 since June 2026).
     // ============================================
     {
       name: 'coindaily-cfis',
@@ -203,7 +204,7 @@ module.exports = {
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3005,
+        PORT: 3007,
         BACKEND_API_URL: 'https://backend.sygn.live',
         CFIS_PUBLIC_HOST: 'cabfi.xyz',
         CFIS_CORS_ORIGINS: 'https://cabfi.xyz,https://jet.sygn.live,https://app.sygn.live,https://press.sygn.live'

@@ -7,7 +7,7 @@
  * - jet.sygn.live (Admin) - Port 3002
  * - press.sygn.live (PR) - Port 3003
  * - ai.sygn.live (AI) - Port 3004
- * - cabfi.xyz (CFIS / finance-system) - Port 3005
+ * - cabfi.xyz (CFIS / finance-system) - Port 3007
  * - app.sygn.live (Backend) - Port 4000
  * - token.sygn.live (MVP / token landing) - Port 3006 (deployed separately)
  */
@@ -235,7 +235,7 @@ module.exports = {
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3005,
+        PORT: 3007,
         // CFIS receives signed webhooks from press.sygn.live and posts receipts back
         // to the news backend on sygn.live.
         BACKEND_API_URL: 'https://backend.sygn.live',
