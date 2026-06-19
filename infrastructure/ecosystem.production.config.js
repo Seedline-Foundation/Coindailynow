@@ -7,8 +7,8 @@
  * - Admin Portal (jet.sygn.live) - Port 3002
  * - PR System (press.sygn.live) - Port 3003
  * - AI Dashboard (ai.sygn.live) - Port 3004
- * - CFIS (cabfi.xyz, finance-system) - Port 3005
- * - Token Landing (token.sygn.live) - Port 3006
+ * - CFIS (cabfi.xyz, finance-system) - Port 3007 (3005 held by section8)
+ * - Token Landing (token.sygn.live) - Port 3001 (from joy-token-landing package.json)
  */
 
 module.exports = {
@@ -45,9 +45,9 @@ module.exports = {
     // ============================================
     {
       name: 'coindaily-news',
-      cwd: '/var/www/coindaily',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3000',
+      cwd: '/var/www/coindaily-news',
+      script: 'npm',
+      args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
@@ -75,8 +75,8 @@ module.exports = {
     {
       name: 'coindaily-admin',
       cwd: '/var/www/coindaily-admin',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3002',
+      script: 'npm',
+      args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
@@ -105,8 +105,8 @@ module.exports = {
     {
       name: 'coindaily-press',
       cwd: '/var/www/coindaily-press',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3003',
+      script: 'npm',
+      args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
@@ -134,8 +134,8 @@ module.exports = {
     {
       name: 'coindaily-ai',
       cwd: '/var/www/coindaily-ai',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3004',
+      script: 'npm',
+      args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
@@ -194,6 +194,7 @@ module.exports = {
     // CFIS (Finance System) - cabfi.xyz
     // Hosted on cabfi.xyz, communicates with backend.sygn.live via HMAC.
     // Deploy target: /var/www/coindaily-cfis (build output of finance-system/).
+    // Port 3007 (was 3005 — section8 is holding 3005 since June 2026).
     // ============================================
     {
       name: 'coindaily-cfis',
@@ -203,7 +204,7 @@ module.exports = {
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3005,
+        PORT: 3007,
         BACKEND_API_URL: 'https://backend.sygn.live',
         CFIS_PUBLIC_HOST: 'cabfi.xyz',
         CFIS_CORS_ORIGINS: 'https://cabfi.xyz,https://jet.sygn.live,https://app.sygn.live,https://press.sygn.live'
@@ -227,14 +228,14 @@ module.exports = {
     // ============================================
     {
       name: 'coindaily-token',
-      cwd: '/var/www/coindaily-token',
+      cwd: '/var/www/token-landing',
       script: 'npm',
       args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3006
+        PORT: 3001
       },
       error_file: '/var/log/coindaily/token-error.log',
       out_file: '/var/log/coindaily/token-out.log',
