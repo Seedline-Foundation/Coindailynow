@@ -8,7 +8,7 @@
  * - PR System (press.sygn.live) - Port 3003
  * - AI Dashboard (ai.sygn.live) - Port 3004
  * - CFIS (cabfi.xyz, finance-system) - Port 3007 (3005 held by section8)
- * - Token Landing (token.sygn.live) - Port 3006
+ * - Token Landing (token.sygn.live) - Port 3001 (from joy-token-landing package.json)
  */
 
 module.exports = {
@@ -228,14 +228,14 @@ module.exports = {
     // ============================================
     {
       name: 'coindaily-token',
-      cwd: '/var/www/coindaily-token',
+      cwd: '/var/www/token-landing',
       script: 'npm',
       args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3006
+        PORT: 3001
       },
       error_file: '/var/log/coindaily/token-error.log',
       out_file: '/var/log/coindaily/token-out.log',

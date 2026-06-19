@@ -9,7 +9,7 @@
  * - ai.sygn.live (AI) - Port 3004
  * - cabfi.xyz (CFIS / finance-system) - Port 3007
  * - app.sygn.live (Backend) - Port 4000
- * - token.sygn.live (MVP / token landing) - Port 3006 (deployed separately)
+ * - token.sygn.live (MVP / token landing) - Port 3001 (cwd: /var/www/token-landing, deployed separately)
  */
 
 module.exports = {
