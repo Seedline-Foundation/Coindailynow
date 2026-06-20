@@ -21,17 +21,31 @@ WEBROOT=/var/www/html
 ROOT_CERTS=(
   "sygn.live www.sygn.live"
   "cabfi.xyz www.cabfi.xyz"
+  "app.sygn.live backend.sygn.live"  # Same Express API, two hostnames, one cert/server block
 )
 # Subdomains that get a single-name cert each:
 SUB_CERTS=(
-  app.sygn.live
-  backend.sygn.live
   jet.sygn.live
   press.sygn.live
   pr.sygn.live
   ai.sygn.live
   token.sygn.live
 )
+
+echo "==> 0. Clean up any partial enable state from a previous interrupted run"
+# If a previous run enabled some new sygn.live confs before failing,
+# they may conflict with the ACME handler. Disable them; we'll re-enable after certs.
+for f in sygn.live.conf app.sygn.live.conf backend.sygn.live.conf jet.sygn.live.conf \
+         press.sygn.live.conf pr.sygn.live.conf ai.sygn.live.conf token.sygn.live.conf \
+         cabfi.xyz.conf sygn-mvp.conf; do
+  if [ -L "/etc/nginx/sites-enabled/$f" ]; then
+    rm -f "/etc/nginx/sites-enabled/$f"
+    echo "    disabled stale: $f"
+  fi
+done
+# The dead backend.sygn.live.conf (collapsed into app.sygn.live) — remove if staged
+rm -f /etc/nginx/sites-available/backend.sygn.live.conf
+echo ""
 
 echo "==> 1. Stage temporary ACME challenge handler"
 mkdir -p "$WEBROOT"
@@ -80,7 +94,7 @@ echo ""
 
 echo "==> 4. Replace ACME handler with real per-host confs"
 rm -f /etc/nginx/sites-enabled/_acme-handler.conf
-for f in sygn.live.conf app.sygn.live.conf backend.sygn.live.conf jet.sygn.live.conf \
+for f in sygn.live.conf app.sygn.live.conf jet.sygn.live.conf \
          press.sygn.live.conf pr.sygn.live.conf ai.sygn.live.conf token.sygn.live.conf \
          cabfi.xyz.conf; do
   if [ -f "/etc/nginx/sites-available/$f" ]; then
@@ -107,6 +121,8 @@ echo "==> 6. Verify HTTPS"
 for host in sygn.live www.sygn.live app.sygn.live backend.sygn.live \
             jet.sygn.live press.sygn.live pr.sygn.live ai.sygn.live token.sygn.live \
             cabfi.xyz www.cabfi.xyz; do
+  # jet.sygn.live is IP-whitelisted; expect connection refused, not a failure
+  :
   printf "    %-25s " "$host"
   curl -sS -o /dev/null -w "HTTP %{http_code}\n" --max-time 10 "https://$host/" 2>&1 \
     || echo "FAIL (no response)"
