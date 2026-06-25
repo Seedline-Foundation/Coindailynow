@@ -1253,7 +1253,7 @@ async function calculateCostByAgent(): Promise<CostBreakdown['byAgent']> {
   let totalSystemCost = 0;
 
   for (const agent of agents) {
-    const tasks = agent.AITask || [];
+    const tasks = (agent as any).AITask || [];
     const totalCost = tasks.reduce((sum, t) => sum + (t.actualCost || 0), 0);
     const tasksCompleted = tasks.filter(t => t.status === 'COMPLETED').length;
     const averageCostPerTask = tasksCompleted > 0 ? totalCost / tasksCompleted : 0;
