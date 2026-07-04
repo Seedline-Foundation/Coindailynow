@@ -1,5 +1,5 @@
 # LM Studio Integration Test Script
-# Tests all LM Studio API endpoints for CoinDaily
+# Tests all LM Studio API endpoints for Sygn
 
 Write-Host "=================================================" -ForegroundColor Cyan
 Write-Host "LM Studio Integration Test" -ForegroundColor Cyan
@@ -97,7 +97,7 @@ $articleRequest = @{
         @{
             role = "user"
             content = @"
-Rewrite this crypto article for CoinDaily Africa.
+Rewrite this crypto article for Sygn Africa.
 
 Original Title: Bitcoin Price Surges Past $50K
 Original Content: Bitcoin reached a new milestone today as its price surpassed $50,000 for the first time in months. The surge comes amid growing institutional adoption and positive market sentiment.

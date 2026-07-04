@@ -207,7 +207,7 @@ function StaffLoginContent() {
             Staff Login
           </h1>
           <p className="text-dark-400 text-sm">
-            CoinDaily Administration Portal
+            Sygn Administration Portal
           </p>
         </div>
 

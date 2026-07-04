@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===============================================================================
-# CoinDaily Quick Fix Script
+# Sygn Quick Fix Script
 # Use this if the main setup fails or for quick repairs
 #===============================================================================
 
@@ -33,7 +33,7 @@ fix_nginx() {
 
 fix_services() {
     log_info "Restarting all services..."
-    cd /opt/coindaily
+    cd /opt/sygn
     docker compose down
     docker compose up -d
 }
@@ -47,29 +47,29 @@ fix_memory() {
 
 fix_ollama_llama() {
     log_info "Restarting Llama service..."
-    docker restart coindaily-ai-llama
+    docker restart sygn-ai-llama
     sleep 10
     curl -s http://localhost:11434/api/tags | jq
 }
 
 fix_ollama_deepseek() {
     log_info "Restarting DeepSeek service..."
-    docker restart coindaily-ai-deepseek
+    docker restart sygn-ai-deepseek
     sleep 10
     curl -s http://localhost:11435/api/tags | jq
 }
 
 fix_translation() {
     log_info "Restarting Translation service..."
-    docker restart coindaily-ai-translation
+    docker restart sygn-ai-translation
     sleep 5
     curl -s http://localhost:8080/health | jq
 }
 
 repull_models() {
     log_info "Re-pulling AI models..."
-    docker exec coindaily-ai-llama ollama pull llama3.1:8b-instruct-q4_0
-    docker exec coindaily-ai-deepseek ollama pull deepseek-r1:8b
+    docker exec sygn-ai-llama ollama pull llama3.1:8b-instruct-q4_0
+    docker exec sygn-ai-deepseek ollama pull deepseek-r1:8b
 }
 
 check_resources() {
@@ -90,7 +90,7 @@ check_logs() {
     if [ -z "$SERVICE" ]; then
         docker compose logs --tail=50 -f
     else
-        docker logs --tail=50 -f coindaily-$SERVICE
+        docker logs --tail=50 -f sygn-$SERVICE
     fi
 }
 
@@ -101,7 +101,7 @@ check_logs() {
 show_menu() {
     echo ""
     echo "=============================================="
-    echo "   CoinDaily Quick Fix Menu"
+    echo "   Sygn Quick Fix Menu"
     echo "=============================================="
     echo ""
     echo "  1) Fix Docker"

@@ -55,7 +55,7 @@ export default function BountyPage() {
       id: 'content-creation',
       category: 'Content Creation',
       title: 'News & Educational Material',
-      description: 'Produce high-quality articles, videos, or infographics on African crypto news, blockchain tutorials, or Coindaily features. Submit via DAO with metrics (views >1,000, shares >200).',
+      description: 'Produce high-quality articles, videos, or infographics on African crypto news, blockchain tutorials, or Sygn features. Submit via DAO with metrics (views >1,000, shares >200).',
       reward: '1,000-10,000 JY',
       rewardRange: '1,000 JY per submission that meets metrics. Accepted research submissions: 5,000 JY (top 20/month receive 10,000 JY bonus)',
       stakingRequired: 'Stake at least 15,000 JY for 4 months minimum in Whale Prison (90% APY eligible). 1.5x multiplier for sinkhole stakers. Non-stakers ineligible.',
@@ -74,7 +74,7 @@ export default function BountyPage() {
       id: 'meme-marketing',
       category: 'Meme & Viral Marketing',
       title: 'Viral Content Creation',
-      description: 'Create and distribute memes, short-form videos, or social campaigns promoting JY or Coindaily. Track via X impressions (>10,000 views).',
+      description: 'Create and distribute memes, short-form videos, or social campaigns promoting JY or Sygn. Track via X impressions (>10,000 views).',
       reward: '1,500-5,000 JY',
       rewardRange: '1,500 JY per entry (monthly winners get 5,000 JY). Total pool: 50,000 JY.',
       stakingRequired: 'Stake 10,000 JY for 3 months in Whale Prison. 2x rewards for OGs with proven prior traction (DAO-verified).',
@@ -83,7 +83,7 @@ export default function BountyPage() {
       tasks: [
         'Track via X impressions or viral score (>10,000 views)',
         'Emphasize scarcity narratives and platform utility',
-        'Tag @JYToken and use #CoinDaily'
+        'Tag @JYToken and use #Sygn'
       ],
       isTaken: false,
       totalSlots: undefined,
@@ -131,7 +131,7 @@ export default function BountyPage() {
       id: 'bug-hunts',
       category: 'Bug Hunts & Technical',
       title: 'Technical Improvements',
-      description: 'Report vulnerabilities in Coindaily MVP, suggest code enhancements, or contribute SDK integrations/PRs on GitHub. Prioritize AI data tools, crypto tools, bots, news tools or news distribution.',
+      description: 'Report vulnerabilities in Sygn MVP, suggest code enhancements, or contribute SDK integrations/PRs on GitHub. Prioritize AI data tools, crypto tools, bots, news tools or news distribution.',
       reward: '1,500-8,000 JY',
       rewardRange: '1,500 JY per valid contribution (8,000 JY for critical bug fix). Total pool: 50,000 JY.',
       stakingRequired: 'Stake 5,000 JY for 4 months. Tech-focused OGs get 2x rewards if in top 40 stakers.',
@@ -297,7 +297,7 @@ export default function BountyPage() {
             <span className="gradient-text">OG Bounty Program</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-4 max-w-3xl mx-auto">
-            Earn up to 20,000 JY tokens by contributing to the Coindaily ecosystem
+            Earn up to 20,000 JY tokens by contributing to the Sygn ecosystem
           </p>
           <div className="mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg max-w-2xl mx-auto">
             <p className="text-red-400 font-semibold mb-2">⚠️ Important: US Jurisdiction Notice</p>

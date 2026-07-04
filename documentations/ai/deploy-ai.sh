@@ -7,10 +7,10 @@ set -e
 # Configuration
 SERVER_USER="${SERVER_USER:-root}"
 SERVER_HOST="${SERVER_HOST:-your-contabo-ip}"
-DEPLOY_PATH="/opt/coindaily/ai"
-APP_NAME="coindaily-ai-dashboard"
+DEPLOY_PATH="/opt/sygn/ai"
+APP_NAME="sygn-ai-dashboard"
 
-echo "🚀 Deploying CoinDaily AI System to $SERVER_HOST"
+echo "🚀 Deploying Sygn AI System to $SERVER_HOST"
 
 # Build the AI app locally first
 echo "📦 Building AI app..."
@@ -35,7 +35,7 @@ scp ai-deploy.tar.gz ${SERVER_USER}@${SERVER_HOST}:${DEPLOY_PATH}/
 # Deploy on server
 echo "🔧 Deploying on server..."
 ssh ${SERVER_USER}@${SERVER_HOST} << 'ENDSSH'
-cd /opt/coindaily/ai
+cd /opt/sygn/ai
 tar -xzf ai-deploy.tar.gz
 
 # Build and restart the AI dashboard container

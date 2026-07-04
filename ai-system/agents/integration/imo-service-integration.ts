@@ -1,11 +1,11 @@
 /**
  * Imo Integration Examples
- * Shows how Imo integrates with existing CoinDaily AI services
+ * Shows how Imo integrates with existing Sygn AI services
  * 
  * ARCHITECTURE FLOW:
  * 
  * ┌─────────────────────────────────────────────────────────────────────────┐
- * │                        CoinDaily AI System                              │
+ * │                        Sygn AI System                              │
  * ├─────────────────────────────────────────────────────────────────────────┤
  * │                                                                         │
  * │  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────────┐  │

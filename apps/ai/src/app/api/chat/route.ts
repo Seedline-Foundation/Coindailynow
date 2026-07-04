@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     } else {
       messages.push({
         role: 'system',
-        content: 'You are CoinDaily\'s AI Concierge, a premium crypto intelligence assistant. Help the user with crypto questions, market summaries, or platform help.'
+        content: 'You are Sygn\'s AI Concierge, a premium crypto intelligence assistant. Help the user with crypto questions, market summaries, or platform help.'
       });
     }
 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           message: aiMessage,
-          sources: ['CoinDaily Live Market Feeds', 'CoinDaily Editorial Archives'],
+          sources: ['Sygn Live Market Feeds', 'Sygn Editorial Archives'],
           model: MODEL
         });
       }
@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: fallbackResponse,
-      sources: ['CoinDaily Knowledge Base', 'Local Regulatory Guides'],
-      model: 'CoinDaily-Fallback-Engine'
+      sources: ['Sygn Knowledge Base', 'Local Regulatory Guides'],
+      model: 'Sygn-Fallback-Engine'
     });
 
   } catch (error: any) {
@@ -122,5 +122,5 @@ function generateSmartFallback(message: string, systemPrompt: string = ''): stri
     return `To secure your crypto: \n1. Use a non-custodial hardware wallet (like Ledger or Trezor) for large amounts.\n2. Never share your 12 or 24-word recovery phrase with anyone.\n3. Enable Multi-Factor Authentication (MFA) on exchange accounts (use Authenticator apps, not SMS).\n4. Double-check all transaction destination addresses before signing.`;
   }
 
-  return `Thanks for reaching out to CoinDaily Concierge! I can help you with market trends, local crypto developments, stablecoins, or general platform support. Ask me something like "Explain Solana's recent rise" or "How do stablecoins work in Africa?"`;
+  return `Thanks for reaching out to Sygn Concierge! I can help you with market trends, local crypto developments, stablecoins, or general platform support. Ask me something like "Explain Solana's recent rise" or "How do stablecoins work in Africa?"`;
 }

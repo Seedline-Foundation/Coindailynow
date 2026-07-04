@@ -39,7 +39,7 @@ export function useMFA(): UseMFAReturn {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('coindaily_access_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('sygn_access_token')}`
         },
         body: JSON.stringify(data)
       });
@@ -82,7 +82,7 @@ export function useMFA(): UseMFAReturn {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('coindaily_access_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('sygn_access_token')}`
         },
         body: JSON.stringify(data)
       });
@@ -125,7 +125,7 @@ export function useMFA(): UseMFAReturn {
       const response = await fetch('/api/auth/mfa/disable', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('coindaily_access_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('sygn_access_token')}`
         }
       });
 
@@ -161,7 +161,7 @@ export function useMFA(): UseMFAReturn {
     try {
       const response = await fetch('/api/auth/mfa/status', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('coindaily_access_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('sygn_access_token')}`
         }
       });
 
@@ -194,7 +194,7 @@ export function useMFA(): UseMFAReturn {
       const response = await fetch('/api/auth/mfa/backup-codes', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('coindaily_access_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('sygn_access_token')}`
         }
       });
 

@@ -97,7 +97,7 @@ export class SubscriptionService {
           {
             amount: parseFloat(amountUsd),
             currency: 'USD',
-            reason: `CoinDaily subscription: ${plan.name}`,
+            reason: `Sygn subscription: ${plan.name}`,
             customerEmail: undefined,
             metadata: {
               reference,
@@ -421,7 +421,7 @@ export class SubscriptionService {
     if (!user?.email) return;
 
     const html = `
-      <h2>CoinDaily Subscription Receipt</h2>
+      <h2>Sygn Subscription Receipt</h2>
       <p>Invoice: ${record.invoiceNumber}</p>
       <p>Amount: ${record.currency} ${record.amount.toFixed(2)}</p>
       <p>Paid: ${record.paidAt.toISOString()}</p>
@@ -434,7 +434,7 @@ export class SubscriptionService {
       const doc = await PDFDocument.create();
       const page = doc.addPage([400, 220]);
       const font = await doc.embedFont(StandardFonts.Helvetica);
-      page.drawText('CoinDaily — Subscription receipt', { x: 40, y: 180, size: 14, font });
+      page.drawText('Sygn — Subscription receipt', { x: 40, y: 180, size: 14, font });
       page.drawText(`Invoice: ${record.invoiceNumber}`, { x: 40, y: 150, size: 11, font });
       page.drawText(`Amount: ${record.currency} ${record.amount.toFixed(2)}`, { x: 40, y: 130, size: 11, font });
       page.drawText(`Paid: ${record.paidAt.toISOString()}`, { x: 40, y: 110, size: 11, font });

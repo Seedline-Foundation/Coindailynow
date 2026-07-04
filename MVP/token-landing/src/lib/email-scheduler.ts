@@ -33,8 +33,8 @@ export const EMAIL_SEQUENCE: EmailSequenceDefinition[] = [
   
   {
     sequence: 1,
-    type: 'day_1_coindaily_mission',
-    subject: 'Welcome to CoinDaily - Africa\'s Premier Crypto News Platform',
+    type: 'day_1_sygn_mission',
+    subject: 'Welcome to Sygn - Africa\'s Premier Crypto News Platform',
     delayHours: 24 // 1 day after welcome
   },
   {
@@ -82,7 +82,7 @@ export const EMAIL_SEQUENCE: EmailSequenceDefinition[] = [
   {
     sequence: 9,
     type: 'day_9_careers',
-    subject: '💼 Join CoinDaily\'s Team or Win 100 $JY for Referrals!',
+    subject: '💼 Join Sygn\'s Team or Win 100 $JY for Referrals!',
     delayHours: 24 // 1 day after day 8
   }
 ];
@@ -342,7 +342,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
   
   const footer = `
       <div class="footer">
-        <p>© 2025 CoinDaily. Africa's Premier Crypto News Platform.</p>
+        <p>© 2025 Sygn. Africa's Premier Crypto News Platform.</p>
         <p>You're receiving this because you signed up for Joy Token updates.</p>
       </div>
     </body>
@@ -350,15 +350,15 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
   `;
   
   switch (emailType) {
-    case 'day_1_coindaily_mission':
+    case 'day_1_sygn_mission':
       return `${baseStyles}
         <div class="container">
           <div class="header">
-            <h1>🚀 Welcome to CoinDaily!</h1>
+            <h1>🚀 Welcome to Sygn!</h1>
           </div>
           <div class="content">
             <h2>Hi ${name},</h2>
-            <p>Welcome to <strong>CoinDaily</strong> - Africa's leading cryptocurrency and memecoin news platform!</p>
+            <p>Welcome to <strong>Sygn</strong> - Africa's leading cryptocurrency and memecoin news platform!</p>
             
             <h3>Our Mission:</h3>
             <p>We're building the most trusted source for crypto news across Africa, covering everything from Bitcoin to the hottest memecoins.</p>
@@ -371,7 +371,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               <li>💎 <strong>Community Driven:</strong> Join thousands of crypto believers</li>
             </ul>
             
-            <p>And we're launching something HUGE: <strong>Joy Token ($JY)</strong> - our native token that will power the entire CoinDaily ecosystem!</p>
+            <p>And we're launching something HUGE: <strong>Joy Token ($JY)</strong> - our native token that will power the entire Sygn ecosystem!</p>
             
             <center><a href="https://token.sygn.live" class="cta-button">Learn About Joy Token →</a></center>
             
@@ -379,7 +379,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p>Stay tuned! 🔥</p>
             
-            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+            <p>Best regards,<br><strong>The Sygn Team</strong></p>
           </div>
           ${footer}
         </div>
@@ -393,7 +393,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
           </div>
           <div class="content">
             <h2>Hi ${name},</h2>
-            <p>Yesterday I introduced you to CoinDaily. Today, let me tell you about <strong>Joy Token ($JY)</strong> - and why you can't afford to miss this.</p>
+            <p>Yesterday I introduced you to Sygn. Today, let me tell you about <strong>Joy Token ($JY)</strong> - and why you can't afford to miss this.</p>
             
             <h3>5 Reasons Joy Token is Different:</h3>
             
@@ -401,7 +401,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             <p>We're not another global crypto project. Joy Token is designed specifically for African crypto enthusiasts, with features that matter to YOU.</p>
             
             <h4>2. 📰 Real Utility</h4>
-            <p>$JY isn't just a token - it powers CoinDaily's entire ecosystem:</p>
+            <p>$JY isn't just a token - it powers Sygn's entire ecosystem:</p>
             <ul>
               <li>Access premium crypto analysis and news</li>
               <li>Unlock exclusive memecoin alerts</li>
@@ -413,7 +413,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             <p>Get in BEFORE the public launch at presale prices. Early believers get the best deals.</p>
             
             <h4>4. 🚀 Growth Potential</h4>
-            <p>With Africa's crypto market exploding and CoinDaily growing daily, $JY holders are positioned for serious gains.</p>
+            <p>With Africa's crypto market exploding and Sygn growing daily, $JY holders are positioned for serious gains.</p>
             
             <h4>5. 👥 Community Power</h4>
             <p>Join a movement of African crypto believers building wealth together.</p>
@@ -422,7 +422,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p>Tomorrow: I'll share why missing this could be your biggest regret. No exaggeration.</p>
             
-            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+            <p>Best regards,<br><strong>The Sygn Team</strong></p>
           </div>
           ${footer}
         </div>
@@ -473,7 +473,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p>Don't say I didn't warn you.</p>
             
-            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+            <p>Best regards,<br><strong>The Sygn Team</strong></p>
           </div>
           ${footer}
         </div>
@@ -504,7 +504,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               <li>🔒 <strong>20% Locked Liquidity:</strong> Ensures price stability and trust</li>
               <li>🎁 <strong>15% Community Rewards:</strong> Airdrops, staking, engagement bonuses</li>
               <li>👥 <strong>15% Team:</strong> Vested over 24 months (aligned with YOUR success)</li>
-              <li>📈 <strong>10% Marketing & Growth:</strong> Expanding CoinDaily ecosystem</li>
+              <li>📈 <strong>10% Marketing & Growth:</strong> Expanding Sygn ecosystem</li>
             </ul>
             
             <h3>Why These Numbers Win</h3>
@@ -524,7 +524,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p>Tomorrow: Step-by-step guide on exactly how to participate in the presale.</p>
             
-            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+            <p>Best regards,<br><strong>The Sygn Team</strong></p>
           </div>
           ${footer}
         </div>
@@ -583,7 +583,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p>Tomorrow: Meet the community that's building wealth together.</p>
             
-            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+            <p>Best regards,<br><strong>The Sygn Team</strong></p>
           </div>
           ${footer}
         </div>
@@ -617,7 +617,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             </div>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-              <h4 style="margin: 0 0 10px 0;">📰 CoinDaily Integration</h4>
+              <h4 style="margin: 0 0 10px 0;">📰 Sygn Integration</h4>
               <p style="margin: 0;">Exclusive news, memecoin alerts, and market insights for $JY holders.</p>
             </div>
             
@@ -648,7 +648,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p>Tomorrow: The final countdown begins. Presale launching soon!</p>
             
-            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+            <p>Best regards,<br><strong>The Sygn Team</strong></p>
           </div>
           ${footer}
         </div>
@@ -710,7 +710,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p>Tomorrow: Real stories from early crypto believers who changed their lives.</p>
             
-            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+            <p>Best regards,<br><strong>The Sygn Team</strong></p>
           </div>
           ${footer}
         </div>
@@ -755,7 +755,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
               Or will you be saying "I wish I had bought when I had the chance"?</p>
             </div>
             
-            <h3>Why People Trust CoinDaily</h3>
+            <h3>Why People Trust Sygn</h3>
             <ul>
               <li>📰 <strong>10,000+ Daily Readers:</strong> Africa's most trusted crypto news</li>
               <li>🎯 <strong>Proven Track Record:</strong> Called 5 memecoin pumps in 2024</li>
@@ -767,7 +767,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             
             <p>Tomorrow: FINAL email. Join our team or earn 100 $JY for referrals!</p>
             
-            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+            <p>Best regards,<br><strong>The Sygn Team</strong></p>
           </div>
           ${footer}
         </div>
@@ -777,14 +777,14 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
       return `${baseStyles}
         <div class="container">
           <div class="header">
-            <h1>💼 Join CoinDaily or Win 100 $JY!</h1>
+            <h1>💼 Join Sygn or Win 100 $JY!</h1>
           </div>
           <div class="content">
             <h2>Hi ${name},</h2>
             <p>This is the final email in our series. But it's not goodbye—it's an invitation to go DEEPER.</p>
             
             <h3>Option 1: Work With Us 🚀</h3>
-            <p>CoinDaily is growing FAST. We're hiring talented Africans who believe in crypto's power to transform lives.</p>
+            <p>Sygn is growing FAST. We're hiring talented Africans who believe in crypto's power to transform lives.</p>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
               <h4 style="margin: 0 0 10px 0;">🖊️ Content Writers</h4>
@@ -836,7 +836,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             <h3>Thank You for This Journey</h3>
             <p>Over the past 9 days, you've learned:</p>
             <ul>
-              <li>✅ What makes CoinDaily special</li>
+              <li>✅ What makes Sygn special</li>
               <li>✅ Why Joy Token is a smart investment</li>
               <li>✅ The power of getting in early</li>
               <li>✅ Exact tokenomics and presale details</li>
@@ -856,7 +856,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             <center><a href="https://token.sygn.live" class="cta-button">Secure My Joy Tokens →</a></center>
             
             <p>To your success,</p>
-            <p><strong>The CoinDaily Team</strong></p>
+            <p><strong>The Sygn Team</strong></p>
             
             <p style="font-size: 12px; color: #666; margin-top: 30px;">P.S. This is the last scheduled email. But you'll still get important updates about presale milestones, exchange listings, and community events. Stay connected!</p>
           </div>
@@ -874,7 +874,7 @@ function getSequenceEmailTemplate(emailType: string, params: { name: string }): 
             <h2>Hi ${name},</h2>
             <p>Important update about Joy Token...</p>
             <center><a href="https://token.sygn.live" class="cta-button">Visit Joy Token →</a></center>
-            <p>Best regards,<br><strong>The CoinDaily Team</strong></p>
+            <p>Best regards,<br><strong>The Sygn Team</strong></p>
           </div>
           ${footer}
         </div>

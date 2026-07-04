@@ -14,7 +14,7 @@ export class OnboardingAgent extends BaseAgent {
       name: 'Onboarding Agent',
       type: 'onboarding',
       category: 'business',
-      description: 'Guides new CoinDaily users through personalized onboarding flows, crypto education, feature discovery, and activation milestones tailored to African market users.',
+      description: 'Guides new Sygn users through personalized onboarding flows, crypto education, feature discovery, and activation milestones tailored to African market users.',
       capabilities: [
         'welcome_flow',
         'personalized_tour',
@@ -58,11 +58,11 @@ export class OnboardingAgent extends BaseAgent {
   }
 
   private async createWelcomeFlow(userData: any): Promise<Record<string, any>> {
-    const prompt = `Create a personalized welcome flow for a new CoinDaily user:
+    const prompt = `Create a personalized welcome flow for a new Sygn user:
 
 User: ${JSON.stringify(userData || {}, null, 2)}
 
-CoinDaily is Africa's premier crypto news platform. Return JSON:
+Sygn is Africa's premier crypto news platform. Return JSON:
 {
   "welcomeFlow": {
     "greeting": string (personalized, warm, African-aware),

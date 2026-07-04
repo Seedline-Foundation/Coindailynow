@@ -301,7 +301,7 @@ export default function PremiumRegulationPage() {
                 <div className={`px-5 py-3 rounded-xl text-center ${outlookColors[c.editorialAnalysis.outlook] || 'bg-gray-50'}`}>
                   <p className="text-2xl mb-1">{outlookEmoji[c.editorialAnalysis.outlook] || '⚪'}</p>
                   <p className="font-bold text-lg">{c.editorialAnalysis.outlook}</p>
-                  <p className="text-xs opacity-70">CoinDaily Outlook</p>
+                  <p className="text-xs opacity-70">Sygn Outlook</p>
                 </div>
               </div>
             </div>
@@ -420,7 +420,7 @@ export default function PremiumRegulationPage() {
                   <div className="flex items-center gap-4 mb-4">
                     <span className="text-5xl">{outlookEmoji[c.editorialAnalysis.outlook]}</span>
                     <div>
-                      <h2 className="text-2xl font-bold">CoinDaily Outlook: {c.editorialAnalysis.outlook}</h2>
+                      <h2 className="text-2xl font-bold">Sygn Outlook: {c.editorialAnalysis.outlook}</h2>
                       <p className="text-sm opacity-70">by {c.editorialAnalysis.analystName} — Published {c.editorialAnalysis.publishedDate}</p>
                     </div>
                   </div>
@@ -429,7 +429,7 @@ export default function PremiumRegulationPage() {
 
                 {/* Recommendation */}
                 <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl shadow-lg p-6 text-white">
-                  <h3 className="text-lg font-bold mb-3">💡 CoinDaily Recommendation</h3>
+                  <h3 className="text-lg font-bold mb-3">💡 Sygn Recommendation</h3>
                   <p className="text-lg leading-relaxed">{c.editorialAnalysis.recommendation}</p>
                 </div>
 

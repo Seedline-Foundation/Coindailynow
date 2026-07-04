@@ -92,7 +92,7 @@ describe('QualityReviewAgent Integration Tests', () => {
       verifiedClaims: ['Adoption is increasing'],
       questionableClaims: [],
       falseClaims: [],
-      sources: ['CoinDaily'],
+      sources: ['Sygn'],
     },
     improvementSuggestions: [],
     recommendations: ['Looks good'],

@@ -144,7 +144,7 @@ async function testLMStudio() {
       {
         title: 'Bitcoin Adoption Grows in Africa',
         category: 'Africa',
-        source: 'CoinDaily Research'
+        source: 'Sygn Research'
       }
     );
 

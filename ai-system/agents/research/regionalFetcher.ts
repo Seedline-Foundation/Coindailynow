@@ -39,7 +39,7 @@ async function fetchWithTimeout(url: string): Promise<Response> {
     return await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'CoinDailyResearchBot/1.0 (+https://sygn.live)',
+        'User-Agent': 'SygnResearchBot/1.0 (+https://sygn.live)',
         Accept: 'application/json, application/xml, text/xml, text/html;q=0.9, */*;q=0.5',
       },
     });

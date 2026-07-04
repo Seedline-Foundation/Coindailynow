@@ -5,11 +5,11 @@ import { Header } from '@/components/landing';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About CoinDaily Africa | Independent Crypto & Finance News',
+  title: 'About Sygn Africa | Independent Crypto & Finance News',
   description:
-    'CoinDaily Africa delivers timely, accurate, and actionable cryptocurrency, blockchain, and financial market news to readers across Africa and the global diaspora.',
+    'Sygn Africa delivers timely, accurate, and actionable cryptocurrency, blockchain, and financial market news to readers across Africa and the global diaspora.',
   openGraph: {
-    title: 'About CoinDaily Africa',
+    title: 'About Sygn Africa',
     description:
       'Independent crypto and financial market intelligence for Africa and the diaspora.',
     type: 'website',
@@ -20,7 +20,7 @@ export default function AboutPage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'CoinDaily Africa',
+    name: 'Sygn Africa',
     url: 'https://sygn.live',
     description:
       'Independent cryptocurrency, blockchain, and financial market intelligence for Africa and the global diaspora.',
@@ -32,8 +32,8 @@ export default function AboutPage() {
       { '@type': 'Country', name: 'Ghana' },
     ],
     sameAs: [
-      'https://twitter.com/coindailyafrica',
-      'https://t.me/coindailyafrica',
+      'https://twitter.com/sygnafrica',
+      'https://t.me/sygnafrica',
     ],
   };
 
@@ -46,7 +46,7 @@ export default function AboutPage() {
       <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">About CoinDaily Africa</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">About Sygn Africa</h1>
           <p className="text-lg text-gray-600 mb-8">
             Africa&#39;s independent source for cryptocurrency, blockchain, and financial market intelligence.
           </p>
@@ -55,7 +55,7 @@ export default function AboutPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Our Mission</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa delivers timely, accurate, and actionable financial news and market data to readers across Africa and the global diaspora. We cover cryptocurrency markets, blockchain technology, traditional finance, regulatory developments, and the intersection of fintech and emerging markets.
+                Sygn Africa delivers timely, accurate, and actionable financial news and market data to readers across Africa and the global diaspora. We cover cryptocurrency markets, blockchain technology, traditional finance, regulatory developments, and the intersection of fintech and emerging markets.
               </p>
               <p className="text-gray-600 leading-relaxed mt-3">
                 Every story is framed through an Africa-first lens. When we cover a Federal Reserve decision or a Bitcoin rally, we explain what it means for Lagos, Nairobi, Johannesburg, and Accra.
@@ -76,7 +76,7 @@ export default function AboutPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Our Approach</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa combines human editorial judgment with AI-assisted content production. Our AI systems accelerate research and drafting, but every piece of market-moving content is reviewed by human editors before publication. We maintain a strict editorial firewall between advertising, sponsored content, and editorial.
+                Sygn Africa combines human editorial judgment with AI-assisted content production. Our AI systems accelerate research and drafting, but every piece of market-moving content is reviewed by human editors before publication. We maintain a strict editorial firewall between advertising, sponsored content, and editorial.
               </p>
               <p className="text-gray-600 leading-relaxed mt-3">
                 We do not use hype language. You will not find sensationalist terms in our coverage. Our tone is confident, neutral, and data-driven, modeled on institutional financial news services.

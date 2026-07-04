@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Legal | CoinDaily',
-  description: 'All legal documents, policies, and terms governing CoinDaily platform.',
+  title: 'Legal | Sygn',
+  description: 'All legal documents, policies, and terms governing Sygn platform.',
   robots: 'index, follow',
 };
 
@@ -11,7 +11,7 @@ export default function LegalIndexPage() {
     {
       title: 'Terms of Service',
       href: '/legal/terms',
-      description: 'Terms and conditions governing your use of CoinDaily.'
+      description: 'Terms and conditions governing your use of Sygn.'
     },
     {
       title: 'Privacy Policy',
@@ -75,7 +75,7 @@ export default function LegalIndexPage() {
       <div className="prose prose-lg max-w-none">
         <h1>Legal Documents</h1>
         <p className="text-gray-600">
-          All policies and legal documents governing your use of CoinDaily platform and services.
+          All policies and legal documents governing your use of Sygn platform and services.
         </p>
 
         <div className="grid gap-6 mt-8">
@@ -97,11 +97,11 @@ export default function LegalIndexPage() {
             For questions about any of these legal documents, please contact us:
           </p>
           <ul>
-            <li>General Legal: <a href="mailto:legal@coindaily.com" className="text-blue-600 hover:text-blue-800">legal@coindaily.com</a></li>
-            <li>Privacy: <a href="mailto:privacy@coindaily.com" className="text-blue-600 hover:text-blue-800">privacy@coindaily.com</a></li>
-            <li>DMCA: <a href="mailto:dmca@coindaily.com" className="text-blue-600 hover:text-blue-800">dmca@coindaily.com</a></li>
-            <li>Security: <a href="mailto:security@coindaily.com" className="text-blue-600 hover:text-blue-800">security@coindaily.com</a></li>
-            <li>Accessibility: <a href="mailto:accessibility@coindaily.com" className="text-blue-600 hover:text-blue-800">accessibility@coindaily.com</a></li>
+            <li>General Legal: <a href="mailto:legal@sygn.com" className="text-blue-600 hover:text-blue-800">legal@sygn.com</a></li>
+            <li>Privacy: <a href="mailto:privacy@sygn.com" className="text-blue-600 hover:text-blue-800">privacy@sygn.com</a></li>
+            <li>DMCA: <a href="mailto:dmca@sygn.com" className="text-blue-600 hover:text-blue-800">dmca@sygn.com</a></li>
+            <li>Security: <a href="mailto:security@sygn.com" className="text-blue-600 hover:text-blue-800">security@sygn.com</a></li>
+            <li>Accessibility: <a href="mailto:accessibility@sygn.com" className="text-blue-600 hover:text-blue-800">accessibility@sygn.com</a></li>
           </ul>
         </div>
       </div>

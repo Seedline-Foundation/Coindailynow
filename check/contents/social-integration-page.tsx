@@ -25,8 +25,8 @@ import { AIEngagementDashboard } from '@/components/ui/ai-engagement';
 const MOCK_ARTICLE = {
   id: 'article-123',
   title: 'Bitcoin Reaches New All-Time High: Market Analysis and Future Predictions',
-  url: 'https://coindaily.news/bitcoin-ath-analysis',
-  author: 'CoinDaily Team'
+  url: 'https://sygn.news/bitcoin-ath-analysis',
+  author: 'Sygn Team'
 };
 
 const MOCK_USER = {
@@ -185,7 +185,7 @@ export function SocialIntegrationPage({ className = '' }: SocialIntegrationPageP
                     url: MOCK_ARTICLE.url,
                     title: MOCK_ARTICLE.title,
                     description: 'Latest crypto market analysis and insights',
-                    hashtags: ['Bitcoin', 'Crypto', 'CoinDaily']
+                    hashtags: ['Bitcoin', 'Crypto', 'Sygn']
                   }}
                   variant="full"
                 />

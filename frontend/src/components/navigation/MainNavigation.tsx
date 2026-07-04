@@ -98,7 +98,7 @@ const NAVIGATION_ITEMS = [
     label: 'About Us',
     icon: InformationCircleIcon,
     items: [
-      { label: 'Our Story', href: '/about/story', description: 'Learn about CoinDaily' },
+      { label: 'Our Story', href: '/about/story', description: 'Learn about Sygn' },
       { label: 'Team', href: '/about/team', description: 'Meet our team' },
       { label: 'Careers', href: '/about/careers', description: 'Join our team' },
       { label: 'Contact', href: '/about/contact', description: 'Get in touch' },
@@ -208,7 +208,7 @@ export default function MainNavigation({ className }: MainNavigationProps) {
             >
               <HomeIcon className="h-8 w-8 text-orange-500" />
               <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-                CoinDaily
+                Sygn
               </span>
             </Link>
           </div>

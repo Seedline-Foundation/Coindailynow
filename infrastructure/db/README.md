@@ -1,6 +1,6 @@
 # Contabo DB Stack — Cutover Runbook
 
-Migrate the CoinDaily database from Supabase to a self-hosted Postgres 16 +
+Migrate the Sygn database from Supabase to a self-hosted Postgres 16 +
 TimescaleDB container on the Contabo VPS.
 
 Architecture decision: **single logical DB running on the `timescale/timescaledb`
@@ -44,8 +44,8 @@ docker compose version
 cd ~/news-platform
 git pull
 
-mkdir -p ~/coindaily/pgdata ~/coindaily/backups
-chmod 700 ~/coindaily/pgdata
+mkdir -p ~/sygn/pgdata ~/sygn/backups
+chmod 700 ~/sygn/pgdata
 
 cd infrastructure/db
 cp .env.example .env
@@ -62,7 +62,7 @@ cd ~/news-platform/infrastructure/db
 bash scripts/provision.sh
 ```
 
-Expected: `coindaily-postgres` container healthy, timescaledb extension
+Expected: `sygn-postgres` container healthy, timescaledb extension
 enabled.
 
 ## 4. Back up the CURRENT live production env (rollback safety)
@@ -78,7 +78,7 @@ Short downtime window starts here (~10 min for <500 MB DB).
 
 ```bash
 cd ~/news-platform
-pm2 stop coindaily-backend coindaily-news coindaily-admin coindaily-press coindaily-ai
+pm2 stop sygn-backend sygn-news sygn-admin sygn-press sygn-ai
 ```
 
 Optional: flip nginx to serve a maintenance page if you have one.
@@ -103,7 +103,7 @@ the Prisma schema (roughly the number of models in `backend/prisma/schema.prisma
 cd ~/news-platform/backend
 
 # Point Prisma at the new DB for this shell only.
-export DATABASE_URL="postgresql://coindaily:<NEW_PASSWORD>@127.0.0.1:5432/coindaily_prod?sslmode=disable"
+export DATABASE_URL="postgresql://sygn:<NEW_PASSWORD>@127.0.0.1:5432/sygn_prod?sslmode=disable"
 export DIRECT_URL="$DATABASE_URL"
 
 npx prisma generate
@@ -120,8 +120,8 @@ bash scripts/apply-timescale.sh
 Edit `~/news-platform/backend/.env.production` so the DB block reads:
 
 ```
-DATABASE_URL="postgresql://coindaily:<NEW_PASSWORD>@127.0.0.1:5432/coindaily_prod?sslmode=disable&connection_limit=20"
-DIRECT_URL="postgresql://coindaily:<NEW_PASSWORD>@127.0.0.1:5432/coindaily_prod?sslmode=disable"
+DATABASE_URL="postgresql://sygn:<NEW_PASSWORD>@127.0.0.1:5432/sygn_prod?sslmode=disable&connection_limit=20"
+DIRECT_URL="postgresql://sygn:<NEW_PASSWORD>@127.0.0.1:5432/sygn_prod?sslmode=disable"
 ```
 
 Comment out the `SUPABASE_*` keys (keep them in the file for a few days as
@@ -183,10 +183,10 @@ and restarts PM2.
 the DB fresh:
 
 ```bash
-docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
-  psql -U "$POSTGRES_USER" -d postgres -c "DROP DATABASE coindaily_prod;"
-docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
-  psql -U "$POSTGRES_USER" -d postgres -c "CREATE DATABASE coindaily_prod OWNER coindaily;"
+docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" sygn-postgres \
+  psql -U "$POSTGRES_USER" -d postgres -c "DROP DATABASE sygn_prod;"
+docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" sygn-postgres \
+  psql -U "$POSTGRES_USER" -d postgres -c "CREATE DATABASE sygn_prod OWNER sygn;"
 ```
 Then re-run `migrate-from-supabase.sh`.
 

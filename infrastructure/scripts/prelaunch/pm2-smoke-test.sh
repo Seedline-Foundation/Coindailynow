@@ -14,13 +14,13 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 PROCS=(
-  coindaily-backend
-  coindaily-news
-  coindaily-admin
-  coindaily-press
-  coindaily-ai
-  coindaily-ai-pipeline
-  coindaily-token
+  sygn-backend
+  sygn-news
+  sygn-admin
+  sygn-press
+  sygn-ai
+  sygn-ai-pipeline
+  sygn-token
 )
 
 URLS=(

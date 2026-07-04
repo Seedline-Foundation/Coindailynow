@@ -452,7 +452,7 @@ export class AIImageService {
       altText += ` featuring ${keywords.slice(0, 2).join(' and ')}`;
     }
 
-    altText += ' - CoinDaily Africa cryptocurrency news';
+    altText += ' - Sygn Africa cryptocurrency news';
 
     return altText.substring(0, 200); // Limit alt text length for SEO
   }

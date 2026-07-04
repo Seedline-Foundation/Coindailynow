@@ -25,7 +25,7 @@ import {
   EventsNewsSection,
   PartnersSection,
   MemefiAwardSection,
-  CoinDailyCastSection,
+  SygnCastSection,
   ScamAlertsSection
 } from './MoreSections';
 
@@ -106,7 +106,7 @@ const defaultConfig: ContentGridConfig = {
     'newsletter',        // FR-063
     'memefi-award',      // FR-064
     'general-crypto',    // FR-066
-    'coindaily-cast',    // FR-067
+    'sygn-cast',    // FR-067
     'opinion',           // FR-068
     'token-reviews',     // FR-069
     'policy-updates',    // FR-070
@@ -140,7 +140,7 @@ const defaultConfig: ContentGridConfig = {
     'editorials',
     'memefi-award',
     'general-crypto',
-    'coindaily-cast',
+    'sygn-cast',
     'opinion',
     'token-reviews',
     'policy-updates',
@@ -217,7 +217,7 @@ export const ContentGrid: React.FC<ContentGridProps> = ({
     'newsletter': NewsletterSection,
     'memefi-award': MemefiAwardSection,
     'general-crypto': GeneralCryptoSection,
-    'coindaily-cast': CoinDailyCastSection,
+    'sygn-cast': SygnCastSection,
     'opinion': OpinionSection,
     'token-reviews': TokenReviewsSection,
     'policy-updates': PolicyUpdatesSection,
@@ -248,7 +248,7 @@ export const ContentGrid: React.FC<ContentGridProps> = ({
       <div className="mb-8 bg-muted/30 rounded-lg p-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold">CoinDaily Content Hub</h1>
+            <h1 className="text-2xl font-bold">Sygn Content Hub</h1>
             <p className="text-muted-foreground">
               All 22 content sections • Last updated: {lastRefresh.toLocaleTimeString()}
             </p>
@@ -459,7 +459,7 @@ export {
   EventsNewsSection,
   PartnersSection,
   MemefiAwardSection,
-  CoinDailyCastSection,
+  SygnCastSection,
   ScamAlertsSection,
   
   // FR-062, FR-065, FR-066, FR-069, FR-071, FR-073, FR-076, FR-077

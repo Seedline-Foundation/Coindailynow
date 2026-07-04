@@ -22,7 +22,7 @@ export class BotService {
 
     // Parse commands
     if (text.startsWith('/start') || text.startsWith('/help')) {
-      const welcomeMsg = `🤖 *Welcome to CoinDaily Alpha Bot, @${username}!*
+      const welcomeMsg = `🤖 *Welcome to Sygn Alpha Bot, @${username}!*
 
 I am your proactive intelligence companion. Here are the commands you can use:
 • \`/ask <question>\` - Ask our AI Concierge for market insights
@@ -35,7 +35,7 @@ Use these commands to navigate local and global crypto movements!`;
     } 
     else if (text.startsWith('/ask ')) {
       const question = text.substring(5).trim();
-      await this.sendTelegramMessage(chatId, `⏳ _Querying CoinDaily AI Concierge for: "${question}"..._`);
+      await this.sendTelegramMessage(chatId, `⏳ _Querying Sygn AI Concierge for: "${question}"..._`);
       
       const aiReply = await this.getAIResponse(question, 'Global', 'en');
       await this.sendTelegramMessage(chatId, `🤖 *AI Concierge Reply:*\n\n${aiReply}`);
@@ -78,7 +78,7 @@ Use these commands to navigate local and global crypto movements!`;
     const lowerText = text.trim().toLowerCase();
 
     if (lowerText.includes('hello') || lowerText.includes('hi') || lowerText.includes('help') || lowerText.includes('start')) {
-      const welcome = `🤖 *Welcome to CoinDaily WhatsApp Intelligence!*
+      const welcome = `🤖 *Welcome to Sygn WhatsApp Intelligence!*
 
 I am your cryptocurrency concierge. You can send me queries directly:
 - Reply with *ASK <question>* to consult our AI
@@ -161,17 +161,17 @@ I am your cryptocurrency concierge. You can send me queries directly:
       });
 
       if (articles.length === 0) {
-        return `📰 *CoinDaily Top News:*\n\n• *Bitcoin Consolidation*: BTC fluctuates near $96k as traders lock in gains.\n• *DeFi Yields Rise*: Lending pool yields see double-digit increases on Solana.\n• *Remittance Growth*: Mobile money stablecoin integrations expand across East Africa.`;
+        return `📰 *Sygn Top News:*\n\n• *Bitcoin Consolidation*: BTC fluctuates near $96k as traders lock in gains.\n• *DeFi Yields Rise*: Lending pool yields see double-digit increases on Solana.\n• *Remittance Growth*: Mobile money stablecoin integrations expand across East Africa.`;
       }
 
-      let res = `📰 *CoinDaily Top News Summary:*\n\n`;
+      let res = `📰 *Sygn Top News Summary:*\n\n`;
       articles.forEach((art: any, index: number) => {
         res += `*${index + 1}. ${art.title}*\n_${art.excerpt || 'Brief market update.'}_\n\n`;
       });
       return res;
     } catch (error) {
       console.error('Error getting article summaries:', error);
-      return `📰 *CoinDaily Hot Update:*\n\n• Markets remain positive; expect SOL and DeFi volumes to consolidate.`;
+      return `📰 *Sygn Hot Update:*\n\n• Markets remain positive; expect SOL and DeFi volumes to consolidate.`;
     }
   }
 
@@ -182,7 +182,7 @@ I am your cryptocurrency concierge. You can send me queries directly:
     try {
       const response = await axios.post(`${AI_SYSTEM_URL}/api/chat`, {
         message,
-        systemPrompt: `You are CoinDaily's AI Concierge. Reply to the user question in a telegram/whatsapp friendly short format. User country: ${country}. Language: ${language}.`
+        systemPrompt: `You are Sygn's AI Concierge. Reply to the user question in a telegram/whatsapp friendly short format. User country: ${country}. Language: ${language}.`
       }, { timeout: 10000 });
 
       if (response.data && response.data.message) {

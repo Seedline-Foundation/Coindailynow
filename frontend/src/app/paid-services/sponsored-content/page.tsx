@@ -12,7 +12,7 @@ const contentPackages = [
     description: 'Get your announcement in front of Africa\'s crypto audience',
     turnaround: '24–48 hours',
     features: [
-      'Published on CoinDaily.africa',
+      'Published on Sygn.africa',
       '500–1,500 word article',
       'Indexed on Google News',
       'Shared to 45K newsletter subscribers',
@@ -32,7 +32,7 @@ const contentPackages = [
     features: [
       'Everything in Press Release',
       '1,000–2,500 word deep-dive',
-      'Written by CoinDaily editors',
+      'Written by Sygn editors',
       'Expert quotes and analysis',
       'Custom graphics / infographics',
       '5 embedded links (do-follow)',
@@ -54,7 +54,7 @@ const contentPackages = [
       'Author profile / expert page',
       'Podcast/Twitter Space mention',
       'Permanent "Featured Expert" badge',
-      'Custom landing page on CoinDaily',
+      'Custom landing page on Sygn',
       'Translated to 3 African languages',
       'Homepage banner (1 week)',
       'Priority placement for all content',
@@ -76,7 +76,7 @@ const addOns = [
 
 const process_steps = [
   { step: 1, title: 'Submit Brief', description: 'Share your key messages, target audience, and goals. Include any assets, links, or quotes.', icon: '📋' },
-  { step: 2, title: 'Editorial Review', description: 'Our editors review and draft content that aligns with CoinDaily\'s editorial standards and your brand voice.', icon: '✏️' },
+  { step: 2, title: 'Editorial Review', description: 'Our editors review and draft content that aligns with Sygn\'s editorial standards and your brand voice.', icon: '✏️' },
   { step: 3, title: 'Your Approval', description: 'Review the draft. Request up to 2 rounds of revisions to ensure it\'s perfect.', icon: '✅' },
   { step: 4, title: 'Publish & Promote', description: 'Content goes live, gets pushed to newsletter and social channels. Track performance in real-time.', icon: '🚀' },
 ];

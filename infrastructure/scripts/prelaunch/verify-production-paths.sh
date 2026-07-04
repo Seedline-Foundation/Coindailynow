@@ -15,7 +15,7 @@ NC='\033[0m'
 
 FAILED=0
 
-echo "=== CoinDaily production path verification ==="
+echo "=== Sygn production path verification ==="
 
 if [ ! -f "$MANIFEST" ]; then
   echo -e "${RED}Missing manifest: $MANIFEST${NC}"
@@ -46,7 +46,7 @@ echo ""
 echo "=== PM2 status ==="
 if command -v pm2 >/dev/null 2>&1; then
   EXPECTED=$(grep -v '^#' "$MANIFEST" | grep -v '^$' | cut -d'|' -f1 | tr '\n' ' ')
-  pm2 jlist 2>/dev/null | grep -q coindaily || true
+  pm2 jlist 2>/dev/null | grep -q sygn || true
   for PROC in $EXPECTED; do
     if pm2 describe "$PROC" 2>/dev/null | grep -q online; then
       echo -e "${GREEN}✓ pm2: $PROC online${NC}"
@@ -67,10 +67,10 @@ else
 fi
 
 # Log directory
-if [ -d /var/log/coindaily ]; then
-  echo -e "${GREEN}✓ /var/log/coindaily exists${NC}"
+if [ -d /var/log/sygn ]; then
+  echo -e "${GREEN}✓ /var/log/sygn exists${NC}"
 else
-  echo -e "${YELLOW}⚠ /var/log/coindaily missing — mkdir -p /var/log/coindaily${NC}"
+  echo -e "${YELLOW}⚠ /var/log/sygn missing — mkdir -p /var/log/sygn${NC}"
 fi
 
 exit $FAILED

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * CoinDaily AI System Quick Test Script
+ * Sygn AI System Quick Test Script
  * Tests all AI features: content generation, research, translation, image generation
  */
 
@@ -237,7 +237,7 @@ async function testImageGeneration() {
 async function runAllTests() {
   console.clear();
   log('cyan', '╔════════════════════════════════════════════════════════════╗');
-  log('cyan', '║         CoinDaily AI System - Quick Test Suite              ║');
+  log('cyan', '║         Sygn AI System - Quick Test Suite              ║');
   log('cyan', '╚════════════════════════════════════════════════════════════╝');
 
   // Check prerequisites

@@ -54,8 +54,8 @@ export default function DynamicMetaTags({
   metadata,
   contentId,
   contentType = 'page',
-  fallbackTitle = 'CoinDaily - Africa\'s Premier Cryptocurrency News Platform',
-  fallbackDescription = 'Stay ahead of the crypto curve with CoinDaily. Get real-time news, market analysis, and insights on cryptocurrencies, blockchain, and emerging trends across Africa.',
+  fallbackTitle = 'Sygn - Africa\'s Premier Cryptocurrency News Platform',
+  fallbackDescription = 'Stay ahead of the crypto curve with Sygn. Get real-time news, market analysis, and insights on cryptocurrencies, blockchain, and emerging trends across Africa.',
   image = '/images/default-og.jpg',
   author,
   publishedAt,
@@ -174,7 +174,7 @@ export default function DynamicMetaTags({
         semanticChunks: [],
         entityMentions: [],
         factClaims: [],
-        aiSource: 'CoinDaily',
+        aiSource: 'Sygn',
         lastVerified: new Date().toISOString(),
         confidence: 0.5,
       },
@@ -195,10 +195,10 @@ export default function DynamicMetaTags({
       image: finalMetadata.ogImage,
       publisher: {
         '@type': 'Organization',
-        name: 'CoinDaily',
+        name: 'Sygn',
         logo: {
           '@type': 'ImageObject',
-          url: '/images/coindaily-logo.png',
+          url: '/images/sygn-logo.png',
         },
       },
     };
@@ -276,14 +276,14 @@ export default function DynamicMetaTags({
       <meta property="og:image" content={finalMetadata.ogImage} />
       <meta property="og:url" content={finalMetadata.canonicalUrl} />
       <meta property="og:type" content={finalMetadata.ogType} />
-      <meta property="og:site_name" content="CoinDaily" />
+      <meta property="og:site_name" content="Sygn" />
 
       {/* Twitter Card Tags */}
       <meta name="twitter:card" content={finalMetadata.twitterCard} />
       <meta name="twitter:title" content={finalMetadata.twitterTitle} />
       <meta name="twitter:description" content={finalMetadata.twitterDescription} />
       <meta name="twitter:image" content={finalMetadata.twitterImage} />
-      <meta name="twitter:site" content="@CoinDailyAfrica" />
+      <meta name="twitter:site" content="@SygnAfrica" />
 
       {/* Article-specific meta tags */}
       {finalMetadata.articleAuthor && (

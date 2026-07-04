@@ -23,7 +23,7 @@ export default function FAQPage() {
       answer: `Joining the whitelist is simple:
       
 1. Visit our homepage and submit your email via the waitlist form
-2. Follow us on Twitter/X (@Coindaily001) and join our Telegram (@CoindailyNewz)
+2. Follow us on Twitter/X (@Sygn001) and join our Telegram (@SygnNewz)
 3. You'll receive an email with your unique whitelist application link
 4. Complete KYC verification (required for compliance)
 5. You'll be notified 48 hours before presale goes live
@@ -83,7 +83,7 @@ This structure ensures long-term alignment and prevents token dumps.`,
       question: 'Why should I invest in Joy Token now?',
       answer: `Here's why early investment makes sense:
 
-🚀 **First-Mover Advantage**: Get in before millions discover CoinDaily
+🚀 **First-Mover Advantage**: Get in before millions discover Sygn
 💰 **Presale Discount**: Up to 200% discount vs public listing price  
 📈 **Revenue-Backed**: Token utility tied to platform revenue (not just speculation)
 🌍 **Real Problem Solved**: Africa needs trusted crypto news - we're the solution
@@ -172,7 +172,7 @@ Still skeptical? Join our Telegram and ask the community!`,
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="https://t.me/CoindailyNewz"
+              href="https://t.me/SygnNewz"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-8 py-4 rounded-full font-bold hover:shadow-lg hover:shadow-primary-500/50 transition-all"
@@ -180,7 +180,7 @@ Still skeptical? Join our Telegram and ask the community!`,
               Join Telegram
             </a>
             <a
-              href="https://twitter.com/Coindaily001"
+              href="https://twitter.com/Sygn001"
               target="_blank"
               rel="noopener noreferrer"
               className="border-2 border-primary-500 text-primary-500 px-8 py-4 rounded-full font-bold hover:bg-primary-500/10 transition-all"

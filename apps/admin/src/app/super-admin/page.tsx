@@ -1,6 +1,6 @@
 /**
  * Super Admin Dashboard - Main Overview Page
- * Central hub for monitoring and managing the entire CoinDaily platform
+ * Central hub for monitoring and managing the entire Sygn platform
  */
 
 'use client';
@@ -220,7 +220,7 @@ export default function SuperAdminDashboard() {
             Super Admin Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Central management console for CoinDaily Africa platform
+            Central management console for Sygn Africa platform
           </p>
         </div>
         <div className="flex items-center space-x-3 mt-4 sm:mt-0">

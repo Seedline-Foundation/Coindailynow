@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: SENDPRESS by Coindaily
+ * Plugin Name: SENDPRESS by Sygn
  * Plugin URI: https://press.sygn.live
  * Description: Integrate SENDPRESS PR distribution SDK into your WordPress site. Earn JOY tokens by displaying PRs.
  * Version: 1.0.0
- * Author: Coindaily
+ * Author: Sygn
  * Author URI: https://sygn.live
  * License: MIT
  * Text Domain: sendpress
@@ -301,7 +301,7 @@ class SendPress_Plugin {
             return '<!-- SENDPRESS: No PR ID specified -->';
         }
         
-        $mode = $atts['mode'] === 'full' ? 'coindaily-pr-full' : 'coindaily-pr-card';
+        $mode = $atts['mode'] === 'full' ? 'sygn-pr-full' : 'sygn-pr-card';
         
         return sprintf(
             '<%s pr-id="%s" theme="%s"></%s>',
@@ -323,7 +323,7 @@ class SendPress_Plugin {
         ), $atts);
         
         return sprintf(
-            '<coindaily-pr-container count="%d" category="%s" mode="%s"></coindaily-pr-container>',
+            '<sygn-pr-container count="%d" category="%s" mode="%s"></sygn-pr-container>',
             intval($atts['count']),
             esc_attr($atts['category']),
             esc_attr($atts['mode'])

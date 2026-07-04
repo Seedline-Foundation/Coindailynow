@@ -1,6 +1,6 @@
 /**
  * Admin API Client
- * Connects to the CoinDaily backend for real-time data
+ * Connects to the Sygn backend for real-time data
  */
 
 import { getAccessToken } from './auth';

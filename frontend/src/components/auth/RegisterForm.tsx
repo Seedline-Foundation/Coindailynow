@@ -145,7 +145,7 @@ export function RegisterForm({
         {/* Header */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-neutral-900 mb-2">
-            Join CoinDaily Africa
+            Join Sygn Africa
           </h2>
           <p className="text-neutral-600">
             Create your account to access premium crypto news and insights
@@ -368,7 +368,7 @@ export function RegisterForm({
             <div className="ml-3">
               <label className="text-sm font-medium text-neutral-700">
                 <span className="text-sm">
-                  I agree to CoinDaily's{' '}
+                  I agree to Sygn's{' '}
                   <a href="/terms" className="text-primary-600 hover:text-primary-500 underline" target="_blank">
                     Terms of Service
                   </a>{' '}

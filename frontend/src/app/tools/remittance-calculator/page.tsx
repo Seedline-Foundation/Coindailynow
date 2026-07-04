@@ -209,7 +209,7 @@ export default function RemittanceCalculatorPage() {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: 'CoinDaily Remittance Comparison',
+          title: 'Sygn Remittance Comparison',
           text: summary,
           url: typeof window !== 'undefined' ? window.location.href : 'https://sygn.live/tools/remittance-calculator',
         });
@@ -231,7 +231,7 @@ export default function RemittanceCalculatorPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `coindaily-remittance-${selectedCorridor.from}-${selectedCorridor.to}.csv`;
+    a.download = `sygn-remittance-${selectedCorridor.from}-${selectedCorridor.to}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -482,7 +482,7 @@ export default function RemittanceCalculatorPage() {
 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           '@context': 'https://schema.org', '@type': 'SoftwareApplication',
-          name: 'CoinDaily Stablecoin Remittance Calculator',
+          name: 'Sygn Stablecoin Remittance Calculator',
           applicationCategory: 'FinanceApplication',
           operatingSystem: 'Web',
           description: 'Compare stablecoin remittances vs traditional providers for African corridors',

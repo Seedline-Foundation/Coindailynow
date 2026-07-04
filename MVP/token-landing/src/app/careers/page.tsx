@@ -132,7 +132,7 @@ export default function CareersPage() {
             '📊 Advanced analytics platforms access',
             '🎯 Performance bonuses tied to growth metrics',
           ],
-          fullDescription: 'As Head of Social Media, you\'ll be the voice of CoinDaily across all social platforms. Your mission is to make CoinDaily the most followed and engaged crypto news brand in Africa. You\'ll craft narratives that go viral, build relationships with crypto influencers, and turn followers into loyal community members. This role requires creativity, speed, cultural awareness, and the ability to respond to trends in real-time. You should be equally comfortable creating serious market analysis threads as you are creating memes that break the internet. Success means: consistent follower growth, high engagement rates, viral content weekly, and becoming the #1 social media presence in African crypto.',
+          fullDescription: 'As Head of Social Media, you\'ll be the voice of Sygn across all social platforms. Your mission is to make Sygn the most followed and engaged crypto news brand in Africa. You\'ll craft narratives that go viral, build relationships with crypto influencers, and turn followers into loyal community members. This role requires creativity, speed, cultural awareness, and the ability to respond to trends in real-time. You should be equally comfortable creating serious market analysis threads as you are creating memes that break the internet. Success means: consistent follower growth, high engagement rates, viral content weekly, and becoming the #1 social media presence in African crypto.',
         },
       ],
     },
@@ -142,7 +142,7 @@ export default function CareersPage() {
       roles: [
         {
           title: 'Senior Full Stack Developer',
-          description: 'Build and scale CoinDaily platform with Next.js, Node.js, PostgreSQL',
+          description: 'Build and scale Sygn platform with Next.js, Node.js, PostgreSQL',
           responsibilities: [
             'Architect new features across full stack',
             'Optimize for sub-500ms response times',
@@ -254,7 +254,7 @@ export default function CareersPage() {
             'Motion graphics skills (After Effects)',
           ],
           perks: [...perksStandard, '🎨 Adobe Creative Cloud + premium design tools', '🖥️ High-end display monitor'],
-          fullDescription: 'Own the visual identity of Africa\'s premier crypto brand. Create stunning designs that make CoinDaily instantly recognizable and trustworthy.',
+          fullDescription: 'Own the visual identity of Africa\'s premier crypto brand. Create stunning designs that make Sygn instantly recognizable and trustworthy.',
         },
       ],
     },
@@ -285,7 +285,7 @@ export default function CareersPage() {
             '5+ years analytics experience',
           ],
           perks: [...perksStandard, '📊 Premium analytics tools access', '🎓 Conference and training budget'],
-          fullDescription: 'Turn on-chain and off-chain data into exclusive stories and business insights. Your analysis will power investigative journalism and strategic decisions that set CoinDaily apart.',
+          fullDescription: 'Turn on-chain and off-chain data into exclusive stories and business insights. Your analysis will power investigative journalism and strategic decisions that set Sygn apart.',
         },
       ],
     },

@@ -386,7 +386,7 @@ const slides = [
             ]}
           />
           <ComparisonCard 
-            title="Joy Token + CoinDaily"
+            title="Joy Token + Sygn"
             items={[
               { text: "Token ownership & governance", bad: false },
               { text: "Africa-first strategy", bad: false },
@@ -670,10 +670,10 @@ const slides = [
             <h4 className="text-xl font-bold mb-4 text-primary-400">Contact Information</h4>
             <div className="space-y-3 text-gray-300">
               <p>📧 Email: <a href="mailto:partnerships@sygn.live" className="text-primary-400 hover:underline">partnerships@sygn.live</a></p>
-              <p>🐦 Twitter: <a href="https://twitter.com/coindaily001" className="text-primary-400 hover:underline">@coindaily001</a></p>
-              <p>💬 Telegram: <a href="https://t.me/coindailynewz" className="text-primary-400 hover:underline">t.me/coindailynewz</a></p>
+              <p>🐦 Twitter: <a href="https://twitter.com/sygn001" className="text-primary-400 hover:underline">@sygn001</a></p>
+              <p>💬 Telegram: <a href="https://t.me/sygnnewz" className="text-primary-400 hover:underline">t.me/sygnnewz</a></p>
               <p>🌐 Website: <a href="https://sygn.live" className="text-primary-400 hover:underline">sygn.live</a></p>
-              <p>💻 GitHub: <a href="https://github.com/seedline_foundation/coindaily" className="text-primary-400 hover:underline">seedline_foundation/coindaily</a></p>
+              <p>💻 GitHub: <a href="https://github.com/seedline_foundation/sygn" className="text-primary-400 hover:underline">seedline_foundation/sygn</a></p>
             </div>
           </div>
 
@@ -682,7 +682,7 @@ const slides = [
             <div className="space-y-3">
               <LinkButton href="/whitepaper" label="📄 Technical Whitepaper" />
               <LinkButton href="/presale" label="🚀 Join Presale" />
-              <LinkButton href="https://github.com/seedline_foundation/coindaily" label="💻 GitHub" external />
+              <LinkButton href="https://github.com/seedline_foundation/sygn" label="💻 GitHub" external />
               <LinkButton href="https://sygn.live" label="🏠 Main Platform" external />
             </div>
           </div>

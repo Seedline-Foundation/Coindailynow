@@ -1,5 +1,5 @@
 /**
- * CoinDaily Platform - Comprehensive Footer Implementation
+ * Sygn Platform - Comprehensive Footer Implementation
  * Task 55: Complete Footer System with 35 FRs coverage (FR-096 to FR-130)
  * 
  * Features:
@@ -163,37 +163,37 @@ const Footer: React.FC = () => {
   const socialPlatforms: SocialPlatform[] = [
     {
       name: 'Twitter',
-      url: 'https://twitter.com/coindailyafrica',
+      url: 'https://twitter.com/sygnafrica',
       icon: <FaTwitter className="h-5 w-5" />,
       followers: '125K'
     },
     {
       name: 'LinkedIn',
-      url: 'https://linkedin.com/company/coindaily-africa',
+      url: 'https://linkedin.com/company/sygn-africa',
       icon: <FaLinkedin className="h-5 w-5" />,
       followers: '45K'
     },
     {
       name: 'Telegram',
-      url: 'https://t.me/coindailyafrica',
+      url: 'https://t.me/sygnafrica',
       icon: <FaTelegram className="h-5 w-5" />,
       followers: '89K'
     },
     {
       name: 'YouTube',
-      url: 'https://youtube.com/@coindailyafrica',
+      url: 'https://youtube.com/@sygnafrica',
       icon: <FaYoutube className="h-5 w-5" />,
       followers: '67K'
     },
     {
       name: 'Discord',
-      url: 'https://discord.gg/coindailyafrica',
+      url: 'https://discord.gg/sygnafrica',
       icon: <FaDiscord className="h-5 w-5" />,
       followers: '34K'
     },
     {
       name: 'Instagram',
-      url: 'https://instagram.com/coindailyafrica',
+      url: 'https://instagram.com/sygnafrica',
       icon: <FaInstagram className="h-5 w-5" />,
       followers: '56K'
     }
@@ -258,7 +258,7 @@ const Footer: React.FC = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'CoinDaily Africa',
+          title: 'Sygn Africa',
           text: 'Africa\'s premier cryptocurrency news platform',
           url: window.location.href,
         });
@@ -309,7 +309,7 @@ const Footer: React.FC = () => {
                     <FaBitcoin className="h-8 w-8 text-orange-500" />
                     <FaEthereum className="h-6 w-6 text-blue-500" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white">CoinDaily</h3>
+                  <h3 className="text-2xl font-bold text-white">Sygn</h3>
                 </div>
                 <p className="text-gray-300 text-sm leading-relaxed">
                   Africa's premier cryptocurrency news platform. Stay informed with AI-powered insights, 
@@ -521,7 +521,7 @@ const Footer: React.FC = () => {
       <div className="bg-gray-800 dark:bg-gray-900 border-t border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <p className="text-xs text-gray-500 text-center leading-relaxed">
-            CoinDaily Africa is a news and information platform. Nothing on this site constitutes financial, investment, legal, or tax advice. Cryptocurrency investments carry significant risk &mdash; you could lose all invested capital. Always consult a licensed financial advisor.{' '}
+            Sygn Africa is a news and information platform. Nothing on this site constitutes financial, investment, legal, or tax advice. Cryptocurrency investments carry significant risk &mdash; you could lose all invested capital. Always consult a licensed financial advisor.{' '}
             <Link href="/disclaimer" className="text-gray-400 hover:text-white underline">
               Full disclaimer
             </Link>
@@ -536,7 +536,7 @@ const Footer: React.FC = () => {
             
             {/* FR-108: Copyright section & FR-106: Footer utility links */}
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-400">
-              <p>&copy; 2025 CoinDaily Africa. All rights reserved.</p>
+              <p>&copy; 2025 Sygn Africa. All rights reserved.</p>
               <div className="flex items-center space-x-4">
                 <Link href="/about" className="hover:text-white transition-colors">{t('about')}</Link>
                 <Link href="/privacy" className="hover:text-white transition-colors">{t('privacy')}</Link>

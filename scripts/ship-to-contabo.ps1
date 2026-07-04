@@ -4,7 +4,7 @@
 #
 # Usage:
 #   .\scripts\ship-to-contabo.ps1
-#   .\scripts\ship-to-contabo.ps1 -VpsHost 167.86.99.97 -RemoteUser root -RemoteDir /var/www/coindaily
+#   .\scripts\ship-to-contabo.ps1 -VpsHost 167.86.99.97 -RemoteUser root -RemoteDir /var/www/sygn
 #   .\scripts\ship-to-contabo.ps1 -SkipVerify   # skip the local build-verify gate
 #   .\scripts\ship-to-contabo.ps1 -DryRun       # rsync --dry-run, don't restart anything
 #   .\scripts\ship-to-contabo.ps1 -OnlyFix      # only run fix-contabo-ollama-sdxl.sh on remote
@@ -14,7 +14,7 @@
 param(
     [string]$VpsHost     = "167.86.99.97",
     [string]$RemoteUser  = "root",
-    [string]$RemoteDir   = "/var/www/coindaily",
+    [string]$RemoteDir   = "/var/www/sygn",
     [string]$SshKey      = "",
     [switch]$SkipVerify,
     [switch]$DryRun,

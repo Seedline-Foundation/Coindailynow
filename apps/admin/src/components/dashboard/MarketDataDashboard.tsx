@@ -126,7 +126,7 @@ export function MarketDataDashboard({
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  CoinDaily Africa
+                  Sygn Africa
                 </h1>
                 <div 
                   className="ml-4 flex items-center text-sm"

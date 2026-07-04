@@ -143,7 +143,7 @@ export default function ApiPricingPage() {
             🔌 API Access
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
-            CoinDaily API
+            Sygn API
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-6">
             Integrate real-time African crypto market data into your applications. REST API and WebSocket feeds

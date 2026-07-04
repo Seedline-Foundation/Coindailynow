@@ -595,7 +595,7 @@ export default function ExpertProgramDashboard() {
             <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-5 text-white">
               <div className="flex items-center gap-2 mb-1 opacity-80"><Sparkles className="w-5 h-5" /> Tokens Paid Out</div>
               <p className="text-3xl font-black">{formatCurrency(stats.totalTokensPaid)}</p>
-              <p className="text-sm opacity-80 mt-1">CoinDaily Token distributions</p>
+              <p className="text-sm opacity-80 mt-1">Sygn Token distributions</p>
             </div>
             <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-5 text-white">
               <div className="flex items-center gap-2 mb-1 opacity-80"><Target className="w-5 h-5" /> Avg Quality Score</div>
@@ -773,7 +773,7 @@ export default function ExpertProgramDashboard() {
         <>
           <div className="bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 rounded-xl p-6 text-white mb-2">
             <h2 className="text-xl font-bold flex items-center gap-2"><Trophy className="w-6 h-6" /> Award Benchmarks & Criteria</h2>
-            <p className="text-yellow-100 text-sm mt-1">Experts who meet these benchmarks qualify for quarterly awards. All prizes in CoinDaily Token (CDT).</p>
+            <p className="text-yellow-100 text-sm mt-1">Experts who meet these benchmarks qualify for quarterly awards. All prizes in Sygn Token (CDT).</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

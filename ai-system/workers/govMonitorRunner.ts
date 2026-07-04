@@ -2,7 +2,7 @@
  * Standalone entry point for the GovMonitor worker.
  *
  * PM2:
- *   pm2 start --name coindaily-govmonitor "tsx ai-system/workers/govMonitorRunner.ts"
+ *   pm2 start --name sygn-govmonitor "tsx ai-system/workers/govMonitorRunner.ts"
  *
  * One-shot (cron):
  *   tsx ai-system/workers/govMonitorRunner.ts --once

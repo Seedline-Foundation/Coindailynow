@@ -198,7 +198,7 @@ export class SitemapService {
       // Google News specific data
       const news = url.ele('news:news');
       news.ele('news:publication')
-        .ele('news:name').txt('CoinDaily').up()
+        .ele('news:name').txt('Sygn').up()
         .ele('news:language').txt('en').up()
         .up();
       news.ele('news:publication_date').txt(article.publishedAt?.toISOString() || article.createdAt.toISOString()).up();

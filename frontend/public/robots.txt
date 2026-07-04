@@ -1,4 +1,4 @@
-# CoinDaily - Africa's Premier Crypto & Finance Data Hub
+# Sygn - Africa's Premier Crypto & Finance Data Hub
 # https://sygn.live
 
 User-agent: *

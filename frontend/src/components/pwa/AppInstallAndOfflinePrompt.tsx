@@ -20,7 +20,7 @@ export default function AppInstallAndOfflinePrompt() {
       if (online) {
         const ts = new Date().toISOString();
         setLastOnlineAt(ts);
-        localStorage.setItem('coindaily_last_online_at', ts);
+        localStorage.setItem('sygn_last_online_at', ts);
       }
     };
 
@@ -30,7 +30,7 @@ export default function AppInstallAndOfflinePrompt() {
       setShowInstall(true);
     };
 
-    const cachedLastOnline = localStorage.getItem('coindaily_last_online_at') || '';
+    const cachedLastOnline = localStorage.getItem('sygn_last_online_at') || '';
     if (cachedLastOnline) setLastOnlineAt(cachedLastOnline);
 
     updateOnlineState();
@@ -67,7 +67,7 @@ export default function AppInstallAndOfflinePrompt() {
 
       {showInstall && (
         <div className="fixed bottom-4 left-4 right-4 z-50 rounded-xl border border-cyan-300 bg-cyan-50 px-4 py-3 text-sm text-cyan-900 shadow-lg md:left-auto md:right-4 md:w-[420px]">
-          <div className="font-semibold">Install CoinDaily App</div>
+          <div className="font-semibold">Install Sygn App</div>
           <div className="mt-1 text-xs">Get faster launch and offline access for African crypto news.</div>
           <div className="mt-3 flex gap-2">
             <button onClick={handleInstall} className="rounded-md bg-cyan-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-cyan-800">

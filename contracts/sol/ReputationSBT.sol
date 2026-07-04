@@ -67,7 +67,7 @@ contract ReputationSBT is ERC721, AccessControl {
     event DisputeRecorded(address indexed merchant, uint256 newDisputeCount);
     event ZKVerificationCompleted(address indexed merchant);
 
-    constructor() ERC721("CoinDaily Eco-Zone Reputation", "CDREP") {
+    constructor() ERC721("Sygn Eco-Zone Reputation", "CDREP") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(UPDATER_ROLE, msg.sender);
         _grantRole(DISPUTE_RESOLVER_ROLE, msg.sender);

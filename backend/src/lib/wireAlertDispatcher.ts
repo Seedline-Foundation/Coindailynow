@@ -1,5 +1,5 @@
 /**
- * Dispatch CoinDaily Wire notifications to subscribers (email / Telegram).
+ * Dispatch Sygn Wire notifications to subscribers (email / Telegram).
  * Subscribers are stored at wire:alert:email:* and wire:alert:tg:*; INDEX_KEY tracks active keys.
  */
 import axios from 'axios';
@@ -51,14 +51,14 @@ export async function notifyWireSubscribers(item: WireAlertPayload): Promise<voi
     return;
   }
 
-  const text = `New on CoinDaily Wire: ${item.headline}\n${item.company ? `Company: ${item.company}\n` : ''}Published: ${item.publishedAt}\n\nView: https://press.sygn.live/wire/${item.id}`;
+  const text = `New on Sygn Wire: ${item.headline}\n${item.company ? `Company: ${item.company}\n` : ''}Published: ${item.publishedAt}\n\nView: https://press.sygn.live/wire/${item.id}`;
 
   const itemUrl = `https://press.sygn.live/wire/${item.id}`;
   const html = `
     <!DOCTYPE html>
     <html><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:#0d1117;color:#e6edf3;">
       <div style="max-width:600px;margin:0 auto;padding:24px;background:#161b22;border:1px solid #30363d;border-radius:8px;">
-        <p style="margin:0 0 8px 0;color:#7d8590;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;">CoinDaily Wire · ${
+        <p style="margin:0 0 8px 0;color:#7d8590;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;">Sygn Wire · ${
           item.region || 'Global'
         }${item.category ? ` · ${item.category}` : ''}</p>
         <h2 style="margin:0 0 16px 0;color:#f0f6fc;font-size:18px;line-height:1.35;">${escapeHtml(item.headline)}</h2>
@@ -68,7 +68,7 @@ export async function notifyWireSubscribers(item: WireAlertPayload): Promise<voi
         </table>
         <a href="${itemUrl}" style="display:inline-block;margin-top:20px;padding:10px 18px;background:#f97316;color:#0d1117;font-weight:600;text-decoration:none;border-radius:6px;font-size:13px;">Read full release →</a>
         <p style="margin-top:24px;font-size:11px;color:#6e7681;line-height:1.5;">
-          You are subscribed to CoinDaily Wire alerts.
+          You are subscribed to Sygn Wire alerts.
           <a href="https://press.sygn.live/wire/unsubscribe" style="color:#7d8590;">Unsubscribe</a>.
         </p>
       </div>

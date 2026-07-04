@@ -4,7 +4,7 @@ import BotService from '../services/botService';
 const router = Router();
 
 // Webhook verification token for WhatsApp Cloud API
-const WHATSAPP_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || 'coindaily_verify';
+const WHATSAPP_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || 'sygn_verify';
 
 /**
  * POST /api/bots/telegram/webhook

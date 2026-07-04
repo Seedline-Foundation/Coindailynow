@@ -1,6 +1,6 @@
 /**
  * ArticleContent - Article Content Renderer with Progress Tracking
- * CoinDaily Platform - Task 21 Implementation
+ * Sygn Platform - Task 21 Implementation
  */
 
 import React, { useEffect, useRef, useCallback } from 'react';

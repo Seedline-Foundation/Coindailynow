@@ -25,7 +25,7 @@ import {
   MemefiAwardSection,
   FeaturedNewsSection,
   GeneralCryptoSection,
-  CoinDailyCastSection,
+  SygnCastSection,
   OpinionSection,
   TokenReviewsSection,
   PolicyUpdatesSection,
@@ -615,7 +615,7 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({
             </div>
             
             <div className="flex-1">
-              <h3 className="text-xl font-bold mb-2">CoinDaily Newsletter</h3>
+              <h3 className="text-xl font-bold mb-2">Sygn Newsletter</h3>
               <p className="text-muted-foreground mb-4">
                 {previewContent}
               </p>

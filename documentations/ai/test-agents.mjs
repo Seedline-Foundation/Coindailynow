@@ -24,7 +24,7 @@ async function main() {
   } catch {}
 
   console.log('\n========================================');
-  console.log(`  CoinDaily AI Agent Test Suite [${mode}]`);
+  console.log(`  Sygn AI Agent Test Suite [${mode}]`);
   console.log(mode === 'LIVE' ? '  Using REAL models via Ollama' : '  Mock mode (no Ollama required)');
   console.log('========================================\n');
 
@@ -82,7 +82,7 @@ async function main() {
     {
       agent: 'support-agent',
       label: 'Customer Support (Llama)',
-      body: { input: { taskType: 'respond', data: { query: 'How do I buy Bitcoin using M-Pesa on CoinDaily?', userRegion: 'kenya' } }, priority: 'high' }
+      body: { input: { taskType: 'respond', data: { query: 'How do I buy Bitcoin using M-Pesa on Sygn?', userRegion: 'kenya' } }, priority: 'high' }
     },
     {
       agent: 'trade-bot-agent',

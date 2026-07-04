@@ -44,7 +44,7 @@ class CacheService {
   private redis: Redis;
   private metrics: CacheMetrics;
   private readonly DEFAULT_TTL = 3600; // 1 hour
-  private readonly KEY_PREFIX = 'coindaily:';
+  private readonly KEY_PREFIX = 'sygn:';
 
   constructor(redis: Redis) {
     this.redis = redis;
@@ -599,8 +599,14 @@ export const cacheHeadersMiddleware = (req: Request, res: Response, next: NextFu
   } else if (path.includes('/api/articles') || path.includes('/api/content')) {
     // Article content: 1 hour
     res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-  } else if (path.includes('/api/user') || path.includes('/api/auth')) {
-    // User data: no cache
+  } else if (
+    path.includes('/api/user') ||
+    path.includes('/api/auth') ||
+    path.includes('/api/admin') ||
+    path.includes('/api/super-admin') ||
+    path.includes('/api/media')
+  ) {
+    // User/admin data: authenticated + mutable — never cache
     res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
   } else {
     // Default: 10 minutes

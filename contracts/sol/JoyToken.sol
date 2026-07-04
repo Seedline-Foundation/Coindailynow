@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title JoyToken (JOY)
- * @dev CoinDaily's ERC-20 utility token for microservice payments.
+ * @dev Sygn's ERC-20 utility token for microservice payments.
  *
  * - Name: Joy Token
  * - Symbol: JOY

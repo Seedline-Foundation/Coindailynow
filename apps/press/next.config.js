@@ -17,7 +17,7 @@ class NormalizeDriveLetterPlugin {
 
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['@coindaily/ui'],
+  transpilePackages: ['@sygn/ui'],
   
   // Comprehensive Windows drive letter casing fix
   webpack: (config) => {

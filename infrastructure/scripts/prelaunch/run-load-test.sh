@@ -8,7 +8,7 @@ API_URL="${API_URL:-https://app.sygn.live}"
 REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 K6_SCRIPT="${REPO_ROOT}/infrastructure/load-tests/k6-launch.js"
 
-echo "=== CoinDaily load test ==="
+echo "=== Sygn load test ==="
 echo "BASE_URL=$BASE_URL"
 echo "API_URL=$API_URL"
 

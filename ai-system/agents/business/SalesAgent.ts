@@ -14,7 +14,7 @@ export class SalesAgent extends BaseAgent {
       name: 'Sales Agent',
       type: 'sales',
       category: 'business',
-      description: 'Automates sales processes including outreach emails, proposal generation, ad package creation, partnership pitches, and deal tracking for CoinDaily advertising and enterprise subscriptions.',
+      description: 'Automates sales processes including outreach emails, proposal generation, ad package creation, partnership pitches, and deal tracking for Sygn advertising and enterprise subscriptions.',
       capabilities: [
         'outreach_email',
         'proposal_generation',
@@ -60,12 +60,12 @@ export class SalesAgent extends BaseAgent {
   }
 
   private async generateOutreach(prospect: any, context?: any): Promise<Record<string, any>> {
-    const prompt = `Create a personalized cold outreach email for CoinDaily advertising:
+    const prompt = `Create a personalized cold outreach email for Sygn advertising:
 
 Prospect: ${JSON.stringify(prospect || {}, null, 2)}
 Context: ${JSON.stringify(context || {}, null, 2)}
 
-CoinDaily is Africa's #1 crypto news platform reaching 500K+ monthly readers across Nigeria, Kenya, South Africa, and Ghana.
+Sygn is Africa's #1 crypto news platform reaching 500K+ monthly readers across Nigeria, Kenya, South Africa, and Ghana.
 
 Return JSON:
 {
@@ -87,7 +87,7 @@ Return JSON:
   }
 
   private async generateProposal(prospect: any, data?: any): Promise<Record<string, any>> {
-    const prompt = `Generate a professional sales proposal for CoinDaily services:
+    const prompt = `Generate a professional sales proposal for Sygn services:
 
 Prospect: ${JSON.stringify(prospect || {}, null, 2)}
 Requirements: ${JSON.stringify(data || {}, null, 2)}
@@ -122,7 +122,7 @@ Return JSON:
   }
 
   private async createAdPackage(prospect: any, data?: any): Promise<Record<string, any>> {
-    const prompt = `Create a tailored advertising package for a crypto/fintech advertiser on CoinDaily:
+    const prompt = `Create a tailored advertising package for a crypto/fintech advertiser on Sygn:
 
 Advertiser: ${JSON.stringify(prospect || {}, null, 2)}
 Requirements: ${JSON.stringify(data || {}, null, 2)}
@@ -159,7 +159,7 @@ Return JSON:
   }
 
   private async partnershipPitch(prospect: any, data?: any): Promise<Record<string, any>> {
-    const prompt = `Create a partnership pitch for CoinDaily:
+    const prompt = `Create a partnership pitch for Sygn:
 
 Partner: ${JSON.stringify(prospect || {}, null, 2)}
 Partnership type: ${JSON.stringify(data || {}, null, 2)}
@@ -172,7 +172,7 @@ Return JSON:
     "valueProposition": string,
     "synergies": [string],
     "partnershipModel": string,
-    "benefits": {"forPartner": [string], "forCoinDaily": [string], "forUsers": [string]},
+    "benefits": {"forPartner": [string], "forSygn": [string], "forUsers": [string]},
     "revenueModel": string,
     "implementationPlan": [{"phase": string, "actions": [string], "timeline": string}],
     "metrics": [{"kpi": string, "target": string}],
@@ -185,7 +185,7 @@ Return JSON:
   }
 
   private async handleObjection(objection: string, context?: any): Promise<Record<string, any>> {
-    const prompt = `Handle this sales objection for CoinDaily services:
+    const prompt = `Handle this sales objection for Sygn services:
 
 Objection: "${objection}"
 Context: ${JSON.stringify(context || {}, null, 2)}
@@ -231,7 +231,7 @@ Return JSON:
   }
 
   private async calculateROI(data: any): Promise<Record<string, any>> {
-    const prompt = `Calculate ROI for advertising on CoinDaily:
+    const prompt = `Calculate ROI for advertising on Sygn:
 
 Campaign data: ${JSON.stringify(data || {}, null, 2)}
 

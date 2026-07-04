@@ -1,5 +1,5 @@
 /**
- * CoinDaily Platform - Footer Component Types
+ * Sygn Platform - Footer Component Types
  * Task 55: Type definitions for comprehensive footer system
  */
 

@@ -2,15 +2,15 @@
 # Idempotent deploy for the Contabo VPS using symlinks.
 #
 # Topology:
-#   /var/www/Coindailynow                      ← source of truth (monorepo, git pull)
-#   /var/www/coindaily-app          → symlink → Coindailynow/backend
-#   /var/www/coindaily-news         → symlink → Coindailynow/frontend
-#   /var/www/coindaily-admin        → symlink → Coindailynow/apps/admin
-#   /var/www/coindaily-press        → symlink → Coindailynow/apps/press
-#   /var/www/coindaily-ai           → symlink → Coindailynow/apps/ai
-#   /var/www/coindaily-ai-system    → symlink → Coindailynow/ai-system
-#   /var/www/coindaily-cfis         → symlink → Coindailynow/finance-system   [NEW]
-#   /var/www/coindaily-iengine      → symlink → Coindailynow/Iengine          [if needed]
+#   /var/www/Sygn                      ← source of truth (monorepo, git pull)
+#   /var/www/sygn-app          → symlink → Sygn/backend
+#   /var/www/sygn-news         → symlink → Sygn/frontend
+#   /var/www/sygn-admin        → symlink → Sygn/apps/admin
+#   /var/www/sygn-press        → symlink → Sygn/apps/press
+#   /var/www/sygn-ai           → symlink → Sygn/apps/ai
+#   /var/www/sygn-ai-system    → symlink → Sygn/ai-system
+#   /var/www/sygn-cfis         → symlink → Sygn/finance-system   [NEW]
+#   /var/www/sygn-iengine      → symlink → Sygn/Iengine          [if needed]
 #   /var/www/ecosystem.config.js    ← copied from infrastructure/ecosystem.production.config.js
 #
 # Safety:
@@ -22,7 +22,7 @@
 
 set -euo pipefail
 
-REPO=${REPO:-/var/www/Coindailynow}
+REPO=${REPO:-/var/www/Sygn}
 STAMP=$(date +%Y%m%d-%H%M%S)
 
 if [ ! -d "$REPO" ]; then
@@ -35,19 +35,19 @@ echo "==> Backup stamp: $STAMP"
 
 # Each row: <symlink-path> <target-relative-to-REPO>
 mapfile -t LINKS <<EOF
-/var/www/coindaily-app|backend
-/var/www/coindaily-news|frontend
-/var/www/coindaily-admin|apps/admin
-/var/www/coindaily-press|apps/press
-/var/www/coindaily-ai|apps/ai
-/var/www/coindaily-ai-system|ai-system
-/var/www/coindaily-cfis|finance-system
-/var/www/coindaily-iengine|Iengine
+/var/www/sygn-app|backend
+/var/www/sygn-news|frontend
+/var/www/sygn-admin|apps/admin
+/var/www/sygn-press|apps/press
+/var/www/sygn-ai|apps/ai
+/var/www/sygn-ai-system|ai-system
+/var/www/sygn-cfis|finance-system
+/var/www/sygn-iengine|Iengine
 EOF
 
-# ── 1. Ensure each /var/www/coindaily-X is a symlink to the repo subdir ──
+# ── 1. Ensure each /var/www/sygn-X is a symlink to the repo subdir ──
 echo ""
-echo "==> 1. Reconciling /var/www/coindaily-X symlinks"
+echo "==> 1. Reconciling /var/www/sygn-X symlinks"
 for row in "${LINKS[@]}"; do
   link="${row%%|*}"
   target="$REPO/${row##*|}"
@@ -133,7 +133,7 @@ build_step "apps/press"       apps/press     "npm run build"
 # ── 5. Reload PM2 from the now-canonical /var/www/ecosystem.config.js ──
 echo ""
 echo "==> 5. PM2 reload"
-mkdir -p /var/log/coindaily
+mkdir -p /var/log/sygn
 pm2 startOrReload /var/www/ecosystem.config.js
 pm2 save
 

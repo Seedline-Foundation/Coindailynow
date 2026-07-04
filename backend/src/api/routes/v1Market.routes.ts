@@ -258,7 +258,7 @@ router.get('/ticks/:symbol/export.csv', async (req: Request, res: Response) => {
     );
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="coindaily-ticks-${symbol.toUpperCase()}-${interval}.csv"`);
+    res.setHeader('Content-Disposition', `attachment; filename="sygn-ticks-${symbol.toUpperCase()}-${interval}.csv"`);
     return res.send(lines.join('\n'));
   } catch (error: any) {
     return res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
@@ -292,7 +292,7 @@ router.get('/ticks/:symbol/export.json', async (req: Request, res: Response) => 
     });
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="coindaily-ticks-${symbol.toUpperCase()}-${interval}.json"`);
+    res.setHeader('Content-Disposition', `attachment; filename="sygn-ticks-${symbol.toUpperCase()}-${interval}.json"`);
     return res.send(JSON.stringify({
       symbol: symbol.toUpperCase(),
       interval,

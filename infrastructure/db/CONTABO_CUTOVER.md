@@ -1,10 +1,10 @@
 # Contabo DB Cutover Runbook
 
 > **Set this once:** `REPO_DIR` below should match the actual repo directory on your VPS.
-> Your server shows `Coindailynow` — adjust if needed.
+> Your server shows `Sygn` — adjust if needed.
 
 ```bash
-export REPO_DIR="/var/www/Coindailynow"
+export REPO_DIR="/var/www/Sygn"
 ```
 
 ## Step 1 — Push & Pull
@@ -53,11 +53,11 @@ cp backend/.env.production backend/.env.production.pre-contabo
 ## Step 6 — Stop PM2 Services
 
 ```bash
-pm2 stop coindaily-backend
-pm2 stop coindaily-news
-pm2 stop coindaily-admin
-pm2 stop coindaily-press
-pm2 stop coindaily-ai
+pm2 stop sygn-backend
+pm2 stop sygn-news
+pm2 stop sygn-admin
+pm2 stop sygn-press
+pm2 stop sygn-ai
 pm2 status
 ```
 
@@ -73,8 +73,8 @@ bash scripts/migrate-from-supabase.sh
 
 ```bash
 cd $REPO_DIR/backend
-export DATABASE_URL='postgresql://coindaily:<password>@127.0.0.1:5432/coindaily?sslmode=disable'
-export DIRECT_URL='postgresql://coindaily:<password>@127.0.0.1:5432/coindaily?sslmode=disable'
+export DATABASE_URL='postgresql://sygn:<password>@127.0.0.1:5432/sygn?sslmode=disable'
+export DIRECT_URL='postgresql://sygn:<password>@127.0.0.1:5432/sygn?sslmode=disable'
 npx prisma db push
 
 cd $REPO_DIR/infrastructure/db
@@ -83,17 +83,17 @@ bash scripts/apply-timescale.sh
 
 ## Step 9 — Cutover Env + Restart
 
-The deployed backend lives at `/var/www/coindaily-app/`, not in the repo.
+The deployed backend lives at `/var/www/sygn-app/`, not in the repo.
 
 Edit **the deployed** backend env:
 ```bash
-nano /var/www/coindaily-app/.env.production
+nano /var/www/sygn-app/.env.production
 ```
 
 Replace **only** the database lines:
 ```
-DATABASE_URL="postgresql://coindaily:<password>@127.0.0.1:5432/coindaily_prod?sslmode=disable"
-DIRECT_URL="postgresql://coindaily:<password>@127.0.0.1:5432/coindaily_prod?sslmode=disable"
+DATABASE_URL="postgresql://sygn:<password>@127.0.0.1:5432/sygn_prod?sslmode=disable"
+DIRECT_URL="postgresql://sygn:<password>@127.0.0.1:5432/sygn_prod?sslmode=disable"
 ```
 Save (`Ctrl+O`, `Enter`, `Ctrl+X`).
 
@@ -105,9 +105,9 @@ pm2 save
 
 Health checks:
 ```bash
-curl -fsS https://backend.coindaily.online/health
-curl -I -s -o /dev/null -w "%{http_code}" https://coindaily.online
-curl -I -s -o /dev/null -w "%{http_code}" https://jet.coindaily.online
+curl -fsS https://backend.sygn.online/health
+curl -I -s -o /dev/null -w "%{http_code}" https://sygn.online
+curl -I -s -o /dev/null -w "%{http_code}" https://jet.sygn.online
 ```
 
 ## Step 10 — Post-Cutover Backup

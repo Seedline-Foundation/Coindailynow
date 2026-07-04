@@ -6,7 +6,7 @@ import { TimelockController as OZTimelock } from "@openzeppelin/contracts/govern
 /**
  * C-2-3: Timelock for privileged ops — deploy with multisig as proposers/executors.
  */
-contract CoinDailyTimelock is OZTimelock {
+contract SygnTimelock is OZTimelock {
     constructor(
         uint256 minDelay,
         address[] memory proposers,

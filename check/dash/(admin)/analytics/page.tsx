@@ -27,7 +27,7 @@ export default function AdminAnalyticsPage() {
       connected: true,
       lastSync: new Date(),
       status: 'verified',
-      siteUrl: 'https://coindaily.news'
+      siteUrl: 'https://sygn.news'
     },
     facebook: {
       connected: false,
@@ -39,7 +39,7 @@ export default function AdminAnalyticsPage() {
       connected: true,
       lastSync: new Date(),
       status: 'active',
-      accountId: '@coindailynews'
+      accountId: '@sygnnews'
     }
   };
 

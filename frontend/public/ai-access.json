@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "name": "CoinDaily Knowledge API",
+  "name": "Sygn Knowledge API",
   "description": "AI-optimized API for cryptocurrency and blockchain news, analysis, and data from Africa's premier crypto news platform",
   "base_url": "https://sygn.live",
   "api_base": "https://sygn.live/api/knowledge-api",

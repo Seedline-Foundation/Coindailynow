@@ -1,4 +1,4 @@
-# UptimeRobot Setup — CoinDaily Africa
+# UptimeRobot Setup — Sygn Africa
 
 Free tier: 50 monitors, 5-minute intervals.
 
@@ -9,11 +9,11 @@ Free tier: 50 monitors, 5-minute intervals.
 
 | Monitor Name | URL | Type | Interval |
 |---|---|---|---|
-| CoinDaily Frontend | `https://sygn.live` | HTTP(s) | 5 min |
-| CoinDaily API Health | `https://api.sygn.live/health` | HTTP(s) - keyword "healthy" | 5 min |
-| CoinDaily Admin | `https://jet.sygn.live` | HTTP(s) | 5 min |
-| CoinDaily Press | `https://press.sygn.live` | HTTP(s) | 5 min |
-| CoinDaily AI | `https://ai.sygn.live` | HTTP(s) | 5 min |
+| Sygn Frontend | `https://sygn.live` | HTTP(s) | 5 min |
+| Sygn API Health | `https://api.sygn.live/health` | HTTP(s) - keyword "healthy" | 5 min |
+| Sygn Admin | `https://jet.sygn.live` | HTTP(s) | 5 min |
+| Sygn Press | `https://press.sygn.live` | HTTP(s) | 5 min |
+| Sygn AI | `https://ai.sygn.live` | HTTP(s) | 5 min |
 
 3. Configure alerts:
    - **Email**: your founder email

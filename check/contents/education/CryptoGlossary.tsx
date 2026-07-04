@@ -20,7 +20,7 @@ const CryptoGlossary = () => {
       const timeoutId = setTimeout(() => controller.abort(), 2000); // Terminate after 2 seconds
 
       try {
-        const response = await fetch('https://api.coindaily.online/mock-glossary', {
+        const response = await fetch('https://api.sygn.online/mock-glossary', {
           signal: controller.signal,
           cache: 'no-store',
         });

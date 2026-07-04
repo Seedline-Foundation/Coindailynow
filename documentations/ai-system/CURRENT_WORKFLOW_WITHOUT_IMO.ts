@@ -1,6 +1,6 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════════╗
- * ║         COINDAILY AI SYSTEM WORKFLOW (WITHOUT IMO)                       ║
+ * ║         SYGN AI SYSTEM WORKFLOW (WITHOUT IMO)                       ║
  * ║                    Current Architecture                                   ║
  * ╚══════════════════════════════════════════════════════════════════════════╝
  * 

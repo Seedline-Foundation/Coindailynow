@@ -1,5 +1,5 @@
 /**
- * CoinDaily App Mode Configuration
+ * Sygn App Mode Configuration
  * Determines which sections of the app are enabled based on deployment
  */
 

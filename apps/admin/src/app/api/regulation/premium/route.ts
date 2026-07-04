@@ -2,7 +2,7 @@
  * Premium Regulation API
  * Serves comprehensive regulatory intelligence data for paid members.
  * Includes risk scores, editorial analysis, full timelines, tax frameworks,
- * licensing requirements, CBDC progress, and CoinDaily expert views.
+ * licensing requirements, CBDC progress, and Sygn expert views.
  */
 
 export const runtime = 'nodejs';
@@ -68,7 +68,7 @@ export interface PremiumCountryRegulation {
     description: string;
     impactLevel: string;
   }[];
-  // CoinDaily Expert Analysis
+  // Sygn Expert Analysis
   editorialAnalysis: {
     outlook: 'Bullish' | 'Neutral' | 'Bearish' | 'Uncertain';
     summary: string;
@@ -156,7 +156,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
         'Multiple regulators (SEC, CBN, NFIU) create coordination challenges',
       ],
       recommendation: 'Nigeria is a MUST-ENTER market for any African crypto business. Pursue SEC VASP registration immediately. The clear regulatory framework reduces uncertainty, and the sheer market size (~35M crypto users) justifies the compliance investment. Budget 16-20 weeks for licensing.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-02-12',
     },
     marketContext: {
@@ -228,7 +228,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
         'Competition with Dubai and South Africa for pan-African crypto headquarters',
       ],
       recommendation: 'Kenya is a HIGH-PRIORITY market for East Africa expansion. Apply for CMA sandbox ASAP to secure an early position. The Virtual Assets Bill is likely to pass in 2026, creating a clear compliance pathway. M-Pesa integration is a unique moat — design your product around mobile money flows.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-02-08',
     },
     marketContext: {
@@ -301,7 +301,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
         '24-week licensing timeline is among the longest in Africa',
       ],
       recommendation: 'South Africa should be in every serious crypto company\'s portfolio. The regulatory clarity is unmatched in Africa. Start FSCA application early. Ensure Travel Rule compliance by June 2026 deadline. Consider ZA as your African compliance headquarters.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-02-10',
     },
     marketContext: {
@@ -371,7 +371,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
         'No licensing framework means no regulatory protection for operators',
       ],
       recommendation: 'Ghana is a WATCH market. Don\'t invest heavily in compliance infrastructure yet, but maintain presence through P2P and partnerships. When the Digital Assets Framework drops (expected Q4 2026), be ready to apply quickly.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-02-05',
     },
     marketContext: {
@@ -439,7 +439,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
         'NBE historically conservative — ban reversal timeline uncertain',
       ],
       recommendation: 'Ethiopia is for PATIENT investors only. Do not attempt exchange operations under current regulations. Mining operations are viable if you have capital for PPA negotiation. Monitor the Digital Currency Study Commission for signals of policy shift.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-01-30',
     },
     marketContext: {
@@ -508,7 +508,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
         'KIFC licensing details still unknown',
       ],
       recommendation: 'Rwanda is an OPPORTUNITY market for companies seeking an East African license. The KIFC digital asset hub could become Africa\'s answer to Dubai\'s VARA. Apply for BNR sandbox to establish presence. Low cost of entry.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-02-01',
     },
     marketContext: {
@@ -573,7 +573,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
         'Capital controls complicate fund flows',
       ],
       recommendation: 'WAIT AND MONITOR. Apply for FRA sandbox if you have blockchain-based (non-trading) services. Do not attempt exchange operations until the Fintech Law passes. If the law is crypto-friendly, move fast — Egypt wil be a gold rush.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-01-25',
     },
     marketContext: {
@@ -638,7 +638,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
         'AMMC securities regulations may classify most tokens as securities',
       ],
       recommendation: 'Morocco is a HIGH-POTENTIAL market to watch. When the framework is finalized (expected Q3 2026), be among the first to apply. The diaspora remittance angle is particularly compelling. Start building relationships with BAM and AMMC now.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-02-05',
     },
     marketContext: {
@@ -678,7 +678,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
       opportunities: ['No regulatory barriers to market entry', 'Growing P2P volume driven by remittances', 'Mobile money infrastructure (MTN MoMo, Airtel Money)'],
       risks: ['No regulatory protection for operators', 'BOU could impose sudden restrictions', 'Small formal market'],
       recommendation: 'Low-priority market. Maintain P2P presence through Yellow Card or Binance. No need for significant compliance investment until formal regulation emerges.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-01-15',
     },
     marketContext: {
@@ -722,7 +722,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
       opportunities: ['Large underbanked population (60M)', 'If ban reverses, early movers win', 'M-Pesa Tanzania presence'],
       risks: ['Ban still officially in place', 'No regulatory protection', 'BOT unpredictable on timeline'],
       recommendation: 'WATCH market. Maintain low-cost P2P presence. Do not invest in compliance or infrastructure until ban is formally reversed.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-01-20',
     },
     marketContext: {
@@ -762,7 +762,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
       opportunities: ['Gateway to 8-country WAEMU market', 'eCFA could create CBDC infrastructure', 'Dakar tech hub growing'],
       risks: ['BCEAO conservative and slow-moving', 'Limited independent regulatory authority', 'Small formal crypto market'],
       recommendation: 'LOW PRIORITY as standalone market. More interesting as part of WAEMU strategy. Monitor eCFA developments.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-01-10',
     },
     marketContext: {
@@ -802,7 +802,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
       opportunities: ['Abidjan as francophone fintech hub', 'Orange Money crypto integration potential', 'Part of WAEMU market access'],
       risks: ['Same BCEAO limitations as Senegal', 'Political stability variable', 'Small formal crypto market'],
       recommendation: 'Pair with Senegal as WAEMU strategy. Abidjan has more fintech energy. Monitor ARTCI digital economy framework.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-01-10',
     },
     marketContext: {
@@ -840,7 +840,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
       opportunities: ['No regulatory barriers', 'Kwanza volatility drives crypto interest'],
       risks: ['Tiny market', 'Capital controls', 'Low internet penetration', 'No regulatory protection'],
       recommendation: 'LOW PRIORITY. Only relevant as part of SADC-wide strategy. No standalone opportunity.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-01-05',
     },
     marketContext: {
@@ -878,7 +878,7 @@ const PREMIUM_COUNTRIES: PremiumCountryRegulation[] = [
       opportunities: ['Mobile money growth', 'Natural gas revenue could spur fintech interest'],
       risks: ['Very small market', 'Low internet penetration', 'Political instability risk'],
       recommendation: 'NOT RECOMMENDED as standalone market. Only relevant as part of Southern African portfolio.',
-      analystName: 'CoinDaily Regulation Desk',
+      analystName: 'Sygn Regulation Desk',
       publishedDate: '2026-01-05',
     },
     marketContext: {

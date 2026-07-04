@@ -78,7 +78,7 @@ export default function SuperAdminHeader({ sidebarOpen, setSidebarOpen }: SuperA
             <Shield className="w-8 h-8 text-blue-600" />
             <div>
               <h1 className="text-lg font-bold text-gray-900 dark:text-white">
-                CoinDaily Super Admin
+                Sygn Super Admin
               </h1>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Central Management Console

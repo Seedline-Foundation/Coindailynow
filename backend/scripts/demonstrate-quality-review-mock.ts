@@ -273,7 +273,7 @@ async function demonstrateQualityReview() {
     mockPrisma,
     logger,
     {
-      projectId: 'coindaily-africa-demo',
+      projectId: 'sygn-africa-demo',
       location: 'us-central1',
       modelName: 'gemini-1.5-pro',
       qualityThreshold: 85,

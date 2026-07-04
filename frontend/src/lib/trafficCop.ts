@@ -44,9 +44,9 @@ function canvasFingerprint(): string | undefined {
     ctx.fillStyle = '#f60';
     ctx.fillRect(125, 1, 62, 20);
     ctx.fillStyle = '#069';
-    ctx.fillText('coindaily', 2, 2);
+    ctx.fillText('sygn', 2, 2);
     ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
-    ctx.fillText('coindaily', 4, 4);
+    ctx.fillText('sygn', 4, 4);
     return canvas.toDataURL().slice(0, 200);
   } catch {
     return undefined;

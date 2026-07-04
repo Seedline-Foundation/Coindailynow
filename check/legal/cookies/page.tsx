@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy | CoinDaily',
+  title: 'Cookie Policy | Sygn',
   description: 'Learn about our cookie usage and how to manage your preferences.',
   robots: 'index, follow',
 };
@@ -14,7 +14,7 @@ export default function CookiePolicyPage() {
         <p className="text-gray-600">Effective Date: July 31, 2025</p>
 
         <p>
-          This Cookie Policy explains how CoinDaily (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) uses cookies and similar 
+          This Cookie Policy explains how Sygn (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) uses cookies and similar 
           tracking technologies on our website and services to collect and store information.
         </p>
 
@@ -58,8 +58,8 @@ export default function CookiePolicyPage() {
         <h2>7. Contact</h2>
         <p>
           Email{' '}
-          <a href="mailto:privacy@coindaily.com" className="text-blue-600 hover:text-blue-800">
-            privacy@coindaily.com
+          <a href="mailto:privacy@sygn.com" className="text-blue-600 hover:text-blue-800">
+            privacy@sygn.com
           </a>{' '}
           for questions about this policy.
         </p>

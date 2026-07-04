@@ -153,7 +153,7 @@ export class AIVerificationAgent {
 
     // Enhance with DeepSeek R1 reasoning (non-blocking)
     const aiReasoning = await this.queryDeepSeek(
-      `You are ARIA, a financial risk AI for CoinDaily. Analyze this withdrawal request and provide a brief risk assessment in 2-3 sentences.\n\n` +
+      `You are ARIA, a financial risk AI for Sygn. Analyze this withdrawal request and provide a brief risk assessment in 2-3 sentences.\n\n` +
       `User: ${data.userId}\nAmount: ${data.amount} JY\n` +
       `Activity Score: ${activityScore.toFixed(4)}\nAccount Age: ${data.activityData.accountAgeDays} days\n` +
       `Points Earned: ${data.activityData.totalPointsEarned}\nArticles Read: ${data.activityData.totalArticlesRead}\n` +
@@ -380,7 +380,7 @@ export class AIVerificationAgent {
 
     // Enhance with DeepSeek R1 contract analysis
     const aiReasoning = await this.queryDeepSeek(
-      `You are ARIA, a financial compliance AI for CoinDaily. Analyze this partnership contract verification and provide a 2-3 sentence compliance assessment.\n\n` +
+      `You are ARIA, a financial compliance AI for Sygn. Analyze this partnership contract verification and provide a 2-3 sentence compliance assessment.\n\n` +
       `Partner: ${data.partnerName}\nContract Amount: ${data.contractAmount} JY\n` +
       `Signed Date: ${data.contractSignedDate}\nParties: ${data.contractParties?.length || 0}\n` +
       `Document Hash Present: ${!!data.contractDocHash}\nDoc URL: ${data.contractDocUrl}\n` +

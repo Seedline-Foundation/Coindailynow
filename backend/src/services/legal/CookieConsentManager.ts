@@ -78,7 +78,7 @@ export class CookieConsentManager {
         cookies: [
           {
             name: 'session_token',
-            provider: 'CoinDaily',
+            provider: 'Sygn',
             purpose: 'User authentication and session management',
             duration: '24 hours',
             type: 'first_party',
@@ -86,7 +86,7 @@ export class CookieConsentManager {
           },
           {
             name: 'csrf_token',
-            provider: 'CoinDaily',
+            provider: 'Sygn',
             purpose: 'Cross-Site Request Forgery protection',
             duration: 'Session',
             type: 'first_party',
@@ -113,7 +113,7 @@ export class CookieConsentManager {
         cookies: [
           {
             name: 'user_preferences',
-            provider: 'CoinDaily',
+            provider: 'Sygn',
             purpose: 'Store user interface preferences',
             duration: '1 year',
             type: 'first_party',
@@ -121,7 +121,7 @@ export class CookieConsentManager {
           },
           {
             name: 'language_setting',
-            provider: 'CoinDaily',
+            provider: 'Sygn',
             purpose: 'Remember language selection',
             duration: '1 year',
             type: 'first_party',
@@ -156,7 +156,7 @@ export class CookieConsentManager {
           },
           {
             name: 'internal_analytics',
-            provider: 'CoinDaily',
+            provider: 'Sygn',
             purpose: 'Internal usage analytics',
             duration: '2 years',
             type: 'first_party',
@@ -175,7 +175,7 @@ export class CookieConsentManager {
         cookies: [
           {
             name: 'marketing_consent',
-            provider: 'CoinDaily',
+            provider: 'Sygn',
             purpose: 'Track marketing consent preferences',
             duration: '1 year',
             type: 'first_party',
@@ -194,7 +194,7 @@ export class CookieConsentManager {
         cookies: [
           {
             name: 'ad_consent',
-            provider: 'CoinDaily',
+            provider: 'Sygn',
             purpose: 'Track advertising consent',
             duration: '1 year',
             type: 'first_party',

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# CoinDaily Coming Soon - Quick Setup Script
+# Sygn Coming Soon - Quick Setup Script
 # This script sets up the coming soon landing page
 
-echo "🚀 CoinDaily - Coming Soon Setup"
+echo "🚀 Sygn - Coming Soon Setup"
 echo "================================="
 echo ""
 

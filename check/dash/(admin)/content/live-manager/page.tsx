@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import LiveContentManager from '@/components/admin/content/LiveContentManager';
 
 export const metadata: Metadata = {
-  title: 'Live Content Manager | CoinDaily Admin',
+  title: 'Live Content Manager | Sygn Admin',
   description: 'Real-time content management with AI-powered tagging, live updates, and multi-site publishing.',
   keywords: 'live content, real-time updates, AI tagging, content management, admin dashboard',
 };

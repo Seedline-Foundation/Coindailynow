@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Provision the CoinDaily Postgres/TimescaleDB container on Contabo.
+# Provision the Sygn Postgres/TimescaleDB container on Contabo.
 # Idempotent: safe to re-run.
 #
 # Usage:
@@ -19,8 +19,8 @@ fi
 # shellcheck disable=SC1091
 set -a; source .env; set +a
 
-PGDATA_DIR="${HOST_PGDATA_DIR:-$HOME/coindaily/pgdata}"
-BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/coindaily/backups}"
+PGDATA_DIR="${HOST_PGDATA_DIR:-$HOME/sygn/pgdata}"
+BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/sygn/backups}"
 
 mkdir -p "$PGDATA_DIR" "$BACKUPS_DIR"
 chmod 700 "$PGDATA_DIR"
@@ -36,7 +36,7 @@ docker compose --env-file .env -f docker-compose.db.yml up -d
 
 echo "[provision] waiting for postgres to become ready..."
 for i in {1..60}; do
-  if docker exec coindaily-postgres pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" >/dev/null 2>&1; then
+  if docker exec sygn-postgres pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" >/dev/null 2>&1; then
     echo "[provision] postgres is ready."
     break
   fi
@@ -49,7 +49,7 @@ for i in {1..60}; do
 done
 
 echo "[provision] ensuring timescaledb extension is enabled..."
-docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
+docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" sygn-postgres \
   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
   -c "CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;"
 

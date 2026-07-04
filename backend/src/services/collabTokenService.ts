@@ -35,14 +35,14 @@ export interface CollabTokenPayload {
 export function mintCollabToken(payload: CollabTokenPayload): { token: string; expiresIn: number } {
   const token = jwt.sign(payload, getSecret(), {
     expiresIn: TOKEN_TTL_SECONDS,
-    issuer: 'coindaily-collab',
+    issuer: 'sygn-collab',
   });
   return { token, expiresIn: TOKEN_TTL_SECONDS };
 }
 
 export function verifyCollabToken(token: string): CollabTokenPayload {
   const decoded = jwt.verify(token, getSecret(), {
-    issuer: 'coindaily-collab',
+    issuer: 'sygn-collab',
   }) as CollabTokenPayload & { iat: number; exp: number };
 
   if (!decoded.runId || !decoded.userId) {

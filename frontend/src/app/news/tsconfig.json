@@ -21,9 +21,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@frontend/*": ["../../frontend/src/*"],
-      "@coindaily/ui": ["../../packages/ui/src"],
-      "@coindaily/utils": ["../../packages/utils/src"],
-      "@coindaily/types": ["../../packages/types/src"]
+      "@sygn/ui": ["../../packages/ui/src"],
+      "@sygn/utils": ["../../packages/utils/src"],
+      "@sygn/types": ["../../packages/types/src"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/**/*"],

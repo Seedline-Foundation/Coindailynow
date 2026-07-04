@@ -1,5 +1,5 @@
 /**
- * CoinDaily Platform - PM2 Ecosystem Configuration
+ * Sygn Platform - PM2 Ecosystem Configuration
  * 
  * Services:
  * - Backend API (app.sygn.live) - Port 4000
@@ -17,8 +17,8 @@ module.exports = {
     // BACKEND API - app.sygn.live
     // ============================================
     {
-      name: 'coindaily-backend',
-      cwd: '/var/www/coindaily-app',
+      name: 'sygn-backend',
+      cwd: '/var/www/sygn-app',
       script: 'dist/index.js',
       instances: 2,
       exec_mode: 'cluster',
@@ -26,8 +26,8 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 4000
       },
-      error_file: '/var/log/coindaily/backend-error.log',
-      out_file: '/var/log/coindaily/backend-out.log',
+      error_file: '/var/log/sygn/backend-error.log',
+      out_file: '/var/log/sygn/backend-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
       max_memory_restart: '1G',
@@ -44,8 +44,8 @@ module.exports = {
     // NEWS FRONTEND - sygn.live
     // ============================================
     {
-      name: 'coindaily-news',
-      cwd: '/var/www/coindaily-news',
+      name: 'sygn-news',
+      cwd: '/var/www/sygn-news',
       script: 'npm',
       args: 'start',
       instances: 1,
@@ -58,8 +58,8 @@ module.exports = {
         NEXT_PUBLIC_WS_URL: 'wss://app.sygn.live/graphql',
         NEXT_PUBLIC_AI_URL: 'https://ai.sygn.live'
       },
-      error_file: '/var/log/coindaily/news-error.log',
-      out_file: '/var/log/coindaily/news-out.log',
+      error_file: '/var/log/sygn/news-error.log',
+      out_file: '/var/log/sygn/news-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
       max_memory_restart: '800M',
@@ -73,8 +73,8 @@ module.exports = {
     // ADMIN PORTAL - jet.sygn.live
     // ============================================
     {
-      name: 'coindaily-admin',
-      cwd: '/var/www/coindaily-admin',
+      name: 'sygn-admin',
+      cwd: '/var/www/sygn-admin',
       script: 'npm',
       args: 'start',
       instances: 1,
@@ -88,8 +88,8 @@ module.exports = {
         NEXT_PUBLIC_AI_URL: 'https://ai.sygn.live',
         ADMIN_MODE: 'true'
       },
-      error_file: '/var/log/coindaily/admin-error.log',
-      out_file: '/var/log/coindaily/admin-out.log',
+      error_file: '/var/log/sygn/admin-error.log',
+      out_file: '/var/log/sygn/admin-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
       max_memory_restart: '500M',
@@ -103,8 +103,8 @@ module.exports = {
     // PR SYSTEM - press.sygn.live
     // ============================================
     {
-      name: 'coindaily-press',
-      cwd: '/var/www/coindaily-press',
+      name: 'sygn-press',
+      cwd: '/var/www/sygn-press',
       script: 'npm',
       args: 'start',
       instances: 1,
@@ -117,8 +117,8 @@ module.exports = {
         NEXT_PUBLIC_AI_URL: 'https://ai.sygn.live',
         PR_MODE: 'true'
       },
-      error_file: '/var/log/coindaily/pr-error.log',
-      out_file: '/var/log/coindaily/pr-out.log',
+      error_file: '/var/log/sygn/pr-error.log',
+      out_file: '/var/log/sygn/pr-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
       max_memory_restart: '500M',
@@ -132,8 +132,8 @@ module.exports = {
     // AI DASHBOARD - ai.sygn.live
     // ============================================
     {
-      name: 'coindaily-ai',
-      cwd: '/var/www/coindaily-ai',
+      name: 'sygn-ai',
+      cwd: '/var/www/sygn-ai',
       script: 'npm',
       args: 'start',
       instances: 1,
@@ -148,8 +148,8 @@ module.exports = {
         SDXL_API_ENDPOINT: 'http://localhost:7860',
         DEEPSEEK_API_URL: 'http://localhost:11434'
       },
-      error_file: '/var/log/coindaily/ai-error.log',
-      out_file: '/var/log/coindaily/ai-out.log',
+      error_file: '/var/log/sygn/ai-error.log',
+      out_file: '/var/log/sygn/ai-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
       max_memory_restart: '2G',
@@ -165,8 +165,8 @@ module.exports = {
     // NOT the Next.js dashboard (apps/ai/).
     // ============================================
     {
-      name: 'coindaily-ai-pipeline',
-      cwd: '/var/www/coindaily-ai-system',
+      name: 'sygn-ai-pipeline',
+      cwd: '/var/www/sygn-ai-system',
       script: 'dist/orchestrator/index.js',
       instances: 1,
       exec_mode: 'fork',
@@ -178,8 +178,8 @@ module.exports = {
         DEEPSEEK_API_URL: 'http://localhost:11434',
         REDIS_URL: 'redis://localhost:6379'
       },
-      error_file: '/var/log/coindaily/ai-pipeline-error.log',
-      out_file: '/var/log/coindaily/ai-pipeline-out.log',
+      error_file: '/var/log/sygn/ai-pipeline-error.log',
+      out_file: '/var/log/sygn/ai-pipeline-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
       max_memory_restart: '1G',
@@ -193,12 +193,12 @@ module.exports = {
     // ============================================
     // CFIS (Finance System) - cabfi.xyz
     // Hosted on cabfi.xyz, communicates with backend.sygn.live via HMAC.
-    // Deploy target: /var/www/coindaily-cfis (build output of finance-system/).
+    // Deploy target: /var/www/sygn-cfis (build output of finance-system/).
     // Port 3007 (was 3005 — section8 is holding 3005 since June 2026).
     // ============================================
     {
-      name: 'coindaily-cfis',
-      cwd: '/var/www/coindaily-cfis',
+      name: 'sygn-cfis',
+      cwd: '/var/www/sygn-cfis',
       script: 'dist/index.js',
       instances: 1,
       exec_mode: 'fork',
@@ -209,8 +209,8 @@ module.exports = {
         CFIS_PUBLIC_HOST: 'cabfi.xyz',
         CFIS_CORS_ORIGINS: 'https://cabfi.xyz,https://jet.sygn.live,https://app.sygn.live,https://press.sygn.live'
       },
-      error_file: '/var/log/coindaily/cfis-error.log',
-      out_file: '/var/log/coindaily/cfis-out.log',
+      error_file: '/var/log/sygn/cfis-error.log',
+      out_file: '/var/log/sygn/cfis-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
       max_memory_restart: '512M',
@@ -227,7 +227,7 @@ module.exports = {
     // upstream to 127.0.0.1:3006.
     // ============================================
     {
-      name: 'coindaily-token',
+      name: 'sygn-token',
       cwd: '/var/www/token-landing',
       script: 'npm',
       args: 'start',
@@ -237,8 +237,8 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3001
       },
-      error_file: '/var/log/coindaily/token-error.log',
-      out_file: '/var/log/coindaily/token-out.log',
+      error_file: '/var/log/sygn/token-error.log',
+      out_file: '/var/log/sygn/token-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
       max_memory_restart: '300M',

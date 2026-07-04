@@ -82,7 +82,7 @@ export const ValidationRules = {
       const reserved = [
         'admin', 'root', 'user', 'test', 'demo', 'api', 'www',
         'mail', 'support', 'help', 'info', 'contact', 'news',
-        'coindaily', 'bitcoin', 'ethereum', 'crypto'
+        'sygn', 'bitcoin', 'ethereum', 'crypto'
       ];
       
       if (reserved.includes(value.toLowerCase())) {

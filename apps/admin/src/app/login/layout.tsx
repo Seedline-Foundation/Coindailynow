@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Staff Login | CoinDaily Admin',
+  title: 'Staff Login | Sygn Admin',
   description: 'Secure staff login portal',
   robots: 'noindex, nofollow',
 };

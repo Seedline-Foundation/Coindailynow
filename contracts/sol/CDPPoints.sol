@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
- * @title CDPPoints — CoinDaily Points
- * @dev Off-chain-compatible on-chain ledger for CoinDaily Points (CDP).
+ * @title CDPPoints — Sygn Points
+ * @dev Off-chain-compatible on-chain ledger for Sygn Points (CDP).
  *
  *      CDP is NOT an ERC-20 token. It is a non-transferable points system
  *      used for engagement rewards, leaderboard ranking, and conversion

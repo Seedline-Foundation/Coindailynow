@@ -29,7 +29,7 @@ interface MarketplaceProduct {
 const products: MarketplaceProduct[] = [
   {
     id: 'pro-sub',
-    name: 'CoinDaily Pro',
+    name: 'Sygn Pro',
     category: 'Subscriptions',
     price: 29,
     originalPrice: 49,
@@ -45,7 +45,7 @@ const products: MarketplaceProduct[] = [
   },
   {
     id: 'enterprise-sub',
-    name: 'CoinDaily Enterprise',
+    name: 'Sygn Enterprise',
     category: 'Subscriptions',
     price: 199,
     interval: '/month',
@@ -133,14 +133,14 @@ const products: MarketplaceProduct[] = [
     isBoosted: true,
     paysWith: 'joy_token',
   },
-  // ── CoinDaily Products ───────────────────────────────
+  // ── Sygn Products ───────────────────────────────
   {
     id: 'q1-report',
     name: 'Africa Crypto Q1 2026 Report',
     category: 'Reports',
     price: 49.99,
     description: 'Institutional-grade analysis of the African crypto market for Q1 2026. ECOWAS focus with DeFi, P2P, and regulatory chapters.',
-    badge: 'CoinDaily',
+    badge: 'Sygn',
     rating: 4.9,
     reviews: 430,
     features: ['80+ pages', 'Market sizing data', '14 country profiles', 'DeFi & P2P analysis', 'Regulatory outlook', 'Downloadable PDF'],
@@ -205,12 +205,12 @@ export default function MarketplacePage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high' | 'rating'>('popular');
-  const [sellerFilter, setSellerFilter] = useState<'all' | 'sellers' | 'coindaily'>('all');
+  const [sellerFilter, setSellerFilter] = useState<'all' | 'sellers' | 'sygn'>('all');
 
   const filtered = products
     .filter(p => {
       if (sellerFilter === 'sellers' && !p.seller) return false;
-      if (sellerFilter === 'coindaily' && p.seller) return false;
+      if (sellerFilter === 'sygn' && p.seller) return false;
       return true;
     })
     .filter(p => (activeCategory === 'All' || p.category === activeCategory) &&
@@ -236,13 +236,13 @@ export default function MarketplacePage() {
         {/* Hero */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full text-sm font-medium mb-4">
-            🛒 CoinDaily Marketplace
+            🛒 Sygn Marketplace
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
             Products &amp; Digital Goods
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-4">
-            Premium reports, courses, API access, digital tools from CoinDaily and verified sellers — everything you need to succeed in Africa&apos;s crypto ecosystem.
+            Premium reports, courses, API access, digital tools from Sygn and verified sellers — everything you need to succeed in Africa&apos;s crypto ecosystem.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 mb-4 text-sm text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">📦 <strong className="text-gray-900 dark:text-white">{products.length}</strong> Products</span>
@@ -259,7 +259,7 @@ export default function MarketplacePage() {
         {/* Sell CTA Banner */}
         <div className="bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-white">
-            <h3 className="text-xl font-bold mb-1">Start Selling on CoinDaily Marketplace</h3>
+            <h3 className="text-xl font-bold mb-1">Start Selling on Sygn Marketplace</h3>
             <p className="text-orange-100 text-sm">List your courses, ebooks, tools, and reports for free. Boost them with our AI-powered ad agent.</p>
           </div>
           <Link href="/user/marketplace/products" className="px-6 py-3 bg-white text-orange-600 font-bold rounded-xl hover:bg-orange-50 transition-all whitespace-nowrap">
@@ -282,7 +282,7 @@ export default function MarketplacePage() {
             className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
           >
             <option value="all">All Sellers</option>
-            <option value="coindaily">CoinDaily Official</option>
+            <option value="sygn">Sygn Official</option>
             <option value="sellers">Community Sellers</option>
           </select>
           <select
@@ -326,7 +326,7 @@ export default function MarketplacePage() {
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">{product.name}</h3>
                     {product.badge && product.badge !== 'Boosted' && (
-                      <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${product.badge === 'CoinDaily' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'}`}>
+                      <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${product.badge === 'Sygn' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'}`}>
                         {product.badge}
                       </span>
                     )}
@@ -355,7 +355,7 @@ export default function MarketplacePage() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">🏢 Sold by CoinDaily</span>
+                  <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">🏢 Sold by Sygn</span>
                 </div>
               )}
 
@@ -416,7 +416,7 @@ export default function MarketplacePage() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 text-center">
           <h3 className="font-bold text-gray-900 dark:text-white mb-3">Secure Payments with JOY Tokens</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Pay with JOY Tokens from your CoinDaily Wallet, or fiat via Visa, Mastercard, M-Pesa, and crypto (BTC/ETH/USDT). All transactions are encrypted and secure.
+            Pay with JOY Tokens from your Sygn Wallet, or fiat via Visa, Mastercard, M-Pesa, and crypto (BTC/ETH/USDT). All transactions are encrypted and secure.
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-2xl">
             <span>🪙</span><span>💳</span><span>📱</span><span>₿</span><span>🔒</span>

@@ -1,8 +1,8 @@
 {
-  "name": "@coindaily/press",
+  "name": "@sygn/press",
   "version": "1.0.0",
   "private": true,
-  "description": "CoinDaily PR & Ad Distribution Network - press.sygn.live",
+  "description": "Sygn PR & Ad Distribution Network - press.sygn.live",
   "scripts": {
     "dev": "next dev -p 3003",
     "build": "next build",

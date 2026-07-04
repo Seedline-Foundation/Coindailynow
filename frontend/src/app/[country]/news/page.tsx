@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: { params: { country: string }
   if (!SUPPORTED_LANGS.has(code)) return {};
   const langName = LANG_NAMES[code] || code.toUpperCase();
   return {
-    title: `${langName} news | CoinDaily`,
+    title: `${langName} news | Sygn`,
     description: `Latest crypto, AI, and finance news in ${langName}.`,
     alternates: {
       canonical: `https://sygn.live/${code}/news`,

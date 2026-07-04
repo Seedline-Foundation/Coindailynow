@@ -1,8 +1,8 @@
 {
-  "name": "coindaily-platform",
+  "name": "sygn-platform",
   "version": "1.0.0",
   "private": true,
-  "description": "CoinDaily - Africa's Premier Cryptocurrency News Platform",
+  "description": "Sygn - Africa's Premier Cryptocurrency News Platform",
   "workspaces": [
     "apps/*",
     "packages/*",

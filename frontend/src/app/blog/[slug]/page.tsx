@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: article.metaTitle,
       description: article.metaDescription,
       url: `https://sygn.live/blog/${article.slug}`,
-      siteName: 'CoinDaily',
+      siteName: 'Sygn',
       type: 'article',
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title: article.metaTitle,
       description: article.metaDescription,
-      creator: '@CoinDailyOnline',
+      creator: '@SygnOnline',
     },
     alternates: {
       canonical: `https://sygn.live/blog/${article.slug}`,

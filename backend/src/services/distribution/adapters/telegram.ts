@@ -3,8 +3,8 @@
  *
  * Setup:
  *   1. Talk to @BotFather, /newbot → get token, save as TELEGRAM_BOT_TOKEN
- *   2. Add bot to your CoinDaily channel as an admin
- *   3. Channel id goes into DistributionTarget.metadata.channelId (e.g. @coindailyafrica)
+ *   2. Add bot to your Sygn channel as an admin
+ *   3. Channel id goes into DistributionTarget.metadata.channelId (e.g. @sygnafrica)
  *
  * Supports: article + video + image posts. Metrics via getChatMessage view count.
  */
@@ -95,7 +95,7 @@ function formatCaption(payload: DistributionPayload): string {
     '',
     payload.description ? escapeHtml(payload.description) : '',
     '',
-    `<a href="${escapeAttr(payload.articleUrl)}">Read on CoinDaily →</a>`,
+    `<a href="${escapeAttr(payload.articleUrl)}">Read on Sygn →</a>`,
     tags ? `\n${tags}` : '',
   ];
   return parts.filter(Boolean).join('\n').slice(0, 1024); // Telegram caption limit

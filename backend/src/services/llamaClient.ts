@@ -80,7 +80,7 @@ class LlamaClient {
     content: string;
     keywords: string[];
   }> {
-    const prompt = `Rewrite this crypto/finance article for CoinDaily, an African cryptocurrency news platform.
+    const prompt = `Rewrite this crypto/finance article for Sygn, an African cryptocurrency news platform.
 
 Make it:
 - 80%+ unique and plagiarism-free

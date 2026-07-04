@@ -32,7 +32,7 @@ const MarketSentiment = () => {
       const timeoutId = setTimeout(() => controller.abort(), 2000); // Terminate after 2 seconds
 
       try {
-        const response = await fetch('https://api.coindaily.online/mock-sentiment', {
+        const response = await fetch('https://api.sygn.online/mock-sentiment', {
           signal: controller.signal,
           cache: 'no-store',
         });

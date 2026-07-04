@@ -41,8 +41,8 @@ export function generateJWT(payload: {
     getJwtSecret(),
     {
       expiresIn: ACCESS_TOKEN_EXPIRY,
-      issuer: 'coindaily-api',
-      audience: 'coindaily-app'
+      issuer: 'sygn-api',
+      audience: 'sygn-app'
     }
   );
 }
@@ -56,8 +56,8 @@ export function generateRefreshToken(userId: string): string {
     getRefreshSecret(),
     {
       expiresIn: REFRESH_TOKEN_EXPIRY,
-      issuer: 'coindaily-api',
-      audience: 'coindaily-app'
+      issuer: 'sygn-api',
+      audience: 'sygn-app'
     }
   );
 }
@@ -68,8 +68,8 @@ export function generateRefreshToken(userId: string): string {
 export function verifyJWT(token: string): any {
   try {
     return jwt.verify(token, getJwtSecret(), {
-      issuer: 'coindaily-api',
-      audience: 'coindaily-app'
+      issuer: 'sygn-api',
+      audience: 'sygn-app'
     });
   } catch (error) {
     throw new Error('Invalid or expired token');
@@ -82,8 +82,8 @@ export function verifyJWT(token: string): any {
 export function verifyRefreshToken(token: string): any {
   try {
     return jwt.verify(token, getRefreshSecret(), {
-      issuer: 'coindaily-api',
-      audience: 'coindaily-app'
+      issuer: 'sygn-api',
+      audience: 'sygn-app'
     });
   } catch (error) {
     throw new Error('Invalid or expired refresh token');

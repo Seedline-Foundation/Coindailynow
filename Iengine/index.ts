@@ -1,7 +1,7 @@
 /**
  * Iengine — AI Visual Journalism Intelligence Engine
  *
- * A real-time editorial visual operating system for CoinDaily.
+ * A real-time editorial visual operating system for Sygn.
  * This is NOT merely an image generator. This is:
  *   - recognizable visual identity
  *   - cinematic editorial consistency

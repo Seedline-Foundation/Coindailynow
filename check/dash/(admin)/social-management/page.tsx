@@ -37,7 +37,7 @@ const MOCK_ADMIN_STATS = {
 
 const MOCK_NEWSLETTER_SUBSCRIPTION: NewsletterSubscription = {
   id: 'sub-123',
-  email: 'admin@coindaily.news',
+  email: 'admin@sygn.news',
   name: 'Admin User',
   isActive: true,
   frequency: 'daily',

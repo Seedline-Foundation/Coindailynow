@@ -1,5 +1,5 @@
 /**
- * @coindaily/contracts — shared workspace package consumed by backend, CFIS,
+ * @sygn/contracts — shared workspace package consumed by backend, CFIS,
  * and any frontend that needs to talk to deployed contracts.
  *
  * The Solidity source of truth lives in /contracts. After `cd contracts &&
@@ -34,7 +34,7 @@ export interface DeploymentManifest {
   deployedAt?: string;
   contracts: Partial<
     Record<
-      ContractName | 'PressDistribution' | 'SimpleWallet' | 'ReputationSBT' | 'Subscription' | 'CoinDailyTimelock',
+      ContractName | 'PressDistribution' | 'SimpleWallet' | 'ReputationSBT' | 'Subscription' | 'SygnTimelock',
       {
         address: string;
         constructorArgs?: unknown[];

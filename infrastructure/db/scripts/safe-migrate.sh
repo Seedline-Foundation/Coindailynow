@@ -23,7 +23,7 @@ if [[ "${1:-}" == "--deploy" ]]; then
   MODE="deploy"
 fi
 
-echo "=== CoinDaily Safe Migration ==="
+echo "=== Sygn Safe Migration ==="
 echo "Mode: $MODE"
 echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo ""
@@ -33,7 +33,7 @@ echo "[1/3] Taking pre-migration backup..."
 BACKUP_FILE=""
 if bash "$SCRIPT_DIR/backup.sh" 2>/dev/null; then
   # Find the most recent backup
-  BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/coindaily/backups}"
+  BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/sygn/backups}"
   BACKUP_FILE="$(ls -t "$BACKUPS_DIR"/*.dump 2>/dev/null | head -1)"
   echo "[1/3] ✅ Backup saved: $BACKUP_FILE"
 else
@@ -61,7 +61,7 @@ if [[ "$MODE" == "deploy" ]]; then
     if [[ -n "$BACKUP_FILE" ]]; then
       echo ""
       echo "To restore from backup:"
-      echo "  docker exec -e PGPASSWORD=\$POSTGRES_PASSWORD coindaily-postgres \\"
+      echo "  docker exec -e PGPASSWORD=\$POSTGRES_PASSWORD sygn-postgres \\"
       echo "    pg_restore -U \$POSTGRES_USER -d \$POSTGRES_DB --clean --if-exists \\"
       echo "    \"/backups/$(basename "$BACKUP_FILE")\""
     fi

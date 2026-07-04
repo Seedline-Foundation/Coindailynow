@@ -176,7 +176,7 @@ export default function RichSnippetPreview({
               <ul className="text-xs text-blue-800 space-y-1">
                 <li>✓ NewsArticle schema</li>
                 <li>✓ Author Person schema</li>
-                <li>✓ Organization schema (CoinDaily)</li>
+                <li>✓ Organization schema (Sygn)</li>
                 <li>✓ RAO (Retrieval-Augmented Optimization) for AI/LLMs</li>
                 <li>✓ FAQ schema with Q&A pairs</li>
                 <li>✓ Cryptocurrency mention schemas</li>

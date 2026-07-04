@@ -5,11 +5,11 @@ import { Header } from '@/components/landing';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Editorial Standards | CoinDaily Africa',
+  title: 'Editorial Standards | Sygn Africa',
   description:
     'Our commitment to accuracy, independence, and transparency in cryptocurrency and financial market reporting across Africa.',
   openGraph: {
-    title: 'Editorial Standards — CoinDaily Africa',
+    title: 'Editorial Standards — Sygn Africa',
     description:
       'How we maintain accuracy, editorial independence, and responsible AI-assisted journalism.',
     type: 'website',
@@ -22,10 +22,10 @@ export default function EditorialStandardsPage() {
     '@type': 'WebPage',
     name: 'Editorial Standards',
     description:
-      'CoinDaily Africa editorial standards covering accuracy, sourcing, AI transparency, tone policy, and corrections.',
+      'Sygn Africa editorial standards covering accuracy, sourcing, AI transparency, tone policy, and corrections.',
     publisher: {
       '@type': 'Organization',
-      name: 'CoinDaily Africa',
+      name: 'Sygn Africa',
       url: 'https://sygn.live',
     },
   };
@@ -45,14 +45,14 @@ export default function EditorialStandardsPage() {
           <div className="prose prose-gray max-w-none space-y-6">
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg mb-8">
               <p className="text-blue-800 font-medium">
-                CoinDaily Africa is committed to accuracy, independence, and transparency in all of our reporting.
+                Sygn Africa is committed to accuracy, independence, and transparency in all of our reporting.
               </p>
             </div>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Editorial Independence</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa maintains strict separation between editorial content and business operations. Our editorial team operates independently from advertising, sponsored content, and partnership teams. No advertiser, sponsor, or commercial partner has influence over our editorial decisions, story selection, or reporting angle.
+                Sygn Africa maintains strict separation between editorial content and business operations. Our editorial team operates independently from advertising, sponsored content, and partnership teams. No advertiser, sponsor, or commercial partner has influence over our editorial decisions, story selection, or reporting angle.
               </p>
               <p className="text-gray-600 leading-relaxed mt-3">
                 Sponsored content and paid press releases are clearly labeled and visually distinguished from editorial content. They are never presented as independent journalism.
@@ -72,7 +72,7 @@ export default function EditorialStandardsPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">AI-Assisted Content</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa uses artificial intelligence to assist in research, content drafting, and translation. Our AI systems are trained to produce factual, neutral, data-driven content consistent with institutional financial journalism standards. All AI-generated content undergoes human editorial review before publication.
+                Sygn Africa uses artificial intelligence to assist in research, content drafting, and translation. Our AI systems are trained to produce factual, neutral, data-driven content consistent with institutional financial journalism standards. All AI-generated content undergoes human editorial review before publication.
               </p>
               <p className="text-gray-600 leading-relaxed mt-3">
                 AI-generated content is identified as such where appropriate. Our AI systems are explicitly instructed to avoid sensationalist language, unsupported predictions, and financial advice.
@@ -82,7 +82,7 @@ export default function EditorialStandardsPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Tone and Language Policy</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa follows a strict editorial tone policy. Our content must be confident, neutral, and data-driven. We explicitly prohibit the following language in all editorial content:
+                Sygn Africa follows a strict editorial tone policy. Our content must be confident, neutral, and data-driven. We explicitly prohibit the following language in all editorial content:
               </p>
               <ul className="list-disc pl-6 text-gray-600 space-y-1 mt-3">
                 <li>Hype terms: &quot;moon,&quot; &quot;mooning,&quot; &quot;rocket,&quot; &quot;skyrocket,&quot; &quot;gem,&quot; &quot;100x&quot;</li>
@@ -98,7 +98,7 @@ export default function EditorialStandardsPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Africa-First Framing</h2>
               <p className="text-gray-600 leading-relaxed">
-                Every story on CoinDaily Africa is framed through the lens of African readers. Global events are contextualized for their impact on African markets, currencies, regulations, and consumers. A U.S. Federal Reserve interest rate decision is reported through its effect on the naira, rand, and shilling. A Bitcoin price movement is analyzed through the lens of African exchange volumes and P2P premiums.
+                Every story on Sygn Africa is framed through the lens of African readers. Global events are contextualized for their impact on African markets, currencies, regulations, and consumers. A U.S. Federal Reserve interest rate decision is reported through its effect on the naira, rand, and shilling. A Bitcoin price movement is analyzed through the lens of African exchange volumes and P2P premiums.
               </p>
             </section>
 
@@ -118,21 +118,21 @@ export default function EditorialStandardsPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Conflict of Interest Disclosure</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa and its editorial staff disclose any material financial interests in the assets, companies, or projects they cover. Staff members are prohibited from trading on information obtained through their editorial work before publication. When staff hold positions in assets covered by the platform, those positions are disclosed.
+                Sygn Africa and its editorial staff disclose any material financial interests in the assets, companies, or projects they cover. Staff members are prohibited from trading on information obtained through their editorial work before publication. When staff hold positions in assets covered by the platform, those positions are disclosed.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Translation Quality</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa publishes content in multiple languages including English, Hausa, Yoruba, Swahili, and Zulu. Translations are produced using self-hosted NLLB-200 machine translation models and reviewed for accuracy. We continuously improve translation quality based on native-speaker feedback.
+                Sygn Africa publishes content in multiple languages including English, Hausa, Yoruba, Swahili, and Zulu. Translations are produced using self-hosted NLLB-200 machine translation models and reviewed for accuracy. We continuously improve translation quality based on native-speaker feedback.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Not Financial Advice</h2>
               <p className="text-gray-600 leading-relaxed">
-                Nothing published on CoinDaily Africa constitutes financial, investment, legal, or tax advice. Our content is for informational purposes only. Readers should consult qualified professionals before making financial decisions. See our{' '}
+                Nothing published on Sygn Africa constitutes financial, investment, legal, or tax advice. Our content is for informational purposes only. Readers should consult qualified professionals before making financial decisions. See our{' '}
                 <Link href="/disclaimer" className="text-blue-600 hover:underline">
                   full disclaimer
                 </Link>{' '}
@@ -143,7 +143,7 @@ export default function EditorialStandardsPage() {
 
           <div className="mt-10 pt-6 border-t border-gray-200 flex flex-wrap gap-4">
             <Link href="/about" className="text-blue-600 hover:underline text-sm">
-              &larr; About CoinDaily Africa
+              &larr; About Sygn Africa
             </Link>
             <Link href="/disclaimer" className="text-blue-600 hover:underline text-sm">
               Disclaimer &rarr;

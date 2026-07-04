@@ -171,7 +171,7 @@ export class ContentAutomationService {
     const startTime = Date.now();
 
     try {
-      const prompt = `You are a professional crypto and finance content writer for CoinDaily, an African cryptocurrency news platform.
+      const prompt = `You are a professional crypto and finance content writer for Sygn, an African cryptocurrency news platform.
 
 Rewrite the following article to be:
 1. Unique and plagiarism-free (80%+ uniqueness)

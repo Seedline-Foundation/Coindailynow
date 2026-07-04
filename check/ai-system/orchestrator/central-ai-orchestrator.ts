@@ -1,5 +1,5 @@
 // Central AI Orchestrator - Main coordination hub for all AI agents
-// Optimized for CoinDaily Africa's requirements: <500ms response, single I/O, SEO-focused
+// Optimized for Sygn Africa's requirements: <500ms response, single I/O, SEO-focused
 
 import { createAuditLog, AuditActions } from '@/lib/audit';
 import { TaskManager } from './task-manager';

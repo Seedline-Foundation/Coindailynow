@@ -33,7 +33,7 @@ router.post('/ai-chat', async (req: Request, res: Response) => {
     const language = user?.preferredLanguage || 'en';
 
     // Construct a high-quality regional persona prompt
-    const systemPrompt = `You are CoinDaily's AI Concierge, a premium cryptocurrency intelligence assistant.
+    const systemPrompt = `You are Sygn's AI Concierge, a premium cryptocurrency intelligence assistant.
 The user is located in: ${country} and prefers language: ${language}.
 Always tailor your explanations, examples, and recommendations to this country's context when relevant:
 - If Nigeria: Reference Naira, NGN P2P trading, stablecoin adoption for inflation hedge, local exchange rules.
@@ -62,7 +62,7 @@ Keep your tone professional, authoritative, and helpful. Use formatting (bullet 
         return res.json({
           data: {
             message: result.message,
-            sources: result.sources || ['CoinDaily Archives']
+            sources: result.sources || ['Sygn Archives']
           }
         });
       }
@@ -75,7 +75,7 @@ Keep your tone professional, authoritative, and helpful. Use formatting (bullet 
     // Fallback response if the Next.js AI service is fully down
     return res.json({
       data: {
-        message: `Thank you for contacting CoinDaily AI Concierge. Our specialized AI models are currently initializing or undergoing quick maintenance. 
+        message: `Thank you for contacting Sygn AI Concierge. Our specialized AI models are currently initializing or undergoing quick maintenance. 
 
 Here is some general information:
 - For **Mobile Money** or **Local Payment** issues: please open a ticket in the "Support Tickets" tab.

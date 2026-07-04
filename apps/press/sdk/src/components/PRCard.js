@@ -217,8 +217,8 @@ class PRCard extends HTMLElement {
     
     trackClick() {
         const prId = this.getAttribute('pr-id');
-        if (window.Coindaily && prId) {
-            window.Coindaily.trackMetric?.('click', { prId });
+        if (window.Sygn && prId) {
+            window.Sygn.trackMetric?.('click', { prId });
         }
         
         this.dispatchEvent(new CustomEvent('pr-click', {

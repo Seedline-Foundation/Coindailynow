@@ -190,7 +190,7 @@ export default function PublisherDashboard() {
         <div className="absolute bottom-0 left-0 right-0 border-t border-dark-700">
           <div className="p-4 space-y-2">
             <a
-              href="https://discord.gg/coindaily"
+              href="https://discord.gg/sygn"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-dark-400 hover:text-white hover:bg-dark-800 transition-colors text-sm w-full"

@@ -1,5 +1,5 @@
 /**
- * CoinDaily — Canonical Language Configuration
+ * Sygn — Canonical Language Configuration
  *
  * Single source of truth for all 18 supported languages:
  *   1 source language (English) + 17 NLLB translation targets.

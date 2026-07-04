@@ -47,7 +47,7 @@ export default function PWAInstallButton() {
     if (subscription) {
       setIsPushEnabled(true);
       await pwaHelper.showNotification('Notifications Enabled!', {
-        body: 'You will now receive important updates from CoinDaily',
+        body: 'You will now receive important updates from Sygn',
         icon: '/icons/manifest-icon-192.maskable.png',
       });
     }
@@ -93,7 +93,7 @@ export default function PWAInstallButton() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">
-                  Install CoinDaily
+                  Install Sygn
                 </h3>
                 <p className="text-sm text-gray-600">
                   Get instant access to crypto news

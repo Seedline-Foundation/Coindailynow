@@ -28,7 +28,7 @@ const MarketAnalysisTool = () => {
       const timeoutId = setTimeout(() => controller.abort(), 2000);
 
       try {
-        const response = await fetch('https://api.coindaily.online/mock-market-data', {
+        const response = await fetch('https://api.sygn.online/mock-market-data', {
           signal: controller.signal,
           cache: 'no-store',
         });

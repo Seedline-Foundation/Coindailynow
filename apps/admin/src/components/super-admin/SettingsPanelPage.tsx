@@ -17,7 +17,7 @@ interface FieldDef {
 
 const PAGE_FIELDS: Record<string, FieldDef[]> = {
   general: [
-    { key: 'platformName', label: 'Platform Name', type: 'text', placeholder: 'CoinDaily', helpText: 'The display name of the platform.' },
+    { key: 'platformName', label: 'Platform Name', type: 'text', placeholder: 'Sygn', helpText: 'The display name of the platform.' },
     { key: 'platformDescription', label: 'Platform Description', type: 'textarea', placeholder: "Africa's premier crypto news platform", helpText: 'Short description shown in meta tags and footers.' },
     { key: 'maintenanceMode', label: 'Maintenance Mode', type: 'toggle', helpText: 'Put the site into read-only maintenance mode.' },
     { key: 'itemsPerPage', label: 'Items Per Page (default)', type: 'number', placeholder: '20', helpText: 'Default pagination size for lists.' },

@@ -40,7 +40,7 @@ const ContentSectionsDemo: React.FC = () => {
     { id: 'FR-064', name: 'Memefi Award Section', component: 'MemefiAwardSection' },
     { id: 'FR-065', name: 'Featured News Section', component: 'FeaturedNewsSection' },
     { id: 'FR-066', name: 'General Crypto Section', component: 'GeneralCryptoSection' },
-    { id: 'FR-067', name: 'CoinDaily Cast Section', component: 'CoinDailyCastSection' },
+    { id: 'FR-067', name: 'Sygn Cast Section', component: 'SygnCastSection' },
     { id: 'FR-068', name: 'Opinion Section', component: 'OpinionSection' },
     { id: 'FR-069', name: 'Token Reviews Section', component: 'TokenReviewsSection' },
     { id: 'FR-070', name: 'Policy Updates Section', component: 'PolicyUpdatesSection' },

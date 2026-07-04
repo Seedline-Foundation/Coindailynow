@@ -396,7 +396,7 @@ async function generateReport() {
 async function runAllTests() {
   console.log(`${colors.bright}${colors.cyan}`);
   console.log('╔══════════════════════════════════════════════════════════════╗');
-  console.log('║  CoinDaily Super Admin - Phase 1 Authentication Test Suite  ║');
+  console.log('║  Sygn Super Admin - Phase 1 Authentication Test Suite  ║');
   console.log('╚══════════════════════════════════════════════════════════════╝');
   console.log(colors.reset);
 

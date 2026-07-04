@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 # =============================================================================
-# CoinDaily Nightly Postgres Backup — Backblaze B2 upload
+# Sygn Nightly Postgres Backup — Backblaze B2 upload
 # =============================================================================
 #
 # Runs nightly via cron. Dumps Postgres, compresses, uploads to B2, prunes old
 # local backups. Add to crontab:
 #
-#   0 2 * * * /var/www/infrastructure/db/scripts/backup-nightly.sh >> /var/log/coindaily/backup.log 2>&1
+#   0 2 * * * /var/www/infrastructure/db/scripts/backup-nightly.sh >> /var/log/sygn/backup.log 2>&1
 #
 # Required env vars (from .env or /etc/environment):
 #   POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
 #   B2_APPLICATION_KEY_ID, B2_APPLICATION_KEY, B2_BUCKET_NAME
 #
 # Optional:
-#   HOST_BACKUPS_DIR  — local backup directory (default: ~/coindaily/backups)
+#   HOST_BACKUPS_DIR  — local backup directory (default: ~/sygn/backups)
 #   BACKUP_RETAIN_DAYS — how many days of local backups to keep (default: 7)
 #   BACKUP_ALERT_WEBHOOK — Telegram/Slack webhook URL for failure alerts
 #
@@ -29,11 +29,11 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
 fi
 
 # Config
-BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/coindaily/backups}"
+BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/sygn/backups}"
 RETAIN_DAYS="${BACKUP_RETAIN_DAYS:-7}"
-B2_BUCKET="${B2_BUCKET_NAME:-coindaily-backups}"
+B2_BUCKET="${B2_BUCKET_NAME:-sygn-backups}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-DUMP_FILE="${POSTGRES_DB:-coindaily}-${STAMP}.dump"
+DUMP_FILE="${POSTGRES_DB:-sygn}-${STAMP}.dump"
 COMPRESSED_FILE="${DUMP_FILE}.gz"
 LOG_PREFIX="[backup $(date -u +%H:%M:%S)]"
 
@@ -54,17 +54,17 @@ alert_failure() {
 echo "$LOG_PREFIX Starting nightly backup..."
 
 # --- Step 1: Dump Postgres ---
-echo "$LOG_PREFIX Dumping Postgres database: ${POSTGRES_DB:-coindaily}..."
+echo "$LOG_PREFIX Dumping Postgres database: ${POSTGRES_DB:-sygn}..."
 
-if command -v docker &> /dev/null && docker ps -q -f name=coindaily-postgres &> /dev/null; then
+if command -v docker &> /dev/null && docker ps -q -f name=sygn-postgres &> /dev/null; then
   # Docker-based Postgres (Contabo setup)
-  docker exec -e PGPASSWORD="${POSTGRES_PASSWORD}" coindaily-postgres \
+  docker exec -e PGPASSWORD="${POSTGRES_PASSWORD}" sygn-postgres \
     pg_dump -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -F c \
     -f "/backups/${DUMP_FILE}" \
     || alert_failure "pg_dump failed inside Docker"
 
   # Copy from Docker volume to host
-  docker cp "coindaily-postgres:/backups/${DUMP_FILE}" "$BACKUPS_DIR/${DUMP_FILE}" \
+  docker cp "sygn-postgres:/backups/${DUMP_FILE}" "$BACKUPS_DIR/${DUMP_FILE}" \
     || alert_failure "docker cp failed"
 else
   # Direct Postgres (no Docker)

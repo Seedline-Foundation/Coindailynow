@@ -462,7 +462,7 @@ export default function SearchClient({
       {!query && (
         <div className="text-center py-20">
           <div className="text-5xl mb-4 opacity-30">&#128270;</div>
-          <h2 className="text-xl font-semibold text-gray-300 mb-2">Search CoinDaily Africa</h2>
+          <h2 className="text-xl font-semibold text-gray-300 mb-2">Search Sygn Africa</h2>
           <p className="text-gray-500 max-w-md mx-auto">
             Find articles, factsheets, regulatory updates, and market data across Africa&#39;s crypto
             and financial markets.

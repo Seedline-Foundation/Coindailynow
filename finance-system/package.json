@@ -1,7 +1,7 @@
 {
-  "name": "coindaily-finance-system-cfis",
+  "name": "sygn-finance-system-cfis",
   "version": "1.0.0",
-  "description": "CoinDaily Financial Intelligence System (CFIS)",
+  "description": "Sygn Financial Intelligence System (CFIS)",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",

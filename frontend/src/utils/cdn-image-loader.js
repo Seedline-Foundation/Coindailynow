@@ -4,8 +4,8 @@
  */
 
 export default function cdnImageLoader({ src, width, quality }) {
-  // Don't optimize already optimized URLs
-  if (src.startsWith('/api/cdn/') || src.includes('cdn.sygn.live')) {
+  // Don't optimize already optimized URLs (CDN or Contabo bucket originals)
+  if (src.startsWith('/api/cdn/') || src.includes('cdn.sygn.live') || src.includes('contabostorage.com')) {
     return src;
   }
 

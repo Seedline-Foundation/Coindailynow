@@ -17,7 +17,7 @@ const QuickOpportunities = () => {
       const timeoutId = setTimeout(() => controller.abort(), 2000); // Terminate after 2 seconds
 
       try {
-        const response = await fetch('https://api.coindaily.online/mock-opportunities', {
+        const response = await fetch('https://api.sygn.online/mock-opportunities', {
           signal: controller.signal,
           cache: 'no-store', // Disable caching for real-time data
         });

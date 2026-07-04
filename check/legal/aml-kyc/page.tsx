@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'AML/KYC Policy | CoinDaily Online',
-  description: 'CoinDaily Online\'s Anti-Money Laundering (AML) and Know Your Customer (KYC) compliance policies and procedures.',
+  title: 'AML/KYC Policy | Sygn Online',
+  description: 'Sygn Online\'s Anti-Money Laundering (AML) and Know Your Customer (KYC) compliance policies and procedures.',
   robots: 'index, follow',
 };
 
@@ -26,10 +26,10 @@ export default function AMLKYCPage() {
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Overview</h2>
                 <p className="text-gray-700 mb-4">
-                  CoinDaily Online is committed to preventing money laundering, terrorist financing, and other financial crimes. This Anti-Money Laundering (AML) and Know Your Customer (KYC) Policy outlines our compliance procedures and requirements.
+                  Sygn Online is committed to preventing money laundering, terrorist financing, and other financial crimes. This Anti-Money Laundering (AML) and Know Your Customer (KYC) Policy outlines our compliance procedures and requirements.
                 </p>
                 <p className="text-gray-700 mb-4">
-                  While CoinDaily Online is primarily a news and information platform, we maintain these policies to ensure compliance with applicable laws and regulations, particularly for any financial services or premium features we may offer.
+                  While Sygn Online is primarily a news and information platform, we maintain these policies to ensure compliance with applicable laws and regulations, particularly for any financial services or premium features we may offer.
                 </p>
               </div>
 
@@ -344,13 +344,13 @@ export default function AMLKYCPage() {
                 </p>
                 <div className="bg-gray-100 p-6 rounded-lg">
                   <p className="font-medium text-gray-800">AML/KYC Compliance Officer</p>
-                  <p className="text-gray-700">Email: <a href="mailto:compliance@coindaily.online" className="text-blue-600 hover:text-blue-800">compliance@coindaily.online</a></p>
+                  <p className="text-gray-700">Email: <a href="mailto:compliance@sygn.online" className="text-blue-600 hover:text-blue-800">compliance@sygn.online</a></p>
                   <p className="text-gray-700">Phone: +234 (0) 123-456-7890</p>
                   <p className="text-gray-700">Emergency: Available 24/7 for suspicious activity reports</p>
                   <p className="text-gray-700 mt-2">
                     <strong>Mailing Address:</strong><br />
                     Compliance Department<br />
-                    CoinDaily Online<br />
+                    Sygn Online<br />
                     [Address Line 1]<br />
                     Lagos, Nigeria
                   </p>

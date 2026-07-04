@@ -488,7 +488,7 @@ async function callDeepSeekR1(
   }
 }
 
-const ADS_SYSTEM_PROMPT = `You are the CoinDaily Ads Optimization AI. You analyze ad campaign data, traffic patterns, and user behavior to maximize advertiser ROI and platform revenue. You specialize in the African cryptocurrency market.
+const ADS_SYSTEM_PROMPT = `You are the Sygn Ads Optimization AI. You analyze ad campaign data, traffic patterns, and user behavior to maximize advertiser ROI and platform revenue. You specialize in the African cryptocurrency market.
 
 Your decisions must:
 1. Respect budget constraints and pacing requirements
@@ -884,7 +884,7 @@ export function generateVASTXml(campaign: AdCampaign, slot: InventorySlot): stri
 <VAST version="${VAST_VERSION}" xmlns="http://www.iab.com/VAST">
   <Ad id="${campaign.id}" sequence="1">
     <InLine>
-      <AdSystem version="1.0">CoinDaily AdsAgent</AdSystem>
+      <AdSystem version="1.0">Sygn AdsAgent</AdSystem>
       <AdTitle><![CDATA[${campaign.title}]]></AdTitle>
       <Description><![CDATA[${campaign.description}]]></Description>
       <Impression><![CDATA[/api/ads/track/impression/${campaign.id}/${slot.id}]]></Impression>
@@ -2101,7 +2101,7 @@ export async function getAIPlacementStrategy(campaignId: string): Promise<{
   const slots = await getAllInventorySlots();
 
   const prompt = `
-You are analyzing traffic patterns for an ad campaign on CoinDaily, Africa's crypto news platform.
+You are analyzing traffic patterns for an ad campaign on Sygn, Africa's crypto news platform.
 
 CAMPAIGN: ${campaign.adType} ad, targeting ${campaign.targeting.sections.join(', ')} sections in ${campaign.targeting.regions.join(', ')} regions.
 Budget remaining: $${campaign.remainingBudget} of $${campaign.totalBudget}.

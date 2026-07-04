@@ -17,7 +17,7 @@ describe('ReputationSBT', function () {
 
   describe('Deployment', function () {
     it('has correct name and symbol', async function () {
-      expect(await sbt.name()).to.equal('CoinDaily Eco-Zone Reputation');
+      expect(await sbt.name()).to.equal('Sygn Eco-Zone Reputation');
       expect(await sbt.symbol()).to.equal('CDREP');
     });
 

@@ -403,7 +403,7 @@ export default function WireFeed() {
               <>
                 <p className="text-dark-400 text-sm font-mono mb-1">No published releases on the wire yet.</p>
                 <p className="text-dark-600 text-xs font-mono max-w-md mx-auto">
-                  Approved releases from CoinDaily API or SENDPRESS Supabase appear here automatically.
+                  Approved releases from Sygn API or SENDPRESS Supabase appear here automatically.
                   {fetchError ? ` (${fetchError})` : ''}
                 </p>
                 <Link

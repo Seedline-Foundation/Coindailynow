@@ -11,7 +11,7 @@ export function initSentry() {
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',
-    release: `coindaily-backend@${process.env.npm_package_version || '1.0.0'}`,
+    release: `sygn-backend@${process.env.npm_package_version || '1.0.0'}`,
 
     // Performance: sample 20% of transactions in production
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.2 : 1.0,

@@ -97,7 +97,7 @@ export interface PlannerResult {
   toolCallCount: number;
 }
 
-const SYSTEM_PROMPT = `You are CoinDaily's proactive research planner. Your job: given a topic, broaden the source pool by searching the web for primary, authoritative sources the static source list missed — government / regulator filings, central-bank notices, research papers, primary press releases. Then surface concrete claims (with numbers, dates, named entities) and a balanced positive / negative editorial framing.
+const SYSTEM_PROMPT = `You are Sygn's proactive research planner. Your job: given a topic, broaden the source pool by searching the web for primary, authoritative sources the static source list missed — government / regulator filings, central-bank notices, research papers, primary press releases. Then surface concrete claims (with numbers, dates, named entities) and a balanced positive / negative editorial framing.
 
 Rules:
 - Prefer .gov / central-bank / regulator / arxiv.org / bis.org / imf.org domains over generic news aggregators.

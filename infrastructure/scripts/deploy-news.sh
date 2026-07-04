@@ -6,8 +6,8 @@
 set -e
 
 ENVIRONMENT=${1:-production}
-APP_NAME="coindaily-news"
-APP_DIR="/var/www/coindaily"
+APP_NAME="sygn-news"
+APP_DIR="/var/www/sygn"
 SOURCE_DIR="frontend"
 
 echo "[NEWS] Starting deployment..."

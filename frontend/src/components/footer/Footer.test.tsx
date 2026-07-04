@@ -1,5 +1,5 @@
 /**
- * CoinDaily Platform - Footer Components Test Suite
+ * Sygn Platform - Footer Components Test Suite
  * Task 55: Comprehensive testing for footer implementation
  * 
  * Tests cover:
@@ -86,7 +86,7 @@ describe('Footer Component', () => {
     it('renders footer with all main sections', () => {
       render(<Footer />);
       
-      expect(screen.getByText('CoinDaily')).toBeInTheDocument();
+      expect(screen.getByText('Sygn')).toBeInTheDocument();
       expect(screen.getByText('Services')).toBeInTheDocument();
       expect(screen.getByText('Products')).toBeInTheDocument();
       expect(screen.getByText('Resources')).toBeInTheDocument();
@@ -96,7 +96,7 @@ describe('Footer Component', () => {
     it('renders branding section with logo and tagline', () => {
       render(<Footer />);
       
-      expect(screen.getByText('CoinDaily')).toBeInTheDocument();
+      expect(screen.getByText('Sygn')).toBeInTheDocument();
       expect(screen.getByText(/Africa's premier cryptocurrency news platform/)).toBeInTheDocument();
     });
 
@@ -112,7 +112,7 @@ describe('Footer Component', () => {
     it('renders copyright section', () => {
       render(<Footer />);
       
-      expect(screen.getByText('© 2025 CoinDaily Africa. All rights reserved.')).toBeInTheDocument();
+      expect(screen.getByText('© 2025 Sygn Africa. All rights reserved.')).toBeInTheDocument();
     });
 
     it('renders utility links', () => {
@@ -142,7 +142,7 @@ describe('Footer Component', () => {
       render(<Footer />);
       
       const twitterLink = screen.getByText('Twitter').closest('a');
-      expect(twitterLink).toHaveAttribute('href', 'https://twitter.com/coindaily_africa');
+      expect(twitterLink).toHaveAttribute('href', 'https://twitter.com/sygn_africa');
       expect(twitterLink).toHaveAttribute('target', '_blank');
       expect(twitterLink).toHaveAttribute('rel', 'noopener noreferrer');
     });
@@ -367,7 +367,7 @@ describe('NewsletterWidget Component', () => {
   it('renders full version with preferences', () => {
     render(<NewsletterWidget {...mockProps} compact={false} />);
     
-    expect(screen.getByText('Stay Updated with CoinDaily')).toBeInTheDocument();
+    expect(screen.getByText('Stay Updated with Sygn')).toBeInTheDocument();
     expect(screen.getByText('Subscription Preferences')).toBeInTheDocument();
     expect(screen.getByText('Daily Digest')).toBeInTheDocument();
     expect(screen.getByText('Breaking News')).toBeInTheDocument();
@@ -496,7 +496,7 @@ describe('Footer Integration', () => {
     render(<Footer />);
     
     // Verify all major sections are present
-    expect(screen.getByText('CoinDaily')).toBeInTheDocument();
+    expect(screen.getByText('Sygn')).toBeInTheDocument();
     expect(screen.getByText('Stay Updated')).toBeInTheDocument();
     expect(screen.getByText('Follow Us')).toBeInTheDocument();
     expect(screen.getByText('Language')).toBeInTheDocument();

@@ -22,7 +22,7 @@ export default function StaffLandingPage() {
             <Shield className="w-8 h-8 text-primary-500" />
           </div>
           <h1 className="text-2xl font-display font-bold text-white mb-2">
-            CoinDaily Admin
+            Sygn Admin
           </h1>
           <p className="text-dark-400 text-sm">
             Secure Administrative Portal
@@ -61,7 +61,7 @@ export default function StaffLandingPage() {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-dark-500 text-xs">
-            © {new Date().getFullYear()} CoinDaily. All rights reserved.
+            © {new Date().getFullYear()} Sygn. All rights reserved.
           </p>
         </div>
       </div>

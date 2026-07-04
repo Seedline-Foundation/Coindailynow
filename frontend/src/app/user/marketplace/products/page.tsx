@@ -283,7 +283,7 @@ function ProductFormModal({ product, onClose, onSave }: ProductFormProps) {
             <div className="flex items-center gap-3">
               <Globe className="w-5 h-5 text-primary-400" />
               <div>
-                <p className="text-sm font-medium text-white">List on CoinDaily Marketplace</p>
+                <p className="text-sm font-medium text-white">List on Sygn Marketplace</p>
                 <p className="text-xs text-dark-400">Make this product visible to all marketplace visitors (free)</p>
               </div>
             </div>

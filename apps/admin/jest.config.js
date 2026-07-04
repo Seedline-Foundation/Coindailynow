@@ -12,7 +12,7 @@ module.exports = {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@coindaily/(.*)$': '<rootDir>/../../packages/$1/src',
+    '^@sygn/(.*)$': '<rootDir>/../../packages/$1/src',
   },
   transformIgnorePatterns: ['/node_modules/'],
 };

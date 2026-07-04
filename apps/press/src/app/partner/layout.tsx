@@ -81,7 +81,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-dark-700">
           <a
-            href="https://discord.gg/coindaily"
+            href="https://discord.gg/sygn"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-dark-400 hover:text-white hover:bg-dark-800 transition-colors text-sm mb-2"

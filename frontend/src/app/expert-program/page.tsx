@@ -13,7 +13,7 @@ const tiers = [
     color: 'blue',
     type: 'Content',
     requirements: ['Basic crypto/finance knowledge', 'Good writing skills in any African language', 'Active social media presence', 'Passion for African financial education'],
-    perks: ['Published byline on articles', 'CoinDaily author badge', 'Access to community Slack', 'Free CoinDaily Premium', 'AI writing tools access'],
+    perks: ['Published byline on articles', 'Sygn author badge', 'Access to community Slack', 'Free Sygn Premium', 'AI writing tools access'],
     compensation: '0.5 CP per 100 verified reads + Ad revenue share (55/45)',
     slots: 'Open — Apply Now',
   },
@@ -23,7 +23,7 @@ const tiers = [
     color: 'orange',
     type: 'Content & Analysis',
     requirements: ['Deep local market knowledge', '3+ published articles or equivalent', 'Verified expertise in your region', 'Local language fluency', 'Consistent availability'],
-    perks: ['Featured author profile', 'Priority editorial calendar', 'Quarterly bonus pool', 'Event speaker invitations', 'Free CoinDaily Premium', 'Course creation rights'],
+    perks: ['Featured author profile', 'Priority editorial calendar', 'Quarterly bonus pool', 'Event speaker invitations', 'Free Sygn Premium', 'Course creation rights'],
     compensation: '1.0 CP per 100 verified reads + Ad revenue share (55/45) + Course sales (80/20)',
     slots: '20 positions',
   },
@@ -32,8 +32,8 @@ const tiers = [
     emoji: '✅',
     color: 'green',
     type: 'Analysis & Insights',
-    requirements: ['50+ published articles on CoinDaily', '10K+ total verified reads', 'Consistent quality score above 80%', 'Proven track record of accurate analysis', 'Must maintain "NEXUS Verified" badge standards'],
-    perks: ['"CoinDaily Verified" trust badge', 'Full Content Studio access', 'Press release submission rights', 'Subscriber community feature', '30% rev share on their ads', 'Priority AI research tools'],
+    requirements: ['50+ published articles on Sygn', '10K+ total verified reads', 'Consistent quality score above 80%', 'Proven track record of accurate analysis', 'Must maintain "NEXUS Verified" badge standards'],
+    perks: ['"Sygn Verified" trust badge', 'Full Content Studio access', 'Press release submission rights', 'Subscriber community feature', '30% rev share on their ads', 'Priority AI research tools'],
     compensation: '1.5 CP per 100 verified reads + 30% ad rev share + Course sales (80/20)',
     slots: '15 positions',
   },
@@ -43,7 +43,7 @@ const tiers = [
     color: 'indigo',
     type: 'Expert Research',
     requirements: ['Domain expert (regulators, ex-bankers, fund managers, founders)', 'Recruited actively or exceptional application', 'Must produce min 2 pieces/month', 'Demonstrated thought leadership in EM markets'],
-    perks: ['Co-branded research reports', 'Speaker slot at CoinDaily events', '50% rev share on all content ads', 'Quarterly bonus from Creator Fund', 'Free CHIMA Data access', 'Advisory board eligibility'],
+    perks: ['Co-branded research reports', 'Speaker slot at Sygn events', '50% rev share on all content ads', 'Quarterly bonus from Creator Fund', 'Free CHIMA Data access', 'Advisory board eligibility'],
     compensation: '3.0 CP per 100 verified reads + 50% ad rev share + Creator Fund bonus',
     slots: '10 positions',
   },
@@ -86,11 +86,11 @@ const benefits = [
 
 /* ──────────── EXPERT SPOTLIGHT ──────────── */
 const expertSpotlight = [
-  { name: 'Amara Okafor', country: '🇳🇬', title: 'Nigeria Market Analyst', articles: 47, tier: 'Regional Expert', specialties: ['DeFi', 'P2P Markets', 'CBN Policy'], earnings: '$4,200+', quote: 'CoinDaily gave me a platform to share what I know and earn from it.' },
+  { name: 'Amara Okafor', country: '🇳🇬', title: 'Nigeria Market Analyst', articles: 47, tier: 'Regional Expert', specialties: ['DeFi', 'P2P Markets', 'CBN Policy'], earnings: '$4,200+', quote: 'Sygn gave me a platform to share what I know and earn from it.' },
   { name: 'Wanjiku Kamau', country: '🇰🇪', title: 'Kenya Fintech Reporter', articles: 32, tier: 'Regional Expert', specialties: ['M-Pesa', 'Mobile Money', 'CMA Regulation'], earnings: '$3,100+', quote: 'The AI tools make writing so much faster. I focus on what I know best.' },
   { name: 'Thabo Ndlovu', country: '🇿🇦', title: 'SA Market Correspondent', articles: 28, tier: 'Senior Analyst', specialties: ['FSCA', 'Institutional Crypto', 'Mining'], earnings: '$5,800+', quote: 'The revenue share model is fair. My premium content consistently earns well.' },
   { name: 'Kwame Asante', country: '🇬🇭', title: 'West Africa Desk', articles: 19, tier: 'Community Writer', specialties: ['BoG Policy', 'e-Cedi', 'Remittances'], earnings: '$1,400+', quote: 'Started as a community writer, now building my course on crypto remittances.' },
-  { name: 'Fatima Hassan', country: '🇪🇬', title: 'MENA-Africa Bridge', articles: 24, tier: 'Regional Expert', specialties: ['Islamic Finance', 'CBDC', 'Cross-border'], earnings: '$2,900+', quote: 'No other platform covers the MENA-Africa corridor like CoinDaily.' },
+  { name: 'Fatima Hassan', country: '🇪🇬', title: 'MENA-Africa Bridge', articles: 24, tier: 'Regional Expert', specialties: ['Islamic Finance', 'CBDC', 'Cross-border'], earnings: '$2,900+', quote: 'No other platform covers the MENA-Africa corridor like Sygn.' },
   { name: 'Jean-Pierre Nkurunziza', country: '🇷🇼', title: 'East Africa Reporter', articles: 15, tier: 'Community Writer', specialties: ['Innovation Hub', 'Digital Economy', 'BNR Framework'], earnings: '$1,100+', quote: 'I host a weekly podcast that my community loves. The tools make it easy.' },
 ];
 
@@ -100,7 +100,7 @@ const howItWorks = [
   { step: 2, title: 'Get Reviewed', desc: 'Our editorial team reviews your application within 48 hours.' },
   { step: 3, title: 'Onboard & Learn', desc: 'Access tools, AI assistants, editorial guidelines, and the contributor dashboard.' },
   { step: 4, title: 'Create & Publish', desc: 'Write articles, create courses, host podcasts — use our AI-powered CMS.' },
-  { step: 5, title: 'Earn & Grow', desc: 'Get paid in CoinDaily Token. Earn from ads, courses, tips, podcasts, and more.' },
+  { step: 5, title: 'Earn & Grow', desc: 'Get paid in Sygn Token. Earn from ads, courses, tips, podcasts, and more.' },
 ];
 
 /* ──────────── APPLICATION TOPICS ──────────── */
@@ -114,7 +114,7 @@ const applicationTopics = [
 
 /* ──────────── FAQ ──────────── */
 const faqs = [
-  { q: 'How do I get paid?', a: 'ALL payments are made in the official CoinDaily Token (to be launched). You can swap tokens on imaswap.online or stake them at stake.imaswap.online for additional yield.' },
+  { q: 'How do I get paid?', a: 'ALL payments are made in the official Sygn Token (to be launched). You can swap tokens on imaswap.online or stake them at stake.imaswap.online for additional yield.' },
   { q: 'What is the revenue share model?', a: 'For ad revenue on your content: You=55%, We=45%. For courses you create: You=80%, We=20% (including processing fees). For premium podcasts: similar split based on your tier.' },
   { q: 'What languages can I write in?', a: 'We accept content in English, French, Swahili, Hausa, Yoruba, Igbo, Amharic, Zulu, Pidgin, Portuguese, Arabic, and more. Our AI translation team handles multi-language distribution.' },
   { q: 'How many articles per month?', a: 'Community Writers: 2-4 articles/month. Regional Experts: 4-8 articles/month. Senior Analysts: Flexible based on retainer agreement.' },
@@ -171,7 +171,7 @@ export default function ExpertProgramPage() {
             Help us build Africa&apos;s Crypto Knowledge Base and recreate the Africa money future we all desire.
           </p>
           <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-full text-sm font-bold mb-6">
-            💎 ALL payments are made in official CoinDaily Token
+            💎 ALL payments are made in official Sygn Token
           </div>
           <div className="flex flex-wrap gap-4 justify-center">
             <div className="bg-white dark:bg-gray-800 rounded-xl px-6 py-3 shadow">
@@ -331,7 +331,7 @@ export default function ExpertProgramPage() {
             {/* CTA */}
             <div className="text-center bg-gray-900 dark:bg-gray-800 rounded-2xl p-10 mb-8">
               <h3 className="text-2xl font-bold text-white mb-3">Ready to Share Your Expertise?</h3>
-              <p className="text-gray-400 mb-6 max-w-xl mx-auto">Join 48+ contributors from 13 African countries already earning and building their reputation on CoinDaily.</p>
+              <p className="text-gray-400 mb-6 max-w-xl mx-auto">Join 48+ contributors from 13 African countries already earning and building their reputation on Sygn.</p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <button onClick={() => setTab('apply')} className="px-8 py-3 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition-all shadow-lg">
                   Apply Now 🚀
@@ -352,7 +352,7 @@ export default function ExpertProgramPage() {
                 <p className="text-5xl mb-4">🎉</p>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Application Submitted!</h2>
                 <p className="text-gray-500 mb-6">We review applications within 48 hours. You&apos;ll receive an email with next steps.</p>
-                <p className="text-sm text-gray-400">Remember: All payments will be made in CoinDaily Token.</p>
+                <p className="text-sm text-gray-400">Remember: All payments will be made in Sygn Token.</p>
                 <button onClick={() => { setSubmitted(false); setFormData({ name: '', email: '', country: '', expertise: '', portfolio: '', why: '', topics: [] }); }}
                   className="mt-6 px-6 py-2 bg-gray-100 dark:bg-gray-700 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300">
                   Submit Another Application
@@ -361,7 +361,7 @@ export default function ExpertProgramPage() {
             ) : (
               <>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Apply to the Expert Program</h2>
-                <p className="text-sm text-gray-500 mb-6">All payments are made in CoinDaily Token • No fees to join</p>
+                <p className="text-sm text-gray-500 mb-6">All payments are made in Sygn Token • No fees to join</p>
                 <form className="space-y-5" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -433,7 +433,7 @@ export default function ExpertProgramPage() {
                   <button type="submit" className="w-full py-4 bg-orange-600 text-white rounded-xl font-bold text-lg hover:bg-orange-700 transition-all shadow-lg">
                     Submit Application 🚀
                   </button>
-                  <p className="text-xs text-gray-500 text-center">We review applications within 48 hours. All payments in CoinDaily Token.</p>
+                  <p className="text-xs text-gray-500 text-center">We review applications within 48 hours. All payments in Sygn Token.</p>
                 </form>
               </>
             )}

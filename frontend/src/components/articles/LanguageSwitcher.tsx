@@ -1,6 +1,6 @@
 /**
  * LanguageSwitcher - Multi-language Content Switching Component
- * CoinDaily Platform - Task 21 Implementation
+ * Sygn Platform - Task 21 Implementation
  */
 
 import React, { useState, useRef, useEffect } from 'react';

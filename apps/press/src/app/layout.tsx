@@ -4,7 +4,7 @@ import { Providers } from './providers';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://press.sygn.live'),
-  title: 'SENDPRESS - PR Distribution Network by CoinDaily',
+  title: 'SENDPRESS - PR Distribution Network by Sygn',
   description: 'Africa\'s largest automated PR distribution network. Distribute press releases to targeted websites with blockchain payments and AI verification.',
   keywords: ['PR', 'press release', 'distribution', 'crypto', 'JOY token', 'blockchain', 'Africa', 'SENDPRESS'],
   openGraph: {

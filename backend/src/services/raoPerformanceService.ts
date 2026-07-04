@@ -447,7 +447,7 @@ export async function applyAutomaticAdaptations(recommendations: AdaptationRecom
               },
               publisher: {
                 '@type': 'Organization',
-                name: 'CoinDaily',
+                name: 'Sygn',
                 logo: {
                   '@type': 'ImageObject',
                   url: process.env.LOGO_URL || 'https://sygn.live/logo.png',

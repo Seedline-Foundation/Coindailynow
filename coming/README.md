@@ -1,6 +1,6 @@
-# CoinDaily - Coming Soon Landing Page
+# Sygn - Coming Soon Landing Page
 
-A beautiful, standalone "Coming Soon" landing page for CoinDaily with email capture integration using Resend.
+A beautiful, standalone "Coming Soon" landing page for Sygn with email capture integration using Resend.
 
 ## 🚀 Features
 
@@ -43,7 +43,7 @@ DATABASE_URL="file:./waitlist.db"
 
 # Resend API Configuration
 RESEND_API_KEY=your_actual_resend_api_key
-RESEND_FROM_EMAIL=noreply@coindaily.com
+RESEND_FROM_EMAIL=noreply@sygn.com
 
 # Launch Date (YYYY-MM-DD)
 NEXT_PUBLIC_LAUNCH_DATE=2025-12-31
@@ -85,7 +85,7 @@ npm start
 3. Set up environment variables in `.env.local`
 4. Run database migrations: `npx prisma db push`
 5. Build: `npm run build`
-6. Start with PM2: `pm2 start npm --name "coindaily-coming-soon" -- start`
+6. Start with PM2: `pm2 start npm --name "sygn-coming-soon" -- start`
 
 ## 🔧 Configuration
 
@@ -241,11 +241,11 @@ npm run build
 
 ## 📝 License
 
-This is part of the CoinDaily platform. All rights reserved.
+This is part of the Sygn platform. All rights reserved.
 
 ## 🤝 Support
 
-For issues or questions, contact the CoinDaily development team.
+For issues or questions, contact the Sygn development team.
 
 ---
 

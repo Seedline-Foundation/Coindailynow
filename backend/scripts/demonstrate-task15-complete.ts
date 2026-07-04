@@ -66,7 +66,7 @@ async function demonstrateTask15() {
       amount: 100000, // 1000 KES in cents
       currency: 'KES',
       phoneNumber: '+254708374149',
-      description: 'CoinDaily Premium Subscription',
+      description: 'Sygn Premium Subscription',
       transactionType: TransactionType.SUBSCRIPTION_PAYMENT,
       expiresAt: new Date(Date.now() + 30 * 60 * 1000) // 30 minutes
     };

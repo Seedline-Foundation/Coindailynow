@@ -231,8 +231,8 @@ export default function UserPortfolioPage() {
   // Load from localStorage on mount
   useEffect(() => {
     try {
-      const savedWallets = localStorage.getItem('coindaily_wallets');
-      const savedAlerts = localStorage.getItem('coindaily_alerts');
+      const savedWallets = localStorage.getItem('sygn_wallets');
+      const savedAlerts = localStorage.getItem('sygn_alerts');
       if (savedWallets) setWallets(JSON.parse(savedWallets));
       else setWallets(SAMPLE_WALLETS);
       if (savedAlerts) setAlerts(JSON.parse(savedAlerts));
@@ -247,10 +247,10 @@ export default function UserPortfolioPage() {
 
   // Persist wallets & alerts
   useEffect(() => {
-    if (wallets.length) localStorage.setItem('coindaily_wallets', JSON.stringify(wallets));
+    if (wallets.length) localStorage.setItem('sygn_wallets', JSON.stringify(wallets));
   }, [wallets]);
   useEffect(() => {
-    if (alerts.length) localStorage.setItem('coindaily_alerts', JSON.stringify(alerts));
+    if (alerts.length) localStorage.setItem('sygn_alerts', JSON.stringify(alerts));
   }, [alerts]);
 
   /* ── Wallet management ── */

@@ -164,7 +164,7 @@ export class AMPService {
 
     // Extract article content
     const { title, content, excerpt, featuredImageUrl, publishedAt, updatedAt } = article;
-    const author = article.User?.email?.split('@')[0] || 'CoinDaily';
+    const author = article.User?.email?.split('@')[0] || 'Sygn';
     const category = article.Category?.name || 'Cryptocurrency News';
 
     // Clean and optimize content for AMP
@@ -180,7 +180,7 @@ export class AMPService {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
   <title>${this.escapeHtml(title)}</title>
-  <link rel="canonical" href="${process.env.NEXT_PUBLIC_APP_URL || 'https://coindaily.co'}/news/${article.slug}">
+  <link rel="canonical" href="${process.env.NEXT_PUBLIC_APP_URL || 'https://sygn.co'}/news/${article.slug}">
   
   <!-- AMP Required Scripts -->
   <script async src="https://cdn.ampproject.org/v0.js"></script>
@@ -314,11 +314,11 @@ export class AMPService {
     
     <div class="cta">
       <p><strong>Read the full article with interactive features</strong></p>
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://coindaily.co'}/news/${article.slug}">View Full Article</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://sygn.co'}/news/${article.slug}">View Full Article</a>
     </div>
     
     <footer class="footer">
-      <p>&copy; ${new Date().getFullYear()} CoinDaily - Africa's Premier Cryptocurrency News Platform</p>
+      <p>&copy; ${new Date().getFullYear()} Sygn - Africa's Premier Cryptocurrency News Platform</p>
       <p>Mobile-optimized AMP version for faster loading</p>
     </footer>
   </article>
@@ -370,7 +370,7 @@ export class AMPService {
    * Build structured data for SEO and RAO
    */
   private buildStructuredData(article: any, enableRAO: boolean): any {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://coindaily.co';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sygn.co';
     
     const structuredData: any = {
       '@context': 'https://schema.org',
@@ -382,11 +382,11 @@ export class AMPService {
       dateModified: article.updatedAt,
       author: {
         '@type': 'Person',
-        name: article.User?.email?.split('@')[0] || 'CoinDaily Editorial Team',
+        name: article.User?.email?.split('@')[0] || 'Sygn Editorial Team',
       },
       publisher: {
         '@type': 'Organization',
-        name: 'CoinDaily',
+        name: 'Sygn',
         logo: {
           '@type': 'ImageObject',
           url: `${baseUrl}/images/logo.png`,
@@ -435,7 +435,7 @@ export class AMPService {
    * Build AMP Analytics tracking pixel
    */
   private buildAMPAnalyticsPixel(articleId: string): string {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://coindaily.co';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sygn.co';
     
     return `
   <amp-analytics type="googleanalytics">
@@ -571,7 +571,7 @@ export class AMPService {
    */
   private async submitToAMPCache(ampUrl: string): Promise<void> {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://coindaily.co';
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sygn.co';
       const fullUrl = `${baseUrl}${ampUrl}`;
       const cacheUrl = `${this.GOOGLE_AMP_CACHE_BASE}${fullUrl.replace('https://', '')}`;
 

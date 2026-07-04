@@ -44,7 +44,7 @@ async function demonstrateTask5Implementation() {
         category: 'African Markets',
         tags: ['bitcoin', 'nigeria', 'adoption', 'quidax', 'mobile-money'],
         publishedAt: new Date(),
-        author: 'CoinDaily Editorial',
+        author: 'Sygn Editorial',
         status: 'published',
         location: {
           country: 'Nigeria',
@@ -61,7 +61,7 @@ async function demonstrateTask5Implementation() {
         category: 'Masoko ya Afrika',
         tags: ['ethereum', 'kenya', 'mpesa', 'ukuaji'],
         publishedAt: new Date(),
-        author: 'Mhariri wa CoinDaily',
+        author: 'Mhariri wa Sygn',
         status: 'published',
         location: {
           country: 'Kenya',
@@ -78,7 +78,7 @@ async function demonstrateTask5Implementation() {
         category: 'Actualités des échanges',
         tags: ['luno', 'afrique-du-sud', 'échange', 'services'],
         publishedAt: new Date(),
-        author: 'Équipe CoinDaily',
+        author: 'Équipe Sygn',
         status: 'published',
         location: {
           country: 'South Africa',

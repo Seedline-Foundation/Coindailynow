@@ -14,7 +14,7 @@ export interface RSSFeedOptions {
 
 export class RSSFeedService {
   private readonly siteUrl = process.env.SITE_URL || 'https://sygn.live';
-  private readonly siteName = 'CoinDaily';
+  private readonly siteName = 'Sygn';
   private readonly siteDescription = "Africa's Premier Cryptocurrency & Finance News Platform";
 
   /**
@@ -68,12 +68,12 @@ export class RSSFeedService {
     <description>${this.escapeXml(this.siteDescription)}</description>
     <language>${language || 'en'}</language>
     <copyright>Copyright ${new Date().getFullYear()} ${this.siteName}. All rights reserved.</copyright>
-    <managingEditor>editor@sygn.live (CoinDaily Editorial)</managingEditor>
-    <webMaster>tech@sygn.live (CoinDaily Tech)</webMaster>
+    <managingEditor>editor@sygn.live (Sygn Editorial)</managingEditor>
+    <webMaster>tech@sygn.live (Sygn Tech)</webMaster>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
     <sy:updatePeriod>hourly</sy:updatePeriod>
     <sy:updateFrequency>1</sy:updateFrequency>
-    <generator>CoinDaily RSS Generator v1.0</generator>
+    <generator>Sygn RSS Generator v1.0</generator>
     <atom:link href="${this.siteUrl}/rss${category ? `/${category}` : ''}.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>${this.siteUrl}/logo.png</url>
@@ -83,7 +83,7 @@ export class RSSFeedService {
 `;
 
     for (const article of articles) {
-      const authorName = article.User ? `${article.User.firstName || ''} ${article.User.lastName || ''}`.trim() || 'CoinDaily Staff' : 'CoinDaily Staff';
+      const authorName = article.User ? `${article.User.firstName || ''} ${article.User.lastName || ''}`.trim() || 'Sygn Staff' : 'Sygn Staff';
       const authorEmail = article.User?.email || 'editor@sygn.live';
       const pubDate = new Date(article.publishedAt || article.createdAt).toUTCString();
       const articleUrl = `${this.siteUrl}/news/${article.slug}`;
@@ -177,13 +177,13 @@ export class RSSFeedService {
   <id>${this.siteUrl}/</id>
   <updated>${updated}</updated>
   <rights>Copyright ${new Date().getFullYear()} ${this.siteName}</rights>
-  <generator uri="${this.siteUrl}" version="1.0">CoinDaily Feed Generator</generator>
+  <generator uri="${this.siteUrl}" version="1.0">Sygn Feed Generator</generator>
   <icon>${this.siteUrl}/favicon.ico</icon>
   <logo>${this.siteUrl}/logo.png</logo>
 `;
 
     for (const article of articles) {
-      const authorName = article.User ? `${article.User.firstName || ''} ${article.User.lastName || ''}`.trim() || 'CoinDaily Staff' : 'CoinDaily Staff';
+      const authorName = article.User ? `${article.User.firstName || ''} ${article.User.lastName || ''}`.trim() || 'Sygn Staff' : 'Sygn Staff';
       const articleUrl = `${this.siteUrl}/news/${article.slug}`;
       const published = new Date(article.publishedAt || article.createdAt).toISOString();
       const updatedAt = new Date(article.updatedAt || article.createdAt).toISOString();
@@ -311,7 +311,7 @@ export class RSSFeedService {
           date_published: new Date(article.publishedAt || article.createdAt).toISOString(),
           date_modified: new Date(article.updatedAt || article.createdAt).toISOString(),
           authors: article.User ? [{
-            name: `${article.User.firstName || ''} ${article.User.lastName || ''}`.trim() || 'CoinDaily Staff',
+            name: `${article.User.firstName || ''} ${article.User.lastName || ''}`.trim() || 'Sygn Staff',
             url: `${this.siteUrl}/authors/${(article.User.firstName || '').toLowerCase()}-${(article.User.lastName || '').toLowerCase()}`
           }] : [],
           tags: [

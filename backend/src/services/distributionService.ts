@@ -794,8 +794,8 @@ export const createPartnerSyndication = async (input: CreatePartnerInput) => {
 };
 
 const generateWidgetCode = (domain: string, apiKey: string) => {
-  return `<!-- CoinDaily Content Widget -->
-<div id="coindaily-widget" data-domain="${domain}" data-apikey="${apiKey}"></div>
+  return `<!-- Sygn Content Widget -->
+<div id="sygn-widget" data-domain="${domain}" data-apikey="${apiKey}"></div>
 <script src="https://sygn.live/widget.js" async></script>`;
 };
 

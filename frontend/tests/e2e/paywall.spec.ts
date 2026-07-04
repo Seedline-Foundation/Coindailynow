@@ -18,7 +18,7 @@ import { test, expect, type Page } from '@playwright/test';
 const STUB_MODE = process.env.FRONTEND_E2E_STUB === '1';
 
 const TEST_USER = {
-  email: `e2e-paywall-${Date.now()}@coindaily.test`,
+  email: `e2e-paywall-${Date.now()}@sygn.test`,
   username: `e2e_paywall_${Date.now()}`,
   password: 'Pa$$w0rd-e2e!',
   firstName: 'E2E',
@@ -27,7 +27,7 @@ const TEST_USER = {
 
 async function gotoHome(page: Page) {
   await page.goto('/');
-  await expect(page).toHaveTitle(/CoinDaily/i);
+  await expect(page).toHaveTitle(/Sygn/i);
 }
 
 test.describe('Paywall — public surface', () => {

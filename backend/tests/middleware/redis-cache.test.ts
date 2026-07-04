@@ -183,19 +183,19 @@ describe('Redis Caching Layer - Task 4 Implementation', () => {
   describe('Multi-layer Caching Features - Task 4 Requirements', () => {
     it('should handle cache invalidation by pattern', async () => {
       mockRedis.keys.mockResolvedValue([
-        'coindaily:article:1',
-        'coindaily:article:2',
-        'coindaily:featuredArticles:all'
+        'sygn:article:1',
+        'sygn:article:2',
+        'sygn:featuredArticles:all'
       ]);
       mockRedis.del.mockResolvedValue(3);
 
       await cacheService.invalidateContent('article');
 
-      expect(mockRedis.keys).toHaveBeenCalledWith('coindaily:article*');
+      expect(mockRedis.keys).toHaveBeenCalledWith('sygn:article*');
       expect(mockRedis.del).toHaveBeenCalledWith(
-        'coindaily:article:1',
-        'coindaily:article:2',
-        'coindaily:featuredArticles:all'
+        'sygn:article:1',
+        'sygn:article:2',
+        'sygn:featuredArticles:all'
       );
     });
 

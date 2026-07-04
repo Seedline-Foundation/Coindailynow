@@ -1,7 +1,7 @@
 {
   "name": "iengine",
   "version": "1.0.0",
-  "description": "Iengine — AI Visual Journalism Intelligence Engine for CoinDaily",
+  "description": "Iengine — AI Visual Journalism Intelligence Engine for Sygn",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --skipLibCheck",

@@ -37,7 +37,7 @@ const AMPArticle: React.FC<AMPArticleProps> = ({ article }) => {
     },
     "publisher": {
       "@type": "Organization",
-      "name": "CoinDaily Africa",
+      "name": "Sygn Africa",
       "logo": {
         "@type": "ImageObject",
         "url": "https://sygn.live/images/logo.png"
@@ -53,7 +53,7 @@ const AMPArticle: React.FC<AMPArticleProps> = ({ article }) => {
   return (
     <>
       <Head>
-        <title>{article.title} - CoinDaily Africa</title>
+        <title>{article.title} - Sygn Africa</title>
         <meta name="description" content={article.excerpt} />
         <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" />
         
@@ -248,7 +248,7 @@ const AMPArticle: React.FC<AMPArticleProps> = ({ article }) => {
       <div className="container">
         {/* Header */}
         <header className="header">
-          <a href="/" className="logo">CoinDaily Africa</a>
+          <a href="/" className="logo">Sygn Africa</a>
         </header>
 
         {/* Article */}
@@ -336,7 +336,7 @@ const AMPArticle: React.FC<AMPArticleProps> = ({ article }) => {
 
         {/* Footer */}
         <footer className="footer">
-          <p>&copy; 2025 CoinDaily Africa. All rights reserved.</p>
+          <p>&copy; 2025 Sygn Africa. All rights reserved.</p>
           <p>
             <a href="/privacy">Privacy Policy</a> • 
             <a href="/terms">Terms of Service</a> • 

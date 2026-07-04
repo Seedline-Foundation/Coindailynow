@@ -12,7 +12,7 @@ const settingsStore: Record<string, Record<string, string>> = {};
 
 const DEFAULT_SETTINGS: Record<string, Record<string, string>> = {
   general: {
-    platformName: 'CoinDaily',
+    platformName: 'Sygn',
     platformDescription: "Africa's premier cryptocurrency and memecoin news platform",
     maintenanceMode: 'false',
     itemsPerPage: '20',

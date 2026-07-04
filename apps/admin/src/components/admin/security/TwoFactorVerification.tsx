@@ -206,7 +206,7 @@ export default function TwoFactorVerification({
                       Security Notice
                     </h4>
                     <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                      Never share your authentication codes with anyone. CoinDaily will never ask for your 2FA codes.
+                      Never share your authentication codes with anyone. Sygn will never ask for your 2FA codes.
                     </p>
                   </div>
                 </div>

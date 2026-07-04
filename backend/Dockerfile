@@ -1,4 +1,4 @@
-# ── CoinDaily Backend ───────────────────────────────────
+# ── Sygn Backend ───────────────────────────────────
 FROM node:18-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache openssl
@@ -22,13 +22,13 @@ RUN npm run build 2>/dev/null || npx tsc --outDir dist --skipLibCheck 2>/dev/nul
 # ── Production ──────────────────────────────────────────
 FROM base AS runner
 ENV NODE_ENV=production
-RUN addgroup -g 1001 -S nodejs && adduser -S coindaily -u 1001
+RUN addgroup -g 1001 -S nodejs && adduser -S sygn -u 1001
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY backend/package.json ./
 
-USER coindaily
+USER sygn
 EXPOSE 4000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:4000/health || exit 1

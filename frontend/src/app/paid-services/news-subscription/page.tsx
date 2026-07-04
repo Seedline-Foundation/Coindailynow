@@ -207,7 +207,7 @@ const plans = [
       'Custom regulatory tracking by jurisdiction',
       'Board-ready news briefing templates',
       'Competitor intelligence monitoring',
-      'Direct line to CoinDaily editorial team',
+      'Direct line to Sygn editorial team',
       'Quarterly trend forecast reports',
       'Compliance-ready audit trail for news sources',
     ],
@@ -294,7 +294,7 @@ export default function NewsSubscriptionPage() {
             📰 Premium News Intelligence
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
-            CoinDaily News Subscription
+            Sygn News Subscription
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-3">
             Choose the exact news topics you want — or pick a ready-made bundle.
@@ -616,7 +616,7 @@ export default function NewsSubscriptionPage() {
         {/* Why Subscribe */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">Why Subscribe?</h2>
-          <p className="text-gray-500 text-center mb-8">What makes CoinDaily News different from free crypto news</p>
+          <p className="text-gray-500 text-center mb-8">What makes Sygn News different from free crypto news</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {whySubscribe.map(w => (
               <div key={w.title} className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
@@ -631,7 +631,7 @@ export default function NewsSubscriptionPage() {
         {/* Testimonial */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-16 text-center max-w-3xl mx-auto">
           <p className="text-lg text-gray-700 dark:text-gray-300 italic mb-4">
-            &ldquo;I used to spend 2 hours every morning reading crypto news. CoinDaily&apos;s curated digest gives me everything I need in 10 minutes. As a fund manager, those saved hours are worth more than the subscription.&rdquo;
+            &ldquo;I used to spend 2 hours every morning reading crypto news. Sygn&apos;s curated digest gives me everything I need in 10 minutes. As a fund manager, those saved hours are worth more than the subscription.&rdquo;
           </p>
           <div className="flex items-center justify-center gap-3">
             <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 font-bold">AO</div>
@@ -646,7 +646,7 @@ export default function NewsSubscriptionPage() {
         <div className="text-center bg-gray-900 dark:bg-gray-800 rounded-2xl p-10 mb-8">
           <h3 className="text-2xl font-bold text-white mb-3">Never Miss a Story That Matters</h3>
           <p className="text-gray-400 mb-6 max-w-xl mx-auto">
-            Join traders and institutions who trust CoinDaily editors to keep them ahead of the market.
+            Join traders and institutions who trust Sygn editors to keep them ahead of the market.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <button onClick={() => { setActiveView('custom'); window.scrollTo(0, 0); }} className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg">

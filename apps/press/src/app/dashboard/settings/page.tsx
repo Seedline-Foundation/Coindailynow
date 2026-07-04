@@ -205,7 +205,7 @@ export default function SettingsPage() {
               </a>
             </div>
             <div className="p-4 bg-dark-900 border border-dark-700 rounded-xl text-center">
-              <p className="text-dark-500 text-sm">Need help? Join our <a href="https://discord.gg/coindaily" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-400">Discord community</a></p>
+              <p className="text-dark-500 text-sm">Need help? Join our <a href="https://discord.gg/sygn" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-400">Discord community</a></p>
             </div>
           </div>
         )}

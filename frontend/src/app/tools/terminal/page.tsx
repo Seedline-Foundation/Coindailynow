@@ -66,12 +66,12 @@ const seedAfricanRates: ExchangeRate[] = [
 ];
 
 const seedNews: NewsItem[] = [
-  { id: '1', title: 'SEC Nigeria Approves Two New Crypto Exchange Licenses', source: 'CoinDaily', ts: '12 min ago', sentiment: 'bullish' },
+  { id: '1', title: 'SEC Nigeria Approves Two New Crypto Exchange Licenses', source: 'Sygn', ts: '12 min ago', sentiment: 'bullish' },
   { id: '2', title: 'CBK Exploring M-Pesa ↔ Stablecoin Bridge for Remittances', source: 'Reuters Africa', ts: '28 min ago', sentiment: 'bullish' },
   { id: '3', title: 'Bitcoin Whale Moves 12,000 BTC to Binance — Sell Pressure?', source: 'Whale Alert', ts: '45 min ago', sentiment: 'bearish' },
   { id: '4', title: 'Luno South Africa Reports Record Trading Volume in Q1', source: 'TechCabal', ts: '1 hr ago', sentiment: 'bullish' },
   { id: '5', title: 'Ghana SEC Issues New Advisory on Unlicensed Exchanges', source: 'GhanaWeb', ts: '2 hr ago', sentiment: 'neutral' },
-  { id: '6', title: 'Solana Memecoin Surge: African Traders Drive 40% Volume', source: 'CoinDaily', ts: '3 hr ago', sentiment: 'bullish' },
+  { id: '6', title: 'Solana Memecoin Surge: African Traders Drive 40% Volume', source: 'Sygn', ts: '3 hr ago', sentiment: 'bullish' },
 ];
 
 function genOHLC(base: number, count = 48): OHLC[] {
@@ -296,7 +296,7 @@ export default function TerminalPage() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <span className="text-yellow-400">⚡</span> CoinDaily Terminal
+              <span className="text-yellow-400">⚡</span> Sygn Terminal
               <span className="text-xs px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-400 font-normal ml-2">BETA</span>
             </h1>
             <p className="text-xs text-gray-500 mt-0.5">Africa&apos;s Crypto Bloomberg — Real-time market intelligence</p>

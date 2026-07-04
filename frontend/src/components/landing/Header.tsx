@@ -358,19 +358,19 @@ const Header: React.FC<HeaderProps> = ({ className = '', showDateTime = true }) 
             {/* Social Media Icons */}
             <div className="flex items-center gap-1">
               <div className="hidden sm:flex items-center gap-1 mr-2">
-                <a href="https://twitter.com/coindailyafrica" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-200 rounded-md transition-colors" aria-label="X (Twitter)">
+                <a href="https://twitter.com/sygnafrica" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-200 rounded-md transition-colors" aria-label="X (Twitter)">
                   <FaXTwitter className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://t.me/coindailyafrica" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-colors" aria-label="Telegram">
+                <a href="https://t.me/sygnafrica" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-colors" aria-label="Telegram">
                   <FaTelegram className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://facebook.com/coindailyafrica" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors" aria-label="Facebook">
+                <a href="https://facebook.com/sygnafrica" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors" aria-label="Facebook">
                   <FaFacebookF className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://linkedin.com/company/coindaily" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors" aria-label="LinkedIn">
+                <a href="https://linkedin.com/company/sygn" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors" aria-label="LinkedIn">
                   <FaLinkedinIn className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://youtube.com/@coindailyafrica" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors" aria-label="YouTube">
+                <a href="https://youtube.com/@sygnafrica" target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors" aria-label="YouTube">
                   <FaYoutube className="w-3.5 h-3.5" />
                 </a>
                 <span className="w-px h-4 bg-gray-200 mx-1" />
@@ -390,7 +390,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', showDateTime = true }) 
               <span className="text-white font-bold text-base">CD</span>
             </div>
             <div className="hidden xs:block">
-              <h1 className="text-lg font-bold text-gray-900 leading-none">CoinDaily</h1>
+              <h1 className="text-lg font-bold text-gray-900 leading-none">Sygn</h1>
               <p className="text-[10px] text-gray-500 leading-none mt-0.5">Africa&apos;s #1 Crypto News</p>
             </div>
           </Link>
@@ -472,7 +472,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', showDateTime = true }) 
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">CD</span>
                 </div>
-                <span className="font-bold text-gray-900">CoinDaily</span>
+                <span className="font-bold text-gray-900">Sygn</span>
               </Link>
               <button
                 onClick={() => setIsMenuOpen(false)}

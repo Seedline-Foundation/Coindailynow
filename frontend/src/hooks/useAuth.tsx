@@ -89,15 +89,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         if (typeof window === 'undefined') return;
 
-        const storedTokens = localStorage.getItem('coindaily_tokens');
-        const storedUser = localStorage.getItem('coindaily_user');
+        const storedTokens = localStorage.getItem('sygn_tokens');
+        const storedUser = localStorage.getItem('sygn_user');
         
         if (storedTokens && storedUser) {
           const tokens: AuthTokens = JSON.parse(storedTokens);
           const user: User = JSON.parse(storedUser);
           
           // Check if token is expired using stored expiresAt timestamp
-          const expiresAt = localStorage.getItem('coindaily_token_expires_at');
+          const expiresAt = localStorage.getItem('sygn_token_expires_at');
           const expiryTime = expiresAt ? parseInt(expiresAt, 10) : 0;
           const isExpired = !expiryTime || Date.now() > expiryTime;
 
@@ -134,9 +134,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Clear authentication data
   const clearAuthData = useCallback(() => {
-    localStorage.removeItem('coindaily_tokens');
-    localStorage.removeItem('coindaily_user');
-    localStorage.removeItem('coindaily_token_expires_at');
+    localStorage.removeItem('sygn_tokens');
+    localStorage.removeItem('sygn_user');
+    localStorage.removeItem('sygn_token_expires_at');
     localStorage.removeItem('authToken');
     localStorage.removeItem('auth_token');
     localStorage.removeItem('accessToken');
@@ -154,8 +154,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Store authentication data
   const storeAuthData = useCallback((user: User, tokens: AuthTokens) => {
     const accessToken = tokens.accessToken;
-    localStorage.setItem('coindaily_tokens', JSON.stringify(tokens));
-    localStorage.setItem('coindaily_user', JSON.stringify(user));
+    localStorage.setItem('sygn_tokens', JSON.stringify(tokens));
+    localStorage.setItem('sygn_user', JSON.stringify(user));
     localStorage.setItem('authToken', accessToken);
     localStorage.setItem('auth_token', accessToken);
     localStorage.setItem('accessToken', accessToken);
@@ -163,7 +163,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.setItem('user', JSON.stringify(user));
     // Store absolute expiry timestamp (expiresIn from token or default 24h)
     const expiresIn = tokens.expiresIn || DEFAULT_EXPIRES_IN;
-    localStorage.setItem('coindaily_token_expires_at', String(Date.now() + expiresIn * 1000));
+    localStorage.setItem('sygn_token_expires_at', String(Date.now() + expiresIn * 1000));
     setAuthState({
       user,
       tokens,
@@ -338,7 +338,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Refresh token function — calls backend GraphQL
   const refreshTokenInternal = useCallback(async (): Promise<void> => {
-    const storedTokens = localStorage.getItem('coindaily_tokens');
+    const storedTokens = localStorage.getItem('sygn_tokens');
     if (!storedTokens) return;
 
     try {
@@ -367,7 +367,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error('Token refresh failed');
       }
 
-      const storedUser = localStorage.getItem('coindaily_user');
+      const storedUser = localStorage.getItem('sygn_user');
       const user: User = storedUser ? JSON.parse(storedUser) : null;
       if (user) {
         setAuthCookie(result.tokens.accessToken);
@@ -386,7 +386,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const updateUser = useCallback((userData: Partial<User>) => {
     if (authState.user) {
       const updatedUser = { ...authState.user, ...userData };
-      localStorage.setItem('coindaily_user', JSON.stringify(updatedUser));
+      localStorage.setItem('sygn_user', JSON.stringify(updatedUser));
       setAuthState(prev => ({
         ...prev,
         user: updatedUser

@@ -238,7 +238,7 @@ export default function AISystemDashboard() {
               <span className="text-xl">🧠</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">CoinDaily AI System</h1>
+              <h1 className="text-xl font-bold text-white">Sygn AI System</h1>
               <p className="text-sm text-gray-400">Agent Orchestration Platform</p>
             </div>
           </div>

@@ -47,7 +47,7 @@ export default function ReadingAssistant({ article, userCountry = 'NG' }: Readin
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-amber-400 animate-pulse" />
           <span className="font-bold text-sm text-white group-hover:text-amber-400 transition-colors">
-            CoinDaily Reading Assistant
+            Sygn Reading Assistant
           </span>
         </div>
         <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full font-bold">

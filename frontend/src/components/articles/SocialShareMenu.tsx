@@ -1,6 +1,6 @@
 /**
  * SocialShareMenu - Social Sharing Component for African Platforms
- * CoinDaily Platform - Task 21 Implementation
+ * Sygn Platform - Task 21 Implementation
  */
 
 import React, { useState } from 'react';

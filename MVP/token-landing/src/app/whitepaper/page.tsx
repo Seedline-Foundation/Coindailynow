@@ -195,7 +195,7 @@ export default function WhitepaperPage() {
           <Section id="executive" icon={<ChartBarIcon />} title="Executive Summary">
             <p className="text-gray-300 mb-4">
               Joy Token ($JY) is the exclusive payment currency for Africa's largest Web3 PR and advertising distribution 
-              network, built to power CoinDaily—Africa's premier cryptocurrency news platform launching with 13-language 
+              network, built to power Sygn—Africa's premier cryptocurrency news platform launching with 13-language 
               support across 13+ African countries.
             </p>
             <div className="grid md:grid-cols-3 gap-6 my-8">
@@ -253,7 +253,7 @@ export default function WhitepaperPage() {
                 to reach $2.5 trillion by 2030.
               </p>
               <p className="text-gray-300">
-                CoinDaily's distribution network targets <strong className="text-accent-400">21.1 million publisher partnerships</strong> 
+                Sygn's distribution network targets <strong className="text-accent-400">21.1 million publisher partnerships</strong> 
                 (100K Tier 1, 1M Tier 2, 20M Tier 3) with Joy Token as the mandatory payment currency. Early holders capture 
                 exponential value as network effects compound.
               </p>
@@ -501,7 +501,7 @@ export default function WhitepaperPage() {
 
             {/* Risk-Adjusted APR Model */}
             <div className="mb-8 p-6 bg-gradient-to-r from-primary-500/10 to-accent-500/10 rounded-lg border border-primary-500/20">
-              <h4 className="text-2xl font-bold mb-4 text-primary-400">CoinDaily Risk-Adjusted APR Model</h4>
+              <h4 className="text-2xl font-bold mb-4 text-primary-400">Sygn Risk-Adjusted APR Model</h4>
               
               <div className="p-4 bg-gray-900/50 rounded-lg mb-6">
                 <p className="text-lg font-semibold text-white mb-2">Core Formula (Whitepaper Version)</p>

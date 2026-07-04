@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
                                 <ul style="color: #d1d5db; margin: 0; padding-left: 20px; line-height: 1.8;">
                                     <li><strong style="color: #ffffff;">90% APR Staking Rewards</strong></li>
                                     <li><strong style="color: #ffffff;">6M Max Supply</strong> - No inflation</li>
-                                    <li><strong style="color: #ffffff;">CoinDaily Premium Access</strong></li>
+                                    <li><strong style="color: #ffffff;">Sygn Premium Access</strong></li>
                                     <li><strong style="color: #ffffff;">Governance Rights</strong></li>
                                     <li><strong style="color: #ffffff;">Early Presale Access</strong></li>
                                     <li><strong style="color: #ffffff;">Exclusive Community Perks</strong></li>
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
                             <p style="color: #9ca3af; font-size: 14px; text-align: center; margin: 25px 0; line-height: 1.6;">
                                 Have questions? We're here to help!<br/>
                                 <a href="https://discord.gg/srgWv7nCSr" style="color: #6366f1; text-decoration: none; font-weight: 600;">Contact us on Discord</a> or 
-                                <a href="https://t.me/CoindailyNewz" style="color: #6366f1; text-decoration: none; font-weight: 600;">Telegram</a>
+                                <a href="https://t.me/SygnNewz" style="color: #6366f1; text-decoration: none; font-weight: 600;">Telegram</a>
                             </p>
 
                         </td>
@@ -184,13 +184,13 @@ export async function POST(request: NextRequest) {
                                     </td>
                                     <td style="padding: 0 10px; color: #4b5563;">|</td>
                                     <td style="padding: 0 10px;">
-                                        <a href="https://t.me/CoindailyNewz" style="color: #6366f1; text-decoration: none; font-size: 14px; font-weight: 600;">
+                                        <a href="https://t.me/SygnNewz" style="color: #6366f1; text-decoration: none; font-size: 14px; font-weight: 600;">
                                             📱 Telegram
                                         </a>
                                     </td>
                                     <td style="padding: 0 10px; color: #4b5563;">|</td>
                                     <td style="padding: 0 10px;">
-                                        <a href="https://twitter.com/Coindaily001" style="color: #6366f1; text-decoration: none; font-size: 14px; font-weight: 600;">
+                                        <a href="https://twitter.com/Sygn001" style="color: #6366f1; text-decoration: none; font-size: 14px; font-weight: 600;">
                                             𝕏 Twitter
                                         </a>
                                     </td>
@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
                                 <a href="${SITE_URL}" style="color: #6366f1; text-decoration: none;">${SITE_URL}</a>
                             </p>
                             <p style="color: #4b5563; font-size: 11px; margin: 0;">
-                                © ${new Date().getFullYear()} CoinDaily. All rights reserved.
+                                © ${new Date().getFullYear()} Sygn. All rights reserved.
                             </p>
                         </td>
                     </tr>

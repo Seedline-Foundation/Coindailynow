@@ -106,7 +106,7 @@ Market analysts predict continued growth as African nations embrace digital curr
       {
         type: 'social_post' as const,
         title: '🚀 BREAKING: Bitcoin hits $50K!',
-        content: '🔥 Bitcoin just broke $50,000! 📈 African markets are absolutely crushing it with 127% adoption growth in Nigeria alone! 🇳🇬\n\n#Bitcoin #Crypto #Africa #BTC50K #BreakingNews #CoinDaily',
+        content: '🔥 Bitcoin just broke $50,000! 📈 African markets are absolutely crushing it with 127% adoption growth in Nigeria alone! 🇳🇬\n\n#Bitcoin #Crypto #Africa #BTC50K #BreakingNews #Sygn',
         generatedBy: 'social-media-agent',
         confidenceScore: 0.85,
         qualityScore: 0.78,
@@ -114,7 +114,7 @@ Market analysts predict continued growth as African nations embrace digital curr
         metadata: {
           platform: 'twitter',
           characterCount: 178,
-          hashtags: ['#Bitcoin', '#Crypto', '#Africa', '#BTC50K', '#BreakingNews', '#CoinDaily'],
+          hashtags: ['#Bitcoin', '#Crypto', '#Africa', '#BTC50K', '#BreakingNews', '#Sygn'],
           scheduledTime: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
           engagementPrediction: 0.84
         },

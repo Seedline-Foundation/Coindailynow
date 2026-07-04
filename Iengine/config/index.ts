@@ -62,9 +62,9 @@ export function loadConfig(): IengineConfig {
       serviceToken: process.env.IENGINE_SERVICE_TOKEN || process.env.AI_PIPELINE_SERVICE_TOKEN || '',
     },
     cdn: {
-      provider: process.env.CDN_PROVIDER || 'backblaze-b2',
+      provider: process.env.CDN_PROVIDER || 'contabo',
       publicUrl: process.env.CDN_URL || process.env.CFIS_PUBLIC_MEDIA_BASE || 'https://cdn.sygn.live',
-      bucket: process.env.CDN_BUCKET || 'coindaily-media',
+      bucket: process.env.CDN_BUCKET || 'simages',
     },
     generation: {
       maxConcurrency: parseInt(process.env.IENGINE_MAX_CONCURRENCY || '2'),

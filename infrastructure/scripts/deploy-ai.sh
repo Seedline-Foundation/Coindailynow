@@ -6,8 +6,8 @@
 set -e
 
 ENVIRONMENT=${1:-production}
-APP_NAME="coindaily-ai"
-APP_DIR="/var/www/coindaily-ai"
+APP_NAME="sygn-ai"
+APP_DIR="/var/www/sygn-ai"
 SOURCE_DIR="ai-system"
 
 echo "[AI] Starting deployment..."

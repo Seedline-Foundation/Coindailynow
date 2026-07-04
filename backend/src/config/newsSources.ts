@@ -356,7 +356,7 @@ export const API_DATA_SOURCES: NewsSource[] = [
   { name: 'World Bank LC API', url: 'https://api.worldbank.org/v2/country/LC/indicator/NY.GDP.MKTP.CD?format=json', type: 'api', category: 'Market Data', region: 'LC' },
 
   // ─── Vanuatu ───
-  { name: 'ReliefWeb VU API', url: 'https://api.reliefweb.int/v1/reports?appname=coindaily&query[value]=primary_country.iso3:vut', type: 'api', category: 'Policy', region: 'VU' },
+  { name: 'ReliefWeb VU API', url: 'https://api.reliefweb.int/v1/reports?appname=sygn&query[value]=primary_country.iso3:vut', type: 'api', category: 'Policy', region: 'VU' },
 
   // ─── Chile ───
   { name: 'Banco Central Chile API', url: 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx', type: 'api', category: 'Finance', region: 'CL' },

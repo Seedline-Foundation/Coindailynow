@@ -14,7 +14,7 @@ export class SupportAgent extends BaseAgent {
       name: 'Support Agent',
       type: 'customer_support',
       category: 'business',
-      description: 'AI customer support for CoinDaily platform users. Handles queries about subscriptions, account issues, crypto basics, platform features, and African market questions with 24/7 availability.',
+      description: 'AI customer support for Sygn platform users. Handles queries about subscriptions, account issues, crypto basics, platform features, and African market questions with 24/7 availability.',
       capabilities: [
         'ticket_response',
         'faq_answering',
@@ -58,7 +58,7 @@ export class SupportAgent extends BaseAgent {
   }
 
   private async handleTicket(query: string, userId?: string, context?: any): Promise<Record<string, any>> {
-    const prompt = `You are CoinDaily's support agent for Africa's premier crypto news platform.
+    const prompt = `You are Sygn's support agent for Africa's premier crypto news platform.
 
 User query: "${query}"
 User ID: ${userId || 'anonymous'}
@@ -85,7 +85,7 @@ Respond helpfully, accurately, and with African market awareness. Return JSON:
   }
 
   private async answerFAQ(query: string, language?: string): Promise<Record<string, any>> {
-    const prompt = `Answer this CoinDaily FAQ question:
+    const prompt = `Answer this Sygn FAQ question:
 
 Question: "${query}"
 Language: ${language || 'English'}
@@ -107,7 +107,7 @@ Return JSON:
   }
 
   private async handleAccountIssue(query: string, userId?: string, context?: any): Promise<Record<string, any>> {
-    const prompt = `Handle account issue for CoinDaily user:
+    const prompt = `Handle account issue for Sygn user:
 
 Issue: "${query}"
 User: ${userId || 'unknown'}
@@ -135,7 +135,7 @@ Return JSON:
   }
 
   private async handleSubscription(query: string, userId?: string, context?: any): Promise<Record<string, any>> {
-    const prompt = `Handle subscription query for CoinDaily (tiers: Free, Pro, Premium, Enterprise):
+    const prompt = `Handle subscription query for Sygn (tiers: Free, Pro, Premium, Enterprise):
 
 Query: "${query}"
 User: ${userId || 'unknown'}
@@ -207,7 +207,7 @@ Return JSON:
   }
 
   private async collectFeedback(feedback: any, userId?: string): Promise<Record<string, any>> {
-    const prompt = `Analyze user feedback for CoinDaily:
+    const prompt = `Analyze user feedback for Sygn:
 
 Feedback: ${JSON.stringify(feedback, null, 2)}
 User: ${userId || 'anonymous'}

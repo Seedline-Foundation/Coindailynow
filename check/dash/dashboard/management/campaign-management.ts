@@ -672,7 +672,7 @@ export class CampaignManagementSystem {
       slug: 'sample-article',
       category: 'market',
       tags: ['crypto', 'bitcoin'],
-      author: 'CoinDaily Team',
+      author: 'Sygn Team',
       publishedAt: new Date(),
       language: 'en'
     };

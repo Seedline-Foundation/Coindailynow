@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo   Starting CoinDaily Dev Server
+echo   Starting Sygn Dev Server
 echo ========================================
 echo.
 cd /d "C:\Users\onech\Desktop\news-platform\frontend"

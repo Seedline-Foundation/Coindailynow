@@ -606,7 +606,7 @@ export default function HelpCenterPage() {
                 </div>
                 <div>
                   <h3 className="font-extrabold text-sm md:text-base flex items-center gap-1.5">
-                    CoinDaily AI Concierge
+                    Sygn AI Concierge
                     <span className="flex h-2 w-2 relative">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -628,7 +628,7 @@ export default function HelpCenterPage() {
                 // Welcome screen
                 <div className="h-full flex flex-col justify-center items-center text-center max-w-md mx-auto py-10">
                   <Sparkles className="h-10 w-10 text-amber-400 mb-4 animate-pulse" />
-                  <h2 className="text-lg font-bold mb-2">Welcome to CoinDaily Intelligence!</h2>
+                  <h2 className="text-lg font-bold mb-2">Welcome to Sygn Intelligence!</h2>
                   <p className="text-gray-400 text-xs md:text-sm mb-8 leading-relaxed">
                     Ask me anything about market shifts, project metrics, or platform usage. I adapt my insights based on your region.
                   </p>

@@ -37,8 +37,8 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://sygn.live'),
   title: {
-    default: 'CoinDaily Africa - Premier Cryptocurrency News Platform',
-    template: '%s | CoinDaily Africa'
+    default: 'Sygn Africa - Premier Cryptocurrency News Platform',
+    template: '%s | Sygn Africa'
   },
   description: 'Africa\'s premier cryptocurrency and memecoin news platform with AI-driven content generation, real-time market data from African exchanges, and community features. Stay informed with the latest crypto news from Nigeria, Kenya, South Africa, and Ghana.',
   keywords: [
@@ -59,18 +59,18 @@ export const metadata: Metadata = {
     'm-pesa crypto',
     'mobile money cryptocurrency'
   ],
-  authors: [{ name: 'CoinDaily Africa Team', url: 'https://sygn.live' }],
-  creator: 'CoinDaily Africa',
-  publisher: 'CoinDaily Africa',
-  applicationName: 'CoinDaily Africa',
+  authors: [{ name: 'Sygn Africa Team', url: 'https://sygn.live' }],
+  creator: 'Sygn Africa',
+  publisher: 'Sygn Africa',
+  applicationName: 'Sygn Africa',
   category: 'Finance',
   classification: 'Cryptocurrency News Platform',
   
   // Open Graph
   openGraph: {
     type: 'website',
-    siteName: 'CoinDaily Africa',
-    title: 'CoinDaily Africa - Premier Cryptocurrency News Platform',
+    siteName: 'Sygn Africa',
+    title: 'Sygn Africa - Premier Cryptocurrency News Platform',
     description: 'Africa\'s premier cryptocurrency news platform with real-time market data and AI-driven content',
     url: 'https://sygn.live',
     countryName: 'Nigeria',
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'CoinDaily Africa - Cryptocurrency News Platform',
+        alt: 'Sygn Africa - Cryptocurrency News Platform',
       }
     ],
     locale: 'en_US',
@@ -89,9 +89,9 @@ export const metadata: Metadata = {
   // Twitter
   twitter: {
     card: 'summary_large_image',
-    site: '@coindailyafrica',
-    creator: '@coindailyafrica',
-    title: 'CoinDaily Africa - Premier Cryptocurrency News Platform',
+    site: '@sygnafrica',
+    creator: '@sygnafrica',
+    title: 'Sygn Africa - Premier Cryptocurrency News Platform',
     description: 'Africa\'s premier cryptocurrency news platform with real-time market data and AI-driven content',
     images: ['/twitter-image.png'],
   },
@@ -105,7 +105,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'CoinDaily Africa',
+    title: 'Sygn Africa',
     startupImage: [
       {
         url: '/apple-splash-2048-2732.jpg',
@@ -127,7 +127,7 @@ export const metadata: Metadata = {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'default',
-    'apple-mobile-web-app-title': 'CoinDaily',
+    'apple-mobile-web-app-title': 'Sygn',
     'msapplication-TileColor': '#f97316',
     'msapplication-config': '/browserconfig.xml',
     'theme-color': '#f97316',
@@ -207,26 +207,26 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'WebSite',
-              name: 'CoinDaily',
-              alternateName: ['CoinDaily Africa', 'CoinDaily Online'],
+              name: 'Sygn',
+              alternateName: ['Sygn Africa', 'Sygn Online'],
               url: 'https://sygn.live',
               description: 'Africa\'s premier cryptocurrency news platform with AI-powered content in 15+ African languages',
               inLanguage: ['en', 'sw', 'ha', 'yo', 'am', 'zu', 'ig', 'af', 'so', 'rw', 'sn', 'lg', 'wo', 'om', 'ti'],
               isAccessibleForFree: true,
               publisher: {
                 '@type': 'Organization',
-                name: 'CoinDaily',
+                name: 'Sygn',
                 url: 'https://sygn.live',
                 logo: {
                   '@type': 'ImageObject',
                   url: 'https://sygn.live/images/logo.svg'
                 },
                 sameAs: [
-                  'https://twitter.com/coindailyafrica',
-                  'https://t.me/coindaily',
-                  'https://www.facebook.com/coindailyafrica',
-                  'https://www.linkedin.com/company/coindaily',
-                  'https://www.youtube.com/@coindaily'
+                  'https://twitter.com/sygnafrica',
+                  'https://t.me/sygn',
+                  'https://www.facebook.com/sygnafrica',
+                  'https://www.linkedin.com/company/sygn',
+                  'https://www.youtube.com/@sygn'
                 ],
                 contactPoint: {
                   '@type': 'ContactPoint',

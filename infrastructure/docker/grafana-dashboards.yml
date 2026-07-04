@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: CoinDaily
+  - name: Sygn
     orgId: 1
-    folder: CoinDaily
+    folder: Sygn
     type: file
     disableDeletion: false
     editable: true

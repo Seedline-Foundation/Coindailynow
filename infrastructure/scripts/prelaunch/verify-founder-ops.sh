@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-ENV_FILE="${1:-/var/www/coindaily-app/.env}"
+ENV_FILE="${1:-/var/www/sygn-app/.env}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'

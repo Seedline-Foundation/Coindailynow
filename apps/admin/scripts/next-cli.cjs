@@ -16,7 +16,7 @@ if (!nextBin) {
   console.error(
     'Next.js is not installed.\n' +
       '  From repo root: npm install\n' +
-      '  Or: npm install --workspace=@coindaily/admin',
+      '  Or: npm install --workspace=@sygn/admin',
   );
   process.exit(1);
 }

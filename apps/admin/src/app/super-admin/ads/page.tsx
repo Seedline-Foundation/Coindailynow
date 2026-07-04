@@ -278,7 +278,7 @@ const mockCampaigns: Campaign[] = [
   {
     id: 'C006',
     name: 'JOY Token Airdrop Banner',
-    advertiser: 'CoinDaily Internal',
+    advertiser: 'Sygn Internal',
     advertiserEmail: 'internal@sygn.live',
     advertiserCountry: 'Nigeria',
     countryFlag: '🇳🇬',

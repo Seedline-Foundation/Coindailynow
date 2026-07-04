@@ -168,7 +168,7 @@ export function SearchInterface({
       className={`search-interface ${className} ${state.isMobile ? 'mobile-optimized' : ''}`}
       data-testid="search-container"
       role="search"
-      aria-label="CoinDaily content search"
+      aria-label="Sygn content search"
     >
       {/* Language Detection Banner */}
       {detectedLanguage && (

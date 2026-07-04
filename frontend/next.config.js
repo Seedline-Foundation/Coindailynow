@@ -82,7 +82,7 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    domains: ['localhost', 'api.sygn.live', 'cdn.sygn.live'],
+    domains: ['localhost', 'api.sygn.live', 'cdn.sygn.live', 'eu2.contabostorage.com'],
     loader: 'custom',
     loaderFile: './src/utils/cdn-image-loader.js'
   },

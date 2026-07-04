@@ -76,7 +76,7 @@ function VerifyEmailContent() {
               </h2>
               <p className="text-gray-300 leading-relaxed">
                 We've sent you a welcome email with your whitelist application link. 
-                You'll also receive a 9-day educational series about Joy Token and the CoinDaily ecosystem.
+                You'll also receive a 9-day educational series about Joy Token and the Sygn ecosystem.
               </p>
             </div>
 

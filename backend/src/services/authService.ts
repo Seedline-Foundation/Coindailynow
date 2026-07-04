@@ -339,8 +339,8 @@ export class AuthService {
       process.env.JWT_SECRET!,
       { 
         expiresIn: this.ACCESS_TOKEN_EXPIRY,
-        issuer: 'coindaily-api',
-        audience: 'coindaily-app'
+        issuer: 'sygn-api',
+        audience: 'sygn-app'
       }
     );
 

@@ -41,7 +41,7 @@ const recentAlerts = [
   { bot: 'Regulator Crawler', message: 'New SEC Nigeria bulletin detected: "Updated VASP Registration Requirements"', severity: 'high', time: '2 min ago' },
   { bot: 'Link Risk Bot', message: '4 broken outbound links found in articles published this week', severity: 'medium', time: '8 hours ago' },
   { bot: 'Freshness Scanner', message: '28 articles older than 90 days need editorial review', severity: 'low', time: '12 hours ago' },
-  { bot: 'Social Mention Scraper', message: 'Spike detected: "CoinDaily" mentions up 340% on Twitter/X in last hour', severity: 'info', time: '3 min ago' },
+  { bot: 'Social Mention Scraper', message: 'Spike detected: "Sygn" mentions up 340% on Twitter/X in last hour', severity: 'info', time: '3 min ago' },
   { bot: 'Schema CI', message: 'Blocked publish: Article "DeFi Guide" missing author Person schema', severity: 'high', time: '5 min ago' },
   { bot: 'Indexing Bot', message: 'IndexNow ping delivered for 12 new/updated articles', severity: 'info', time: '1 min ago' },
   { bot: 'Alert & Task Creator', message: 'Created 2 tickets from high-severity alerts in last hour', severity: 'medium', time: '15 min ago' },

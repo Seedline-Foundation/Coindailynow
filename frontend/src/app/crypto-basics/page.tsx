@@ -252,7 +252,7 @@ export default function CryptoBasicsPage() {
                     <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
                       <p className="font-bold text-blue-800 dark:text-blue-200">🏆 Knowledge Check</p>
                       <p className="text-sm text-blue-600 dark:text-blue-300 mt-1">
-                        Complete all modules to unlock the quiz and earn your CoinDaily certificate. Share it on social media!
+                        Complete all modules to unlock the quiz and earn your Sygn certificate. Share it on social media!
                       </p>
                     </div>
                   </div>

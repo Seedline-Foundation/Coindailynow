@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-# CoinDaily Production Deployment Script
+# Sygn Production Deployment Script
 # Run on Contabo VPS (167.86.99.97)
 # ============================================================================
 set -e
@@ -9,7 +9,7 @@ PROJECT_DIR="/var/www/news-platform"
 cd "$PROJECT_DIR"
 
 echo "=========================================="
-echo "  CoinDaily Production Deployment"
+echo "  Sygn Production Deployment"
 echo "=========================================="
 
 # Step 1: Pull latest code
@@ -76,7 +76,7 @@ pm2 stop all 2>/dev/null || true
 pm2 delete all 2>/dev/null || true
 
 # Start all apps
-pm2 start ecosystem.config.js --only coindaily-backend,coindaily-news,coindaily-admin
+pm2 start ecosystem.config.js --only sygn-backend,sygn-news,sygn-admin
 
 # Save PM2 process list (auto-restart on reboot)
 pm2 save

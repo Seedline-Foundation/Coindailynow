@@ -14,7 +14,7 @@ export class PricingAgent extends BaseAgent {
       name: 'Pricing Agent',
       type: 'pricing',
       category: 'finance',
-      description: 'Optimizes pricing for CoinDaily subscriptions and ad packages using market analysis, competitive intelligence, willingness-to-pay analysis, and regional optimization for African markets.',
+      description: 'Optimizes pricing for Sygn subscriptions and ad packages using market analysis, competitive intelligence, willingness-to-pay analysis, and regional optimization for African markets.',
       capabilities: [
         'price_optimization',
         'competitive_analysis',
@@ -62,7 +62,7 @@ export class PricingAgent extends BaseAgent {
   }
 
   private async optimizePricing(product: any, data: any): Promise<Record<string, any>> {
-    const prompt = `Optimize pricing for CoinDaily product:
+    const prompt = `Optimize pricing for Sygn product:
 
 Product: ${JSON.stringify(product || {}, null, 2)}
 Data: ${JSON.stringify(data || {}, null, 2)}
@@ -162,7 +162,7 @@ Return JSON:
   }
 
   private async willingnessToPayAnalysis(data: any): Promise<Record<string, any>> {
-    const prompt = `Analyze willingness to pay for CoinDaily services:
+    const prompt = `Analyze willingness to pay for Sygn services:
 
 Data: ${JSON.stringify(data || {}, null, 2)}
 
@@ -227,7 +227,7 @@ Return JSON:
   }
 
   private async createBundle(data: any): Promise<Record<string, any>> {
-    const prompt = `Create product bundles for CoinDaily:
+    const prompt = `Create product bundles for Sygn:
 
 Data: ${JSON.stringify(data || {}, null, 2)}
 

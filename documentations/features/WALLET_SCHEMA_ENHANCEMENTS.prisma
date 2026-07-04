@@ -1,8 +1,8 @@
-# CoinDaily Platform ERC-20 Token - Complete Feature Template
+# Sygn Platform ERC-20 Token - Complete Feature Template
 
 ## 🪙 TOKEN OVERVIEW
 
-### Token Name: **CoinDaily Token (CDT)**
+### Token Name: **Sygn Token (CDT)**
 ### Network: **Polygon (MATIC)** - Low fees, fast transactions, EVM-compatible
 ### Standard: **ERC-20** with additional features
 ### Purpose: **Platform utility token for African cryptocurrency news ecosystem**
@@ -13,7 +13,7 @@
 
 ### Basic Information
 ```solidity
-Name: CoinDaily Token
+Name: Sygn Token
 Symbol: CDT
 Decimals: 18
 Total Supply: 1,000,000,000 CDT (1 Billion tokens)

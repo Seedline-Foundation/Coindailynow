@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { authMiddleware } from '../middleware/auth';
-import { uploadBase64ImageToCdn } from '../services/b2MediaService';
+import { uploadBase64ImageToCdn } from '../services/mediaStorageService';
 
 const router = Router();
 

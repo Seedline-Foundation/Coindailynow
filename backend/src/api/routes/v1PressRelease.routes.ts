@@ -123,7 +123,7 @@ function mapReleaseToWireItem(release: any) {
     source:
       [release.user?.firstName, release.user?.lastName].filter(Boolean).join(' ') ||
       release.user?.username ||
-      'CoinDaily Wire',
+      'Sygn Wire',
     publishedAt: new Date(release.publishedAt || release.createdAt).toISOString(),
     url: release.slug ? `/press/${release.slug}` : null,
     tags,
@@ -443,7 +443,7 @@ router.post('/checkout/yellowcard', async (req: Request, res: Response) => {
         {
           amount: parseFloat(amount),
           currency: 'USD',
-          reason: `CoinDaily Press distribution: order ${orderId}`,
+          reason: `Sygn Press distribution: order ${orderId}`,
           metadata: { publisherId, orderId, reference },
         },
         {
@@ -505,7 +505,7 @@ router.post('/wire/alerts', async (req: Request, res: Response) => {
         {
           From: process.env.WIRE_ALERT_FROM || 'wire@sygn.live',
           To: email,
-          Subject: 'CoinDaily Wire alerts enabled',
+          Subject: 'Sygn Wire alerts enabled',
           TextBody: `You will receive alerts for: ${(sources || []).join(', ') || 'all sources'}.`,
         },
         { headers: { 'X-Postmark-Server-Token': process.env.POSTMARK_SERVER_TOKEN } },

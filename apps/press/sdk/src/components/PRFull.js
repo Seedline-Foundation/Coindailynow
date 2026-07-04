@@ -298,9 +298,9 @@ class PRFull extends HTMLElement {
                 </a>` : ''}
                 
                 <div class="pr-disclaimer">
-                    <strong>Disclaimer:</strong> This is a sponsored press release distributed via SENDPRESS by Coindaily. 
+                    <strong>Disclaimer:</strong> This is a sponsored press release distributed via SENDPRESS by Sygn. 
                     The views and opinions expressed in this article are those of the authors and do not necessarily 
-                    reflect the official policy or position of Coindaily or any of its affiliates.
+                    reflect the official policy or position of Sygn or any of its affiliates.
                 </div>
             </footer>
         `;
@@ -325,8 +325,8 @@ class PRFull extends HTMLElement {
     
     trackImpression() {
         const prId = this.getAttribute('pr-id');
-        if (window.Coindaily && prId) {
-            window.Coindaily.trackMetric?.('full_view', { prId });
+        if (window.Sygn && prId) {
+            window.Sygn.trackMetric?.('full_view', { prId });
         }
         
         this.dispatchEvent(new CustomEvent('pr-view', {

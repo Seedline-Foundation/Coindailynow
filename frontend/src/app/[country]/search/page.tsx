@@ -23,8 +23,8 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: 'Search | CoinDaily',
-  description: 'Search across articles, factsheets, regulations, and market data on CoinDaily.',
+  title: 'Search | Sygn',
+  description: 'Search across articles, factsheets, regulations, and market data on Sygn.',
   robots: { index: false },
 };
 

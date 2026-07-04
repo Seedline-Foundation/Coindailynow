@@ -1,6 +1,6 @@
 // Inter-Agent Workflow System - Orchestrates complex multi-agent news creation workflows
 // Handles Research → Reviewer → Writer → Translator → Reviewer → Human Editor Queue
-// Optimized for CoinDaily Africa's requirements: <500ms response, single I/O, SEO-focused
+// Optimized for Sygn Africa's requirements: <500ms response, single I/O, SEO-focused
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { createAuditLog } from '../../../backend/src/services/aiAuditService';

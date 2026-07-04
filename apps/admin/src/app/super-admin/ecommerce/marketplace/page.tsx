@@ -12,16 +12,16 @@ import Link from 'next/link';
 const CATEGORIES = ['All', 'Digital', 'Subscription', 'Report', 'Course', 'API Access', 'Merchandise'];
 
 const ALL_PRODUCTS = [
-  { id: 'p1', name: 'CoinDaily Pro Subscription', category: 'Subscription', price: 29.99, description: 'Full access to premium news, alerts and analytics.', sales: 1240, rating: 4.8, status: 'active', badge: 'Bestseller', image: null },
+  { id: 'p1', name: 'Sygn Pro Subscription', category: 'Subscription', price: 29.99, description: 'Full access to premium news, alerts and analytics.', sales: 1240, rating: 4.8, status: 'active', badge: 'Bestseller', image: null },
   { id: 'p2', name: 'Eco-Zone Q1 2026 Market Report', category: 'Report', price: 49.99, description: 'Institutional-grade ECOWAS crypto market analysis for Q1 2026.', sales: 430, rating: 4.9, status: 'active', badge: 'New', image: null },
   { id: 'p3', name: 'West Africa Regulatory Passport Guide', category: 'Report', price: 24.99, description: 'Complete compliance guide for 15 ECOWAS jurisdictions.', sales: 320, rating: 4.7, status: 'active', badge: null, image: null },
   { id: 'p4', name: 'Crypto Tax Calculator — Nigeria/Ghana', category: 'Digital', price: 9.99, description: 'Audit-ready PDF tax reports for NG and GH crypto traders.', sales: 862, rating: 4.6, status: 'active', badge: 'Popular', image: null },
   { id: 'p5', name: 'Bloomberg API — Basic Tier', category: 'API Access', price: 99.00, description: '10,000 API requests/month. Real-time prices and on-chain data.', sales: 88, rating: 4.5, status: 'active', badge: null, image: null },
   { id: 'p6', name: 'Stablecoin Corridors Data Feed', category: 'API Access', price: 79.00, description: 'Live NGN/GHS/XOF premium feeds across 12 African exchanges.', sales: 56, rating: 4.7, status: 'active', badge: null, image: null },
   { id: 'p7', name: 'ECO Transition Masterclass', category: 'Course', price: 79.00, description: '6-hour video course on trading and investing through the ECO launch.', sales: 215, rating: 4.8, status: 'active', badge: 'Hot', image: null },
-  { id: 'p8', name: 'CoinDaily Analyst T-Shirt', category: 'Merchandise', price: 24.99, description: 'Premium cotton. Ships within Africa.', sales: 184, rating: 4.4, status: 'active', badge: null, image: null },
+  { id: 'p8', name: 'Sygn Analyst T-Shirt', category: 'Merchandise', price: 24.99, description: 'Premium cotton. Ships within Africa.', sales: 184, rating: 4.4, status: 'active', badge: null, image: null },
   { id: 'p9', name: 'DeFi Beginner Bundle', category: 'Course', price: 19.99, description: 'Three beginner guides to DeFi, bridging, and staking on Polygon.', sales: 396, rating: 4.5, status: 'active', badge: null, image: null },
-  { id: 'p10', name: 'CoinDaily Enterprise Subscription', category: 'Subscription', price: 299.00, description: 'Team access, API bundle and weekly analyst calls.', sales: 34, rating: 4.9, status: 'active', badge: 'Enterprise', image: null },
+  { id: 'p10', name: 'Sygn Enterprise Subscription', category: 'Subscription', price: 299.00, description: 'Team access, API bundle and weekly analyst calls.', sales: 34, rating: 4.9, status: 'active', badge: 'Enterprise', image: null },
   { id: 'p11', name: 'Memecoin Surge Alert Pack', category: 'Digital', price: 4.99, description: 'Instant alerts when any token pumps 20%+ in under 1 hour.', sales: 1120, rating: 4.3, status: 'active', badge: null, image: null },
   { id: 'p12', name: 'Crypto Portfolio Tracker Template', category: 'Digital', price: 7.99, description: 'Google Sheets + Notion template for African crypto portfolios.', sales: 540, rating: 4.6, status: 'active', badge: 'Popular', image: null },
 ];

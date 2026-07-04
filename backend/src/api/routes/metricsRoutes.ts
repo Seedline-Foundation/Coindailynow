@@ -271,7 +271,7 @@ router.get('/services', async (req: Request, res: Response) => {
 
     // Update status from Prometheus
     (containerUp || []).forEach((result: PrometheusResult) => {
-      const name = result.metric.name?.replace('coindaily_', '').toLowerCase();
+      const name = result.metric.name?.replace('sygn_', '').toLowerCase();
       if (name && name in services) {
         services[name as keyof typeof services].status = parseFloat(result.value[1]) > 0 ? 'healthy' : 'down';
       }
@@ -279,14 +279,14 @@ router.get('/services', async (req: Request, res: Response) => {
 
     // Add CPU and memory info
     (containerCpu || []).forEach((result: PrometheusResult) => {
-      const name = result.metric.name?.replace('coindaily_', '').toLowerCase();
+      const name = result.metric.name?.replace('sygn_', '').toLowerCase();
       if (name && name in services) {
         services[name as keyof typeof services].cpu = parseFloat(result.value[1]).toFixed(1) + '%';
       }
     });
 
     (containerMemory || []).forEach((result: PrometheusResult) => {
-      const name = result.metric.name?.replace('coindaily_', '').toLowerCase();
+      const name = result.metric.name?.replace('sygn_', '').toLowerCase();
       if (name && name in services) {
         const memMB = parseFloat(result.value[1]) / (1024 * 1024);
         services[name as keyof typeof services].memory = memMB.toFixed(0) + 'MB';

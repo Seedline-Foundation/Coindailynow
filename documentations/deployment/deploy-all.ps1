@@ -1,4 +1,4 @@
-# CoinDaily Platform - Full Deployment Script
+# Sygn Platform - Full Deployment Script
 # Deploys all systems to Contabo server at 167.86.99.97
 
 $SERVER = "167.86.99.97"
@@ -7,7 +7,7 @@ $WEB_DIR = "/var/www"
 $LOCAL_DIR = "c:\Users\user\Desktop\news-platform"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  CoinDaily Platform Full Deployment" -ForegroundColor Cyan
+Write-Host "  Sygn Platform Full Deployment" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -19,8 +19,8 @@ mkdir -p $WEB_DIR/jet.sygn.live/{admin-frontend,contracts}
 mkdir -p $WEB_DIR/pr.sygn.live/frontend
 mkdir -p $WEB_DIR/ai.sygn.live
 mkdir -p $WEB_DIR/backend.sygn.live
-mkdir -p /var/log/coindaily
-mkdir -p /opt/coindaily/{backups,configs,scripts}
+mkdir -p /var/log/sygn
+mkdir -p /opt/sygn/{backups,configs,scripts}
 chown -R www-data:www-data $WEB_DIR
 "@
 ssh ${SSH_USER}@${SERVER} $dirStructure
@@ -103,12 +103,12 @@ Write-Host "  ✓ Server configured" -ForegroundColor Green
 Write-Host "[8/8] Starting services with PM2..." -ForegroundColor Yellow
 $startScript = @"
 cd $WEB_DIR/backend.sygn.live
-pm2 delete coindaily-backend 2>/dev/null || true
-pm2 start dist/backend/src/index.js --name coindaily-backend -i 2
+pm2 delete sygn-backend 2>/dev/null || true
+pm2 start dist/backend/src/index.js --name sygn-backend -i 2
 
 cd $WEB_DIR/sygn.live/frontend
-pm2 delete coindaily-frontend 2>/dev/null || true
-pm2 start npm --name coindaily-frontend -- start
+pm2 delete sygn-frontend 2>/dev/null || true
+pm2 start npm --name sygn-frontend -- start
 
 pm2 save
 pm2 startup

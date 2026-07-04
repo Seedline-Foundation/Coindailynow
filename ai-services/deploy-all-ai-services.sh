@@ -7,7 +7,7 @@
 set -e
 
 echo "=================================================="
-echo "CoinDaily AI Services Deployment"
+echo "Sygn AI Services Deployment"
 echo "=================================================="
 echo ""
 echo "This script will install:"

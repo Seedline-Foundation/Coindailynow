@@ -1,4 +1,4 @@
-# CoinDaily — Master Pre/Post-Launch TODO
+# Sygn — Master Pre/Post-Launch TODO
 
 **Owner:** Solo founder
 **Target launch date:** 2026-06-01 (Africa + diaspora wave 1)
@@ -70,7 +70,7 @@
 ## ✅ Done
 
 - [x] DB migrated from Supabase to self-hosted Postgres + TimescaleDB on Contabo.
-- [x] PM2 path bug fixed in `ecosystem.config.js`: `coindaily-news` now points to `./frontend` (was the non-existent `./apps/news`). `infrastructure/ecosystem.production.config.js` uses `/var/www/coindaily` and is unaffected.
+- [x] PM2 path bug fixed in `ecosystem.config.js`: `sygn-news` now points to `./frontend` (was the non-existent `./apps/news`). `infrastructure/ecosystem.production.config.js` uses `/var/www/sygn` and is unaffected.
 
 ---
 
@@ -83,8 +83,8 @@ These block launch. Anything not done here = launch slips or breaks.
 **Runbook:** [../guides/PRELAUNCH_INFRA_RUNBOOK.md](../guides/PRELAUNCH_INFRA_RUNBOOK.md) · Scripts: `infrastructure/scripts/prelaunch/`
 
 - [ ] **Verify `.env` does not contain any `CHANGE_ME` or example values.** Run `verify-env.sh` on server `.env` files. See [SECRETS_ROTATION.md](SECRETS_ROTATION.md). Owner: founder. Time: 1h.
-- [ ] **Rotate JWT_SECRET and JWT_REFRESH_SECRET on the production server** — run `rotate-jwt.sh`, paste into `/var/www/coindaily-app/.env`, `pm2 restart coindaily-backend --update-env`. Plan a 5-minute maintenance window.
-- [ ] **Confirm `infrastructure/ecosystem.production.config.js` paths match Contabo** — run `verify-production-paths.sh` (manifest: `production-paths.manifest`). Fixed deploy-all paths 2026-05-15 (`coindaily-ai` + `coindaily-ai-system` split).
+- [ ] **Rotate JWT_SECRET and JWT_REFRESH_SECRET on the production server** — run `rotate-jwt.sh`, paste into `/var/www/sygn-app/.env`, `pm2 restart sygn-backend --update-env`. Plan a 5-minute maintenance window.
+- [ ] **Confirm `infrastructure/ecosystem.production.config.js` paths match Contabo** — run `verify-production-paths.sh` (manifest: `production-paths.manifest`). Fixed deploy-all paths 2026-05-15 (`sygn-ai` + `sygn-ai-system` split).
 - [ ] **Run the PM2 smoke-test script** — [../guides/PM2_SMOKE_TEST.md](../guides/PM2_SMOKE_TEST.md) · `pm2-smoke-test.sh --restart`. All **7** processes online within 90s.
 - [x] **Wire Sentry** (free tier: 5k errors/month) ✅ Added `@sentry/node` v9 to backend with `lib/sentry.ts` init module (loaded before all other imports in `index.ts`), wired into `errorHandler.ts` middleware (captures 5xx only) and `unhandledRejection` handler. Added `@sentry/nextjs` v9 to frontend with `sentry.client.config.ts` (10% trace sampling, 1% replay, 100% on-error replay), `sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation.ts`, `global-error.tsx`. Wrapped `next.config.js` with `withSentryConfig`. Privacy: strips auth/cookie headers, filters bots, no PII. Env vars already in `.env.production.example`.
 - [x] **Wire UptimeRobot** (free tier: 50 monitors at 5-min interval) ✅ Created `infrastructure/monitoring/UPTIMEROBOT_SETUP.md` with 5-monitor config (frontend, API health, admin, press, AI), alert channels (email + Telegram + SMS), status page setup, and API health keyword monitoring. Manual 5-min setup task for founder. Complements existing Upptime GitHub-hosted status page.
@@ -183,9 +183,9 @@ These block launch. Anything not done here = launch slips or breaks.
 - [x] **AI-2-4: Move @prisma/client to dependencies** — Moved @prisma/client and prisma from devDependencies to dependencies in ai-system/package.json.
 - [x] **AI-0-1: Resolve three disconnected architectures** ✅ 2026-05-20 — Decision recorded in `documentations/launch/AI_ARCHITECTURE.md`: editorial pipeline owned by `aiReviewAgent`, lifecycle/queues/metrics owned by `AIAgentOrchestrator`, BaseAgent registry kept as a lazy-loaded catalogue (`AI_ENABLED_AGENTS` env). Backend marked as a consumer; mechanical migration of `backend/src/agents/*` deferred but documented.
 - [x] **AI-0-2: Replace hardcoded research agent** ✅ Already implemented in this branch's audit: `researchAgent.ts` calls backend `/api/news?region=africa` and falls back to `NewsAggregationAgent`. No more static Nigeria/CBN data.
-- [~] **AI-0-3: Wire backend ↔ ai-system integration** — 2026-05-20: added `coindaily-ai-system` as a workspace dependency in `backend/package.json` and exposed deep `exports` in `ai-system/package.json` (`/agents/review`, `/agents/research`, `/agents/image`, `/agents/translation`, `/agents/moderation`, `/orchestrator`). REST bridge already exists at `/api/admin/editorial-queue` and `/api/moderation/scan`. **Remaining (Wave 1):** mechanical removal of the deprecated `backend/src/agents/*` files after migrating their importers (see `AI_ARCHITECTURE.md` § "Deprecation plan").
+- [~] **AI-0-3: Wire backend ↔ ai-system integration** — 2026-05-20: added `sygn-ai-system` as a workspace dependency in `backend/package.json` and exposed deep `exports` in `ai-system/package.json` (`/agents/review`, `/agents/research`, `/agents/image`, `/agents/translation`, `/agents/moderation`, `/orchestrator`). REST bridge already exists at `/api/admin/editorial-queue` and `/api/moderation/scan`. **Remaining (Wave 1):** mechanical removal of the deprecated `backend/src/agents/*` files after migrating their importers (see `AI_ARCHITECTURE.md` § "Deprecation plan").
 - [x] **AI-2-1: Mock mode content safety** — Added `checkMockMode()` to AIReviewAgent. Pipeline detects Ollama availability at start. Queue items flagged with `is_mock_generated: true` when running without real models.
-- [x] **AI-3-3: Add PM2 process for ai-system** — Added `coindaily-ai-pipeline` entry to both `ecosystem.config.js` (dev) and `infrastructure/ecosystem.production.config.js` (prod). Points to `dist/orchestrator/index.js`. Added `start` script to ai-system package.json.
+- [x] **AI-3-3: Add PM2 process for ai-system** — Added `sygn-ai-pipeline` entry to both `ecosystem.config.js` (dev) and `infrastructure/ecosystem.production.config.js` (prod). Points to `dist/orchestrator/index.js`. Added `start` script to ai-system package.json.
 
 **Sev-1 — pre-launch if AI content is active at launch:**
 - [x] **AI-1-2: Image CDN upload** ✅ Both image agents now upload to Backblaze B2 via backend `/api/media/upload`. The primary `imageAgent.ts` was already wired; the SDXL variant `imageAgent-sdxl.ts` had a TODO stub fabricating cdn.sygn.live URLs — fixed 2026-05-20 to call the same upload path with proper data-URL fallback only on genuine failure.
@@ -245,16 +245,16 @@ These block launch. Anything not done here = launch slips or breaks.
 - [ ] **C-0-3: Fix JoyToken.bak OZ v5** — (if adopted) `_beforeTokenTransfer` → `_update`, fix import paths. 2-3h.
 - [x] **C-1-3: Token vesting** ✅ `contracts/sol/TokenVesting.sol` exists (linear vesting against JoyToken). Tested in `contracts/test/TokenVesting.test.js`.
 - [x] **C-3-1: Decimal mismatch** ✅ All on 12 decimals; CFIS `NUMERIC(20,6)` is fiat-only (intentional).
-- [x] **C-4-1: Test suite** ✅ 2026-05-20 — expanded from 1 test file (JoyToken) to 8 covering StakingVault, CDPPoints, TokenVesting, PressDistribution, SimpleWallet, ReputationSBT, Subscription, CoinDailyTimelock.
+- [x] **C-4-1: Test suite** ✅ 2026-05-20 — expanded from 1 test file (JoyToken) to 8 covering StakingVault, CDPPoints, TokenVesting, PressDistribution, SimpleWallet, ReputationSBT, Subscription, SygnTimelock.
 
 **Sev-1 — security hardening (~8h total):**
 - [x] **C-2-1: CDPPoints SafeERC20** — Replaced all raw `call` with SafeERC20 `safeTransfer` + IERC20 `balanceOf`. Added imports.
 - [x] **C-2-2: SimpleWallet SafeERC20** — Replaced `transfer` with `safeTransfer`. Added SafeERC20 import + `using` declaration.
-- [~] **C-2-3: Timelock + multisig** — TimelockController shipped (`CoinDailyTimelock` extends OZ); deploy script + tests in place. **Founder offline:** deploy a Gnosis Safe and pass it as the proposer/executor when running the deploy script.
+- [~] **C-2-3: Timelock + multisig** — TimelockController shipped (`SygnTimelock` extends OZ); deploy script + tests in place. **Founder offline:** deploy a Gnosis Safe and pass it as the proposer/executor when running the deploy script.
 - [x] **C-2-4: StakingVault reward funding** ✅ `StakingVault.fundRewards()` + `rewardPoolBalance()` shipped; covered in `StakingVault.test.js`.
 - [x] **C-2-5: Airdrop batch limit** — Added `require(recipients.length <= 200)` guard to Airdrop.sol and PressDistribution.sol batchPayPress.
-- [x] **C-3-2: Fix deploy scripts** ✅ 2026-05-20 — `deploy-all.js` now deploys all 9 contracts (JoyToken, CDPPoints, ReputationSBT, StakingVault, PressDistribution, SimpleWallet, TokenVesting, Subscription, CoinDailyTimelock) with correct constructor args; failures are isolated per contract; full manifest written to both legacy and canonical paths.
-- [x] **C-3-3: ABI export + typechain** ✅ 2026-05-20 — Created `packages/contracts/` workspace package (`@coindaily/contracts`) with `Abis`, `Deployments`, `addressOf()`, `contractOf()` API; subpath exports `./abis/*` and `./deployments/*`; sync script pulls fresh ABIs for all 9 contracts after compile.
+- [x] **C-3-2: Fix deploy scripts** ✅ 2026-05-20 — `deploy-all.js` now deploys all 9 contracts (JoyToken, CDPPoints, ReputationSBT, StakingVault, PressDistribution, SimpleWallet, TokenVesting, Subscription, SygnTimelock) with correct constructor args; failures are isolated per contract; full manifest written to both legacy and canonical paths.
+- [x] **C-3-3: ABI export + typechain** ✅ 2026-05-20 — Created `packages/contracts/` workspace package (`@sygn/contracts`) with `Abis`, `Deployments`, `addressOf()`, `contractOf()` API; subpath exports `./abis/*` and `./deployments/*`; sync script pulls fresh ABIs for all 9 contracts after compile.
 - [~] **C-3-4: Testnet deployment** — Deploy script + manifest generation ready; founder still needs to run `npx hardhat run scripts/deploy-all.js --network amoy` with funded wallet. The manifest will land in `packages/contracts/src/deployments/amoy.json` automatically.
 
 **Sev-2 — cleanup:**
@@ -264,7 +264,7 @@ These block launch. Anything not done here = launch slips or breaks.
 ### Legal
 - [x] **Terms of Service + Privacy Policy** pages created — `/terms` page with 18 sections (acceptance, service description, not-financial-advice, accounts, subscriptions/payments, API usage, AI content disclosure, press release T&Cs, IP, prohibited conduct, data protection, cookies, third-party services, liability limitation, indemnification, modifications, governing law/arbitration, contact). Privacy policy at `/privacy` already done. **TODO (founder):** pay $200 for lawyer review covering Nigerian + EU + SA data regulation before launch.
 - [x] **Disclaimer page** for crypto content — Created `/disclaimer` route with full legal disclaimer (General, Not Financial Advice, Investment Risk Warning, AI-Generated Content, Third-Party Links, Regulatory Compliance, Limitation of Liability). Footer banner links to it.
-- [x] **Press release T&Cs** for the press app — Covered in Terms of Service section 8 (Press Release Distribution): submission doesn't guarantee publication, CoinDaily may reject/edit/remove, labelled as sponsored/press content, non-refundable once published. TODO (founder): consider standalone press T&Cs page if press app goes premium.
+- [x] **Press release T&Cs** for the press app — Covered in Terms of Service section 8 (Press Release Distribution): submission doesn't guarantee publication, Sygn may reject/edit/remove, labelled as sponsored/press content, non-refundable once published. TODO (founder): consider standalone press T&Cs page if press app goes premium.
 
 ### Bloomberg positioning (from [STRATEGY_GAP_ANALYSIS.md](STRATEGY_GAP_ANALYSIS.md) + [BLOOMBERG_BACKBONE.md](BLOOMBERG_BACKBONE.md))
 - [x] **WhatsApp share buttons on every article** — Already built: `SocialShare.tsx` + `SocialShareMenu.tsx` with WhatsApp (`wa.me/` scheme), Telegram, Twitter, Facebook. Africa-first ordering (WhatsApp first). Used in `ArticleReader.tsx`.
@@ -275,14 +275,14 @@ These block launch. Anything not done here = launch slips or breaks.
 - [x] **Factsheet pages for top 20 entities** — Created `/factsheets` index + `/factsheets/[slug]` with **20 seed entities**: BTC, ETH, BNB, SOL, USDT + Binance, Luno, Quidax, YellowCard, VALR + MTN, Safaricom, Standard Bank, Naspers + NG, KE, ZA, GH, Tanzania + Ripple (XRP). Seed data in `frontend/src/data/factsheets.ts`. JSON-LD, related entities, African relevance, Pro CTA. Footer link added.
 - [x] **About / Editorial Standards / Masthead page** — Created `/about` page (mission, coverage areas, approach, markets served, contact) and `/editorial-standards` page (editorial independence, sourcing, AI disclosure, tone policy, corrections policy, COI disclosure, translation quality). Added "Editorial Standards" link to Footer.
 - [x] **Financial disclaimer on every page** — Footer banner added to `Footer.tsx` with "Not financial advice" text + link to `/disclaimer` page. Dedicated disclaimer page created at `frontend/src/app/disclaimer/page.tsx`.
-- [x] **WhatsApp-optimized OG social cards** — Created branded SVG template (`frontend/public/og-image.svg`) with CoinDaily branding, market tags (Nigeria, Kenya, South Africa, Ghana, Diaspora), and dark gradient background. Generated PNG versions via sharp (`og-image.png`, `twitter-image.png`, 1200x630, 118KB). Layout.tsx updated to reference PNGs. Regenerate script at `frontend/scripts/generate-og-images.mjs`.
+- [x] **WhatsApp-optimized OG social cards** — Created branded SVG template (`frontend/public/og-image.svg`) with Sygn branding, market tags (Nigeria, Kenya, South Africa, Ghana, Diaspora), and dark gradient background. Generated PNG versions via sharp (`og-image.png`, `twitter-image.png`, 1200x630, 118KB). Layout.tsx updated to reference PNGs. Regenerate script at `frontend/scripts/generate-og-images.mjs`.
 - [x] **Seed the regulatory map** — Enhanced fallback data in `v1Regulations.routes.ts` for NG, KE, ZA, GH with detailed summaries, regulatory events (5 for NG, 4 for KE, 5 for ZA, 4 for GH), licensing requirements with capital/fees/processing times, and key regulatory documents. Per-country and events endpoints now return rich fallback data when DB is not seeded.
-- [x] **Listmonk setup + daily newsletter template** — Added Listmonk v4.1.0 to Docker Compose stack (`infrastructure/docker/docker-compose.yml`). Config at `infrastructure/docker/listmonk/config.toml`. Daily brief HTML template at `infrastructure/docker/listmonk/templates/daily-brief.html` with market snapshot, 5 article slots, branded CoinDaily design, unsubscribe link, and financial disclaimer. Listmonk DB auto-created via `initdb/02-create-listmonk-db.sql`. Env vars added to `.env.production.example`. **Founder TODO:** boot Listmonk on Contabo, create "Daily Brief" list, import template, set up SMTP sender.
+- [x] **Listmonk setup + daily newsletter template** — Added Listmonk v4.1.0 to Docker Compose stack (`infrastructure/docker/docker-compose.yml`). Config at `infrastructure/docker/listmonk/config.toml`. Daily brief HTML template at `infrastructure/docker/listmonk/templates/daily-brief.html` with market snapshot, 5 article slots, branded Sygn design, unsubscribe link, and financial disclaimer. Listmonk DB auto-created via `initdb/02-create-listmonk-db.sql`. Env vars added to `.env.production.example`. **Founder TODO:** boot Listmonk on Contabo, create "Daily Brief" list, import template, set up SMTP sender.
 - [x] **Citations / sources block on every article** — Added STEP 6 (Sources Cited) to both `buildArticlePrompt` and `buildSEOPrompt` in ImoPromptAgent. Requires numbered list of sources with name, date, URL. Minimum 3 sources per article. Also added metadata block for source/FAQ counts.
 - [x] **Hype/fear language ban** — Added `EDITORIAL_TONE_CONSTRAINT` static property to `ImoPromptAgent` with banned word list (moon, rocket, crash, doom, WAGMI, etc.). Applied to article, SEO, and research prompts. Enforces Bloomberg-tier neutral tone + Africa-first framing.
 
 ### Communications & launch ops
-- [x] **Status page config** — Upptime configuration at `infrastructure/upptime/.upptimerc.yml` monitoring all 5 public domains (news, API health, admin, press, AI) every 5 minutes. Setup guide at `infrastructure/upptime/SETUP.md`. **Founder TODO:** create `nicefacer/coindaily-status` GitHub repo from Upptime template, copy config, add CNAME `status.sygn.live`, add `GH_PAT` secret. ~15 minutes.
+- [x] **Status page config** — Upptime configuration at `infrastructure/upptime/.upptimerc.yml` monitoring all 5 public domains (news, API health, admin, press, AI) every 5 minutes. Setup guide at `infrastructure/upptime/SETUP.md`. **Founder TODO:** create `nicefacer/sygn-status` GitHub repo from Upptime template, copy config, add CNAME `status.sygn.live`, add `GH_PAT` secret. ~15 minutes.
 - [ ] **Telegram + Twitter/X launch announcement** drafted and scheduled.
 - [x] **3am runbook** — Written at `documentations/guides/RUNBOOK_3AM.md`. Covers: situational awareness (60s), PM2 crashes, database failures, Redis down, nginx 502, disk full, high CPU, SSL cert expired, DNS issues. Pinned-tab ready for launch week.
 - [ ] **Founder on-call schedule**: you're on-call 100% of launch week. Set a 2nd phone number forward for friends-and-family who shouldn't call during incidents.
@@ -354,8 +354,8 @@ Stabilize before adding. New feature work resumes mid-June at the earliest.
 
 **Features (from new features.md + finance.md):**
 - [ ] **SPEC-NEW-1: Live provider API integrations** — v1Onramp and v1Remittance routes return fallback/hardcoded data. Wire actual YellowCard SDK, Binance P2P API, and mobile money APIs for production use. 8-12h.
-- [ ] **SPEC-NEW-3: CoinDaily embeddable news widget** — JavaScript widget for third-party sites to embed CoinDaily news by category (breaking, press releases, viewpoints). Widget builder page + embed script. 6-8h.
-- [x] **SPEC-SEO-1: ai-access.json manifest** — File already existed at `frontend/public/ai-access.json`. Fixed domain URLs from `coindaily.ai` → `sygn.live`, aligned rate limits with pricing page tiers (Free 100/day, Pro 10K/day, Enterprise unlimited), updated timestamp. Referenced in both `robots.txt` and `llms.txt`.
+- [ ] **SPEC-NEW-3: Sygn embeddable news widget** — JavaScript widget for third-party sites to embed Sygn news by category (breaking, press releases, viewpoints). Widget builder page + embed script. 6-8h.
+- [x] **SPEC-SEO-1: ai-access.json manifest** — File already existed at `frontend/public/ai-access.json`. Fixed domain URLs from `sygn.ai` → `sygn.live`, aligned rate limits with pricing page tiers (Free 100/day, Pro 10K/day, Enterprise unlimited), updated timestamp. Referenced in both `robots.txt` and `llms.txt`.
 
 ### AI system Wave 1 (from [AI_SYSTEM_AUDIT.md](AI_SYSTEM_AUDIT.md))
 - [ ] **AI-0-4: Test coverage for AI pipeline** — Zero test files. Add tests for content pipeline (research → article → translation validation), BaseAgent task queue, mock mode detection. 8-12h.
@@ -377,11 +377,11 @@ Stabilize before adding. New feature work resumes mid-June at the earliest.
 - [ ] **Pro subscription checkout end-to-end tested** — user signs up → pays via YellowCard → gets Pro badge → sees gated content. Must work in NG + KE + ZA + GH.
 - [ ] **Events page (minimal)** — submission form + calendar listing at `/events`. Strategy says no competitor has an EM crypto events aggregator. Start with manual submissions. Estimate: 8h.
 - [ ] **Fact-Check Agent** — triple-source verification before any AI article publishes. Integrate as a mandatory step in `ai-system/orchestrator/`. Estimate: 12h.
-- [ ] **Weekly "CoinDaily Africa Crypto Snapshot" report** — AI-generated from existing MarketDataAggregator data. Publish every Monday. This is the seed of the branded index products. Estimate: 4h.
+- [ ] **Weekly "Sygn Africa Crypto Snapshot" report** — AI-generated from existing MarketDataAggregator data. Publish every Monday. This is the seed of the branded index products. Estimate: 4h.
 - [ ] **Social Publisher agent** — auto-post to Twitter/X, Telegram, LinkedIn when an article publishes. Put in `ai-system/agents/integration/` or `apps/bots/`. Estimate: 8h.
 - [ ] **Real-time price + news alerting** — user-configurable price alerts for crypto + FX. Delivery: email + Telegram bot. **The** retention feature for finance users. Estimate: 16h.
 - [ ] **Markets dashboard page** at `/markets` — sortable tables of crypto + African stocks + FX + commodities. TradingView free widget for charts. Per-instrument detail page with OHLC chart + related news articles. Estimate: 12h.
-- [ ] **Read-only multi-asset portfolio tracker** (Bloomberg Backbone §13) — subscribers paste wallet addresses or exchange API read-only keys → see PnL + relevant CoinDaily news for their holdings. **Never move money.** Just show context. Bloomberg-terminal-light for individuals. Estimate: 16h.
+- [ ] **Read-only multi-asset portfolio tracker** (Bloomberg Backbone §13) — subscribers paste wallet addresses or exchange API read-only keys → see PnL + relevant Sygn news for their holdings. **Never move money.** Just show context. Bloomberg-terminal-light for individuals. Estimate: 16h.
 - [ ] **Markets-close newsletter brief** — second daily Listmonk edition sent at African market close. Summarizes the day's market moves + top articles. Estimate: 4h.
 - [ ] **Weekend deep-dive newsletter** — AI-curated long-form digest every Saturday. Estimate: 2h.
 
@@ -402,7 +402,7 @@ Stabilize before adding. New feature work resumes mid-June at the earliest.
 - [ ] `amp.routes.ts` — AMP for mobile-first African traffic.
 - [ ] `structured-content.routes.ts` — schema.org markup for article types.
 - [ ] **Keyword rank tracking** — SerpAPI free tier or DataForSEO. Track top 100 keywords weekly.
-- [ ] **LLM citation tracking** — monitor when ChatGPT/Gemini/Perplexity cite CoinDaily articles. Novel competitive advantage from existing `llms.txt` + Knowledge API.
+- [ ] **LLM citation tracking** — monitor when ChatGPT/Gemini/Perplexity cite Sygn articles. Novel competitive advantage from existing `llms.txt` + Knowledge API.
 
 ### Community / growth surface
 - [ ] `v1Bounty.routes.ts` — bounty system for community contributions.
@@ -437,7 +437,7 @@ Stabilize before adding. New feature work resumes mid-June at the earliest.
 **SEO/RAO (from SEO system.md + More on seo.md):**
 - [ ] **SPEC-SEO-2: Vector embedding & semantic search** — Build vector index of all articles for RAG/LLM retrieval. Hybrid keyword + embedding search. 12-16h.
 - [ ] **SPEC-SEO-3: WebSub (PubSubHubbub)** — Real-time content notification to Google/Bing indexing when articles publish. 4-6h.
-- [ ] **SPEC-SEO-4: RAO performance tracking** — Monitor when ChatGPT/Perplexity/Claude cite CoinDaily content. Analyze which article structures get retrieved. 8-12h.
+- [ ] **SPEC-SEO-4: RAO performance tracking** — Monitor when ChatGPT/Perplexity/Claude cite Sygn content. Analyze which article structures get retrieved. 8-12h.
 - [ ] **SPEC-SEO-5: n8n automation orchestration** — Connect AI agents + analytics + CMS with workflow triggers (publish → auto-share → recheck → refresh). 8-12h.
 - [ ] **SPEC-SEO-8: Enhanced RSS for AI consumption** — Add machine-readable metadata (entity type, sentiment, urgency) to RSS feed items via custom XML namespaces. 4-6h.
 
@@ -526,7 +526,7 @@ These are cheap, mostly-CSS, brand-defining changes. Do them in parallel with fe
 - [ ] Weekly: review 5 random AI-generated articles for quality drift.
 - [ ] Weekly: review top 10 Sentry errors.
 - [ ] Weekly: review week's analytics (PostHog) and write a 1-paragraph internal note.
-- [ ] Weekly: publish CoinDaily Africa Crypto Snapshot (once established in Wave 1).
+- [ ] Weekly: publish Sygn Africa Crypto Snapshot (once established in Wave 1).
 - [ ] Monthly: dependency audit (`npm audit`, Snyk free tier).
 - [ ] Monthly: backup restore drill.
 - [ ] Monthly: revisit this TODO + [STRATEGY_GAP_ANALYSIS.md](STRATEGY_GAP_ANALYSIS.md). Update alignment score (currently 55%).

@@ -1,5 +1,5 @@
 // Image Generation Agent - DALL-E powered visual content creation
-// Handles article thumbnails, charts, and promotional images for CoinDaily Africa
+// Handles article thumbnails, charts, and promotional images for Sygn Africa
 
 import { createAuditLog } from '../../../../backend/src/services/aiAuditService';
 
@@ -263,7 +263,7 @@ export class ImageGenerationAgent {
     subtitle?: string, 
     cryptoSymbol?: string
   ): Promise<ImageGenerationResult> {
-    let prompt = `Create a social media image for CoinDaily Africa with the title "${title}"`;
+    let prompt = `Create a social media image for Sygn Africa with the title "${title}"`;
     
     if (subtitle) {
       prompt += ` and subtitle "${subtitle}"`;
@@ -337,7 +337,7 @@ export class ImageGenerationAgent {
     // Add color scheme guidance
     if (request.style?.colorScheme) {
       const colorSchemes = {
-        brand: 'Use CoinDaily Africa brand colors (blues, oranges, professional palette)',
+        brand: 'Use Sygn Africa brand colors (blues, oranges, professional palette)',
         crypto: 'Cryptocurrency themed colors (gold, green, blue, digital themes)',
         african: 'African inspired colors (earth tones, vibrant oranges, reds, greens)',
         neutral: 'Neutral color palette (grays, whites, subtle accent colors)'

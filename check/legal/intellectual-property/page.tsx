@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Intellectual Property Policy | CoinDaily Online',
-  description: 'Learn about CoinDaily Online\'s intellectual property policy, including copyrights, trademarks, and user-generated content rights.',
+  title: 'Intellectual Property Policy | Sygn Online',
+  description: 'Learn about Sygn Online\'s intellectual property policy, including copyrights, trademarks, and user-generated content rights.',
   robots: 'index, follow',
 };
 
@@ -26,7 +26,7 @@ export default function IntellectualPropertyPage() {
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Overview</h2>
                 <p className="text-gray-700 mb-4">
-                  CoinDaily Online respects intellectual property rights and expects our users to do the same. This policy outlines our approach to intellectual property protection and enforcement.
+                  Sygn Online respects intellectual property rights and expects our users to do the same. This policy outlines our approach to intellectual property protection and enforcement.
                 </p>
               </div>
 
@@ -35,12 +35,12 @@ export default function IntellectualPropertyPage() {
                 
                 <h3 className="text-xl font-medium text-gray-800 mb-2">Copyrights</h3>
                 <p className="text-gray-700 mb-4">
-                  All content on CoinDaily Online, including but not limited to text, graphics, logos, images, audio clips, video clips, digital downloads, data compilations, and software, is our property or the property of our content suppliers and is protected by copyright laws.
+                  All content on Sygn Online, including but not limited to text, graphics, logos, images, audio clips, video clips, digital downloads, data compilations, and software, is our property or the property of our content suppliers and is protected by copyright laws.
                 </p>
 
                 <h3 className="text-xl font-medium text-gray-800 mb-2">Trademarks</h3>
                 <p className="text-gray-700 mb-4">
-                  &ldquo;CoinDaily Online,&rdquo; our logo, and other marks indicated on our website are our trademarks. All other trademarks not owned by us that appear on this site are the property of their respective owners.
+                  &ldquo;Sygn Online,&rdquo; our logo, and other marks indicated on our website are our trademarks. All other trademarks not owned by us that appear on this site are the property of their respective owners.
                 </p>
 
                 <h3 className="text-xl font-medium text-gray-800 mb-2">Database Rights</h3>
@@ -123,7 +123,7 @@ export default function IntellectualPropertyPage() {
                 </p>
                 <div className="bg-gray-100 p-4 rounded-lg mb-4">
                   <p className="font-medium text-gray-800">Intellectual Property Team</p>
-                  <p className="text-gray-700">Email: <a href="mailto:ip@coindaily.online" className="text-blue-600 hover:text-blue-800">ip@coindaily.online</a></p>
+                  <p className="text-gray-700">Email: <a href="mailto:ip@sygn.online" className="text-blue-600 hover:text-blue-800">ip@sygn.online</a></p>
                   <p className="text-gray-700">Subject Line: IP Violation Report</p>
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default function IntellectualPropertyPage() {
                   For questions about this Intellectual Property Policy, contact us:
                 </p>
                 <div className="bg-gray-100 p-4 rounded-lg">
-                  <p className="text-gray-700">Email: <a href="mailto:legal@coindaily.online" className="text-blue-600 hover:text-blue-800">legal@coindaily.online</a></p>
+                  <p className="text-gray-700">Email: <a href="mailto:legal@sygn.online" className="text-blue-600 hover:text-blue-800">legal@sygn.online</a></p>
                   <p className="text-gray-700">Phone: +234 (0) 123-456-7890</p>
                 </div>
               </div>

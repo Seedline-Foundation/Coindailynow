@@ -1,7 +1,7 @@
 /**
  * Iengine Integration
  * Mounts the AI Visual Journalism Intelligence Engine routes
- * into the CoinDaily backend Express app.
+ * into the Sygn backend Express app.
  */
 
 import { Express } from 'express';

@@ -30,7 +30,7 @@ const logger = winston.createLogger({
 
 async function testCompleteWorkflow() {
   console.log('\n╔════════════════════════════════════════════════════════════════╗');
-  console.log('║  COINDAILY AI SYSTEM - COMPLETE WORKFLOW TEST                 ║');
+  console.log('║  SYGN AI SYSTEM - COMPLETE WORKFLOW TEST                 ║');
   console.log('║  Review Agent + Imo + Real Agents                             ║');
   console.log('╚════════════════════════════════════════════════════════════════╝\n');
 

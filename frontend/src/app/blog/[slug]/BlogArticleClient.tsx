@@ -202,7 +202,7 @@ export default function BlogArticleClient({ article }: { article: BlogArticle })
                 {/* Internal Links */}
                 {article.internalLinks && article.internalLinks.length > 0 && (
                   <div className="mt-10 p-6 bg-gray-50 rounded-xl not-prose">
-                    <h3 className="font-bold text-gray-800 mb-3">📚 Related Reading on CoinDaily</h3>
+                    <h3 className="font-bold text-gray-800 mb-3">📚 Related Reading on Sygn</h3>
                     <ul className="space-y-2">
                       {article.internalLinks.map((link, i) => {
                         const href = typeof link === 'string' ? link : link.url;
@@ -291,7 +291,7 @@ export default function BlogArticleClient({ article }: { article: BlogArticle })
             author: { '@type': 'Person', name: article.author },
             publisher: {
               '@type': 'Organization',
-              name: 'CoinDaily',
+              name: 'Sygn',
               url: 'https://sygn.live',
               logo: { '@type': 'ImageObject', url: 'https://sygn.live/images/logo.svg' },
             },

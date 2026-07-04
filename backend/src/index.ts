@@ -97,6 +97,9 @@ import govAlertsRoutes from './api/admin/govAlertsRoutes';
 import pipelineSettingsRoutes from './api/admin/pipelineSettingsRoutes';
 import videoRunRoutes from './api/admin/videoRunRoutes';
 import distributionRoutes from './api/admin/distributionRoutes';
+import dashboardAccessRoutes from './api/admin/dashboardAccessRoutes';
+import storageRoutes from './api/admin/storageRoutes';
+import aiPlaygroundRoutes from './api/admin/aiPlaygroundRoutes';
 import { startDistributionDispatcher } from './services/distribution/distributionDispatcher';
 import { startMetricsWorker } from './services/distribution/metricsWorker';
 import { attachCollabServer } from './services/collabServer';
@@ -546,6 +549,15 @@ export async function setupApp() {
 
   // Distribution admin + dispatcher (P7)
   app.use('/api/admin/distribution', distributionRoutes);
+
+  // Dashboard access — CEO assigns per-user menu visibility (P10.5)
+  app.use('/api/admin/dashboard-access', dashboardAccessRoutes);
+
+  // Contabo bucket storage dashboard (super-admin only)
+  app.use('/api/admin/storage', storageRoutes);
+
+  // AI playground — live test surface for self-hosted models
+  app.use('/api/admin/ai-playground', aiPlaygroundRoutes);
 
   // Ads Management & Rotation Agent Routes (DeepSeek R1-powered ad engine)
   app.use('/api/ads', adsRotationRouter);

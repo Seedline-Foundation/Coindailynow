@@ -1,6 +1,6 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════════╗
- * ║         COINDAILY AI SYSTEM WORKFLOW (WITH IMO + REVIEW AGENT)           ║
+ * ║         SYGN AI SYSTEM WORKFLOW (WITH IMO + REVIEW AGENT)           ║
  * ║                      New Architecture 2026                               ║
  * ╚══════════════════════════════════════════════════════════════════════════╝
  * 

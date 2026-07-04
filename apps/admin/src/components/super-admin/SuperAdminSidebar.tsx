@@ -50,6 +50,7 @@ import {
   Megaphone,
   ClipboardList,
   Calendar,
+  Play,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -71,34 +72,67 @@ interface SuperAdminSidebarProps {
 const ALWAYS_ACCESSIBLE_MENUS = [
   'overview',
   'today-todo',
+  'setup-checklist',
   'help-center',
 ];
 
-/* ─── Role detection ─── */
-function detectSidebarRole(): { isCeo: boolean; staffId: string; assignedMenus: string[] } {
-  if (typeof window === 'undefined') return { isCeo: true, staffId: 'ceo', assignedMenus: [] };
-  const token = getAccessToken() || '';
-  const isCeo = token.includes('super_admin') || token.includes('ceo') || token.includes('super-admin');
-  const staffId = localStorage.getItem('staff_id') || (isCeo ? 'ceo' : 'staff-unknown');
-  // Staff menu assignments stored by CEO (JSON array of menu IDs)
-  const assignedRaw = localStorage.getItem('staff_assigned_menus');
-  const assignedMenus: string[] = assignedRaw ? JSON.parse(assignedRaw) : [];
-  return { isCeo, staffId, assignedMenus };
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+const LS_CACHE_KEY = 'sidebar_access_cache';
+
+/**
+ * Resolve who-sees-what.
+ *   - Asks /api/admin/dashboard-access/me (canonical source).
+ *   - Falls back to a localStorage cache for fast first paint when offline
+ *     or before the network round-trip completes.
+ *   - SUPER_ADMIN + CEO always see everything (backend tells us so via
+ *     `unrestricted: true`).
+ */
+async function fetchSidebarRole(token: string): Promise<{ unrestricted: boolean; assignedMenus: string[] }> {
+  const res = await fetch(`${API_URL}/api/admin/dashboard-access/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`me HTTP ${res.status}`);
+  const j = await res.json();
+  return {
+    unrestricted: !!j.unrestricted,
+    assignedMenus: Array.isArray(j.allowedMenuIds) ? j.allowedMenuIds : [],
+  };
+}
+
+function readCachedRole(): { unrestricted: boolean; assignedMenus: string[] } {
+  if (typeof window === 'undefined') return { unrestricted: true, assignedMenus: [] };
+  try {
+    const raw = localStorage.getItem(LS_CACHE_KEY);
+    if (!raw) return { unrestricted: true, assignedMenus: [] };
+    const parsed = JSON.parse(raw);
+    return {
+      unrestricted: !!parsed.unrestricted,
+      assignedMenus: Array.isArray(parsed.assignedMenus) ? parsed.assignedMenus : [],
+    };
+  } catch { return { unrestricted: true, assignedMenus: [] }; }
+}
+
+function writeCachedRole(role: { unrestricted: boolean; assignedMenus: string[] }) {
+  try { localStorage.setItem(LS_CACHE_KEY, JSON.stringify(role)); } catch { /* swallow */ }
 }
 
 export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>(['overview', 'content-management']);
-  const [userRole, setUserRole] = useState<{ isCeo: boolean; staffId: string; assignedMenus: string[] }>({ isCeo: true, staffId: 'ceo', assignedMenus: [] });
+  const [userRole, setUserRole] = useState<{ unrestricted: boolean; assignedMenus: string[] }>(() => readCachedRole());
 
   useEffect(() => {
-    setUserRole(detectSidebarRole());
+    const token = getAccessToken();
+    if (!token) return;
+    fetchSidebarRole(token)
+      .then(role => { setUserRole(role); writeCachedRole(role); })
+      .catch(() => { /* keep cached role on error */ });
   }, []);
 
   const isMenuAccessible = (menuId: string): boolean => {
-    if (userRole.isCeo) return true; // CEO sees everything
+    if (userRole.unrestricted) return true; // CEO / SUPER_ADMIN bypass
     if (ALWAYS_ACCESSIBLE_MENUS.includes(menuId)) return true;
-    if (userRole.assignedMenus.length === 0) return true; // No restriction set yet — show all
+    if (userRole.assignedMenus.length === 0) return true; // Unset → show all (backend hasn't assigned yet)
     return userRole.assignedMenus.includes(menuId);
   };
 
@@ -138,6 +172,14 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       badgeColor: 'bg-red-500 text-white',
     },
     {
+      id: 'setup-checklist',
+      label: 'Setup Checklist',
+      icon: ClipboardList,
+      href: '/super-admin/setup-checklist',
+      badge: 'SETUP',
+      badgeColor: 'bg-blue-500 text-white',
+    },
+    {
       id: 'admin-management',
       label: 'Admin Management',
       icon: UserCog,
@@ -145,6 +187,7 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
         { id: 'admin-accounts', label: 'Admin Accounts', icon: Users, href: '/super-admin/admins' },
         { id: 'permissions', label: 'Permissions', icon: Shield, href: '/super-admin/permissions' },
         { id: 'roles', label: 'Roles & Access', icon: Crown, href: '/super-admin/roles' },
+        { id: 'dashboard-access', label: 'Dashboard Access (CEO)', icon: Key, href: '/super-admin/dashboard-access', badge: 'CEO', badgeColor: 'bg-purple-500 text-white' },
         { id: 'audit-logs', label: 'Audit Logs', icon: Eye, href: '/super-admin/audit' },
       ]
     },
@@ -165,6 +208,8 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       icon: FileText,
       children: [
         { id: 'articles', label: 'Articles', icon: FileText, href: '/super-admin/content' },
+        { id: 'editorial-pipeline', label: 'Editorial Pipeline', icon: ClipboardList, href: '/super-admin/content/editorial-pipeline', badge: 'NEW', badgeColor: 'bg-indigo-500 text-white' },
+        { id: 'gov-alerts', label: 'Gov Alerts', icon: AlertTriangle, href: '/super-admin/content/gov-alerts', badge: 'NEW', badgeColor: 'bg-amber-500 text-white' },
         { id: 'ai-content', label: 'AI Content', icon: Bot, href: '/super-admin/content/ai' },
         { id: 'content-automation', label: 'Content Automation', icon: Bot, href: '/super-admin/content-automation', badge: 'NEW', badgeColor: 'bg-green-500 text-white' },
         { id: 'translations', label: 'Translations', icon: Globe, href: '/super-admin/translations', badge: 'NEW', badgeColor: 'bg-cyan-500 text-white' },
@@ -179,9 +224,10 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       id: 'ai-management',
       label: 'AI Management',
       icon: Brain,
-      href: '/super-admin/ai',
-      badge: 'NEW',
-      badgeColor: 'bg-yellow-500 text-white',
+      children: [
+        { id: 'ai-overview', label: 'Overview', icon: BarChart3, href: '/super-admin/ai' },
+        { id: 'ai-playground', label: 'Playground (live test)', icon: Play, href: '/super-admin/ai/playground', badge: 'NEW', badgeColor: 'bg-yellow-500 text-white' },
+      ],
     },
     {
       id: 'automations',
@@ -243,9 +289,11 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
       id: 'distribution',
       label: 'Distribution',
       icon: Send,
-      href: '/super-admin/distribution',
-      badge: 'NEW',
-      badgeColor: 'bg-yellow-500 text-white',
+      children: [
+        { id: 'distribution-dashboard', label: 'Dashboard', icon: BarChart3, href: '/super-admin/distribution' },
+        { id: 'distribution-settings', label: 'Settings (handles)', icon: Settings, href: '/super-admin/distribution/settings', badge: 'NEW', badgeColor: 'bg-yellow-500 text-white' },
+        { id: 'distribution-campaigns', label: 'Campaigns', icon: Megaphone, href: '/super-admin/distribution/campaigns' },
+      ],
     },
     {
       id: 'ecommerce',
@@ -403,6 +451,14 @@ export default function SuperAdminSidebar({ isOpen, onClose }: SuperAdminSidebar
         { id: 'integrations', label: 'Integrations', icon: Zap, href: '/super-admin/partnerships/integrations' },
         { id: 'contracts', label: 'Contracts', icon: FileText, href: '/super-admin/partnerships/contracts' },
       ]
+    },
+    {
+      id: 'storage',
+      label: 'Storage Buckets',
+      icon: Database,
+      href: '/super-admin/storage',
+      badge: 'NEW',
+      badgeColor: 'bg-indigo-500 text-white',
     },
     {
       id: 'data-management',

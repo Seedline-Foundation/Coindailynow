@@ -45,7 +45,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
           max_score: 2.5,
           hits: [
             {
-              _index: 'coindaily_articles',
+              _index: 'sygn_articles',
               _id: '1',
               _score: 2.5,
               _source: {
@@ -55,11 +55,11 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
                 language: 'en',
                 publishedAt: '2025-09-23T10:00:00Z',
                 tags: ['bitcoin', 'nigeria', 'adoption'],
-                author: 'CoinDaily Editorial'
+                author: 'Sygn Editorial'
               }
             },
             {
-              _index: 'coindaily_articles',
+              _index: 'sygn_articles',
               _id: '2',
               _score: 2.1,
               _source: {
@@ -85,7 +85,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       });
 
       expect(mockElasticsearchClient.search).toHaveBeenCalledWith({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         body: {
           query: {
             bool: {
@@ -132,7 +132,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
           total: { value: 3 },
           hits: [
             {
-              _index: 'coindaily_articles',
+              _index: 'sygn_articles',
               _id: '3',
               _score: 1.8,
               _source: {
@@ -142,7 +142,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
                 language: 'sw',
                 publishedAt: '2025-09-23T08:00:00Z',
                 tags: ['bitcoin', 'afrika', 'ukuaji'],
-                author: 'Mhariri wa CoinDaily'
+                author: 'Mhariri wa Sygn'
               }
             }
           ]
@@ -159,7 +159,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
 
       expect(mockElasticsearchClient.search).toHaveBeenCalledWith(
         expect.objectContaining({
-          index: 'coindaily_articles',
+          index: 'sygn_articles',
           body: expect.objectContaining({
             query: expect.objectContaining({
               bool: expect.objectContaining({
@@ -183,7 +183,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
           total: { value: 2 },
           hits: [
             {
-              _index: 'coindaily_articles',
+              _index: 'sygn_articles',
               _id: '4',
               _score: 1.5,
               _source: {
@@ -251,7 +251,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       });
 
       expect(mockElasticsearchClient.search).toHaveBeenCalledWith({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         body: {
           suggest: {
             article_suggest: {
@@ -284,7 +284,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       
       // Check that articles index was created with African language analyzers
       const createCalls = mockElasticsearchClient.indices.create.mock.calls;
-      const articlesIndexCall = createCalls.find((call: any) => call[0].index === 'coindaily_articles');
+      const articlesIndexCall = createCalls.find((call: any) => call[0].index === 'sygn_articles');
       
       expect(articlesIndexCall).toBeDefined();
       expect(articlesIndexCall[0].body.settings.analysis.analyzer.african_multilang).toBeDefined();
@@ -302,7 +302,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
         category: 'African Markets',
         tags: ['bitcoin', 'nigeria', 'adoption', 'exchanges'],
         publishedAt: new Date('2025-09-23T10:00:00Z'),
-        author: 'CoinDaily Editorial',
+        author: 'Sygn Editorial',
         status: 'published',
         location: {
           country: 'Nigeria',
@@ -312,7 +312,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       };
 
       mockElasticsearchClient.index.mockResolvedValue({
-        _index: 'coindaily_articles',
+        _index: 'sygn_articles',
         _id: '1',
         result: 'created'
       });
@@ -320,7 +320,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       const result = await elasticsearchService.indexArticle(article);
 
       expect(mockElasticsearchClient.index).toHaveBeenCalledWith({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         id: '1',
         body: {
           title: article.title,
@@ -367,8 +367,8 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
         took: 5,
         errors: false,
         items: [
-          { index: { _index: 'coindaily_articles', _id: '1', result: 'created' } },
-          { index: { _index: 'coindaily_articles', _id: '2', result: 'created' } }
+          { index: { _index: 'sygn_articles', _id: '1', result: 'created' } },
+          { index: { _index: 'sygn_articles', _id: '2', result: 'created' } }
         ]
       });
 
@@ -376,14 +376,14 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
 
       expect(mockElasticsearchClient.bulk).toHaveBeenCalledWith({
         body: [
-          { index: { _index: 'coindaily_articles', _id: '1' } },
+          { index: { _index: 'sygn_articles', _id: '1' } },
           expect.objectContaining({
             title: 'Bitcoin News 1',
             content: 'Content 1',
             language: 'en',
             status: 'published'
           }),
-          { index: { _index: 'coindaily_articles', _id: '2' } },
+          { index: { _index: 'sygn_articles', _id: '2' } },
           expect.objectContaining({
             title: 'Ethereum News 2',
             content: 'Content 2',
@@ -401,7 +401,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
     it('should handle index updates and deletions', async () => {
       // Test update
       mockElasticsearchClient.update.mockResolvedValue({
-        _index: 'coindaily_articles',
+        _index: 'sygn_articles',
         _id: '1',
         result: 'updated'
       });
@@ -412,7 +412,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       });
 
       expect(mockElasticsearchClient.update).toHaveBeenCalledWith({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         id: '1',
         body: {
           doc: {
@@ -427,7 +427,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
 
       // Test deletion
       mockElasticsearchClient.delete.mockResolvedValue({
-        _index: 'coindaily_articles',
+        _index: 'sygn_articles',
         _id: '1',
         result: 'deleted'
       });
@@ -435,7 +435,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       const deleteResult = await elasticsearchService.deleteArticle('1');
 
       expect(mockElasticsearchClient.delete).toHaveBeenCalledWith({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         id: '1'
       });
 
@@ -551,7 +551,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       };
 
       mockElasticsearchClient.index.mockResolvedValue({
-        _index: 'coindaily_articles',
+        _index: 'sygn_articles',
         _id: 'sw-1',
         result: 'created'
       });
@@ -591,7 +591,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       };
 
       mockElasticsearchClient.index.mockResolvedValue({
-        _index: 'coindaily_market_data',
+        _index: 'sygn_market_data',
         _id: 'btc-ngn-2025-09-23',
         result: 'created'
       });
@@ -599,7 +599,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       const result = await elasticsearchService.indexMarketData(marketData);
 
       expect(mockElasticsearchClient.index).toHaveBeenCalledWith({
-        index: 'coindaily_market_data',
+        index: 'sygn_market_data',
         id: 'btc-ngn-2025-09-23',
         body: {
           symbol: 'BTC',
@@ -654,7 +654,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       });
 
       expect(mockElasticsearchClient.search).toHaveBeenCalledWith({
-        index: 'coindaily_market_data',
+        index: 'sygn_market_data',
         body: {
           query: {
             bool: {
@@ -740,7 +740,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       });
 
       mockElasticsearchClient.index.mockResolvedValue({
-        _index: 'coindaily_search_analytics',
+        _index: 'sygn_search_analytics',
         result: 'created'
       });
 
@@ -749,7 +749,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       // Verify analytics tracking
       expect(mockElasticsearchClient.index).toHaveBeenCalledWith(
         expect.objectContaining({
-          index: 'coindaily_search_analytics',
+          index: 'sygn_search_analytics',
           body: expect.objectContaining({
             query: searchQuery,
             language: 'en',
@@ -792,7 +792,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
       });
 
       expect(mockElasticsearchClient.search).toHaveBeenCalledWith({
-        index: 'coindaily_search_analytics',
+        index: 'sygn_search_analytics',
         body: {
           query: {
             range: {
@@ -938,7 +938,7 @@ describe('Elasticsearch Search Foundation - Task 5 Implementation', () => {
   describe('Health and Monitoring Tests', () => {
     it('should provide cluster health information', async () => {
       mockElasticsearchClient.cat.health.mockResolvedValue([{
-        cluster: 'coindaily-search',
+        cluster: 'sygn-search',
         status: 'green',
         node_total: '3',
         node_data: '3',

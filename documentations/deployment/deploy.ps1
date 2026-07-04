@@ -1,4 +1,4 @@
-# CoinDaily Platform - Windows Deployment Script
+# Sygn Platform - Windows Deployment Script
 # Run this from: c:\Users\user\Desktop\news-platform
 
 param(
@@ -10,7 +10,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "   CoinDaily Platform Deployment" -ForegroundColor Cyan
+Write-Host "   Sygn Platform Deployment" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -21,20 +21,20 @@ function Deploy-Backend {
     
     # Sync backend (excluding node_modules, .git, tests, logs)
     Write-Host "  Syncing backend files..." -ForegroundColor Gray
-    ssh ${ServerUser}@${ServerIP} "mkdir -p /var/www/coindaily-backend"
+    ssh ${ServerUser}@${ServerIP} "mkdir -p /var/www/sygn-backend"
     
     # Use robocopy for Windows
     $excludeDirs = @("node_modules", ".git", "tests", "logs")
     robocopy "$LocalDir\backend" "\\temp_backend" /E /XD $excludeDirs /NFL /NDL /NJH /NJS
     
     # SCP the backend
-    scp -r "$LocalDir\backend\dist" "${ServerUser}@${ServerIP}:/var/www/coindaily-backend/"
-    scp -r "$LocalDir\backend\prisma" "${ServerUser}@${ServerIP}:/var/www/coindaily-backend/"
-    scp "$LocalDir\backend\package.json" "${ServerUser}@${ServerIP}:/var/www/coindaily-backend/"
-    scp "$LocalDir\backend\package-lock.json" "${ServerUser}@${ServerIP}:/var/www/coindaily-backend/"
+    scp -r "$LocalDir\backend\dist" "${ServerUser}@${ServerIP}:/var/www/sygn-backend/"
+    scp -r "$LocalDir\backend\prisma" "${ServerUser}@${ServerIP}:/var/www/sygn-backend/"
+    scp "$LocalDir\backend\package.json" "${ServerUser}@${ServerIP}:/var/www/sygn-backend/"
+    scp "$LocalDir\backend\package-lock.json" "${ServerUser}@${ServerIP}:/var/www/sygn-backend/"
     
     Write-Host "  Installing dependencies..." -ForegroundColor Gray
-    ssh ${ServerUser}@${ServerIP} "cd /var/www/coindaily-backend && npm ci --production"
+    ssh ${ServerUser}@${ServerIP} "cd /var/www/sygn-backend && npm ci --production"
     
     Write-Host "[Backend] ✓ Complete" -ForegroundColor Green
 }
@@ -44,20 +44,20 @@ function Deploy-Frontend {
     
     Write-Host "[Frontend] Deploying $Target..." -ForegroundColor Yellow
     
-    ssh ${ServerUser}@${ServerIP} "mkdir -p /var/www/coindaily-$Target"
+    ssh ${ServerUser}@${ServerIP} "mkdir -p /var/www/sygn-$Target"
     
     # Copy .next build
-    scp -r "$LocalDir\frontend\.next" "${ServerUser}@${ServerIP}:/var/www/coindaily-$Target/"
-    scp -r "$LocalDir\frontend\public" "${ServerUser}@${ServerIP}:/var/www/coindaily-$Target/"
-    scp "$LocalDir\frontend\package.json" "${ServerUser}@${ServerIP}:/var/www/coindaily-$Target/"
-    scp "$LocalDir\frontend\package-lock.json" "${ServerUser}@${ServerIP}:/var/www/coindaily-$Target/"
-    scp "$LocalDir\frontend\next.config.js" "${ServerUser}@${ServerIP}:/var/www/coindaily-$Target/"
+    scp -r "$LocalDir\frontend\.next" "${ServerUser}@${ServerIP}:/var/www/sygn-$Target/"
+    scp -r "$LocalDir\frontend\public" "${ServerUser}@${ServerIP}:/var/www/sygn-$Target/"
+    scp "$LocalDir\frontend\package.json" "${ServerUser}@${ServerIP}:/var/www/sygn-$Target/"
+    scp "$LocalDir\frontend\package-lock.json" "${ServerUser}@${ServerIP}:/var/www/sygn-$Target/"
+    scp "$LocalDir\frontend\next.config.js" "${ServerUser}@${ServerIP}:/var/www/sygn-$Target/"
     
     # Create env file
-    ssh ${ServerUser}@${ServerIP} "echo '$EnvVars' > /var/www/coindaily-$Target/.env.local"
+    ssh ${ServerUser}@${ServerIP} "echo '$EnvVars' > /var/www/sygn-$Target/.env.local"
     
     Write-Host "  Installing dependencies..." -ForegroundColor Gray
-    ssh ${ServerUser}@${ServerIP} "cd /var/www/coindaily-$Target && npm ci --production"
+    ssh ${ServerUser}@${ServerIP} "cd /var/www/sygn-$Target && npm ci --production"
     
     Write-Host "[Frontend] ✓ $Target Complete" -ForegroundColor Green
 }
@@ -97,12 +97,12 @@ function Deploy-PM2 {
 function Deploy-AI {
     Write-Host "[AI] Deploying AI System..." -ForegroundColor Yellow
     
-    ssh ${ServerUser}@${ServerIP} "mkdir -p /var/www/coindaily-ai"
+    ssh ${ServerUser}@${ServerIP} "mkdir -p /var/www/sygn-ai"
     
-    scp -r "$LocalDir\ai-system\*" "${ServerUser}@${ServerIP}:/var/www/coindaily-ai/"
+    scp -r "$LocalDir\ai-system\*" "${ServerUser}@${ServerIP}:/var/www/sygn-ai/"
     
     Write-Host "  Installing dependencies..." -ForegroundColor Gray
-    ssh ${ServerUser}@${ServerIP} "cd /var/www/coindaily-ai && npm ci --production 2>/dev/null || echo 'AI system ready'"
+    ssh ${ServerUser}@${ServerIP} "cd /var/www/sygn-ai && npm ci --production 2>/dev/null || echo 'AI system ready'"
     
     Write-Host "[AI] ✓ Complete" -ForegroundColor Green
 }

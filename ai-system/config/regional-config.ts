@@ -1,5 +1,5 @@
 /**
- * Regional priority configuration for CoinDaily content curation and market analysis.
+ * Regional priority configuration for Sygn content curation and market analysis.
  * Covers Africa, Latin America (LatAm), and the Caribbean.
  */
 export const TARGET_REGIONS_PRIORITY = {

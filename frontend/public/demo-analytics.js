@@ -1,7 +1,7 @@
 // Navigation Analytics Demo Script
 // Run this in the browser console to test analytics tracking
 
-console.log('🚀 CoinDaily Navigation Analytics Demo');
+console.log('🚀 Sygn Navigation Analytics Demo');
 console.log('Testing Task 51 implementation...\n');
 
 // Test analytics tracking

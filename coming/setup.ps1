@@ -1,7 +1,7 @@
-# CoinDaily Coming Soon - Quick Setup Script (PowerShell)
+# Sygn Coming Soon - Quick Setup Script (PowerShell)
 # This script sets up the coming soon landing page
 
-Write-Host "🚀 CoinDaily - Coming Soon Setup" -ForegroundColor Cyan
+Write-Host "🚀 Sygn - Coming Soon Setup" -ForegroundColor Cyan
 Write-Host "=================================" -ForegroundColor Cyan
 Write-Host ""
 

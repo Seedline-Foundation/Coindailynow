@@ -15,14 +15,14 @@ export default function PrivacyPolicyPage() {
           <div className="prose prose-gray max-w-none space-y-6">
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg mb-8">
               <p className="text-blue-800 font-medium">
-                CoinDaily Africa is committed to protecting your privacy and handling your personal data in compliance with applicable data protection laws, including Nigeria&apos;s NDPA, the EU GDPR, South Africa&apos;s POPIA, and Kenya&apos;s DPA.
+                Sygn Africa is committed to protecting your privacy and handling your personal data in compliance with applicable data protection laws, including Nigeria&apos;s NDPA, the EU GDPR, South Africa&apos;s POPIA, and Kenya&apos;s DPA.
               </p>
             </div>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">1. Data Controller</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa operates the website sygn.live and related subdomains. For privacy-related inquiries, contact us at{' '}
+                Sygn Africa operates the website sygn.live and related subdomains. For privacy-related inquiries, contact us at{' '}
                 <a href="mailto:privacy@sygn.live" className="text-blue-600 hover:underline">privacy@sygn.live</a>.
               </p>
             </section>
@@ -127,14 +127,14 @@ export default function PrivacyPolicyPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">10. Children&apos;s Privacy</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa is not intended for users under the age of 18. We do not knowingly collect personal data from children. If you believe a child has provided us with personal data, please contact us immediately.
+                Sygn Africa is not intended for users under the age of 18. We do not knowingly collect personal data from children. If you believe a child has provided us with personal data, please contact us immediately.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">11. AI-Generated Content</h2>
               <p className="text-gray-600 leading-relaxed">
-                CoinDaily Africa uses AI systems to generate and translate content. These systems process publicly available information and do not use your personal data for training. AI-generated content is reviewed by human editors before publication.
+                Sygn Africa uses AI systems to generate and translate content. These systems process publicly available information and do not use your personal data for training. AI-generated content is reviewed by human editors before publication.
               </p>
             </section>
 

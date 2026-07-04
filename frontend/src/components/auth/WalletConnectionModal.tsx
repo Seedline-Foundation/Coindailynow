@@ -185,7 +185,7 @@ export function WalletConnectionModal({
               </div>
               <div className="ml-3">
                 <p className="text-sm text-gray-700">
-                  Only connect to wallets you trust. CoinDaily will never ask for your private keys or seed phrases.
+                  Only connect to wallets you trust. Sygn will never ask for your private keys or seed phrases.
                 </p>
               </div>
             </div>

@@ -1,7 +1,7 @@
 /**
  * AI Content Preview Service - Task 7.2
  * Provides AI-powered article summaries, key takeaways, reading time estimation,
- * translation preview, and content quality indicators for the CoinDaily platform
+ * translation preview, and content quality indicators for the Sygn platform
  */
 
 import { PrismaClient, Article, ArticleTranslation } from '@prisma/client';

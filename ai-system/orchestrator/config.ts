@@ -1,6 +1,6 @@
 /**
  * AI Orchestrator Configuration
- * Production-ready configuration for the CoinDaily AI agent orchestration system
+ * Production-ready configuration for the Sygn AI agent orchestration system
  */
 
 import {

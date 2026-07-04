@@ -36,7 +36,7 @@ export default function ScamWarning({
               Security Notice: Unverified or High-Risk Project ({projectName})
             </h4>
             <p className="text-gray-400 text-xs mt-1 leading-relaxed">
-              CoinDaily's automated contract analyzer and security desk have identified multiple risk markers for the mentioned tokens or platform:
+              Sygn's automated contract analyzer and security desk have identified multiple risk markers for the mentioned tokens or platform:
             </p>
           </div>
 

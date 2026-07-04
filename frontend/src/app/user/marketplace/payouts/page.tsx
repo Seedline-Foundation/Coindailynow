@@ -147,8 +147,8 @@ export default function SellerPayoutsPage() {
         <div>
           <p className="text-sm text-white font-medium">How Payouts Work</p>
           <p className="text-xs text-dark-400 mt-1">
-            Earnings are accumulated throughout the month and automatically transferred to your CoinDaily wallet on the last day of each month.
-            CoinDaily charges a <strong className="text-primary-400">10% platform fee</strong> on each sale.
+            Earnings are accumulated throughout the month and automatically transferred to your Sygn wallet on the last day of each month.
+            Sygn charges a <strong className="text-primary-400">10% platform fee</strong> on each sale.
             You can use your earnings as JOY Tokens on the platform or withdraw to external wallets.
           </p>
         </div>

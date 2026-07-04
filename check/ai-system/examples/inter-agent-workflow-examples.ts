@@ -1,6 +1,6 @@
 // Inter-Agent Workflow Examples - Demonstrates agent interaction capabilities
 // Shows Research → Reviewer → Writer → Translator → Reviewer → Human Editor Queue
-// Complete workflow orchestration for CoinDaily Africa news generation
+// Complete workflow orchestration for Sygn Africa news generation
 
 import { interAgentWorkflowOrchestrator } from '../orchestrator/inter-agent-workflow';
 
@@ -147,7 +147,7 @@ async function demonstrateHumanEditorWorkflow(): Promise<void> {
         'approved',
         'Great work! Content meets publication standards.',
         undefined,
-        'editor@coindaily.africa'
+        'editor@sygn.africa'
       );
 
       console.log(`✅ Task ${task.id} approved by human editor`);
@@ -202,7 +202,7 @@ async function demonstrateContentRevisionWorkflow(): Promise<void> {
         'revision_needed',
         'Content needs more African-specific examples and simpler explanations.',
         'Please add 2-3 real African blockchain use cases and simplify technical terms for general audience.',
-        'senior_editor@coindaily.africa'
+        'senior_editor@sygn.africa'
       );
 
       console.log('🔄 Revision requested - workflow restarting from content generation stage');

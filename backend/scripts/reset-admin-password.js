@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Reset a CoinDaily admin password (local dev only).
+ * Reset a Sygn admin password (local dev only).
  *
  * Run from the backend directory:
  *   node scripts/reset-admin-password.js [email]

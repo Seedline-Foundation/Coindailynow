@@ -61,7 +61,7 @@ export class SocialMediaAgent extends BaseAgent {
     const charLimits: Record<string, number> = { twitter: 280, telegram: 4096, discord: 2000, linkedin: 3000 };
     const limit = charLimits[platform] || 280;
 
-    const prompt = `Generate an engaging ${platform} post for CoinDaily (Africa's crypto news platform):
+    const prompt = `Generate an engaging ${platform} post for Sygn (Africa's crypto news platform):
 
 Content/topic: ${JSON.stringify(content || {}, null, 2)}
 Character limit: ${limit}
@@ -91,7 +91,7 @@ Return JSON:
   }
 
   private async generateThread(content: any, platform?: string): Promise<Record<string, any>> {
-    const prompt = `Create an engaging Twitter/X thread for CoinDaily:
+    const prompt = `Create an engaging Twitter/X thread for Sygn:
 
 Topic: ${JSON.stringify(content || {}, null, 2)}
 
@@ -116,7 +116,7 @@ Return JSON:
   }
 
   private async createEngagementPlan(audience: any): Promise<Record<string, any>> {
-    const prompt = `Create a social media engagement plan for CoinDaily targeting African crypto enthusiasts:
+    const prompt = `Create a social media engagement plan for Sygn targeting African crypto enthusiasts:
 
 Audience data: ${JSON.stringify(audience || {}, null, 2)}
 
@@ -215,7 +215,7 @@ Return JSON:
   }
 
   private async planCampaign(campaign: any): Promise<Record<string, any>> {
-    const prompt = `Plan a social media campaign for CoinDaily:
+    const prompt = `Plan a social media campaign for Sygn:
 
 Campaign: ${JSON.stringify(campaign || {}, null, 2)}
 

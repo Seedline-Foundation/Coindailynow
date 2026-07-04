@@ -196,7 +196,7 @@ export default function SuperAdminMarketAlertsPage() {
           <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">
             <h3 className="text-base font-semibold text-white mb-3 flex items-center gap-2"><BellRing className="w-5 h-5 text-yellow-400" /> Notification Channels</h3>
             <div className="space-y-2">
-              {[{channel:'Telegram Bot',enabled:true,detail:'@coindaily_alerts_bot'},
+              {[{channel:'Telegram Bot',enabled:true,detail:'@sygn_alerts_bot'},
                 {channel:'Email (ops team)',enabled:true,detail:'ops@sygn.live'},
                 {channel:'Slack Webhook',enabled:false,detail:'Not configured'},
                 {channel:'PagerDuty',enabled:false,detail:'Enterprise only'}].map(n => (

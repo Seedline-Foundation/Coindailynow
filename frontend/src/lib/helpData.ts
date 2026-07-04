@@ -22,8 +22,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
     articles: [
       {
         id: 'gs-1',
-        question: 'What is CoinDaily?',
-        answer: 'CoinDaily is a premium cryptocurrency news, analysis, and market intelligence platform. We deliver real-time news, deep-dive research reports, creator economy tools, and personalized feeds tailored to global and emerging markets.'
+        question: 'What is Sygn?',
+        answer: 'Sygn is a premium cryptocurrency news, analysis, and market intelligence platform. We deliver real-time news, deep-dive research reports, creator economy tools, and personalized feeds tailored to global and emerging markets.'
       },
       {
         id: 'gs-2',
@@ -32,8 +32,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
       },
       {
         id: 'gs-3',
-        question: 'Is CoinDaily free to use?',
-        answer: 'CoinDaily offers a Free Tier with access to basic news, daily summaries, and standard market tickers. To unlock deep-dive research, advanced alpha signals, full creator tools, and unlimited AI Concierge queries, you can upgrade to our Premium or Enterprise subscription plans.'
+        question: 'Is Sygn free to use?',
+        answer: 'Sygn offers a Free Tier with access to basic news, daily summaries, and standard market tickers. To unlock deep-dive research, advanced alpha signals, full creator tools, and unlimited AI Concierge queries, you can upgrade to our Premium or Enterprise subscription plans.'
       },
       {
         id: 'gs-4',
@@ -50,23 +50,23 @@ export const HELP_CATEGORIES: HelpCategory[] = [
     articles: [
       {
         id: 'ws-1',
-        question: 'How do I secure my CoinDaily account?',
+        question: 'How do I secure my Sygn account?',
         answer: 'We recommend enabling Multi-Factor Authentication (MFA) via Google Authenticator or another app-based TOTP provider. Go to Settings > Security, scan the QR code, and enter the verification code. Avoid using SMS-based 2FA as it is vulnerable to SIM-swap attacks.'
       },
       {
         id: 'ws-2',
         question: 'What is a seed phrase and how do I protect it?',
-        answer: 'A seed phrase (usually 12 or 24 words) is the master key to your Web3 wallet. Never share it with anyone, including CoinDaily staff. Store it physically offline on paper or metal. Never save it on cloud notes, screenshots, or email.'
+        answer: 'A seed phrase (usually 12 or 24 words) is the master key to your Web3 wallet. Never share it with anyone, including Sygn staff. Store it physically offline on paper or metal. Never save it on cloud notes, screenshots, or email.'
       },
       {
         id: 'ws-3',
-        question: 'Can CoinDaily access my private keys?',
-        answer: 'No. CoinDaily is a non-custodial platform. When you connect a Web3 wallet, all transactions are signed locally on your device via your wallet extension or mobile app. CoinDaily never stores or transmits your private keys.'
+        question: 'Can Sygn access my private keys?',
+        answer: 'No. Sygn is a non-custodial platform. When you connect a Web3 wallet, all transactions are signed locally on your device via your wallet extension or mobile app. Sygn never stores or transmits your private keys.'
       },
       {
         id: 'ws-4',
         question: 'What should I do if my account is compromised?',
-        answer: 'If you suspect unauthorized access, immediately go to Settings > Security and change your password. If your Web3 wallet is compromised, transfer all assets to a newly created secure wallet immediately; CoinDaily cannot retrieve funds from a compromised private wallet.'
+        answer: 'If you suspect unauthorized access, immediately go to Settings > Security and change your password. If your Web3 wallet is compromised, transfer all assets to a newly created secure wallet immediately; Sygn cannot retrieve funds from a compromised private wallet.'
       }
     ]
   },
@@ -106,7 +106,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
     articles: [
       {
         id: 'ce-1',
-        question: 'Who writes CoinDaily articles?',
+        question: 'Who writes Sygn articles?',
         answer: 'Our articles are authored by an in-house team of professional crypto journalists, independent regional analysts, and verified creators. We maintain strict editorial guidelines to ensure accuracy and objectivity.'
       },
       {
@@ -116,7 +116,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
       },
       {
         id: 'ce-3',
-        question: 'Can I write for CoinDaily?',
+        question: 'Can I write for Sygn?',
         answer: 'Yes! Navigate to the Creator Studio tab in the sidebar. Once you verify your profile, you can draft articles, build your subscriber list, and earn rewards (in stablecoins or tokens) based on reader engagement.'
       },
       {
@@ -137,7 +137,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
       {
         id: 'af-mm-1',
         question: 'How do I pay with M-Pesa?',
-        answer: 'Select M-Pesa at checkout. Enter your phone number (format: +254...), and click "Pay". You will receive an STK Push prompt on your phone to enter your PIN. Once authorized, your CoinDaily subscription will instantly activate.'
+        answer: 'Select M-Pesa at checkout. Enter your phone number (format: +254...), and click "Pay". You will receive an STK Push prompt on your phone to enter your PIN. Once authorized, your Sygn subscription will instantly activate.'
       },
       {
         id: 'af-mm-2',
@@ -147,7 +147,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
       {
         id: 'af-mm-3',
         question: 'Are there extra fees for mobile money transactions?',
-        answer: 'CoinDaily does not charge any additional fees for mobile money transactions. However, your mobile network operator may apply standard transaction or network fees depending on your tariff plan.'
+        answer: 'Sygn does not charge any additional fees for mobile money transactions. However, your mobile network operator may apply standard transaction or network fees depending on your tariff plan.'
       }
     ]
   },

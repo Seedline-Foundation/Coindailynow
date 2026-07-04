@@ -1,5 +1,5 @@
 /**
- * CFIS API Client — calls CoinDaily Financial Intelligence System endpoints.
+ * CFIS API Client — calls Sygn Financial Intelligence System endpoints.
  * CFIS runs on a separate port (default 3005) and uses Super Admin JWT auth.
  */
 

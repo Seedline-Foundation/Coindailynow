@@ -56,7 +56,7 @@ export class ScenePlanner {
     try {
       console.log(`[ScenePlanner] Attempting LLM planning via Ollama (${this.model})...`);
       
-      const systemPrompt = `You are a cinematic art director for CoinDaily. Your task is to output a scene plan as valid JSON only. Never write image generation prompts directly.
+      const systemPrompt = `You are a cinematic art director for Sygn. Your task is to output a scene plan as valid JSON only. Never write image generation prompts directly.
 Strictly adhere to the following JSON structure:
 {
   "story_type": "breaking-news" | "premium-feature" | "market-analysis" | "cybercrime" | "regulation" | "ai-future" | "startup-vc" | "afrofuturism" | "thumbnail-fast" | "social-banner",

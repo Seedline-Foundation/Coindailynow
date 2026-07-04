@@ -161,7 +161,7 @@ export function CryptoStructuredData({
 
 /**
  * Organization Structured Data Component
- * Global component for CoinDaily organization schema
+ * Global component for Sygn organization schema
  */
 export function OrganizationStructuredData() {
   const [schema, setSchema] = useState<any>(null);

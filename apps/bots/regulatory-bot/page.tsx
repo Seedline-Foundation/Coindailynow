@@ -84,8 +84,8 @@ export default function RegulatoryBotPage() {
                   <li className="flex gap-4">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 flex items-center justify-center font-bold">1</div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">Open Telegram and search for <span className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">@CoinDailyRegBot</span></p>
-                      <p className="text-sm text-gray-500 mt-1">Or click: <a href="#" className="text-blue-600 underline">t.me/CoinDailyRegBot</a></p>
+                      <p className="font-medium text-gray-900 dark:text-white">Open Telegram and search for <span className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">@SygnRegBot</span></p>
+                      <p className="text-sm text-gray-500 mt-1">Or click: <a href="#" className="text-blue-600 underline">t.me/SygnRegBot</a></p>
                     </div>
                   </li>
                   <li className="flex gap-4">

@@ -20,7 +20,7 @@ const TrendingTopics = () => {
       const timeoutId = setTimeout(() => controller.abort(), 2000); // Terminate after 2 seconds
 
       try {
-        const response = await fetch('https://api.coindaily.online/mock-trending-topics', {
+        const response = await fetch('https://api.sygn.online/mock-trending-topics', {
           signal: controller.signal,
           cache: 'no-store',
         });

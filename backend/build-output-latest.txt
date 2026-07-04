@@ -1,5 +1,5 @@
 
-> coindaily-backend@1.0.0 build
+> sygn-backend@1.0.0 build
 > node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc
 
 src/api/user-feedback.ts(130,67): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.

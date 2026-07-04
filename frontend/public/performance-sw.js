@@ -1,8 +1,8 @@
-// Performance-focused service worker for CoinDaily
+// Performance-focused service worker for Sygn
 // Enhances the existing Workbox SW with custom performance optimizations
 
-const PERFORMANCE_CACHE = 'coindaily-performance-v1';
-const CRITICAL_CACHE = 'coindaily-critical-v1';
+const PERFORMANCE_CACHE = 'sygn-performance-v1';
+const CRITICAL_CACHE = 'sygn-critical-v1';
 
 // Performance monitoring cache
 const performanceMetrics = new Map();

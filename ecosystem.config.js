@@ -1,6 +1,6 @@
 /**
  * PM2 Ecosystem Configuration
- * CoinDaily Platform - All Applications
+ * Sygn Platform - All Applications
  * 
  * Domains:
  * - sygn.live (News) - Port 3000
@@ -18,7 +18,7 @@ module.exports = {
     // BACKEND API - app.sygn.live
     // ============================================
     {
-      name: 'coindaily-backend',
+      name: 'sygn-backend',
       cwd: './backend',
       script: 'dist/backend/src/index.js',
       instances: 2,
@@ -48,7 +48,7 @@ module.exports = {
     // If you ever split it into apps/news, update this cwd in lockstep.
     // ============================================
     {
-      name: 'coindaily-news',
+      name: 'sygn-news',
       cwd: './frontend',
       script: 'npm',
       args: 'start',
@@ -76,7 +76,7 @@ module.exports = {
     // ADMIN PORTAL - jet.sygn.live
     // ============================================
     {
-      name: 'coindaily-admin',
+      name: 'sygn-admin',
       cwd: './apps/admin',
       script: 'npm',
       args: 'start',
@@ -104,7 +104,7 @@ module.exports = {
     // PR & AD NETWORK - press.sygn.live
     // ============================================
     {
-      name: 'coindaily-press',
+      name: 'sygn-press',
       cwd: './apps/press',
       script: 'npm',
       args: 'start',
@@ -134,7 +134,7 @@ module.exports = {
     // AI SYSTEM - ai.sygn.live
     // ============================================
     {
-      name: 'coindaily-ai',
+      name: 'sygn-ai',
       cwd: './apps/ai',
       script: 'npm',
       args: 'start',
@@ -164,7 +164,7 @@ module.exports = {
     // NOT the Next.js dashboard (apps/ai/).
     // ============================================
     {
-      name: 'coindaily-ai-pipeline',
+      name: 'sygn-ai-pipeline',
       cwd: './ai-system',
       script: 'dist/orchestrator/index.js',
       instances: 1,
@@ -196,7 +196,7 @@ module.exports = {
     // and a recent-alerts list consumed by admin /api/admin/gov-alerts/recent.
     // ============================================
     {
-      name: 'coindaily-govmonitor',
+      name: 'sygn-govmonitor',
       cwd: './ai-system',
       script: 'dist/workers/govMonitorRunner.js',
       instances: 1,
@@ -224,7 +224,7 @@ module.exports = {
     // GPU workers, upscale, thumbnail, delivery
     // ============================================
     {
-      name: 'coindaily-iengine',
+      name: 'sygn-iengine',
       cwd: '.',
       script: 'dist/Iengine/index.js',
       args: '--workers',
@@ -257,7 +257,7 @@ module.exports = {
     // Hosted on cabfi.xyz, communicates with backend on sygn.live via HMAC.
     // ============================================
     {
-      name: 'coindaily-cfis',
+      name: 'sygn-cfis',
       cwd: './finance-system',
       script: 'dist/index.js',
       instances: 1,
@@ -286,7 +286,7 @@ module.exports = {
     // TRANSLATION SERVICE (Python)
     // ============================================
     {
-      name: 'coindaily-translation',
+      name: 'sygn-translation',
       cwd: './translation-service',
       script: 'venv/bin/python',
       args: '-m uvicorn server:app --host 0.0.0.0 --port 8000',

@@ -1,7 +1,7 @@
 /**
  * AI Content Pipeline Service
  * 
- * Automated content pipeline orchestration for CoinDaily platform.
+ * Automated content pipeline orchestration for Sygn platform.
  * Handles end-to-end content creation from research to publication.
  * 
  * Key Features:
@@ -464,7 +464,7 @@ export class AIContentPipelineService {
         const response = await fetch(`https://oauth.reddit.com/r/${subreddit}/hot?limit=50`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
-            'User-Agent': 'CoinDaily/1.0',
+            'User-Agent': 'Sygn/1.0',
           },
         });
 

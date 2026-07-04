@@ -1,6 +1,6 @@
 /**
  * Visual Bible — Regional Visual Identities
- * Defines location-specific visual languages for CoinDaily's coverage regions:
+ * Defines location-specific visual languages for Sygn's coverage regions:
  * Africa, Latin America, Caribbean, and global markets.
  */
 

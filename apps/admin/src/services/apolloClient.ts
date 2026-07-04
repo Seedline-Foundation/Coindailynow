@@ -1,6 +1,6 @@
 /**
  * Apollo Client Configuration
- * GraphQL client for CoinDaily Platform
+ * GraphQL client for Sygn Platform
  */
 
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, concat } from '@apollo/client';

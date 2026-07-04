@@ -111,7 +111,7 @@ export default function CareersPage() {
       roles: [
         {
           title: 'Senior Full Stack Developer',
-          description: 'Build and scale CoinDaily platform with Next.js, Node.js, PostgreSQL',
+          description: 'Build and scale Sygn platform with Next.js, Node.js, PostgreSQL',
           responsibilities: [
             'Architect new features across full stack',
             'Optimize for sub-500ms response times',

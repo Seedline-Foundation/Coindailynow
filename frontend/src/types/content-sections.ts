@@ -150,7 +150,7 @@ export enum ContentSectionType {
   MEMEFI_AWARD = 'MEMEFI_AWARD', // FR-064
   FEATURED_NEWS = 'FEATURED_NEWS', // FR-065 - Reward Points
   GENERAL_CRYPTO = 'GENERAL_CRYPTO', // FR-066
-  COINDAILY_CAST = 'COINDAILY_CAST', // FR-067 - Reward Points
+  SYGN_CAST = 'SYGN_CAST', // FR-067 - Reward Points
   OPINION = 'OPINION', // FR-068 - Reward Points
   TOKEN_REVIEWS = 'TOKEN_REVIEWS', // FR-069 - Reward Points
   POLICY_UPDATES = 'POLICY_UPDATES', // FR-070
@@ -279,8 +279,8 @@ export interface GeneralCryptoSection extends BaseContentSection {
   config: ContentSectionConfig;
 }
 
-export interface CoinDailyCastSection extends BaseContentSection {
-  type: ContentSectionType.COINDAILY_CAST;
+export interface SygnCastSection extends BaseContentSection {
+  type: ContentSectionType.SYGN_CAST;
   interviews: Interview[];
   upcomingInterviews: UpcomingInterview[];
   config: ContentSectionConfig;
@@ -856,7 +856,7 @@ export type ContentSection =
   | MemefiAwardSection
   | FeaturedNewsSection
   | GeneralCryptoSection
-  | CoinDailyCastSection
+  | SygnCastSection
   | OpinionSection
   | TokenReviewsSection
   | PolicyUpdatesSection

@@ -8,12 +8,12 @@
 
 ## 1. Current State
 
-The CoinDaily platform runs a **split database architecture**:
+The Sygn platform runs a **split database architecture**:
 
 | Component | Database Host | Connection | Notes |
 |-----------|--------------|------------|-------|
 | CFIS (Finance System) | **Supabase** (managed, `aws-1-eu-central-2.pooler.supabase.com:6543`) | `DATABASE_URL` with PgBouncer pooling, SSL required | Dedicated `postgres` database via Supabase project |
-| Backend / API | **Contabo VPS** (self-hosted PostgreSQL, `localhost:5432`) | `DATABASE_URL` pointing to `coindaily` database | Self-hosted on Contabo VPS |
+| Backend / API | **Contabo VPS** (self-hosted PostgreSQL, `localhost:5432`) | `DATABASE_URL` pointing to `sygn` database | Self-hosted on Contabo VPS |
 | Frontend / Apps | N/A (reads via Backend API) | — | No direct DB access |
 | TimescaleDB (market data) | **Contabo VPS** (extension on self-hosted Postgres) | Same host as Backend | OHLC, ticks, time-series |
 
@@ -40,7 +40,7 @@ The CoinDaily platform runs a **split database architecture**:
 
 1. **Create the `cfis_db` database** on the Contabo Postgres instance:
    ```sql
-   CREATE DATABASE cfis_db OWNER coindaily;
+   CREATE DATABASE cfis_db OWNER sygn;
    \c cfis_db
    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
    CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -112,7 +112,7 @@ The CoinDaily platform runs a **split database architecture**:
 - **Automated daily backup** (set up via cron):
   ```bash
   # /etc/cron.d/pg-backup
-  0 2 * * * postgres pg_dump -Fc --compress=9 coindaily > /backups/coindaily_$(date +\%Y\%m\%d).dump
+  0 2 * * * postgres pg_dump -Fc --compress=9 sygn > /backups/sygn_$(date +\%Y\%m\%d).dump
   0 3 * * * postgres pg_dump -Fc --compress=9 cfis_db   > /backups/cfis_db_$(date +\%Y\%m\%d).dump
   ```
 - **Retention**: Keep 30 daily + 12 monthly backups; sync to off-site storage (Backblaze B2).

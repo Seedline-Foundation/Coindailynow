@@ -71,7 +71,7 @@ export class ScriptAgent {
   }
 
   private generateCTA(article: ArticleInput): string {
-    return `Read the full article on CoinDaily. Follow for more ${article.category} updates.`;
+    return `Read the full article on Sygn. Follow for more ${article.category} updates.`;
   }
 }
 

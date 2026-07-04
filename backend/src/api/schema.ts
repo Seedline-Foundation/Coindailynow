@@ -1,5 +1,5 @@
 // GraphQL Schema Definition
-// Based on specs/002-coindaily-africa-s/graphql-schema.graphql
+// Based on specs/002-sygn-africa-s/graphql-schema.graphql
 
 export const typeDefs = `
   # Authentication Types

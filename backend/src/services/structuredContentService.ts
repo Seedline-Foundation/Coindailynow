@@ -159,7 +159,7 @@ export class StructuredContentService {
     const data = articles.map((article: any) => {
       const parsedEntities = safeJsonParse<any[]>(article.KnowledgeBase?.entities, []);
       const parsedFacts = safeJsonParse<any[]>(article.KnowledgeBase?.facts, []);
-      const authorName = `${article.User?.firstName || ''} ${article.User?.lastName || ''}`.trim() || 'CoinDaily Staff';
+      const authorName = `${article.User?.firstName || ''} ${article.User?.lastName || ''}`.trim() || 'Sygn Staff';
 
       return {
         id: article.id,
@@ -339,7 +339,7 @@ export class StructuredContentService {
           count: explicitEntity.articleLinks.length,
           url: `${this.siteUrl}/api/v1/content?entity=${explicitEntity.slug}`,
         },
-        data_sources: ['CoinDaily editorial content graph'],
+        data_sources: ['Sygn editorial content graph'],
       };
     }
 
@@ -386,7 +386,7 @@ export class StructuredContentService {
         count: fallbackEntity.mentionCount,
         url: `${this.siteUrl}/api/v1/content?entity=${normalizedSlug}`,
       },
-      data_sources: ['CoinDaily entity recognition pipeline'],
+      data_sources: ['Sygn entity recognition pipeline'],
     };
   }
 

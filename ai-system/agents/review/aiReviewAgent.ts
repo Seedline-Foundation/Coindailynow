@@ -103,7 +103,7 @@ function appendNarrativeAngles(basePrompt: string, angles?: NarrativeAngles): st
     .map(r => `- ${r.region}: ${r.angle}`)
     .join('\n');
 
-  const block = `\n\n---\nEDITORIAL ANGLES (CoinDaily narrative positioning):\nPRESENT BOTH SIDES. Lead with the positive framing, but explicitly address the negative angle in a "What to watch" or "Risk" paragraph. This is non-negotiable — single-angle pieces do not ship.\n\nPOSITIVE ANGLE:\n${angles.positive}\n\nNEGATIVE / RISK ANGLE:\n${angles.negative}\n\nREGIONAL RELEVANCE (cover the regions that apply; skip ones without an angle below):\n${regional || '(none)'}\n`;
+  const block = `\n\n---\nEDITORIAL ANGLES (Sygn narrative positioning):\nPRESENT BOTH SIDES. Lead with the positive framing, but explicitly address the negative angle in a "What to watch" or "Risk" paragraph. This is non-negotiable — single-angle pieces do not ship.\n\nPOSITIVE ANGLE:\n${angles.positive}\n\nNEGATIVE / RISK ANGLE:\n${angles.negative}\n\nREGIONAL RELEVANCE (cover the regions that apply; skip ones without an angle below):\n${regional || '(none)'}\n`;
 
   return basePrompt + block;
 }

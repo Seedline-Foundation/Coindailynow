@@ -46,7 +46,7 @@ export default function CareersPage() {
             'Create sales playbooks and training programs for team',
             'Establish KPIs and drive accountability across sales org',
             'Negotiate complex contracts with major advertisers and sponsors',
-            'Represent CoinDaily at major crypto conferences and events',
+            'Represent Sygn at major crypto conferences and events',
           ],
           requirements: [
             '7+ years B2B sales leadership in tech/crypto industry',
@@ -65,11 +65,11 @@ export default function CareersPage() {
             '✈️ Travel budget for client meetings and events',
             '📊 Access to premium sales tools and CRM',
           ],
-          fullDescription: `As Head of Sales, you'll be the revenue engine of CoinDaily, responsible for driving growth from $50K to $500K+ MRR within 18 months. You'll have full autonomy to build your team, design comp plans, and execute against ambitious targets. This role requires a hunter mentality combined with strategic thinking - you're equally comfortable cold-calling prospects and presenting to C-level executives.
+          fullDescription: `As Head of Sales, you'll be the revenue engine of Sygn, responsible for driving growth from $50K to $500K+ MRR within 18 months. You'll have full autonomy to build your team, design comp plans, and execute against ambitious targets. This role requires a hunter mentality combined with strategic thinking - you're equally comfortable cold-calling prospects and presenting to C-level executives.
 
 Your day-to-day will involve coaching your team, closing deals yourself (especially in early months), analyzing sales metrics, and constantly iterating on our go-to-market strategy. You'll work closely with the CEO and product team to ensure we're solving real customer problems.
 
-Success in this role means: hitting monthly revenue targets, maintaining healthy customer acquisition costs, building a high-performing team, and establishing CoinDaily as the #1 crypto media platform for advertisers across Africa.`,
+Success in this role means: hitting monthly revenue targets, maintaining healthy customer acquisition costs, building a high-performing team, and establishing Sygn as the #1 crypto media platform for advertisers across Africa.`,
         },
         {
           title: 'Chief of Staff',

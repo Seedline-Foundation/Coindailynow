@@ -1,4 +1,4 @@
-// Content Generation Agent - ChatGPT-powered writing for CoinDaily Africa
+// Content Generation Agent - ChatGPT-powered writing for Sygn Africa
 // Handles article writing, content optimization, and SEO-focused content creation
 
 import { createAuditLog } from '../../../lib/audit';
@@ -171,7 +171,7 @@ export class ContentGenerationAgent {
   }
 
   private buildSystemPrompt(request: ContentGenerationRequest): string {
-    const basePrompt = `You are an expert cryptocurrency and financial journalist specializing in African markets. You write for CoinDaily Africa, the continent's largest AI-driven crypto news platform.
+    const basePrompt = `You are an expert cryptocurrency and financial journalist specializing in African markets. You write for Sygn Africa, the continent's largest AI-driven crypto news platform.
 
 Key Guidelines:
 - Focus on African cryptocurrency markets, adoption, and regulatory developments

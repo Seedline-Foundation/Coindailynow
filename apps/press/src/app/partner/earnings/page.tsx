@@ -30,11 +30,11 @@ interface EarningRecord {
 }
 
 const MOCK_EARNINGS: EarningRecord[] = [
-  { id: 'e-1', prTitle: 'Bitcoin Hits New ATH in African Markets', publisher: 'CoinDaily', position: '/sponsored', amount: 75, status: 'released', date: '2026-02-12' },
+  { id: 'e-1', prTitle: 'Bitcoin Hits New ATH in African Markets', publisher: 'Sygn', position: '/sponsored', amount: 75, status: 'released', date: '2026-02-12' },
   { id: 'e-2', prTitle: 'M-Pesa Crypto Integration Launch', publisher: 'FinTechAfrica', position: '#sidebar-widget', amount: 25, status: 'released', date: '2026-02-11' },
-  { id: 'e-3', prTitle: 'JOY Token Staking Goes Live', publisher: 'CoinDaily', position: '/sponsored', amount: 75, status: 'locked', date: '2026-02-10' },
+  { id: 'e-3', prTitle: 'JOY Token Staking Goes Live', publisher: 'Sygn', position: '/sponsored', amount: 75, status: 'locked', date: '2026-02-10' },
   { id: 'e-4', prTitle: 'DeFi Yield Farming Guide', publisher: 'Web3Weekly', position: '#sidebar-widget', amount: 25, status: 'released', date: '2026-02-09' },
-  { id: 'e-5', prTitle: 'Nigeria SEC Token Framework', publisher: 'CoinDaily', position: '/sponsored', amount: 75, status: 'released', date: '2026-02-07' },
+  { id: 'e-5', prTitle: 'Nigeria SEC Token Framework', publisher: 'Sygn', position: '/sponsored', amount: 75, status: 'released', date: '2026-02-07' },
   { id: 'e-6', prTitle: 'Luno Partners with Orange Money', publisher: 'AfricaTech', position: '/press/feed', amount: 15, status: 'pending', date: '2026-02-06' },
 ];
 

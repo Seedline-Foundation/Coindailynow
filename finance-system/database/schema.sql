@@ -1,6 +1,6 @@
 -- ============================================================
 -- CFIS Database Schema — PostgreSQL
--- CoinDaily Financial Intelligence System
+-- Sygn Financial Intelligence System
 -- ============================================================
 -- This file defines the complete schema for the dedicated CFIS database.
 -- It is SEPARATE from the main app database.

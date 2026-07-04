@@ -109,10 +109,10 @@ export function getVerificationEmailTemplate(params: TemplateParams): EmailTempl
                         <td style="background-color: #0a0a0a; padding: 25px 30px; text-align: center;">
                             <p style="color: #6b7280; font-size: 12px; margin: 0 0 10px 0; line-height: 1.6;">
                                 This email was sent to <strong style="color: #9ca3af;">${email}</strong><br/>
-                                <a href="${siteUrl}" style="color: #6366f1; text-decoration: none;">Joy Token by CoinDaily</a>
+                                <a href="${siteUrl}" style="color: #6366f1; text-decoration: none;">Joy Token by Sygn</a>
                             </p>
                             <p style="color: #4b5563; font-size: 11px; margin: 0;">
-                                © ${new Date().getFullYear()} CoinDaily. All rights reserved.
+                                © ${new Date().getFullYear()} Sygn. All rights reserved.
                             </p>
                         </td>
                     </tr>
@@ -197,7 +197,7 @@ export function getWelcomeEmailTemplate(params: TemplateParams): EmailTemplate {
                                 <ul style="color: #d1d5db; margin: 0; padding-left: 20px; line-height: 1.8;">
                                     <li><strong style="color: #ffffff;">90% APR Staking Rewards</strong></li>
                                     <li><strong style="color: #ffffff;">6M Max Supply</strong> - No inflation</li>
-                                    <li><strong style="color: #ffffff;">CoinDaily Premium Access</strong></li>
+                                    <li><strong style="color: #ffffff;">Sygn Premium Access</strong></li>
                                     <li><strong style="color: #ffffff;">Governance Rights</strong></li>
                                     <li><strong style="color: #ffffff;">Early Presale Access</strong></li>
                                     <li><strong style="color: #ffffff;">Exclusive Community Perks</strong></li>
@@ -220,7 +220,7 @@ export function getWelcomeEmailTemplate(params: TemplateParams): EmailTemplate {
                     <tr>
                         <td style="background-color: #0a0a0a; padding: 25px 30px; text-align: center;">
                             <p style="color: #6b7280; font-size: 12px; margin: 0;">
-                                © ${new Date().getFullYear()} CoinDaily. All rights reserved.
+                                © ${new Date().getFullYear()} Sygn. All rights reserved.
                             </p>
                         </td>
                     </tr>

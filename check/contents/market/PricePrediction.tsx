@@ -23,7 +23,7 @@ const PricePrediction = () => {
       const timeoutId = setTimeout(() => controller.abort(), 2000); // Terminate after 2 seconds
 
       try {
-        const response = await fetch('https://api.coindaily.online/mock-price-predictions', {
+        const response = await fetch('https://api.sygn.online/mock-price-predictions', {
           signal: controller.signal,
           cache: 'no-store',
         });

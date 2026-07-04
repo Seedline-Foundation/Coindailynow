@@ -3,25 +3,25 @@
 # the new ecosystem.config.js, so duplicates and port collisions are resolved.
 #
 # Current bad state (from `pm2 list`):
-#   - coindaily-backend is DUPLICATED (ids 0 and 6, both cluster mode)
-#   - coindaily-token is on :3005 (collides with CFIS that we're about to deploy)
-#   - coindaily-cfis is missing
-#   - coindaily-ai-pipeline / translation / iengine missing
+#   - sygn-backend is DUPLICATED (ids 0 and 6, both cluster mode)
+#   - sygn-token is on :3005 (collides with CFIS that we're about to deploy)
+#   - sygn-cfis is missing
+#   - sygn-ai-pipeline / translation / iengine missing
 #
 # After this script + the ship-to-contabo PM2 reload, your PM2 list should be:
-#   - coindaily-backend     (cluster, 1 instance)
-#   - coindaily-news        :3000/:3001
-#   - coindaily-admin       :3002
-#   - coindaily-press       :3003
-#   - coindaily-ai          :3004
-#   - coindaily-cfis        :3005   (NEW — finance-system on cabfi.xyz)
-#   - coindaily-token       :3006   (MOVED from 3005)
-#   - coindaily-ai-pipeline         (from ai-system/dist/orchestrator)
-#   - coindaily-iengine
-#   - coindaily-translation :8000
+#   - sygn-backend     (cluster, 1 instance)
+#   - sygn-news        :3000/:3001
+#   - sygn-admin       :3002
+#   - sygn-press       :3003
+#   - sygn-ai          :3004
+#   - sygn-cfis        :3005   (NEW — finance-system on cabfi.xyz)
+#   - sygn-token       :3006   (MOVED from 3005)
+#   - sygn-ai-pipeline         (from ai-system/dist/orchestrator)
+#   - sygn-iengine
+#   - sygn-translation :8000
 
 set -euo pipefail
-REPO=${REPO:-/var/www/coindaily}
+REPO=${REPO:-/var/www/sygn}
 
 cd "$REPO"
 
@@ -29,14 +29,14 @@ echo "==> 1. Show current state"
 pm2 list || true
 echo ""
 
-echo "==> 2. Delete the duplicate coindaily-backend entries"
-# 'pm2 delete coindaily-backend' removes BOTH entries with that name.
+echo "==> 2. Delete the duplicate sygn-backend entries"
+# 'pm2 delete sygn-backend' removes BOTH entries with that name.
 # We then let ecosystem.config.js re-create the right one (cluster, 1 instance).
-pm2 delete coindaily-backend 2>/dev/null || true
+pm2 delete sygn-backend 2>/dev/null || true
 
 echo ""
-echo "==> 3. Stop coindaily-token so we can move it from :3005 → :3006"
-pm2 delete coindaily-token 2>/dev/null || true
+echo "==> 3. Stop sygn-token so we can move it from :3005 → :3006"
+pm2 delete sygn-token 2>/dev/null || true
 
 echo ""
 echo "==> 4. Pull latest"

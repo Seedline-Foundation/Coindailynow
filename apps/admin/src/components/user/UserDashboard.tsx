@@ -602,16 +602,16 @@ function RewardsTab({ user }: { user: User }) {
   const currentAirdrops = [
     {
       id: 1,
-      title: 'CoinDaily Community Airdrop',
-      creator: 'CoinDaily Official',
-      tokenName: 'CoinDaily Token',
+      title: 'Sygn Community Airdrop',
+      creator: 'Sygn Official',
+      tokenName: 'Sygn Token',
       tokenSymbol: 'CDT',
       totalAmount: 10000,
       participants: 2547,
       maxParticipants: 5000,
       amountPerUser: 3.92,
       endDate: '2025-10-15',
-      requirements: ['Follow @CoinDaily', 'Be an active member', 'Hold 50+ JOY tokens'],
+      requirements: ['Follow @Sygn', 'Be an active member', 'Hold 50+ JOY tokens'],
       status: 'active' as const,
       image: '/airdrop-placeholder.png'
     },
@@ -1612,7 +1612,7 @@ function AirdropCreatorModal({ user, onClose }: { user: User; onClose: () => voi
                 value={airdropTitle}
                 onChange={(e) => setAirdropTitle(e.target.value)}
                 className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-100"
-                placeholder="e.g., CoinDaily Community Airdrop"
+                placeholder="e.g., Sygn Community Airdrop"
               />
             </div>
             <div>
@@ -1658,7 +1658,7 @@ function AirdropCreatorModal({ user, onClose }: { user: User; onClose: () => voi
                   value={tokenName}
                   onChange={(e) => setTokenName(e.target.value)}
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-100"
-                  placeholder="e.g., CoinDaily Token"
+                  placeholder="e.g., Sygn Token"
                 />
               </div>
               <div>
@@ -4880,7 +4880,7 @@ function LiveTab({ user, adminControls }: { user: User; adminControls: AdminUser
       id: 1,
       type: 'live',
       title: 'Bitcoin ETF Analysis with Michael Saylor',
-      host: 'CoinDaily Africa',
+      host: 'Sygn Africa',
       viewers: 1250,
       time: 'Live Now',
       thumbnail: '/api/placeholder/300/200',
@@ -5009,7 +5009,7 @@ function LiveTab({ user, adminControls }: { user: User; adminControls: AdminUser
             <h3 className="font-semibold text-gray-900 dark:text-gray-100">Create Your Content</h3>
           </div>
           <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-            Share your expertise through live streams and podcasts with the CoinDaily community.
+            Share your expertise through live streams and podcasts with the Sygn community.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button className="py-3 px-4 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 flex items-center gap-2">
@@ -5347,7 +5347,7 @@ function SupportTab({ user }: { user: User }) {
       description: 'Join our Telegram support group for community help',
       icon: SendIcon,
       available: supportAccess.telegram,
-      action: () => window.open('https://t.me/coindaily_support', '_blank'),
+      action: () => window.open('https://t.me/sygn_support', '_blank'),
       responseTime: '1-2 hours'
     },
     {

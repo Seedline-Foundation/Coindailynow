@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# CoinDaily Token Landing - Contabo Deployment Script
+# Sygn Token Landing - Contabo Deployment Script
 # Run this script on your Contabo server
 
 set -e  # Exit on any error
 
 echo "=========================================="
-echo "🚀 CoinDaily Deployment Starting..."
+echo "🚀 Sygn Deployment Starting..."
 echo "=========================================="
 
 # Configuration

@@ -1,6 +1,6 @@
 /**
  * ArticleHeader - Article Header Component with Metadata
- * CoinDaily Platform - Task 21 Implementation
+ * Sygn Platform - Task 21 Implementation
  */
 
 import React from 'react';
@@ -207,7 +207,7 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
             jobTitle: 'Cryptocurrency Journalist',
             worksFor: {
               '@type': 'Organization',
-              name: 'CoinDaily Africa'
+              name: 'Sygn Africa'
             }
           })
         }}

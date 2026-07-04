@@ -1,6 +1,6 @@
 /**
  * Base Agent Class
- * Foundation for all CoinDaily AI agents
+ * Foundation for all Sygn AI agents
  * Provides: Ollama integration, metrics tracking, retry logic, health monitoring
  * 
  * All agents use self-hosted models:
@@ -173,7 +173,7 @@ function generateMockResponse(prompt: string, format?: 'json'): string {
     }
     if (p.includes('support') || p.includes('customer') || p.includes('help')) {
       return JSON.stringify({
-        response: 'To buy Bitcoin using M-Pesa on CoinDaily: 1) Create an account 2) Go to Buy/Sell 3) Select M-Pesa as payment 4) Enter amount 5) Complete the M-Pesa prompt on your phone.',
+        response: 'To buy Bitcoin using M-Pesa on Sygn: 1) Create an account 2) Go to Buy/Sell 3) Select M-Pesa as payment 4) Enter amount 5) Complete the M-Pesa prompt on your phone.',
         category: 'how_to',
         sentiment: 'helpful',
         escalationNeeded: false,

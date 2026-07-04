@@ -1,6 +1,6 @@
-# CoinDaily Financial Intelligence System (CFIS)
+# Sygn Financial Intelligence System (CFIS)
 
-CFIS is a standalone, secure financial operating system for the CoinDaily ecosystem.
+CFIS is a standalone, secure financial operating system for the Sygn ecosystem.
 
 ## Modules
 
@@ -13,7 +13,7 @@ CFIS is a standalone, secure financial operating system for the CoinDaily ecosys
 
 ## Setup
 
-1.  Navigate to `coindaily-finance-system`.
+1.  Navigate to `sygn-finance-system`.
 2.  Install dependencies: `npm install`
 3.  Configure `.env` (see `.env.example`).
 4.  Run development server: `npm run dev`

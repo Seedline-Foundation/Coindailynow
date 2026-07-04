@@ -1,5 +1,5 @@
 /**
- * CoinDaily launch load test — run on Contabo or CI against production/staging.
+ * Sygn launch load test — run on Contabo or CI against production/staging.
  *
  * Install: https://k6.io/docs/get-started/installation/
  * Run:

@@ -1,11 +1,11 @@
-# CoinDaily - Africa's Premier Cryptocurrency News Platform
+# Sygn - Africa's Premier Cryptocurrency News Platform
 
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.0-black)](https://nextjs.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-CoinDaily is Africa's premier cryptocurrency and memecoin news platform featuring AI-driven content generation, real-time market data, custom CMS, multi-language support, and Reddit-like community features.
+Sygn is Africa's premier cryptocurrency and memecoin news platform featuring AI-driven content generation, real-time market data, custom CMS, multi-language support, and Reddit-like community features.
 
 ## 🚀 Quick Start
 
@@ -17,7 +17,7 @@ CoinDaily is Africa's premier cryptocurrency and memecoin news platform featurin
 ### 1. Clone and Setup
 ```bash
 git clone <repository-url>
-cd coindaily-platform
+cd sygn-platform
 
 # Copy environment file
 cp .env.example .env.local
@@ -66,7 +66,7 @@ npm run dev
 ## 📁 Project Structure
 
 ```
-coindaily-platform/
+sygn-platform/
 ├── backend/                    # Node.js/Express backend
 │   ├── src/
 │   │   ├── api/               # GraphQL schema & resolvers
@@ -91,7 +91,7 @@ coindaily-platform/
 │   ├── docker/                # Docker Compose files
 │   └── scripts/               # Deployment scripts
 └── specs/                     # Project specifications
-    └── 002-coindaily-africa-s/
+    └── 002-sygn-africa-s/
         ├── plan.md            # Implementation plan
         ├── data-model.md      # Database schema
         ├── graphql-schema.graphql # API contracts
@@ -288,10 +288,10 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## 📚 Documentation
 
-- **[Quick Start Guide](specs/002-coindaily-africa-s/quickstart.md)**: Complete setup instructions
-- **[API Documentation](specs/002-coindaily-africa-s/graphql-schema.graphql)**: GraphQL schema and REST APIs
-- **[Data Model](specs/002-coindaily-africa-s/data-model.md)**: Database schema and relationships
-- **[Implementation Plan](specs/002-coindaily-africa-s/plan.md)**: Development roadmap and phases
+- **[Quick Start Guide](specs/002-sygn-africa-s/quickstart.md)**: Complete setup instructions
+- **[API Documentation](specs/002-sygn-africa-s/graphql-schema.graphql)**: GraphQL schema and REST APIs
+- **[Data Model](specs/002-sygn-africa-s/data-model.md)**: Database schema and relationships
+- **[Implementation Plan](specs/002-sygn-africa-s/plan.md)**: Development roadmap and phases
 
 ## 🤝 Contributing
 
@@ -320,4 +320,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**CoinDaily Africa** - Empowering Africa's crypto community with quality content and insights.
+**Sygn Africa** - Empowering Africa's crypto community with quality content and insights.

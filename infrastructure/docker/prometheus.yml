@@ -8,7 +8,7 @@ rule_files:
 
 scrape_configs:
   # ── Backend API ─────────────────────────────────────────
-  - job_name: 'coindaily-backend'
+  - job_name: 'sygn-backend'
     metrics_path: '/metrics'
     static_configs:
       - targets: ['host.docker.internal:4000']
@@ -17,7 +17,7 @@ scrape_configs:
           env: 'production'
 
   # ── Frontend (Next.js) ──────────────────────────────────
-  - job_name: 'coindaily-frontend'
+  - job_name: 'sygn-frontend'
     metrics_path: '/api/metrics'
     static_configs:
       - targets: ['host.docker.internal:3000']
@@ -26,7 +26,7 @@ scrape_configs:
           env: 'production'
 
   # ── Finance System ─────────────────────────────────────
-  - job_name: 'coindaily-finance'
+  - job_name: 'sygn-finance'
     metrics_path: '/metrics'
     static_configs:
       - targets: ['host.docker.internal:3005']
@@ -68,4 +68,4 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: coindaily-blackbox:9115
+        replacement: sygn-blackbox:9115

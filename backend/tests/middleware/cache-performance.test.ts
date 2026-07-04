@@ -96,7 +96,7 @@ describe('Cache Middleware Performance Tests', () => {
 
       await cacheService.invalidateContent('article');
 
-      expect(mockRedis.keys).toHaveBeenCalledWith('coindaily:article*');
+      expect(mockRedis.keys).toHaveBeenCalledWith('sygn:article*');
       expect(mockRedis.del).toHaveBeenCalled();
     });
   });
@@ -206,13 +206,13 @@ describe('Cache Middleware Performance Tests', () => {
       expect(key1).not.toBe(key3);
       
       // Keys should be deterministic and hashed
-      expect(key1).toMatch(/^coindaily:articles:/);
+      expect(key1).toMatch(/^sygn:articles:/);
       expect(key1.length).toBeGreaterThan(20); // Should be hashed/shortened
       expect(key3.length).toBeGreaterThan(20); // Should be hashed/shortened
       
       // Both keys should have same prefix but different suffixes
-      expect(key1.startsWith('coindaily:articles:')).toBeTruthy();
-      expect(key3.startsWith('coindaily:articles:')).toBeTruthy();
+      expect(key1.startsWith('sygn:articles:')).toBeTruthy();
+      expect(key3.startsWith('sygn:articles:')).toBeTruthy();
       expect(key1.split(':')[2]).not.toBe(key3.split(':')[2]); // Different hash parts
     });
   });

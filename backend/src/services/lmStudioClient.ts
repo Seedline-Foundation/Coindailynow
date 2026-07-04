@@ -1,6 +1,6 @@
 /**
  * LM Studio Client - OpenAI-Compatible API
- * Production-ready text generation for CoinDaily
+ * Production-ready text generation for Sygn
  * 
  * Replaces: OpenAI GPT-4 for article writing, headlines, categorization
  * Benefits: €300/month savings, faster responses, full control
@@ -119,7 +119,7 @@ class LMStudioClient {
     const messages: ChatMessage[] = [
       {
         role: 'system',
-        content: `You are a professional cryptocurrency content writer for CoinDaily Africa, the premier crypto news platform for African markets.
+        content: `You are a professional cryptocurrency content writer for Sygn Africa, the premier crypto news platform for African markets.
 
 Your writing style:
 - Clear, engaging, and accessible to both beginners and experts
@@ -132,7 +132,7 @@ CRITICAL: Respond ONLY with valid JSON. No markdown formatting, no code blocks, 
       },
       {
         role: 'user',
-        content: `Rewrite this ${category} article for CoinDaily Africa.
+        content: `Rewrite this ${category} article for Sygn Africa.
 
 Requirements:
 - Make it 80%+ unique (avoid plagiarism)
@@ -332,7 +332,7 @@ Provide ONLY valid JSON:
     const messages: ChatMessage[] = [
       {
         role: 'system',
-        content: `You are a senior content quality reviewer for CoinDaily Africa, ensuring all published content meets high standards.
+        content: `You are a senior content quality reviewer for Sygn Africa, ensuring all published content meets high standards.
 
 Review criteria:
 - Factual accuracy (no false claims)

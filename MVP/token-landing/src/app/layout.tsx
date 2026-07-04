@@ -13,8 +13,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Joy Token ($JY) - Africa\'s Premier Crypto Utility Token',
-  description: 'Join the Joy Token presale. Real yield staking up to 70% APR. Deflationary tokenomics with 6M max supply. Powering CoinDaily\'s African crypto ecosystem.',
-  keywords: 'Joy Token, JY Token, crypto presale, African crypto, staking rewards, deflationary token, real yield, CoinDaily',
+  description: 'Join the Joy Token presale. Real yield staking up to 70% APR. Deflationary tokenomics with 6M max supply. Powering Sygn\'s African crypto ecosystem.',
+  keywords: 'Joy Token, JY Token, crypto presale, African crypto, staking rewards, deflationary token, real yield, Sygn',
   openGraph: {
     title: 'Joy Token ($JY) - Don\'t Miss the Presale',
     description: 'Limited supply. Real utility. Up to 70% staking APR. Join Africa\'s crypto revolution.',

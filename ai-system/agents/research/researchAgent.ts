@@ -357,7 +357,7 @@ export class ResearchAgent {
         title: a.title || 'Untitled',
         published_at: new Date(a.publishedAt || a.published_at || Date.now()),
         credibility_score: Math.min(99, 70 + (a.sourceCredibility || 0) * 30),
-        domain: (a.source || a.sourceName || 'coindaily').toString(),
+        domain: (a.source || a.sourceName || 'sygn').toString(),
       }));
 
       const mergedSources = this.deduplicateSources([...freshSources, ...originalResearch.sources]);
@@ -708,7 +708,7 @@ export class ResearchAgent {
     try {
       return new URL(this.normalizeUrl(a)).hostname;
     } catch {
-      return 'coindaily';
+      return 'sygn';
     }
   }
 

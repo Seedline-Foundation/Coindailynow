@@ -14,7 +14,7 @@ export class ContractAgent extends BaseAgent {
       name: 'Contract Agent',
       type: 'contract',
       category: 'legal',
-      description: 'Drafts, reviews, and manages contracts including advertising agreements, partnership deals, subscription terms, contributor agreements, and vendor contracts for CoinDaily platform.',
+      description: 'Drafts, reviews, and manages contracts including advertising agreements, partnership deals, subscription terms, contributor agreements, and vendor contracts for Sygn platform.',
       capabilities: [
         'contract_drafting',
         'contract_review',
@@ -60,7 +60,7 @@ export class ContractAgent extends BaseAgent {
   }
 
   private async draftContract(contractType: string, data: any): Promise<Record<string, any>> {
-    const prompt = `Draft a ${contractType || 'advertising'} contract for CoinDaily:
+    const prompt = `Draft a ${contractType || 'advertising'} contract for Sygn:
 
 Details: ${JSON.stringify(data || {}, null, 2)}
 
@@ -104,7 +104,7 @@ Return JSON:
   }
 
   private async reviewContract(contract: any): Promise<Record<string, any>> {
-    const prompt = `Review this contract for CoinDaily:
+    const prompt = `Review this contract for Sygn:
 
 Contract: ${JSON.stringify(contract || {}, null, 2)}
 
@@ -125,7 +125,7 @@ Return JSON:
       }
     ],
     "missingClauses": [{"clause": string, "importance": string, "suggestedText": string}],
-    "favorability": {"forCoinDaily": number, "forCounterparty": number},
+    "favorability": {"forSygn": number, "forCounterparty": number},
     "cryptoCompliance": {"compliant": boolean, "issues": [string]},
     "africanLegalConsiderations": [{"country": string, "consideration": string}],
     "negotiationPoints": [{"point": string, "priority": string, "approach": string}],
@@ -138,7 +138,7 @@ Return JSON:
   }
 
   private async generateTerms(data: any): Promise<Record<string, any>> {
-    const prompt = `Generate Terms of Service / legal terms for CoinDaily:
+    const prompt = `Generate Terms of Service / legal terms for Sygn:
 
 Type: ${JSON.stringify(data || {}, null, 2)}
 

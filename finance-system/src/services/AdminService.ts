@@ -115,7 +115,7 @@ class AdminService {
 
   private buildTOTP(email: string, secret: string): TOTP {
     return new TOTP({
-      issuer: 'CoinDaily CFIS',
+      issuer: 'Sygn CFIS',
       label: email,
       algorithm: 'SHA1',
       digits: 6,

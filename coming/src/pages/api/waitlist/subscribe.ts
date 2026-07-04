@@ -62,16 +62,16 @@ export default async function handler(
     // Send welcome email via Resend
     try {
       await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'CoinDaily <noreply@coindaily.com>',
+        from: process.env.RESEND_FROM_EMAIL || 'Sygn <noreply@sygn.com>',
         to: email,
-        subject: 'Welcome to CoinDaily Waitlist! 🚀',
+        subject: 'Welcome to Sygn Waitlist! 🚀',
         html: `
           <!DOCTYPE html>
           <html>
             <head>
               <meta charset="utf-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Welcome to CoinDaily</title>
+              <title>Welcome to Sygn</title>
             </head>
             <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 40px 20px;">
@@ -81,7 +81,7 @@ export default async function handler(
                       <!-- Header -->
                       <tr>
                         <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center;">
-                          <h1 style="margin: 0; color: #ffffff; font-size: 36px; font-weight: bold;">CoinDaily</h1>
+                          <h1 style="margin: 0; color: #ffffff; font-size: 36px; font-weight: bold;">Sygn</h1>
                           <p style="margin: 10px 0 0; color: #ffffff; font-size: 16px;">Africa's Premier Crypto News Platform</p>
                         </td>
                       </tr>
@@ -92,12 +92,12 @@ export default async function handler(
                           <h2 style="margin: 0 0 20px; color: #333333; font-size: 24px;">Welcome to the Waitlist! 🎉</h2>
                           
                           <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">
-                            Thank you for joining the CoinDaily waitlist! You're now part of an exclusive group that will get 
+                            Thank you for joining the Sygn waitlist! You're now part of an exclusive group that will get 
                             early access to Africa's first AI-powered cryptocurrency and memecoin news platform.
                           </p>
                           
                           <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">
-                            Here's what you can expect from CoinDaily:
+                            Here's what you can expect from Sygn:
                           </p>
                           
                           <ul style="margin: 0 0 20px; color: #666666; font-size: 16px; line-height: 1.8; padding-left: 20px;">
@@ -132,12 +132,12 @@ export default async function handler(
                             Follow us on social media
                           </p>
                           <div style="margin: 0 0 15px;">
-                            <a href="https://twitter.com/coindaily" style="color: #667eea; text-decoration: none; margin: 0 10px;">Twitter</a>
-                            <a href="https://t.me/coindaily" style="color: #667eea; text-decoration: none; margin: 0 10px;">Telegram</a>
-                            <a href="https://github.com/coindaily" style="color: #667eea; text-decoration: none; margin: 0 10px;">GitHub</a>
+                            <a href="https://twitter.com/sygn" style="color: #667eea; text-decoration: none; margin: 0 10px;">Twitter</a>
+                            <a href="https://t.me/sygn" style="color: #667eea; text-decoration: none; margin: 0 10px;">Telegram</a>
+                            <a href="https://github.com/sygn" style="color: #667eea; text-decoration: none; margin: 0 10px;">GitHub</a>
                           </div>
                           <p style="margin: 0; color: #999999; font-size: 12px;">
-                            © 2025 CoinDaily. All rights reserved.
+                            © 2025 Sygn. All rights reserved.
                           </p>
                         </td>
                       </tr>

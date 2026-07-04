@@ -167,7 +167,7 @@ This is a standalone project. For main platform contributions, see the main repo
 
 ## 📄 License
 
-Proprietary - CoinDaily Platform
+Proprietary - Sygn Platform
 
 ## 🆘 Support
 

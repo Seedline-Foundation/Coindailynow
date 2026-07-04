@@ -160,7 +160,7 @@ async function callDeepSeekR1(
 // ANALYSIS PROMPTS
 // ============================================================================
 
-const ANALYSIS_SYSTEM_PROMPT = `You are an expert financial and market data analyst for CoinDaily, Africa's premier cryptocurrency news platform. Your role is to analyze news data and market trends to produce insightful, actionable reports.
+const ANALYSIS_SYSTEM_PROMPT = `You are an expert financial and market data analyst for Sygn, Africa's premier cryptocurrency news platform. Your role is to analyze news data and market trends to produce insightful, actionable reports.
 
 Your analysis should:
 1. Identify significant market trends and patterns

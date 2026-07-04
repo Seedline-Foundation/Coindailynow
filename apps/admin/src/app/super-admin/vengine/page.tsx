@@ -1,167 +1,160 @@
 'use client';
 
-import React, { useState } from 'react';
+/**
+ * /admin/videos — list of video pipeline runs (P6.7).
+ * Filter by status; click into a run for review.
+ */
 
-const mockVideoJobs = [
-  { id: '1', title: 'BTC & Nigeria CBN Q3 2026', jobType: 'SHORT', status: 'PUBLISHED', provider: 'WAN21', duration: 60, views: 12400, likes: 890, date: '2026-05-18' },
-  { id: '2', title: 'Kenya VASP: 6 Month Report', jobType: 'LONG', status: 'REVIEW', provider: 'WAN21', duration: 180, views: 0, likes: 0, date: '2026-05-19' },
-  { id: '3', title: 'Jamaica Stablecoin Guide', jobType: 'SHORT', status: 'GENERATING', provider: 'COGVIDEOX', duration: 60, views: 0, likes: 0, date: '2026-05-20' },
-  { id: '4', title: 'Brazil DeFi TVL Analysis', jobType: 'SOCIAL_CLIP', status: 'SCRIPTING', provider: 'WAN21', duration: 30, views: 0, likes: 0, date: '2026-05-20' },
-  { id: '5', title: 'CHIMA EMAI Index Explainer', jobType: 'EXPLAINER', status: 'PENDING', provider: null, duration: 120, views: 0, likes: 0, date: '2026-05-20' },
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { Loader2, AlertCircle, CheckCircle2, Clock, PlayCircle, RefreshCw, Filter, Film } from 'lucide-react';
+import { getAccessToken } from '@/lib/auth';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+
+interface VideoRunRow {
+  id: string;
+  articleId: string;
+  status: 'RUNNING' | 'READY_FOR_REVIEW' | 'APPROVED' | 'REJECTED' | 'FAILED' | string;
+  totalDurationMs: number | null;
+  totalCostUsd: string | null;
+  createdAt: string;
+  assets: Array<{ format: string; url: string; provider: string | null }>;
+}
+
+const STATUS_OPTIONS = [
+  { value: 'READY_FOR_REVIEW', label: 'Ready for review' },
+  { value: 'RUNNING', label: 'Running' },
+  { value: 'APPROVED', label: 'Approved' },
+  { value: 'REJECTED', label: 'Rejected' },
+  { value: 'FAILED', label: 'Failed' },
 ];
 
-const mockStats = {
-  totalVideos: 234,
-  publishedVideos: 198,
-  totalViews: 456_000,
-  totalLikes: 32_400,
-  avgEngagement: 7.1,
-  generationCost: 42.80,
-  queueDepth: 3,
-};
+export default function VideosListPage() {
+  const [status, setStatus] = useState('READY_FOR_REVIEW');
+  const [runs, setRuns] = useState<VideoRunRow[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const providers = [
-  { id: 'WAN21', name: 'Wan2.1', status: 'Active', type: 'Self-hosted', cost: 'Free', maxDuration: '15s' },
-  { id: 'COGVIDEOX', name: 'CogVideoX', status: 'Active', type: 'Self-hosted', cost: 'Free', maxDuration: '10s' },
-  { id: 'KLING', name: 'Kling AI', status: 'Not Configured', type: 'Cloud API', cost: '$0.05/s', maxDuration: '60s' },
-  { id: 'RUNWAY', name: 'Runway ML', status: 'Not Configured', type: 'Cloud API', cost: '$0.10/s', maxDuration: '30s' },
-];
+  const headers = useMemo(() => {
+    const t = getAccessToken();
+    return t ? { Authorization: `Bearer ${t}` } : null;
+  }, []);
 
-const statusColors: Record<string, string> = {
-  PENDING: 'bg-gray-100 text-gray-700',
-  SCRIPTING: 'bg-blue-100 text-blue-700',
-  GENERATING: 'bg-yellow-100 text-yellow-700',
-  COMPOSING: 'bg-purple-100 text-purple-700',
-  REVIEW: 'bg-orange-100 text-orange-700',
-  PUBLISHED: 'bg-green-100 text-green-700',
-  FAILED: 'bg-red-100 text-red-700',
-};
+  const refresh = useCallback(async () => {
+    if (!headers) {
+      setError('Not authenticated');
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/video-runs?status=${encodeURIComponent(status)}&limit=100`, { headers });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = (await res.json()) as { runs: VideoRunRow[] };
+      setRuns(json.runs || []);
+      setError(null);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [headers, status]);
 
-export default function VengineDashboard() {
-  const [tab, setTab] = useState<'jobs' | 'providers' | 'distribution'>('jobs');
+  useEffect(() => { refresh(); }, [refresh]);
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-6 space-y-4">
+      <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vengine — Video Generation Pipeline</h1>
-          <p className="text-sm text-gray-500">AI-powered video generation from articles — Script, Generate, Distribute</p>
+          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2 dark:text-gray-100">
+            <Film className="h-5 w-5 text-indigo-600" /> Video pipeline
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Per-article video runs. Short (60s vertical) + long (3-5 min landscape) outputs.
+          </p>
         </div>
-        <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">
-          Generate Video
-        </button>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-        {[
-          { label: 'Total Videos', value: mockStats.totalVideos, color: 'text-indigo-600' },
-          { label: 'Published', value: mockStats.publishedVideos, color: 'text-green-600' },
-          { label: 'Total Views', value: `${(mockStats.totalViews / 1000).toFixed(0)}K`, color: 'text-blue-600' },
-          { label: 'Total Likes', value: `${(mockStats.totalLikes / 1000).toFixed(1)}K`, color: 'text-red-500' },
-          { label: 'Engagement', value: `${mockStats.avgEngagement}%`, color: 'text-orange-600' },
-          { label: 'Gen Cost (MTD)', value: `$${mockStats.generationCost}`, color: 'text-purple-600' },
-          { label: 'Queue', value: mockStats.queueDepth, color: 'text-yellow-600' },
-        ].map(s => (
-          <div key={s.label} className="bg-white rounded-xl border p-3">
-            <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-gray-500">{s.label}</p>
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center gap-1 rounded-lg border bg-white px-2 py-1 text-xs dark:bg-gray-800">
+            <Filter className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+            <select value={status} onChange={e => setStatus(e.target.value)} className="bg-transparent text-xs focus:outline-none">
+              {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
           </div>
-        ))}
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-2">
-        {[
-          { key: 'jobs', label: 'Video Jobs' },
-          { key: 'providers', label: 'Providers' },
-          { key: 'distribution', label: 'Distribution' },
-        ].map(t => (
-          <button key={t.key} onClick={() => setTab(t.key as any)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${tab === t.key ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-            {t.label}
+          <button
+            type="button"
+            onClick={refresh}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 rounded-lg border bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-800 dark:hover:bg-gray-700/50 dark:text-gray-300"
+          >
+            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+            Refresh
           </button>
-        ))}
-      </div>
+        </div>
+      </header>
 
-      {tab === 'jobs' && (
-        <div className="bg-white rounded-xl border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="text-left p-3 font-medium text-gray-500">Video</th>
-                <th className="text-left p-3 font-medium text-gray-500">Type</th>
-                <th className="text-left p-3 font-medium text-gray-500">Status</th>
-                <th className="text-left p-3 font-medium text-gray-500">Provider</th>
-                <th className="text-right p-3 font-medium text-gray-500">Duration</th>
-                <th className="text-right p-3 font-medium text-gray-500">Views</th>
-                <th className="text-right p-3 font-medium text-gray-500">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mockVideoJobs.map(job => (
-                <tr key={job.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 font-medium text-gray-900">{job.title}</td>
-                  <td className="p-3 text-gray-600">{job.jobType}</td>
-                  <td className="p-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[job.status]}`}>{job.status}</span>
-                  </td>
-                  <td className="p-3 text-gray-600">{job.provider || '—'}</td>
-                  <td className="p-3 text-right text-gray-600">{job.duration}s</td>
-                  <td className="p-3 text-right text-gray-600">{job.views > 0 ? job.views.toLocaleString() : '—'}</td>
-                  <td className="p-3 text-right text-gray-500">{job.date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {error && (
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20">
+          <AlertCircle className="h-4 w-4" />
+          {error}
         </div>
       )}
 
-      {tab === 'providers' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {providers.map(p => (
-            <div key={p.id} className={`bg-white rounded-xl border-2 p-5 ${p.status === 'Active' ? 'border-green-200' : 'border-gray-200'}`}>
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="font-bold text-gray-900">{p.name}</h3>
-                  <p className="text-xs text-gray-500">{p.type}</p>
+      {!loading && runs && runs.length === 0 && (
+        <div className="rounded-xl border bg-gray-50 p-6 text-center text-sm text-gray-500 dark:bg-gray-900/40 dark:text-gray-400">
+          No video runs with status <span className="font-mono">{status}</span>.
+          {status === 'READY_FOR_REVIEW' && (
+            <span className="block mt-1">Runs are auto-created when an article is approved & published.</span>
+          )}
+        </div>
+      )}
+
+      <ul className="divide-y rounded-xl border bg-white dark:bg-gray-800">
+        {runs?.map(run => (
+          <li key={run.id} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+            <div className="flex items-center gap-3">
+              <StatusIcon status={run.status} />
+              <div className="flex-1 min-w-0">
+                <Link href={`/super-admin/vengine/${run.id}`} className="font-medium text-gray-900 hover:text-indigo-700 dark:text-gray-100">
+                  Article {run.articleId.slice(0, 8)}…
+                </Link>
+                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+                  <span className="font-mono">{run.id.slice(0, 8)}…</span>
+                  <span>· {new Date(run.createdAt).toLocaleString()}</span>
+                  {run.assets.map(a => (
+                    <span
+                      key={a.format}
+                      className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                        a.format === 'SHORT' ? 'bg-indigo-100 text-indigo-700' :
+                        a.format === 'LONG' ? 'bg-purple-100 text-purple-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {a.format} · {a.provider}
+                    </span>
+                  ))}
+                  {typeof run.totalDurationMs === 'number' && (
+                    <span>⏱ {(run.totalDurationMs / 1000).toFixed(1)}s pipeline</span>
+                  )}
                 </div>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${p.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                  {p.status}
-                </span>
               </div>
-              <div className="flex gap-4 text-xs text-gray-600">
-                <span>Cost: {p.cost}</span>
-                <span>Max: {p.maxDuration}</span>
-              </div>
+              <Link href={`/super-admin/vengine/${run.id}`} className="shrink-0 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700">
+                Open
+              </Link>
             </div>
-          ))}
-        </div>
-      )}
-
-      {tab === 'distribution' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { platform: 'YouTube', videos: 198, views: 234000, enabled: true },
-            { platform: 'TikTok', videos: 198, views: 156000, enabled: true },
-            { platform: 'Instagram Reels', videos: 150, views: 45000, enabled: true },
-            { platform: 'Twitter/X', videos: 120, views: 21000, enabled: true },
-          ].map(p => (
-            <div key={p.platform} className="bg-white rounded-xl border p-5">
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="font-bold text-gray-900">{p.platform}</h3>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${p.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                  {p.enabled ? 'Active' : 'Disabled'}
-                </span>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-gray-600">{p.videos} videos published</p>
-                <p className="text-sm text-gray-600">{(p.views / 1000).toFixed(0)}K total views</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
+}
+
+function StatusIcon({ status }: { status: string }) {
+  switch (status) {
+    case 'READY_FOR_REVIEW': return <PlayCircle className="h-4 w-4 text-indigo-600" />;
+    case 'RUNNING': return <Loader2 className="h-4 w-4 animate-spin text-blue-600" />;
+    case 'APPROVED': return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+    case 'FAILED': return <AlertCircle className="h-4 w-4 text-red-600" />;
+    default: return <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />;
+  }
 }

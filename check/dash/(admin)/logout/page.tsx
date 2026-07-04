@@ -2,8 +2,8 @@ import LogoutPage from '@/components/auth/LogoutPage';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Admin Logout | CoinDaily CMS',
-  description: 'Secure admin logout from CoinDaily content management system.',
+  title: 'Admin Logout | Sygn CMS',
+  description: 'Secure admin logout from Sygn content management system.',
   robots: 'noindex, nofollow',
 };
 

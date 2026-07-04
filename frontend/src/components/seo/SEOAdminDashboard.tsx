@@ -114,7 +114,7 @@ export default function SEOAdminDashboard() {
         id: '3',
         contentId: 'page-about',
         contentType: 'page',
-        title: 'About CoinDaily',
+        title: 'About Sygn',
         score: 92,
         lastUpdated: '2025-01-06T09:15:00Z',
         status: 'active',

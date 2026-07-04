@@ -198,7 +198,7 @@ export class FinanceEmailService {
             </p>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
             <p>This is an automated message. Please do not reply to this email.</p>
           </div>
         </div>
@@ -292,7 +292,7 @@ export class FinanceEmailService {
             </p>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -366,7 +366,7 @@ export class FinanceEmailService {
             </div>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -438,7 +438,7 @@ export class FinanceEmailService {
             </div>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -520,7 +520,7 @@ export class FinanceEmailService {
             </div>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -623,7 +623,7 @@ export class FinanceEmailService {
             ` : ''}
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -697,7 +697,7 @@ export class FinanceEmailService {
               <strong>⚠️ Security Notice:</strong>
               <ul style="margin: 10px 0; padding-left: 20px;">
                 <li>Never share this code with anyone</li>
-                <li>CoinDaily staff will never ask for your OTP code</li>
+                <li>Sygn staff will never ask for your OTP code</li>
                 <li>If you did not request this code, please contact support immediately</li>
                 <li>This code can only be used once</li>
               </ul>
@@ -708,7 +708,7 @@ export class FinanceEmailService {
             </p>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
             <p>This is a security-critical email. Do not forward or share.</p>
           </div>
         </div>
@@ -793,7 +793,7 @@ export class FinanceEmailService {
             </div>
             
             <p><strong>Hi ${data.username},</strong></p>
-            <p>We detected unusual activity on your CoinDaily account. This alert is sent to help protect your account security.</p>
+            <p>We detected unusual activity on your Sygn account. This alert is sent to help protect your account security.</p>
             
             ${data.actionRequired ? `
               <div class="action-box">
@@ -821,7 +821,7 @@ export class FinanceEmailService {
             </p>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
             <p>This is a security-critical notification. Please do not ignore.</p>
           </div>
         </div>
@@ -954,7 +954,7 @@ export class FinanceEmailService {
             </p>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
             <p>
               <a href="${process.env.FRONTEND_URL}/settings/notifications" style="color: #667eea;">Manage Email Preferences</a>
             </p>
@@ -966,7 +966,7 @@ export class FinanceEmailService {
 
     return emailService.sendEmail({
       to: email,
-      subject: `📊 Your ${periodTitle} Financial Summary - CoinDaily`,
+      subject: `📊 Your ${periodTitle} Financial Summary - Sygn`,
       html,
     });
   }

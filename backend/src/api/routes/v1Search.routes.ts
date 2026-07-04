@@ -115,13 +115,13 @@ async function tryElasticsearch(
     };
 
     // P5.A4 — route to the per-language index when lang is specified.
-    //  - explicit lang → `coindaily_articles_<lang>` only
+    //  - explicit lang → `sygn_articles_<lang>` only
     //  - lang='any' or unspecified → wildcard across every language index
     //    AND the legacy single index, for backwards-compat during rollout.
     const targetIndex =
       filters.lang && filters.lang !== 'any'
-        ? `coindaily_articles_${filters.lang.toLowerCase()}`
-        : 'coindaily_articles_*,coindaily_articles';
+        ? `sygn_articles_${filters.lang.toLowerCase()}`
+        : 'sygn_articles_*,sygn_articles';
 
     const start = Date.now();
     const res = await client.search({
@@ -376,7 +376,7 @@ router.get('/by-slug', async (req: Request, res: Response) => {
       try {
         const client = new Client({ node: esUrl, requestTimeout: 5000 });
         const r: any = await client.search({
-          index: `coindaily_articles_${lang}`,
+          index: `sygn_articles_${lang}`,
           body: {
             size: 1,
             query: { bool: { filter: [{ term: { slug } }] } },
@@ -441,7 +441,7 @@ router.get('/by-slug', async (req: Request, res: Response) => {
  * P5.B3 — GET /api/v1/search/by-language?lang=Y&page=N&limit=20
  *
  * List recent published articles available in a given language. Pulls from
- * `coindaily_articles_<lang>` ordered by publishedAt desc; falls back to
+ * `sygn_articles_<lang>` ordered by publishedAt desc; falls back to
  * Prisma Article + ArticleTranslation if ES is down.
  */
 router.get('/by-language', async (req: Request, res: Response) => {
@@ -459,7 +459,7 @@ router.get('/by-language', async (req: Request, res: Response) => {
       try {
         const client = new Client({ node: esUrl, requestTimeout: 5000 });
         const r: any = await client.search({
-          index: `coindaily_articles_${lang}`,
+          index: `sygn_articles_${lang}`,
           body: {
             from,
             size: limit,

@@ -1,6 +1,6 @@
 {
-  "name": "CoinDaily Africa - Premier Cryptocurrency News Platform",
-  "short_name": "CoinDaily",
+  "name": "Sygn Africa - Premier Cryptocurrency News Platform",
+  "short_name": "Sygn",
   "description": "Africa's premier cryptocurrency and memecoin news platform with AI-driven content generation, real-time market data, and community features",
   "start_url": "/",
   "display": "standalone",
@@ -100,11 +100,11 @@
   "related_applications": [
     {
       "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=africa.coindaily.app"
+      "url": "https://play.google.com/store/apps/details?id=africa.sygn.app"
     },
     {
       "platform": "itunes",
-      "url": "https://apps.apple.com/app/coindaily-africa/id123456789"
+      "url": "https://apps.apple.com/app/sygn-africa/id123456789"
     }
   ],
   "prefer_related_applications": false,

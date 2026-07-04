@@ -1,34 +1,34 @@
 owner: nicefacer
-repo: coindaily-status
+repo: sygn-status
 
 sites:
-  - name: CoinDaily News
+  - name: Sygn News
     url: https://sygn.live
     expectedStatusCodes:
       - 200
       - 301
       - 302
 
-  - name: CoinDaily API
+  - name: Sygn API
     url: https://api.sygn.live/health
     expectedStatusCodes:
       - 200
 
-  - name: CoinDaily Admin
+  - name: Sygn Admin
     url: https://jet.sygn.live
     expectedStatusCodes:
       - 200
       - 301
       - 302
 
-  - name: CoinDaily Press
+  - name: Sygn Press
     url: https://press.sygn.live
     expectedStatusCodes:
       - 200
       - 301
       - 302
 
-  - name: CoinDaily AI
+  - name: Sygn AI
     url: https://ai.sygn.live
     expectedStatusCodes:
       - 200
@@ -37,11 +37,11 @@ sites:
 
 status-website:
   cname: status.sygn.live
-  name: CoinDaily Status
+  name: Sygn Status
   theme: dark
   logoUrl: https://sygn.live/og-image.png
   navbar:
-    - title: CoinDaily
+    - title: Sygn
       href: https://sygn.live
     - title: News
       href: https://sygn.live/news

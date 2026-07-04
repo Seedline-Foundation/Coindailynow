@@ -4,7 +4,7 @@
  * Per-language Elasticsearch indexes — one "directory" per language so the
  * reader's locale-scoped search hits a single, tightly-tuned index.
  *
- * Index naming:   coindaily_articles_<lang>   (e.g. coindaily_articles_sw)
+ * Index naming:   sygn_articles_<lang>   (e.g. sygn_articles_sw)
  * Document _id:   <articleId>_<lang>          (article + its translation share parent articleId)
  *
  * Each doc carries:
@@ -23,7 +23,7 @@ import { logger } from '../utils/logger';
 const ES_NODE = process.env.ELASTICSEARCH_NODE || process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
 const ES_USER = process.env.ELASTICSEARCH_USERNAME || '';
 const ES_PASS = process.env.ELASTICSEARCH_PASSWORD || '';
-const INDEX_PREFIX = 'coindaily_articles_';
+const INDEX_PREFIX = 'sygn_articles_';
 
 /**
  * Language → ES analyzer mapping. Built-in ES analyzers:

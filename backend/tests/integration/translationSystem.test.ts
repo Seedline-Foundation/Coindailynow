@@ -52,7 +52,7 @@ describeWithDb('Translation System Integration - Task 7', () => {
       const user = await prisma.user.create({
         data: {
           id: `user-test-${Date.now()}`,
-          email: 'author@coindaily.co',
+          email: 'author@sygn.co',
           username: 'testauthor',
           passwordHash: 'hashedpassword',
           role: 'CONTENT_ADMIN',
@@ -150,7 +150,7 @@ describeWithDb('Translation System Integration - Task 7', () => {
       const user = await prisma.user.create({
         data: {
           id: `user-test-${Date.now() + 1}`,
-          email: 'editor@coindaily.co',
+          email: 'editor@sygn.co',
           username: 'testeditor',
           passwordHash: 'hashedpassword',
           role: 'CONTENT_ADMIN',
@@ -239,7 +239,7 @@ describeWithDb('Translation System Integration - Task 7', () => {
       const user = await prisma.user.create({
         data: {
           id: `user-test-${Date.now() + 4}`,
-          email: 'admin@coindaily.co',
+          email: 'admin@sygn.co',
           username: 'testadmin',
           passwordHash: 'hashedpassword',
           role: 'CONTENT_ADMIN',
@@ -462,7 +462,7 @@ describeWithDb('Translation System Integration - Task 7', () => {
       const user = await prisma.user.create({
         data: {
           id: `user-test-${Date.now() + 6}`,
-          email: 'concurrent@coindaily.co',
+          email: 'concurrent@sygn.co',
           username: 'testconcurrent',
           passwordHash: 'hashedpassword',
           role: 'CONTENT_ADMIN',
@@ -571,7 +571,7 @@ describeWithDb('Translation System Integration - Task 7', () => {
       const user = await prisma.user.create({
         data: {
           id: `user-test-${Date.now() + 8}`,
-          email: 'retry@coindaily.co',
+          email: 'retry@sygn.co',
           username: 'testretry',
           passwordHash: 'hashedpassword',
           role: 'CONTENT_ADMIN',

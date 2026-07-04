@@ -60,7 +60,7 @@ export class ResearchWriterAgent extends BaseAgent {
   }
 
   private async generateWeeklyReport(data: any): Promise<Record<string, any>> {
-    const prompt = `Generate a comprehensive weekly crypto market report for CoinDaily:
+    const prompt = `Generate a comprehensive weekly crypto market report for Sygn:
 
 Data: ${JSON.stringify(data || {}, null, 2)}
 Week: ${new Date().toISOString().split('T')[0]}
@@ -68,7 +68,7 @@ Week: ${new Date().toISOString().split('T')[0]}
 Write a professional report. Return JSON:
 {
   "report": {
-    "title": "CoinDaily Weekly Market Report - [Date]",
+    "title": "Sygn Weekly Market Report - [Date]",
     "executive_summary": string (3-5 sentences),
     "sections": [
       {

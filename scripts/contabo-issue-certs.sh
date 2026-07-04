@@ -14,7 +14,7 @@
 
 set -e
 
-EMAIL=${EMAIL:-memecoindailynow@gmail.com}
+EMAIL=${EMAIL:-memesygn@gmail.com}
 WEBROOT=/var/www/html
 
 # Hostnames that get a single cert (apex + www in one cert):

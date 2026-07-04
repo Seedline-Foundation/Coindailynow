@@ -172,7 +172,7 @@ export default function NarrativeClusterCard({ cluster }: NarrativeClusterCardPr
             </div>
           </div>
           <p className="text-xs text-neutral-500 italic mt-2">
-            Published by {cluster.author} under CoinDaily Narrative Analysis guidelines.
+            Published by {cluster.author} under Sygn Narrative Analysis guidelines.
           </p>
         </div>
       )}

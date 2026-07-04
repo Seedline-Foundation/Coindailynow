@@ -15,7 +15,7 @@ export class NewsAggregationAgent extends BaseAgent {
       name: 'News Aggregation Agent',
       type: 'news_aggregation',
       category: 'research',
-      description: 'Aggregates crypto news from 50+ global and African sources, deduplicates, ranks by relevance, and produces curated news feeds for the CoinDaily platform.',
+      description: 'Aggregates crypto news from 50+ global and African sources, deduplicates, ranks by relevance, and produces curated news feeds for the Sygn platform.',
       capabilities: [
         'multi_source_aggregation',
         'deduplication',
@@ -55,7 +55,7 @@ export class NewsAggregationAgent extends BaseAgent {
   }
 
   private async aggregateNews(sources?: string[], category?: string, region?: string, limit?: number): Promise<Record<string, any>> {
-    const prompt = `You are CoinDaily's news aggregation engine. Compile a curated news feed from crypto and African market sources.
+    const prompt = `You are Sygn's news aggregation engine. Compile a curated news feed from crypto and African market sources.
 
 Parameters:
 - Sources: ${JSON.stringify(sources || ['all'])}

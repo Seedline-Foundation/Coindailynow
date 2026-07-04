@@ -25,7 +25,7 @@ interface UseWalletReturn {
 const walletConnectConfig = {
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your-project-id',
   metadata: {
-    name: 'CoinDaily Africa',
+    name: 'Sygn Africa',
     description: 'African cryptocurrency news platform',
     url: 'https://sygn.live',
     icons: ['https://sygn.live/icon-192x192.png']

@@ -43,7 +43,7 @@ export default function LoginPage() {
             Welcome Back
           </h1>
           <p className="text-gray-600">
-            Sign in to access CoinDaily Africa
+            Sign in to access Sygn Africa
           </p>
         </div>
 

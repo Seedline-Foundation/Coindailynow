@@ -14,7 +14,7 @@ export class TradeBotAgent extends BaseAgent {
       name: 'TradeBot Agent',
       type: 'trade_bot',
       category: 'finance',
-      description: 'Generates trading signals, analyzes market conditions, creates trading strategies, and provides portfolio analysis for CoinDaily premium subscribers in the African crypto market.',
+      description: 'Generates trading signals, analyzes market conditions, creates trading strategies, and provides portfolio analysis for Sygn premium subscribers in the African crypto market.',
       capabilities: [
         'signal_generation',
         'strategy_creation',

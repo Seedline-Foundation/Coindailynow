@@ -1,6 +1,6 @@
 /**
  * Article Display Types
- * CoinDaily Platform - Task 21 Implementation
+ * Sygn Platform - Task 21 Implementation
  */
 
 export interface Article {

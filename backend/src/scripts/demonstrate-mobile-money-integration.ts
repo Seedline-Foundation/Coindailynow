@@ -70,11 +70,11 @@ async function demonstrateMobileMoneyIntegration() {
     console.log('------------------------');
     
     const testUser = await prisma.user.upsert({
-      where: { email: 'test@coindaily.co' },
+      where: { email: 'test@sygn.co' },
       update: {},
       create: {
         id: `user_demo_${Date.now()}`,
-        email: 'test@coindaily.co',
+        email: 'test@sygn.co',
         username: 'testuser',
         passwordHash: 'demo-hash', // Demo password hash
         subscriptionTier: 'FREE',
@@ -97,7 +97,7 @@ async function demonstrateMobileMoneyIntegration() {
       amount: 50000, // 500 KES in cents
       currency: 'KES',
       phoneNumber: '+254712345678',
-      description: 'CoinDaily Premium Subscription',
+      description: 'Sygn Premium Subscription',
       transactionType: TransactionType.SUBSCRIPTION_PAYMENT,
       expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutes
     };

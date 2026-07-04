@@ -56,7 +56,7 @@ export class NewsCuratorAgent extends BaseAgent {
   }
 
   private async curateFeed(data: any, category?: string): Promise<Record<string, any>> {
-    const prompt = `As CoinDaily's autonomous news curator, create a curated news feed:
+    const prompt = `As Sygn's autonomous news curator, create a curated news feed:
 
 Raw data: ${JSON.stringify(data || {}, null, 2)}
 Category: ${category || 'all'}
@@ -112,7 +112,7 @@ Return JSON:
   }
 
   private async generateArticle(data: any): Promise<Record<string, any>> {
-    const prompt = `Generate a publish-ready news article for CoinDaily:
+    const prompt = `Generate a publish-ready news article for Sygn:
 
 Source data: ${JSON.stringify(data || {}, null, 2)}
 
@@ -231,7 +231,7 @@ Return JSON:
   }
 
   private async generateNewsletter(data: any): Promise<Record<string, any>> {
-    const prompt = `Generate a daily crypto newsletter for CoinDaily's African audience:
+    const prompt = `Generate a daily crypto newsletter for Sygn's African audience:
 
 Content: ${JSON.stringify(data || {}, null, 2)}
 

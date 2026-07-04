@@ -1,5 +1,5 @@
 /**
- * CoinDaily Platform - Newsletter Subscription Component
+ * Sygn Platform - Newsletter Subscription Component
  * Task 55: FR-105 Newsletter subscription widget
  * 
  * Features:
@@ -203,7 +203,7 @@ const NewsletterWidget: React.FC<NewsletterWidgetProps> = ({
     <div className={`space-y-4 ${className}`}>
       <h4 className="text-lg font-semibold flex items-center">
         <EnvelopeIcon className="h-5 w-5 mr-2" />
-        Stay Updated with CoinDaily
+        Stay Updated with Sygn
       </h4>
       
       <p className="text-gray-300 text-sm">

@@ -2,7 +2,7 @@
  * Facebook Page adapter (P7.2) — Graph API.
  *
  * Setup:
- *   1. Create a Facebook Page for CoinDaily.
+ *   1. Create a Facebook Page for Sygn.
  *   2. Create a Meta app at developers.facebook.com → Add "Facebook Login for Business" product.
  *   3. Generate a never-expiring Page Access Token (long-lived user token → exchange for page token).
  *   4. Save the page id + token on DistributionTarget.metadata + .authState.

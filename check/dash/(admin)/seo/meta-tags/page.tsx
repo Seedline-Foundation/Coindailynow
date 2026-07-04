@@ -23,7 +23,7 @@ export default function MetaTagsPage() {
       setMetaTags([
         {
           page: '/news/bitcoin-surge-2024',
-          title: 'Bitcoin Surges to New All-Time High - CoinDaily',
+          title: 'Bitcoin Surges to New All-Time High - Sygn',
           description: 'Bitcoin reaches unprecedented heights as institutional adoption continues to drive market sentiment.',
           keywords: ['bitcoin', 'cryptocurrency', 'all-time high', 'market'],
           lastOptimized: '2024-01-15',
@@ -39,9 +39,9 @@ export default function MetaTagsPage() {
         },
         {
           page: '/about',
-          title: 'About CoinDaily - Crypto News Platform',
-          description: 'Learn about CoinDaily, Africa\'s largest AI-driven cryptocurrency news platform.',
-          keywords: ['about', 'coindaily', 'crypto news', 'platform'],
+          title: 'About Sygn - Crypto News Platform',
+          description: 'Learn about Sygn, Africa\'s largest AI-driven cryptocurrency news platform.',
+          keywords: ['about', 'sygn', 'crypto news', 'platform'],
           lastOptimized: '2024-01-10',
           seoScore: 65
         }

@@ -4,7 +4,7 @@
  * Task 20: Authentication UI Components - Implementation Demonstration
  * 
  * This script demonstrates the comprehensive authentication system built for
- * the CoinDaily platform with African market specialization.
+ * the Sygn platform with African market specialization.
  * 
  * Features demonstrated:
  * - Complete authentication component suite
@@ -59,7 +59,7 @@ function getFileStats(filePath) {
 }
 
 function main() {
-  logSection('CoinDaily Platform - Task 20 Implementation Demonstration');
+  logSection('Sygn Platform - Task 20 Implementation Demonstration');
   
   log('🚀 Authentication UI Components with African Market Integration', 'green');
   log('📍 Specialized for Nigeria, Kenya, South Africa, and Ghana markets', 'blue');

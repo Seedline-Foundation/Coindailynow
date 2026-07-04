@@ -5,13 +5,13 @@ import { Header } from '@/components/landing';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'FAQ | CoinDaily Africa — Crypto & Finance News',
+  title: 'FAQ | Sygn Africa — Crypto & Finance News',
   description:
-    'Frequently asked questions about CoinDaily Africa: how we report crypto news, our coverage of African markets, AI-assisted journalism, and how to use the platform.',
+    'Frequently asked questions about Sygn Africa: how we report crypto news, our coverage of African markets, AI-assisted journalism, and how to use the platform.',
   openGraph: {
-    title: 'FAQ — CoinDaily Africa',
+    title: 'FAQ — Sygn Africa',
     description:
-      'Answers to common questions about CoinDaily Africa, our coverage, and the platform.',
+      'Answers to common questions about Sygn Africa, our coverage, and the platform.',
     type: 'website',
   },
 };
@@ -26,41 +26,41 @@ const FAQ_DATA: FAQItem[] = [
   // Platform
   {
     category: 'Platform',
-    question: 'What is CoinDaily Africa?',
+    question: 'What is Sygn Africa?',
     answer:
-      'CoinDaily Africa is an independent financial news platform covering cryptocurrency, blockchain, and traditional finance across Africa and the global diaspora. We provide real-time market data, regulatory analysis, and actionable intelligence for readers in Nigeria, Kenya, South Africa, Ghana, and beyond.',
+      'Sygn Africa is an independent financial news platform covering cryptocurrency, blockchain, and traditional finance across Africa and the global diaspora. We provide real-time market data, regulatory analysis, and actionable intelligence for readers in Nigeria, Kenya, South Africa, Ghana, and beyond.',
   },
   {
     category: 'Platform',
-    question: 'Is CoinDaily Africa free to use?',
+    question: 'Is Sygn Africa free to use?',
     answer:
-      'Yes. Core news, market data, and regulatory coverage are free. CoinDaily Pro subscribers get access to premium features including deeper market analysis, portfolio tracking, and data exports. See our pricing page for details.',
+      'Yes. Core news, market data, and regulatory coverage are free. Sygn Pro subscribers get access to premium features including deeper market analysis, portfolio tracking, and data exports. See our pricing page for details.',
   },
   {
     category: 'Platform',
-    question: 'Which countries does CoinDaily Africa cover?',
+    question: 'Which countries does Sygn Africa cover?',
     answer:
       'We primarily cover Nigeria, Kenya, South Africa, and Ghana, with expanding coverage across Tanzania, Ethiopia, Egypt, and other African markets. We also serve the African diaspora in Europe, North America, the Caribbean, and Latin America. Our country switcher lets you filter news by region.',
   },
   {
     category: 'Platform',
-    question: 'What languages is CoinDaily Africa available in?',
+    question: 'What languages is Sygn Africa available in?',
     answer:
-      'CoinDaily Africa publishes in English, Hausa, Yoruba, Swahili, and Zulu. Translations are produced using self-hosted NLLB-200 machine translation models and reviewed for accuracy. We are continuously adding more African languages.',
+      'Sygn Africa publishes in English, Hausa, Yoruba, Swahili, and Zulu. Translations are produced using self-hosted NLLB-200 machine translation models and reviewed for accuracy. We are continuously adding more African languages.',
   },
 
   // Content & Editorial
   {
     category: 'Content & Editorial',
-    question: 'Does CoinDaily Africa use AI to write articles?',
+    question: 'Does Sygn Africa use AI to write articles?',
     answer:
       'We use AI to assist with research, drafting, and translation. All AI-generated content is reviewed by human editors before publication. Our AI systems follow strict editorial guidelines that prohibit sensationalist language, unsupported predictions, and financial advice. Read our Editorial Standards page for full details.',
   },
   {
     category: 'Content & Editorial',
-    question: 'Does CoinDaily Africa provide financial advice?',
+    question: 'Does Sygn Africa provide financial advice?',
     answer:
-      'No. CoinDaily Africa provides financial news and market data for informational purposes only. Nothing on our platform constitutes financial, investment, legal, or tax advice. Always consult a qualified professional before making financial decisions.',
+      'No. Sygn Africa provides financial news and market data for informational purposes only. Nothing on our platform constitutes financial, investment, legal, or tax advice. Always consult a qualified professional before making financial decisions.',
   },
   {
     category: 'Content & Editorial',
@@ -78,7 +78,7 @@ const FAQ_DATA: FAQItem[] = [
   // Markets & Data
   {
     category: 'Markets & Data',
-    question: 'Where does CoinDaily Africa get its market data?',
+    question: 'Where does Sygn Africa get its market data?',
     answer:
       'Crypto prices come from exchange APIs including Binance, Luno, Quidax, and YellowCard. African equity indices (NGX, JSE, NSE) come from exchange feeds. FX rates are sourced from central bank published rates and P2P market midpoints. All data sources are attributed in our ticker bar and market pages.',
   },
@@ -104,13 +104,13 @@ const FAQ_DATA: FAQItem[] = [
   },
   {
     category: 'Press & Business',
-    question: 'Does CoinDaily Africa accept advertising?',
+    question: 'Does Sygn Africa accept advertising?',
     answer:
       'Yes, we accept display advertising and sponsored content from vetted partners. All sponsored content is clearly labeled and separated from editorial content. We maintain a strict firewall between advertising and editorial. Contact editorial@sygn.live for advertising inquiries.',
   },
   {
     category: 'Press & Business',
-    question: 'How do I contact CoinDaily Africa?',
+    question: 'How do I contact Sygn Africa?',
     answer:
       'For press inquiries and partnerships: editorial@sygn.live. For corrections: corrections@sygn.live. For technical issues: support@sygn.live.',
   },
@@ -143,7 +143,7 @@ export default function FAQPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Frequently Asked Questions</h1>
           <p className="text-gray-600 mb-8">
-            Everything you need to know about CoinDaily Africa.
+            Everything you need to know about Sygn Africa.
           </p>
 
           {/* Category nav */}

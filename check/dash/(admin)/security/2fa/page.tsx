@@ -7,7 +7,7 @@ import TwoFactorVerification from '@/components/admin/security/TwoFactorVerifica
 export default function TwoFactorPage() {
   // In a real app, you would get these from your authentication context or API
   const mockProps = {
-    email: 'admin@coindaily.com',
+    email: 'admin@sygn.com',
     onVerificationSuccess: () => {
       console.log('2FA verification successful');
     },

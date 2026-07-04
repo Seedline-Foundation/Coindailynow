@@ -79,7 +79,7 @@ jobs:
         env:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
-          POSTGRES_DB: coindaily_test
+          POSTGRES_DB: sygn_test
         ports:
           - 5432:5432
         options: >-
@@ -128,13 +128,13 @@ jobs:
       - name: Run database migrations
         working-directory: ./backend
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/coindaily_test
+          DATABASE_URL: postgresql://test:test@localhost:5432/sygn_test
         run: npm run db:migrate
       
       - name: Run API tests with coverage
         working-directory: ./backend
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/coindaily_test
+          DATABASE_URL: postgresql://test:test@localhost:5432/sygn_test
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: test-secret-key
           NODE_ENV: test
@@ -143,7 +143,7 @@ jobs:
       - name: Run security API tests
         working-directory: ./backend
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/coindaily_test
+          DATABASE_URL: postgresql://test:test@localhost:5432/sygn_test
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: test-secret-key
           NODE_ENV: test
@@ -199,7 +199,7 @@ jobs:
       - name: Start backend server
         working-directory: ./backend
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/coindaily_test
+          DATABASE_URL: postgresql://test:test@localhost:5432/sygn_test
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: test-secret-key
           NODE_ENV: test
@@ -311,8 +311,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.organization=coindaily
-            -Dsonar.projectKey=coindaily-africa
+            -Dsonar.organization=sygn
+            -Dsonar.projectKey=sygn-africa
             -Dsonar.sources=frontend/src,backend/src
             -Dsonar.tests=frontend/tests,backend/tests
             -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info,backend/coverage/lcov.info
@@ -339,7 +339,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Coverage" >> $GITHUB_STEP_SUMMARY
           echo "- Target: 85%+ for frontend, 80%+ for backend" >> $GITHUB_STEP_SUMMARY
-          echo "- View detailed coverage on [Codecov](https://codecov.io/gh/coindaily/platform)" >> $GITHUB_STEP_SUMMARY
+          echo "- View detailed coverage on [Codecov](https://codecov.io/gh/sygn/platform)" >> $GITHUB_STEP_SUMMARY
       
       - name: Check overall status
         if: |

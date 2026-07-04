@@ -14,7 +14,7 @@ export class LeadGenAgent extends BaseAgent {
       name: 'LeadGen Agent',
       type: 'lead_generation',
       category: 'business',
-      description: 'Identifies and qualifies potential advertisers, premium subscribers, and enterprise clients for CoinDaily through data analysis, scoring, and automated outreach targeting the African crypto market.',
+      description: 'Identifies and qualifies potential advertisers, premium subscribers, and enterprise clients for Sygn through data analysis, scoring, and automated outreach targeting the African crypto market.',
       capabilities: [
         'lead_scoring',
         'lead_qualification',
@@ -60,7 +60,7 @@ export class LeadGenAgent extends BaseAgent {
   }
 
   private async scoreLeads(leads: any[]): Promise<Record<string, any>> {
-    const prompt = `Score these leads for CoinDaily (Africa crypto news platform):
+    const prompt = `Score these leads for Sygn (Africa crypto news platform):
 
 Leads: ${JSON.stringify(leads || [], null, 2)}
 
@@ -92,7 +92,7 @@ Return JSON:
   }
 
   private async qualifyLead(data: any): Promise<Record<string, any>> {
-    const prompt = `Qualify this lead using BANT framework for CoinDaily:
+    const prompt = `Qualify this lead using BANT framework for Sygn:
 
 Lead: ${JSON.stringify(data || {}, null, 2)}
 
@@ -120,7 +120,7 @@ Return JSON:
   }
 
   private async enrichProspect(data: any): Promise<Record<string, any>> {
-    const prompt = `Enrich this prospect profile for CoinDaily sales:
+    const prompt = `Enrich this prospect profile for Sygn sales:
 
 Prospect: ${JSON.stringify(data || {}, null, 2)}
 
@@ -155,7 +155,7 @@ Return JSON:
   }
 
   private async matchICP(data: any, criteria?: any): Promise<Record<string, any>> {
-    const prompt = `Match this company against CoinDaily's Ideal Customer Profile:
+    const prompt = `Match this company against Sygn's Ideal Customer Profile:
 
 Company: ${JSON.stringify(data || {}, null, 2)}
 ICP Criteria: ${JSON.stringify(criteria || {
@@ -211,7 +211,7 @@ Return JSON:
   }
 
   private async segmentAudience(data: any): Promise<Record<string, any>> {
-    const prompt = `Segment CoinDaily's audience for targeted campaigns:
+    const prompt = `Segment Sygn's audience for targeted campaigns:
 
 Data: ${JSON.stringify(data || {}, null, 2)}
 
@@ -243,7 +243,7 @@ Return JSON:
   }
 
   private async sizeMarket(data: any): Promise<Record<string, any>> {
-    const prompt = `Size the addressable market for CoinDaily's services:
+    const prompt = `Size the addressable market for Sygn's services:
 
 Context: ${JSON.stringify(data || {}, null, 2)}
 
@@ -289,7 +289,7 @@ Return JSON:
   }
 
   private async identifyProspects(criteria: any): Promise<Record<string, any>> {
-    const prompt = `Identify potential prospects for CoinDaily:
+    const prompt = `Identify potential prospects for Sygn:
 
 Criteria: ${JSON.stringify(criteria || {}, null, 2)}
 

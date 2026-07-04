@@ -93,7 +93,7 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Join CoinDaily Africa
+            Join Sygn Africa
           </h1>
           <p className="text-gray-600">
             Create your account to start exploring

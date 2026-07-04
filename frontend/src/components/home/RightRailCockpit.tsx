@@ -37,7 +37,7 @@ export default function RightRailCockpit() {
 
   // Load watchlist
   useEffect(() => {
-    const saved = localStorage.getItem('coindaily_watchlist');
+    const saved = localStorage.getItem('sygn_watchlist');
     if (saved) {
       try {
         setWatchlist(JSON.parse(saved));
@@ -51,7 +51,7 @@ export default function RightRailCockpit() {
 
   const saveWatchlist = (list: WatchlistItem[]) => {
     setWatchlist(list);
-    localStorage.setItem('coindaily_watchlist', JSON.stringify(list));
+    localStorage.setItem('sygn_watchlist', JSON.stringify(list));
   };
 
   const handleAddAsset = (e: React.FormEvent) => {
@@ -95,7 +95,7 @@ export default function RightRailCockpit() {
     };
 
     const normalizedQuery = queryStr.toLowerCase().trim();
-    let text = mockResponses[normalizedQuery] || 'Analyzing current CoinDaily feed... Based on latest market indicators, stablecoin volume in East Africa has increased by 8% and compute cost index remains flat.';
+    let text = mockResponses[normalizedQuery] || 'Analyzing current Sygn feed... Based on latest market indicators, stablecoin volume in East Africa has increased by 8% and compute cost index remains flat.';
     
     let currentIdx = 0;
     const interval = setInterval(() => {

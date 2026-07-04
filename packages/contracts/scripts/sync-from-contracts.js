@@ -19,7 +19,7 @@ const contracts = [
   'SimpleWallet',
   'ReputationSBT',
   'Subscription',
-  'CoinDailyTimelock',
+  'SygnTimelock',
 ];
 
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });

@@ -280,7 +280,7 @@ export default function SettingsPage({ className = '' }: SettingsPageProps) {
             Settings
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Manage your account preferences and customize your CoinDaily experience
+            Manage your account preferences and customize your Sygn experience
           </p>
         </div>
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * CoinDaily Sec  const redis = new Redis({
+ * Sygn Sec  const redis = new Redis({
     host: 'localhost',
     port: 6379,
     maxRetriesPerRequest: 3,
@@ -42,7 +42,7 @@ import { getRedis } from '../../lib/redis';
 const redis = getRedis();
 
 async function validateSecurityServicesFixes() {
-  console.log('🔒 CoinDaily Security Services - Error Fix Validation');
+  console.log('🔒 Sygn Security Services - Error Fix Validation');
   console.log('================================================================');
   
   const prisma = (await import('../../lib/prisma')).default;

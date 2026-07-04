@@ -14,7 +14,7 @@ export class KYCAgent extends BaseAgent {
       name: 'KYC Agent',
       type: 'kyc',
       category: 'legal',
-      description: 'Manages Know Your Customer processes including identity verification, document validation, risk profiling, sanctions screening, and compliance reporting for CoinDaily premium and enterprise users across African markets.',
+      description: 'Manages Know Your Customer processes including identity verification, document validation, risk profiling, sanctions screening, and compliance reporting for Sygn premium and enterprise users across African markets.',
       capabilities: [
         'identity_verification',
         'document_validation',

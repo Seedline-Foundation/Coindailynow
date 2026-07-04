@@ -53,7 +53,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
       "url": finalCanonicalUrl,
       "publisher": {
         "@type": "Organization",
-        "name": "CoinDaily Africa",
+        "name": "Sygn Africa",
         "logo": {
           "@type": "ImageObject",
           "url": "https://sygn.live/images/logo.png"
@@ -67,7 +67,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
         "@type": "NewsArticle",
         "author": {
           "@type": "Person",
-          "name": author || "CoinDaily Editorial Team"
+          "name": author || "Sygn Editorial Team"
         },
         "datePublished": publishedAt,
         "dateModified": modifiedAt || publishedAt,
@@ -108,7 +108,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
   ].filter(Boolean).slice(0, 15);
 
   // Generate SEO-optimized title
-  const fullTitle = `${seoTitle} | CoinDaily Africa`;
+  const fullTitle = `${seoTitle} | Sygn Africa`;
   
   const robotsContent = [
     noindex ? 'noindex' : 'index',
@@ -122,7 +122,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
         <title>{fullTitle}</title>
         <meta name="description" content={seoDescription} />
         <meta name="keywords" content={allKeywords.join(', ')} />
-        <meta name="author" content={author || 'CoinDaily Editorial Team'} />
+        <meta name="author" content={author || 'Sygn Editorial Team'} />
         <meta name="robots" content={robotsContent} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#f97316" />
@@ -135,7 +135,7 @@ export const SEOComponent: React.FC<SEOProps> = ({
         <meta property="og:title" content={seoTitle} />
         <meta property="og:description" content={seoDescription} />
         <meta property="og:url" content={finalCanonicalUrl} />
-        <meta property="og:site_name" content="CoinDaily Africa" />
+        <meta property="og:site_name" content="Sygn Africa" />
         <meta property="og:image" content={image || 'https://sygn.live/images/og-default.png'} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -157,8 +157,8 @@ export const SEOComponent: React.FC<SEOProps> = ({
 
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@coindailyafrica" />
-        <meta name="twitter:creator" content="@coindailyafrica" />
+        <meta name="twitter:site" content="@sygnafrica" />
+        <meta name="twitter:creator" content="@sygnafrica" />
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={seoDescription} />
         <meta name="twitter:image" content={image || 'https://sygn.live/images/og-default.png'} />
@@ -167,10 +167,10 @@ export const SEOComponent: React.FC<SEOProps> = ({
         <meta httpEquiv="x-ua-compatible" content="IE=edge" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-tap-highlight" content="no" />
-        <meta name="application-name" content="CoinDaily Africa" />
+        <meta name="application-name" content="Sygn Africa" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="CoinDaily" />
+        <meta name="apple-mobile-web-app-title" content="Sygn" />
 
         {/* Structured Data */}
         <script
@@ -200,13 +200,13 @@ export const SEOComponent: React.FC<SEOProps> = ({
         <link 
           rel="alternate" 
           type="application/rss+xml" 
-          title="CoinDaily Africa RSS Feed" 
+          title="Sygn Africa RSS Feed" 
           href="/rss.xml" 
         />
         <link 
           rel="alternate" 
           type="application/atom+xml" 
-          title="CoinDaily Africa Atom Feed" 
+          title="Sygn Africa Atom Feed" 
           href="/atom.xml" 
         />
 

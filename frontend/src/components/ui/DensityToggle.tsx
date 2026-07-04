@@ -20,7 +20,7 @@ export function useDensity() {
   return useContext(DensityContext);
 }
 
-const LS_KEY = 'coindaily:density';
+const LS_KEY = 'sygn:density';
 
 export function DensityProvider({ children }: { children: ReactNode }) {
   const [density, setDensityState] = useState<Density>('comfortable');

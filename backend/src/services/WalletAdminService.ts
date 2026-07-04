@@ -702,7 +702,7 @@ async function formatTransactionsAsPDF(
   const margin = 40;
   const rowHeight = 18;
 
-  const brandColor = rgb(0.13, 0.59, 0.95); // CoinDaily blue
+  const brandColor = rgb(0.13, 0.59, 0.95); // Sygn blue
 
   const colWidths = [130, 80, 80, 70, 90, 110];
   const colHeaders = ['Address', 'Type', 'Amount', 'Currency', 'Status', 'Date'];
@@ -755,7 +755,7 @@ async function formatTransactionsAsPDF(
     height: 60,
     color: brandColor,
   });
-  drawText('CoinDaily', margin, pageHeight - 40, 20, boldFont, rgb(1, 1, 1));
+  drawText('Sygn', margin, pageHeight - 40, 20, boldFont, rgb(1, 1, 1));
   drawText(
     'Wallet Transaction Report',
     margin,

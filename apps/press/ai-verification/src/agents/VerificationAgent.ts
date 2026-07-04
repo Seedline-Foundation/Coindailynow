@@ -414,14 +414,14 @@ class VerificationAgent {
      */
     private generatePitchEmail(site: any): string {
         return `
-Subject: Earn Revenue from Your Website with SENDPRESS by Coindaily
+Subject: Earn Revenue from Your Website with SENDPRESS by Sygn
 
 Hi ${site.owner_name || 'Site Owner'},
 
 We've analyzed ${site.domain} and believe it would be a great fit for our SENDPRESS PR distribution network.
 
 What is SENDPRESS?
-SENDPRESS by Coindaily is Africa's largest automated PR distribution platform connecting crypto/finance publishers with quality websites like yours.
+SENDPRESS by Sygn is Africa's largest automated PR distribution platform connecting crypto/finance publishers with quality websites like yours.
 
 Benefits for You:
 ✅ Earn JOY tokens for each PR placement
@@ -439,7 +439,7 @@ Questions? Reply to this email or visit our FAQ at https://press.sygn.live/faq
 
 Best regards,
 The SENDPRESS Team
-Coindaily
+Sygn
         `.trim();
     }
     

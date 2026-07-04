@@ -61,7 +61,7 @@ export default function AdminDashboard() {
         {/* Page title */}
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400">Welcome to CoinDaily&apos;s comprehensive admin panel</p>
+          <p className="text-gray-600 dark:text-gray-400">Welcome to Sygn&apos;s comprehensive admin panel</p>
         </div>
 
         {/* Key metrics grid */}

@@ -7,7 +7,7 @@
  *
  * Env:
  *   DID_API_KEY              (required — get from studio.d-id.com)
- *   DID_PRESENTER_IMAGE_URL  CDN URL of the CoinDaily news anchor avatar
+ *   DID_PRESENTER_IMAGE_URL  CDN URL of the Sygn news anchor avatar
  *                            (default: D-ID's "amy-Aq6OmGZnMt" generic anchor)
  *   DID_DEFAULT_VOICE        ElevenLabs/Microsoft voice id D-ID supports
  *
@@ -101,7 +101,7 @@ export async function generateShortAvatarVideo(
           provider: { type: 'microsoft', voice_id: voiceId },
         },
         config: { stitch: true, result_format: 'mp4' },
-        name: `coindaily_short_${input.articleId}_${lang}`,
+        name: `sygn_short_${input.articleId}_${lang}`,
       }),
       signal: AbortSignal.timeout(20_000),
     });

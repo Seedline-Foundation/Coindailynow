@@ -1,14 +1,14 @@
 #!/bin/bash
 #===============================================================================
-# CoinDaily Real-time Data Fetcher
+# Sygn Real-time Data Fetcher
 # Fetches fresh trending data from multiple sources before AI processing
 # This script runs before each AI content generation cycle
 #===============================================================================
 
 set -e
 
-LOG_FILE="/opt/coindaily/logs/realtime-data-$(date +%Y%m%d).log"
-METRICS_FILE="/opt/coindaily/metrics/realtime_data.prom"
+LOG_FILE="/opt/sygn/logs/realtime-data-$(date +%Y%m%d).log"
+METRICS_FILE="/opt/sygn/metrics/realtime_data.prom"
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a $LOG_FILE
@@ -176,7 +176,7 @@ if [ "$COINS_COUNT" -gt 0 ]; then
     update_metric "coingecko_coins_count" "$COINS_COUNT"
     
     # Cache the data for AI models
-    echo "$COINGECKO_RESPONSE" > /opt/coindaily/cache/coingecko_latest.json
+    echo "$COINGECKO_RESPONSE" > /opt/sygn/cache/coingecko_latest.json
 else
     log "ERROR: CoinGecko fetch failed"
     update_metric "coingecko_fetch_success" "0"
@@ -204,7 +204,7 @@ if [ "$MEME_COUNT" -gt 0 ]; then
     update_metric "memecoin_count" "$MEME_COUNT"
     
     # Cache for AI models
-    echo "$MEME_RESPONSE" > /opt/coindaily/cache/memecoins_latest.json
+    echo "$MEME_RESPONSE" > /opt/sygn/cache/memecoins_latest.json
 else
     log "ERROR: Memecoin fetch failed"
     update_metric "memecoin_fetch_success" "0"

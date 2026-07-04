@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # =============================================================================
-# CoinDaily Platform - Domain Connectivity Test Suite
+# Sygn Platform - Domain Connectivity Test Suite
 # Tests: sygn.live, jet.sygn.live, ai.sygn.live, app.sygn.live
 # Compatible with PowerShell 5.1+
 # =============================================================================
@@ -11,7 +11,7 @@ $ErrorActionPreference = "Continue"
 
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host "  CoinDaily Domain Test Suite" -ForegroundColor Cyan
+Write-Host "  Sygn Domain Test Suite" -ForegroundColor Cyan
 Write-Host "  $timestamp" -ForegroundColor Gray
 Write-Host "========================================`n" -ForegroundColor Cyan
 
@@ -209,8 +209,8 @@ Write-Host "`n6. Frontend Pages" -ForegroundColor White
 # sygn.live
 try {
     $page = (curl.exe -ksSL --max-time 15 "https://sygn.live" 2>&1) -join ""
-    if ($page -match "CoinDaily") { Test-Result "News Site: Branding" "PASS" "" }
-    else { Test-Result "News Site: Branding" "WARN" "CoinDaily not in HTML" }
+    if ($page -match "Sygn") { Test-Result "News Site: Branding" "PASS" "" }
+    else { Test-Result "News Site: Branding" "WARN" "Sygn not in HTML" }
     if ($page -match "_next") { Test-Result "News Site: Next.js" "PASS" "" }
     else { Test-Result "News Site: Next.js" "FAIL" "Missing Next.js assets" }
 } catch { Test-Result "News Site" "FAIL" "Could not load" }
@@ -218,14 +218,14 @@ try {
 # jet.sygn.live
 try {
     $page = (curl.exe -ksSL --max-time 15 "https://jet.sygn.live" 2>&1) -join ""
-    if ($page -match "_next|CoinDaily|admin") { Test-Result "Admin (jet): Loaded" "PASS" "" }
+    if ($page -match "_next|Sygn|admin") { Test-Result "Admin (jet): Loaded" "PASS" "" }
     else { Test-Result "Admin (jet)" "WARN" "Expected content missing" }
 } catch { Test-Result "Admin (jet)" "FAIL" "Could not load" }
 
 # ai.sygn.live
 try {
     $page = (curl.exe -ksSL --max-time 15 "https://ai.sygn.live" 2>&1) -join ""
-    if ($page -match "_next|AI|CoinDaily|dashboard") { 
+    if ($page -match "_next|AI|Sygn|dashboard") { 
         Test-Result "AI Dashboard: Loaded" "PASS" "" 
     } elseif ($page -match "404|not found|Error|Cannot GET") {
         Test-Result "AI Dashboard" "WARN" "404/Error - service may not be running on port 3004"
@@ -309,17 +309,17 @@ if ($failed -gt 0 -or $warnings -gt 0) {
         Write-Host "    Source code (backend/src/index.ts) has correct config but" -ForegroundColor White
         Write-Host "    the deployed build is outdated." -ForegroundColor White
         Write-Host "    SSH into 167.86.99.97 and run:" -ForegroundColor Gray
-        Write-Host "    cd /var/www/coindaily-app" -ForegroundColor Gray
+        Write-Host "    cd /var/www/sygn-app" -ForegroundColor Gray
         Write-Host "    npm ci && npm run build" -ForegroundColor Gray
-        Write-Host "    pm2 restart coindaily-backend" -ForegroundColor Gray
+        Write-Host "    pm2 restart sygn-backend" -ForegroundColor Gray
     }
     
     if ($aiFailed) {
         Write-Host "`n[3] FIX AI DASHBOARD" -ForegroundColor Yellow
         Write-Host "    ai.sygn.live is not serving content properly." -ForegroundColor White
         Write-Host "    Check if the app is running:" -ForegroundColor Gray
-        Write-Host "    pm2 status coindaily-ai" -ForegroundColor Gray
-        Write-Host "    pm2 logs coindaily-ai --lines 50" -ForegroundColor Gray
+        Write-Host "    pm2 status sygn-ai" -ForegroundColor Gray
+        Write-Host "    pm2 logs sygn-ai --lines 50" -ForegroundColor Gray
         Write-Host "    Ensure port 3004 is in use:" -ForegroundColor Gray
         Write-Host "    ss -tlnp | grep 3004" -ForegroundColor Gray
     }

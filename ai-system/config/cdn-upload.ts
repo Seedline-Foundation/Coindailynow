@@ -1,11 +1,13 @@
 /**
- * CDN Upload Utility — Backblaze B2 via S3-compatible API + Cloudflare CDN
+ * CDN Upload Utility — Contabo Object Storage (S3-compatible) + Cloudflare CDN
  *
  * Env vars:
- *   B2_APPLICATION_KEY_ID  – S3-compatible key ID
- *   B2_APPLICATION_KEY     – S3-compatible application key
- *   B2_BUCKET_NAME         – target bucket name
- *   B2_ENDPOINT            – S3-compatible endpoint (e.g. https://s3.us-west-004.backblazeb2.com)
+ *   CONTABO_S3_ENDPOINT    – S3 endpoint (default https://eu2.contabostorage.com)
+ *   CONTABO_S3_REGION      – region (default eu2)
+ *   CONTABO_ACCESS_KEY     – S3 access key
+ *   CONTABO_SECRET_KEY     – S3 secret key
+ *   CONTABO_BUCKET_IMAGES  – images bucket (default simages)
+ *   CONTABO_TENANT_ID      – tenant id for Contabo public URLs
  *   CDN_BASE_URL           – public CDN base (default: https://cdn.sygn.live)
  *   LOCAL_UPLOAD_URL       – base URL returned for local fallback files
  */
@@ -14,6 +16,8 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
+
+const ENDPOINT = (process.env.CONTABO_S3_ENDPOINT || 'https://eu2.contabostorage.com').replace(/\/$/, '');
 
 const CDN_BASE_URL = (
   process.env.CDN_BASE_URL ||
@@ -26,18 +30,17 @@ let _s3: S3Client | null = null;
 function getS3Client(): S3Client | null {
   if (_s3) return _s3;
 
-  const keyId = process.env.B2_APPLICATION_KEY_ID;
-  const appKey = process.env.B2_APPLICATION_KEY;
-  const endpoint = process.env.B2_ENDPOINT;
+  const keyId = process.env.CONTABO_ACCESS_KEY;
+  const secret = process.env.CONTABO_SECRET_KEY;
 
-  if (!keyId || !appKey || !endpoint) return null;
+  if (!keyId || !secret) return null;
 
   _s3 = new S3Client({
-    endpoint,
-    region: process.env.B2_REGION || 'us-west-004',
+    endpoint: ENDPOINT,
+    region: process.env.CONTABO_S3_REGION || 'eu2',
     credentials: {
       accessKeyId: keyId,
-      secretAccessKey: appKey,
+      secretAccessKey: secret,
     },
     forcePathStyle: true,
   });
@@ -53,10 +56,9 @@ function uniqueKey(prefix: string, contentType: string): string {
 }
 
 /**
- * Upload an image to CDN (Backblaze B2 via S3-compatible API → Cloudflare).
- *
- * Falls back to writing into a local `uploads/` directory when B2 credentials
- * are not configured.
+ * Upload an image to the Contabo images bucket (public-read) and return its
+ * CDN URL. Falls back to writing into a local `uploads/` directory when
+ * credentials are not configured.
  *
  * @param imageData - Raw image bytes or a base64-encoded string (data-URL prefixes are stripped automatically)
  * @param filename  - Desired filename (used only for key prefix / extension hints)
@@ -81,18 +83,23 @@ export async function uploadToCDN(
   const key = uniqueKey(`ai-images/${prefix}`, contentType);
 
   const client = getS3Client();
-  const bucket = process.env.B2_BUCKET_NAME;
+  const bucket = process.env.CONTABO_BUCKET_IMAGES || 'simages';
 
-  if (client && bucket) {
+  if (client) {
     await client.send(
       new PutObjectCommand({
         Bucket: bucket,
         Key: key,
         Body: buffer,
         ContentType: contentType,
+        ACL: 'public-read',
       }),
     );
-    return `${CDN_BASE_URL}/${key}`;
+    if (process.env.CDN_BASE_URL || process.env.CLOUDFLARE_CDN_URL) {
+      return `${CDN_BASE_URL}/${key}`;
+    }
+    const tenant = process.env.CONTABO_TENANT_ID;
+    return tenant ? `${ENDPOINT}/${tenant}:${bucket}/${key}` : `${ENDPOINT}/${bucket}/${key}`;
   }
 
   const uploadsDir = path.resolve(process.cwd(), 'uploads', 'ai-images');

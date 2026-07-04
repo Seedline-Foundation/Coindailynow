@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Affiliate Disclosure | CoinDaily',
+  title: 'Affiliate Disclosure | Sygn',
   description: 'Transparency about our affiliate partnerships and commission structures.',
   robots: 'index, follow',
 };
@@ -14,14 +14,14 @@ export default function AffiliateDisclosurePage() {
         <p className="text-gray-600">Effective Date: July 31, 2025</p>
 
         <p>
-          At CoinDaily, we participate in affiliate advertising programs designed to provide 
+          At Sygn, we participate in affiliate advertising programs designed to provide 
           a means for us to earn fees by linking to third-party products and services at 
           no additional cost to you.
         </p>
 
         <h2>1. Nature of Affiliate Links</h2>
         <ul>
-          <li>When you click on an affiliate link and complete a qualifying purchase, CoinDaily may earn a commission or referral fee.</li>
+          <li>When you click on an affiliate link and complete a qualifying purchase, Sygn may earn a commission or referral fee.</li>
           <li>This does not affect the price you pay for the product or service.</li>
         </ul>
 
@@ -46,8 +46,8 @@ export default function AffiliateDisclosurePage() {
         <h2>5. Contact</h2>
         <p>
           Email{' '}
-          <a href="mailto:legal@coindaily.com" className="text-blue-600 hover:text-blue-800">
-            legal@coindaily.com
+          <a href="mailto:legal@sygn.com" className="text-blue-600 hover:text-blue-800">
+            legal@sygn.com
           </a>{' '}
           for questions regarding our affiliate relationships.
         </p>

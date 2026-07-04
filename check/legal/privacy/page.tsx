@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | CoinDaily',
+  title: 'Privacy Policy | Sygn',
   description: 'Our privacy policy explaining how we collect, use, and protect your personal data.',
   robots: 'index, follow',
 };
@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
         <p className="text-gray-600">Effective Date: July 31, 2025</p>
 
         <p>
-          CoinDaily (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is committed to protecting your privacy. 
+          Sygn (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is committed to protecting your privacy. 
           This Privacy Policy explains how we collect, use, store, and share your personal data 
           when you use our website, mobile applications, and services (collectively, the &ldquo;Service&rdquo;).
         </p>
@@ -52,7 +52,7 @@ export default function PrivacyPolicyPage() {
           <li><strong>Access & Portability</strong>: Request copy of data.</li>
           <li><strong>Correction & Deletion</strong>: Update or delete your personal data.</li>
           <li><strong>Opt-Out</strong>: Marketing emails and tracking cookies.</li>
-          <li><strong>Do Not Sell My Info</strong> (CCPA): Submit a request via support@coindaily.com.</li>
+          <li><strong>Do Not Sell My Info</strong> (CCPA): Submit a request via support@sygn.com.</li>
         </ul>
 
         <h2>6. Data Security</h2>
@@ -82,8 +82,8 @@ export default function PrivacyPolicyPage() {
         <h2>10. Contact Us</h2>
         <p>
           Email{' '}
-          <a href="mailto:privacy@coindaily.com" className="text-blue-600 hover:text-blue-800">
-            privacy@coindaily.com
+          <a href="mailto:privacy@sygn.com" className="text-blue-600 hover:text-blue-800">
+            privacy@sygn.com
           </a>
         </p>
       </div>

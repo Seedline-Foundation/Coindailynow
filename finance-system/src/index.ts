@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────
-// CFIS — CoinDaily Financial Intelligence System
+// CFIS — Sygn Financial Intelligence System
 // All cash emanates from CFIS. All receivables sent to CFIS.
 // Super Admin is UPDATED — CFIS executes ALL payments.
 // AI Agent ARIA verifies every outbound transaction.
@@ -239,7 +239,7 @@ blockchainListener.start();
 app.listen(port, () => {
   console.log('');
   console.log('╔══════════════════════════════════════════════════════════════╗');
-  console.log('║     CFIS — CoinDaily Financial Intelligence System          ║');
+  console.log('║     CFIS — Sygn Financial Intelligence System          ║');
   console.log('║     All payments flow through CFIS. AI Agent ARIA active.   ║');
   console.log(`║     Running on port ${String(port).padEnd(41)}║`);
   console.log('║     Dashboard: http://localhost:' + port + '/dashboard               ║');

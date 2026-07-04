@@ -77,7 +77,7 @@ export default function AmbassadorPage() {
     'Passion for cryptocurrency and blockchain technology',
     'Based in or familiar with African crypto markets',
     'Strong communication skills in English (+ local languages bonus)',
-    'Committed to promoting JY Token and CoinDaily ethically',
+    'Committed to promoting JY Token and Sygn ethically',
     'Presale participant OR 15,000+ JY tokens staked for 4+ months',
   ];
 

@@ -1,4 +1,4 @@
-# CoinDaily API Reference
+# Sygn API Reference
 
 ## Base URL
 - **Production**: `https://app.sygn.live`

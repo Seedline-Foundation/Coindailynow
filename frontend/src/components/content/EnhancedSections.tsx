@@ -70,7 +70,7 @@ export const PredictionSection: React.FC<PredictionSectionProps> = ({ isLoading 
         rewardPoints: 50,
         category: 'Price Prediction',
         relatedAssets: ['BTC'],
-        createdBy: 'CoinDaily Team',
+        createdBy: 'Sygn Team',
         status: 'active'
       },
       {

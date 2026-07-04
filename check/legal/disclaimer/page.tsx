@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Disclaimer & No Financial Advice | CoinDaily',
+  title: 'Disclaimer & No Financial Advice | Sygn',
   description: 'Important disclaimers about our content and services. Not financial advice.',
   robots: 'index, follow',
 };
@@ -14,7 +14,7 @@ export default function DisclaimerPage() {
         <p className="text-gray-600">Effective Date: July 31, 2025</p>
 
         <p>
-          The information provided by CoinDaily (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) on our website and services 
+          The information provided by Sygn (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) on our website and services 
           is for general informational purposes only. All content, including text, graphics, 
           images, and videos, is provided &ldquo;as is&rdquo; without any warranty of any kind.
         </p>
@@ -36,8 +36,8 @@ export default function DisclaimerPage() {
         <h2>Contact</h2>
         <p>
           For further clarifications, email{' '}
-          <a href="mailto:legal@coindaily.com" className="text-blue-600 hover:text-blue-800">
-            legal@coindaily.com
+          <a href="mailto:legal@sygn.com" className="text-blue-600 hover:text-blue-800">
+            legal@sygn.com
           </a>.
         </p>
       </div>

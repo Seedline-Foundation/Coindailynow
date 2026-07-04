@@ -331,9 +331,9 @@ ALTER SYSTEM SET random_page_cost = 1.1;
 ALTER SYSTEM SET effective_io_concurrency = 200;
 
 -- Set query timeouts
-ALTER DATABASE coindaily SET statement_timeout = '5000ms';
-ALTER DATABASE coindaily SET lock_timeout = '3000ms';
-ALTER DATABASE coindaily SET idle_in_transaction_session_timeout = '10000ms';
+ALTER DATABASE sygn SET statement_timeout = '5000ms';
+ALTER DATABASE sygn SET lock_timeout = '3000ms';
+ALTER DATABASE sygn SET idle_in_transaction_session_timeout = '10000ms';
 
 -- Enable query logging for slow queries
 ALTER SYSTEM SET log_min_duration_statement = 500; -- Log queries > 500ms

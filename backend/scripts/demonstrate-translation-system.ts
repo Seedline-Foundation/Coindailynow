@@ -1,6 +1,6 @@
 /**
  * Task 7: Multi-Language Content System Demo
- * Demonstrates the comprehensive translation system for CoinDaily Africa
+ * Demonstrates the comprehensive translation system for Sygn Africa
  * Supporting 15+ African languages with Meta NLLB-200 integration
  */
 
@@ -18,7 +18,7 @@ const mockRedis = {
 } as any;
 
 async function demonstrateTranslationSystem() {
-  console.log('\n🌍 CoinDaily Africa - Multi-Language Content System Demo');
+  console.log('\n🌍 Sygn Africa - Multi-Language Content System Demo');
   console.log('=' .repeat(60));
 
   try {
@@ -222,7 +222,7 @@ async function demonstrateTranslationSystem() {
 
 // Run the demonstration
 if (require.main === module) {
-  console.log('🚀 Starting CoinDaily Translation System Demo...\n');
+  console.log('🚀 Starting Sygn Translation System Demo...\n');
   
   demonstrateTranslationSystem()
     .then(() => {

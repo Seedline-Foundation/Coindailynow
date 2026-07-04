@@ -20,14 +20,14 @@ if [[ ! -f "$SQL_FILE" ]]; then
 fi
 
 echo "[timescale] copying SQL into container..."
-docker cp "$SQL_FILE" coindaily-postgres:/tmp/timescaledb_setup.sql
+docker cp "$SQL_FILE" sygn-postgres:/tmp/timescaledb_setup.sql
 
 echo "[timescale] executing..."
-docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
+docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" sygn-postgres \
   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
   -f /tmp/timescaledb_setup.sql
 
 echo "[timescale] verifying hypertables..."
-docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
+docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" sygn-postgres \
   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c \
   "SELECT hypertable_name, num_chunks FROM timescaledb_information.hypertables;"

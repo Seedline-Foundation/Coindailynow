@@ -205,7 +205,7 @@ export default function AdvertisePage() {
             Reach Africa&apos;s Crypto Audience
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-6">
-            CoinDaily is Africa&apos;s leading cryptocurrency news platform with 1.2M+ monthly visitors across 40+ countries.
+            Sygn is Africa&apos;s leading cryptocurrency news platform with 1.2M+ monthly visitors across 40+ countries.
             Put your brand in front of the most engaged crypto audience on the continent.
           </p>
           <div className="flex flex-wrap justify-center gap-3">

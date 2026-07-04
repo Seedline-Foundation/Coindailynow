@@ -41,13 +41,19 @@ export interface ComposeInput {
   brollUrl?: string;
   articleId: string;
   format: 'SHORT' | 'LONG';
+  /** SRT text — if provided, burned into the final video as captions. */
+  subtitlesSrt?: string;
+  /** Music bed URL — if provided, mixed under the voiceover at low gain. */
+  musicUrl?: string;
+  /** Music gain (0-1). Default 0.15 — quiet under voice. */
+  musicGain?: number;
 }
 
 export interface ComposeResult {
   ok: boolean;
   url?: string;
   durationSec?: number;
-  strategy: 'concat' | 'noop' | 'failed';
+  strategy: 'concat' | 'concat+finalize' | 'finalize-only' | 'noop' | 'failed';
   error?: string;
 }
 
@@ -59,9 +65,10 @@ export async function composeVideo(input: ComposeInput, logger: Logger): Promise
   const intro = input.introUrl || process.env.BRAND_INTRO_URL;
   const outro = input.outroUrl || process.env.BRAND_OUTRO_URL;
   const broll = input.brollUrl;
+  const wantsFinalize = !!(input.subtitlesSrt || input.musicUrl);
 
-  // If there's nothing to stitch, return the base URL unchanged.
-  if (!intro && !outro && !broll) {
+  // If there's nothing to stitch AND no finalize pass needed, return base URL unchanged.
+  if (!intro && !outro && !broll && !wantsFinalize) {
     return { ok: true, url: input.baseVideoUrl, strategy: 'noop' };
   }
 
@@ -89,19 +96,48 @@ export async function composeVideo(input: ComposeInput, logger: Logger): Promise
       normalizedFiles.push(out);
     }
 
-    // 3. concat via demuxer
-    const listFile = path.join(tmpDir, 'concat.txt');
-    await fs.writeFile(listFile, normalizedFiles.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n'));
-    const outFile = path.join(tmpDir, 'composed.mp4');
-    await concat(listFile, outFile);
+    // 3. concat via demuxer (skipped if only the base file made it through normalization)
+    let concatOut: string;
+    let strategy: ComposeResult['strategy'] = 'concat';
+    if (normalizedFiles.length > 1) {
+      const listFile = path.join(tmpDir, 'concat.txt');
+      await fs.writeFile(listFile, normalizedFiles.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n'));
+      concatOut = path.join(tmpDir, 'concat.mp4');
+      await concat(listFile, concatOut);
+    } else {
+      // Nothing to concat — fall through to finalize pass on the base directly.
+      concatOut = normalizedFiles[0];
+      strategy = 'finalize-only';
+    }
 
-    // 4. Upload result to CDN
+    // 4. Finalize pass — burn subtitles + mix music if requested. Otherwise concatOut is final.
+    let outFile = concatOut;
+    if (wantsFinalize) {
+      let srtFile: string | null = null;
+      if (input.subtitlesSrt) {
+        srtFile = path.join(tmpDir, 'captions.srt');
+        await fs.writeFile(srtFile, input.subtitlesSrt, 'utf8');
+      }
+      let musicFile: string | null = null;
+      if (input.musicUrl) {
+        musicFile = await downloadToTmp(input.musicUrl, tmpDir, 'music.m4a').catch(err => {
+          logger.warn(`[composer] music download failed: ${err.message}; skipping music mix`);
+          return null;
+        });
+      }
+      const finalFile = path.join(tmpDir, 'final.mp4');
+      await finalize(concatOut, finalFile, srtFile, musicFile, input.musicGain ?? 0.15);
+      outFile = finalFile;
+      strategy = strategy === 'finalize-only' ? 'finalize-only' : 'concat+finalize';
+    }
+
+    // 5. Upload result to CDN
     const buffer = await fs.readFile(outFile);
     const url = await uploadComposed(buffer, input.articleId, input.format, logger);
 
     // Best-effort duration probe
     const durationSec = await probeDuration(outFile).catch(() => undefined);
-    return { ok: true, url, durationSec, strategy: 'concat' };
+    return { ok: true, url, durationSec, strategy };
   } catch (err: any) {
     logger.warn(`[composer] failed: ${err.message}; falling back to base URL`);
     return { ok: false, url: input.baseVideoUrl, strategy: 'failed', error: err.message };
@@ -139,6 +175,60 @@ function concat(listFile: string, outputFile: string): Promise<void> {
       .input(listFile)
       .inputOptions(['-f', 'concat', '-safe', '0'])
       .outputOptions(['-c', 'copy', '-y'])
+      .save(outputFile)
+      .on('end', () => resolve())
+      .on('error', (err) => reject(err));
+  });
+}
+
+/**
+ * Finalize pass — re-encodes the concatenated video with optional subtitle
+ * burn-in and music bed. Triggered only when caller passes subtitlesSrt or
+ * musicUrl, so we don't pay the re-encode cost otherwise.
+ *
+ * Subtitle filter: `subtitles=` reads SRT directly. ASS-style overrides
+ * keep captions large + centered + readable on dark backgrounds (good
+ * default for vertical shorts). Path is sanitized for ffmpeg's filter
+ * arg parser which treats `:` and `\` specially.
+ *
+ * Music mix: simple amix of the base track + ducked music. We don't
+ * sidechain because the base audio has no easily-separable voice channel;
+ * a constant gain of ~0.15 sits well under typical TTS narration.
+ */
+function finalize(
+  inputFile: string,
+  outputFile: string,
+  srtFile: string | null,
+  musicFile: string | null,
+  musicGain: number,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const cmd = ffmpeg(inputFile);
+    if (musicFile) cmd.input(musicFile);
+
+    const vf: string[] = [];
+    if (srtFile) {
+      // Escape for ffmpeg filter parser: backslashes, colons, single quotes.
+      const esc = srtFile.replace(/\\/g, '/').replace(/:/g, '\\:').replace(/'/g, "'\\''");
+      vf.push(`subtitles='${esc}':force_style='Fontsize=22,Outline=2,Shadow=1,BorderStyle=1,Alignment=2,MarginV=60'`);
+    }
+
+    const outputOpts: string[] = [
+      '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
+      '-c:a', 'aac', '-b:a', '128k',
+      '-y',
+    ];
+
+    if (vf.length) outputOpts.push('-vf', vf.join(','));
+
+    if (musicFile) {
+      // Mix base audio (0:a) with ducked music (1:a). `duration=first` ends
+      // when the base track ends — music gets cut to fit.
+      const filter = `[1:a]volume=${musicGain.toFixed(2)}[bg];[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]`;
+      outputOpts.push('-filter_complex', filter, '-map', '0:v', '-map', '[aout]');
+    }
+
+    cmd.outputOptions(outputOpts)
       .save(outputFile)
       .on('end', () => resolve())
       .on('error', (err) => reject(err));

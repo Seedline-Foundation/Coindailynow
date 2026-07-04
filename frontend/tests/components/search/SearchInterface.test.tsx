@@ -546,7 +546,7 @@ describe('SearchInterface Component', () => {
       renderSearchInterface();
       
       const searchInput = screen.getByRole('searchbox');
-      expect(searchInput).toHaveAttribute('aria-label', 'Search CoinDaily content');
+      expect(searchInput).toHaveAttribute('aria-label', 'Search Sygn content');
       expect(searchInput).toHaveAttribute('aria-autocomplete', 'list');
       
       const resultsContainer = screen.getByRole('region', { name: /search results/i });

@@ -156,7 +156,7 @@ export function MobileMoneyModal({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('coindaily_access_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('sygn_access_token')}`
         },
         body: JSON.stringify({
           provider: data.provider,

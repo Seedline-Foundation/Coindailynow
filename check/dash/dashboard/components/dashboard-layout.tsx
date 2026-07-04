@@ -67,7 +67,7 @@ function DashboardNavigation({
             {/* Logo/Title */}
             <div className="flex-shrink-0 flex items-center">
               <h1 className="text-xl font-bold text-gray-900">
-                CoinDaily Africa - Admin Dashboard
+                Sygn Africa - Admin Dashboard
               </h1>
             </div>
 
@@ -193,7 +193,7 @@ function DashboardFooter() {
       <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
           <div className="flex items-center space-x-4 mb-2 sm:mb-0">
-            <span>© 2024 CoinDaily Africa</span>
+            <span>© 2024 Sygn Africa</span>
             <span>•</span>
             <span>Phase 4 Dashboard v1.0</span>
             {dashboard && (

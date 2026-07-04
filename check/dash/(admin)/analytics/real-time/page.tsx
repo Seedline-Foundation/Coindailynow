@@ -97,7 +97,7 @@ export default function RealTimeAnalytics() {
           </div>
           <div className="relative h-[300px] md:h-[400px] rounded-lg overflow-hidden">
             <Image 
-              src="/images/CoinDaily_Logo.jpeg" 
+              src="/images/Sygn_Logo.jpeg" 
               alt="Real-Time Analytics" 
               fill 
               className="object-cover"

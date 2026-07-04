@@ -17,10 +17,10 @@ scrape_configs:
           job: varlogs
           __path__: /var/log/*.log
 
-  - job_name: coindaily-backend
+  - job_name: sygn-backend
     static_configs:
       - targets:
           - localhost
         labels:
-          job: coindaily-backend
-          __path__: /opt/coindaily/backend/logs/*.log
+          job: sygn-backend
+          __path__: /opt/sygn/backend/logs/*.log

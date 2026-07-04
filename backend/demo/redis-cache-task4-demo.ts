@@ -49,7 +49,7 @@ class RedisCachingDemo {
       id: 1,
       title: 'Bitcoin Adoption Surges Across Africa',
       content: 'Major African exchanges report 300% increase in cryptocurrency adoption...',
-      author: 'CoinDaily Editorial',
+      author: 'Sygn Editorial',
       publishedAt: new Date(),
       category: 'African Markets',
       language: 'en'
@@ -65,7 +65,7 @@ class RedisCachingDemo {
     console.log(`⏱️  TTL: 3600 seconds (1 hour)`);
     
     // Verify call was made correctly
-    const expectedKey = 'coindaily:article:1';
+    const expectedKey = 'sygn:article:1';
     console.log(`🔑 Cache Key: ${expectedKey}`);
     
     // Demonstrate retrieval
@@ -372,7 +372,7 @@ class RedisCachingDemo {
    * Run complete demonstration
    */
   async runCompleteDemonstration() {
-    console.log('🚀 CoinDaily Platform - Task 4: Redis Caching Layer Implementation');
+    console.log('🚀 Sygn Platform - Task 4: Redis Caching Layer Implementation');
     console.log('==================================================================');
     console.log('Demonstrating comprehensive Redis caching with African market focus');
     

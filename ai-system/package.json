@@ -1,7 +1,7 @@
 {
-  "name": "coindaily-ai-system",
+  "name": "sygn-ai-system",
   "version": "1.0.0",
-  "description": "CoinDaily AI Agent System - Content Generation, Translation, and Analysis",
+  "description": "Sygn AI Agent System - Content Generation, Translation, and Analysis",
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",

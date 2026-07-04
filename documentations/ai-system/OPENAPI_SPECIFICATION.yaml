@@ -1,12 +1,12 @@
 openapi: 3.0.3
 info:
-  title: CoinDaily AI System API
+  title: Sygn AI System API
   version: 1.0.0
   description: |
-    Comprehensive REST API documentation for CoinDaily's AI System.
+    Comprehensive REST API documentation for Sygn's AI System.
     
     ## Overview
-    The CoinDaily AI System provides a comprehensive suite of AI-powered features for cryptocurrency content management,
+    The Sygn AI System provides a comprehensive suite of AI-powered features for cryptocurrency content management,
     market analysis, social media automation, and more.
     
     ## Base URL
@@ -40,7 +40,7 @@ info:
     ```
     
   contact:
-    name: CoinDaily API Support
+    name: Sygn API Support
     email: api@sygn.live
     url: https://docs.sygn.live
   license:

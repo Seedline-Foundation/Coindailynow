@@ -14,7 +14,7 @@ export class BillingAgent extends BaseAgent {
       name: 'Billing Agent',
       type: 'billing',
       category: 'finance',
-      description: 'Manages billing operations including invoice generation, payment reminders, subscription management, revenue analytics, and financial reporting for CoinDaily platform.',
+      description: 'Manages billing operations including invoice generation, payment reminders, subscription management, revenue analytics, and financial reporting for Sygn platform.',
       capabilities: [
         'invoice_generation',
         'payment_reminder',
@@ -60,7 +60,7 @@ export class BillingAgent extends BaseAgent {
   }
 
   private async generateInvoice(data: any, customerId?: string): Promise<Record<string, any>> {
-    const prompt = `Generate a professional invoice for CoinDaily services:
+    const prompt = `Generate a professional invoice for Sygn services:
 
 Customer: ${customerId || 'unknown'}
 Data: ${JSON.stringify(data || {}, null, 2)}
@@ -120,12 +120,12 @@ Return JSON:
   }
 
   private async manageSubscription(data: any, customerId?: string): Promise<Record<string, any>> {
-    const prompt = `Manage subscription for CoinDaily user:
+    const prompt = `Manage subscription for Sygn user:
 
 Customer: ${customerId || 'unknown'}
 Action: ${JSON.stringify(data || {}, null, 2)}
 
-CoinDaily tiers: Free, Pro ($9.99/mo), Premium ($24.99/mo), Enterprise (custom).
+Sygn tiers: Free, Pro ($9.99/mo), Premium ($24.99/mo), Enterprise (custom).
 
 Return JSON:
 {

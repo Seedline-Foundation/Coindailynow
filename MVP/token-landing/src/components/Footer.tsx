@@ -21,13 +21,13 @@ export default function Footer() {
     resources: [
       { name: 'About Us', href: '/about' },
       { name: 'How to Buy', href: '/#how-to-buy' },
-      { name: 'CoinDaily Platform', href: 'https://sygn.live' },
+      { name: 'Sygn Platform', href: 'https://sygn.live' },
       { name: 'FAQs', href: '/faq' },
       { name: 'Contact', href: '/contact' },
     ],
     social: [
-      { name: 'Twitter', href: 'https://twitter.com/coindaily001' },
-      { name: 'Telegram', href: 'https://t.me/coindailynewz' },
+      { name: 'Twitter', href: 'https://twitter.com/sygn001' },
+      { name: 'Telegram', href: 'https://t.me/sygnnewz' },
     ],
   };
 
@@ -44,16 +44,16 @@ export default function Footer() {
               <span className="text-xl font-bold gradient-text">Joy Token</span>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              Africa's premier utility token powering the CoinDaily ecosystem. Real yield, real utility.
+              Africa's premier utility token powering the Sygn ecosystem. Real yield, real utility.
             </p>
             <div className="flex space-x-4">
-              <a href="https://twitter.com/coindaily001" className="text-gray-400 hover:text-primary-500 transition-colors">
+              <a href="https://twitter.com/sygn001" className="text-gray-400 hover:text-primary-500 transition-colors">
                 <span className="sr-only">Twitter</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
                 </svg>
               </a>
-              <a href="https://t.me/coindailynewz" className="text-gray-400 hover:text-primary-500 transition-colors">
+              <a href="https://t.me/sygnnewz" className="text-gray-400 hover:text-primary-500 transition-colors">
                 <span className="sr-only">Telegram</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-1.078 4.465-1.524 5.926-.189.62-.561.827-.921.847-.783.072-1.377-.518-2.135-1.015-1.187-.779-1.856-1.264-3.011-2.024-1.335-.878-.47-1.36.291-2.149.199-.207 3.656-3.352 3.725-3.641.009-.036.017-.171-.064-.242-.081-.071-.2-.047-.285-.028-.122.028-2.065 1.313-5.832 3.856-.552.378-1.052.562-1.501.552-.494-.011-1.444-.279-2.15-.509-.866-.281-1.554-.43-1.495-.908.03-.248.376-.502.997-.761 3.906-1.702 6.51-2.826 7.812-3.374 3.719-1.551 4.488-1.821 4.991-1.83.111-.002.358.026.519.159.136.112.173.264.191.371.018.107.041.351.023.542z" />

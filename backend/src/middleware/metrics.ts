@@ -102,9 +102,9 @@ export function metricsRouter(): Router {
     }
 
     // Gauges
-    lines.push('# HELP coindaily_ivt_rate Current IVT percentage');
-    lines.push('# TYPE coindaily_ivt_rate gauge');
-    lines.push(`coindaily_ivt_rate ${ivtRate.toFixed(2)}`);
+    lines.push('# HELP sygn_ivt_rate Current IVT percentage');
+    lines.push('# TYPE sygn_ivt_rate gauge');
+    lines.push(`sygn_ivt_rate ${ivtRate.toFixed(2)}`);
 
     lines.push('# HELP nodejs_process_uptime_seconds Process uptime');
     lines.push('# TYPE nodejs_process_uptime_seconds gauge');

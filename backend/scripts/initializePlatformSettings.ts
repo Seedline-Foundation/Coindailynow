@@ -35,7 +35,7 @@ async function initializeSettings() {
         cePointsEnabled: true,
         defaultCurrency: 'JY',
         supportedCurrencies: 'JY,USD,EUR,KES,NGN,GHS,ZAR',
-        platformName: 'CoinDaily',
+        platformName: 'Sygn',
         maintenanceMode: false
       }
     });

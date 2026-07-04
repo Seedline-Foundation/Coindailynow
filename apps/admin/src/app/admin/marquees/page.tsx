@@ -1,15 +1,9 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import MarqueeAdmin from '@/components/admin/MarqueeAdmin';
-
-export default function AdminMarqueesPage() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Marquee Ticker</h1>
-        <p className="text-gray-400 text-sm mt-1">Manage header/footer tickers and breaking news flashes.</p>
-      </div>
-      <MarqueeAdmin />
-    </div>
-  );
+/**
+ * Archived. The /admin back office was consolidated into /super-admin.
+ * This stub redirects to the equivalent super-admin destination.
+ */
+export default function ArchivedAdminPage() {
+  redirect('/super-admin/marquees');
 }

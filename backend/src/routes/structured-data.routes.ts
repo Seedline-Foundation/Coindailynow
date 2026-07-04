@@ -248,7 +248,7 @@ router.post('/exchange-rate/generate', authMiddleware, async (req, res): Promise
 
 /**
  * GET /api/structured-data/organization
- * Get CoinDaily organization schema
+ * Get Sygn organization schema
  */
 router.get('/organization', async (req, res): Promise<void> => {
   try {

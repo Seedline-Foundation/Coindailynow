@@ -276,8 +276,8 @@ export class IdentityAccessManagement extends EventEmitter {
         process.env.JWT_SECRET!,
         {
           expiresIn: `${this.config.sessionTimeout}m`,
-          issuer: 'coindaily-iam',
-          audience: 'coindaily-app',
+          issuer: 'sygn-iam',
+          audience: 'sygn-app',
         }
       );
 

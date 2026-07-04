@@ -1,12 +1,12 @@
 #!/bin/bash
 # =============================================================================
-# CoinDaily Platform - Server Fix Script
+# Sygn Platform - Server Fix Script
 # Run on production server (167.86.99.97) to fix SSL + CORS + AI Dashboard
 # =============================================================================
 
 set -e
 echo "============================================"
-echo "  CoinDaily Server Fix Script"
+echo "  Sygn Server Fix Script"
 echo "  $(date)"
 echo "============================================"
 
@@ -44,7 +44,7 @@ echo "     [OK] SSL certificates updated"
 echo ""
 echo "[2/3] Rebuilding Backend (CORS fix)..."
 
-cd /var/www/coindaily-app
+cd /var/www/sygn-app
 
 echo "     Installing dependencies..."
 npm ci --production=false
@@ -56,7 +56,7 @@ echo "     Running Prisma generate..."
 npx prisma generate
 
 echo "     Restarting backend..."
-pm2 restart coindaily-backend
+pm2 restart sygn-backend
 
 echo "     Waiting for health check..."
 sleep 3
@@ -104,8 +104,8 @@ if ss -tlnp | grep -q ':3004'; then
 else
     echo "     [WARN] Port 3004 is NOT listening"
     echo "     Attempting to start AI dashboard..."
-    cd /var/www/coindaily-ai
-    pm2 restart coindaily-ai || pm2 start ecosystem.config.js --only coindaily-ai
+    cd /var/www/sygn-ai
+    pm2 restart sygn-ai || pm2 start ecosystem.config.js --only sygn-ai
 fi
 
 # Quick health check on AI endpoints

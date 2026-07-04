@@ -1,8 +1,8 @@
 {
-  "name": "@coindaily/news",
+  "name": "@sygn/news",
   "version": "1.0.0",
   "private": true,
-  "description": "CoinDaily News System - sygn.live",
+  "description": "Sygn News System - sygn.live",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",

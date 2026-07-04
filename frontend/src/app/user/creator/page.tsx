@@ -306,7 +306,7 @@ export default function CreatorHubPage() {
               <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800">
                 <h4 className="font-bold text-yellow-800 dark:text-yellow-200 mb-2">Only Trending Content Earns CP</h4>
                 <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                  Unlike flat per-read payments, CoinDaily rewards content that trends. The higher your article trends, the more CP you earn. This incentivizes quality, shareability, and genuine engagement.
+                  Unlike flat per-read payments, Sygn rewards content that trends. The higher your article trends, the more CP you earn. This incentivizes quality, shareability, and genuine engagement.
                 </p>
               </div>
 

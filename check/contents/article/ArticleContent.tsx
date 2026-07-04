@@ -198,7 +198,7 @@ export function ArticleContent({ article, seoData }: ArticleContentProps) {
             <span className="text-sm text-gray-500">Share:</span>
             <div className="flex items-center space-x-2">
               <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(`https://coindaily.online/news/${article.slug}`)}`}
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(`https://sygn.online/news/${article.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:text-blue-700 transition-colors"
@@ -206,7 +206,7 @@ export function ArticleContent({ article, seoData }: ArticleContentProps) {
                 Twitter
               </a>
               <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://coindaily.online/news/${article.slug}`)}`}
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://sygn.online/news/${article.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 transition-colors"
@@ -214,7 +214,7 @@ export function ArticleContent({ article, seoData }: ArticleContentProps) {
                 Facebook
               </a>
               <a
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://coindaily.online/news/${article.slug}`)}`}
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://sygn.online/news/${article.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-700 hover:text-blue-900 transition-colors"

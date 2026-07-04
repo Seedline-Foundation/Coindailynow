@@ -15,7 +15,7 @@ export const mockSearchResults = {
       isAiGenerated: true,
       isPremium: true,
       publishedAt: new Date().toISOString(),
-      author: 'CoinDaily AI',
+      author: 'Sygn AI',
       readTime: 5,
       category: 'Market Analysis'
     },

@@ -63,19 +63,19 @@ export async function sendEmailAlert(
 
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-      <h2 style="color:#1a1a2e;">New on CoinDaily Wire</h2>
+      <h2 style="color:#1a1a2e;">New on Sygn Wire</h2>
       <h3 style="margin:4px 0;">${escapeHtml(pr.title)}</h3>
       <p style="color:#555;">${escapeHtml(pr.summary)}</p>
       ${pr.company ? `<p><strong>Company:</strong> ${escapeHtml(pr.company)}</p>` : ''}
       <p><strong>Published:</strong> ${new Date(pr.publishedAt).toUTCString()}</p>
       <a href="${pressUrl}" style="display:inline-block;padding:10px 24px;background:#667eea;color:#fff;text-decoration:none;border-radius:4px;">Read Full Release</a>
       <hr style="margin-top:24px;border:none;border-top:1px solid #ddd;" />
-      <p style="font-size:12px;color:#888;">You are receiving this because you subscribed to CoinDaily Wire alerts.</p>
+      <p style="font-size:12px;color:#888;">You are receiving this because you subscribed to Sygn Wire alerts.</p>
     </div>
   `;
 
   const textBody = [
-    `New on CoinDaily Wire: ${pr.title}`,
+    `New on Sygn Wire: ${pr.title}`,
     pr.company ? `Company: ${pr.company}` : '',
     `Summary: ${pr.summary}`,
     `Published: ${pr.publishedAt}`,
@@ -130,7 +130,7 @@ export async function sendTelegramAlert(
   const pressUrl = pr.slug ? `${siteUrl}/press/${pr.slug}` : siteUrl;
 
   const text = [
-    `*New on CoinDaily Wire*`,
+    `*New on Sygn Wire*`,
     `*${escapeTelegramMd(pr.title)}*`,
     '',
     escapeTelegramMd(pr.summary),

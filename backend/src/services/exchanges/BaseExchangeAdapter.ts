@@ -225,7 +225,7 @@ export abstract class BaseExchangeAdapter extends EventEmitter {
       baseURL: this.integration.apiEndpoint,
       timeout: 10000,
       headers: {
-        'User-Agent': 'CoinDaily-Africa/1.0',
+        'User-Agent': 'Sygn-Africa/1.0',
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }

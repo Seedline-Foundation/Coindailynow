@@ -186,7 +186,7 @@ export function createMobileMoneyRoutes(
         amount: Math.round(amount * 100), // Convert to cents
         currency: currency || 'KES',
         phoneNumber,
-        description: description || 'CoinDaily Payment',
+        description: description || 'Sygn Payment',
         transactionType: transactionType || TransactionType.PREMIUM_CONTENT,
         subscriptionId,
         callbackUrl,

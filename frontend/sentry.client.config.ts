@@ -6,7 +6,7 @@ if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',
-    release: `coindaily-frontend@${process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0'}`,
+    release: `sygn-frontend@${process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0'}`,
 
     // Performance: sample 10% of page loads in production
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,

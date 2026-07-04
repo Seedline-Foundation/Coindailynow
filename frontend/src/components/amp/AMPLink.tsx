@@ -33,7 +33,7 @@ export default function AMPLink({ articleSlug, className = '' }: AMPLinkProps) {
  * Adds AMP metadata to article head
  */
 export function AMPMetaTags({ articleSlug }: { articleSlug: string }) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://coindaily.co';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sygn.co';
   const ampUrl = `${baseUrl}/amp/news/${articleSlug}`;
 
   return (

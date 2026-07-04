@@ -36,7 +36,7 @@ export default function PrivacyPage() {
           {/* Introduction */}
           <Section title="1. Introduction">
             <p className="text-gray-300 mb-4">
-              Joy Token ("we," "us," or "our") operates the website at joytoken.io and the CoinDaily platform 
+              Joy Token ("we," "us," or "our") operates the website at joytoken.io and the Sygn platform 
               (collectively, the "Services"). This Privacy Policy describes:
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">

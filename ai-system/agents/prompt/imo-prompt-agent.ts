@@ -551,12 +551,12 @@ Generate a comprehensive, well-structured response:`;
   // ============================================
 
   /**
-   * CoinDaily Editorial Tone Constraint — Bloomberg-tier, not CoinDesk/tabloid.
+   * Sygn Editorial Tone Constraint — Bloomberg-tier, not CoinDesk/tabloid.
    * Applied to every article and SEO prompt. Ensures confident neutral reporting.
    */
   private static readonly EDITORIAL_TONE_CONSTRAINT = `
 === EDITORIAL TONE POLICY (MANDATORY) ===
-You are writing for CoinDaily — a Bloomberg-tier financial news platform, NOT a hype blog. We cover Crypto, AI, TradFi, and Blockchain across Africa, LatAm, and the Caribbean.
+You are writing for Sygn — a Bloomberg-tier financial news platform, NOT a hype blog. We cover Crypto, AI, TradFi, and Blockchain across Africa, LatAm, and the Caribbean.
 
 BANNED LANGUAGE — never use these words or their synonyms:
 - Crypto/Blockchain: "moon", "mooning", "to the moon", "rocket", "skyrocket", "lambo", "pump", "dump", "shill", "FUD" (as dismissal), "hopium", "gem", "100x", "Ethereum killer", "web3 will save the world", "decentralize everything", "guaranteed returns", "can't lose", "WAGMI", "NGMI", "diamond hands", "degen"
@@ -575,7 +575,7 @@ REQUIRED TONE:
   private buildArticlePrompt(request: ImoPromptRequest): string {
     const { topic, tone = 'professional', targetAudience = 'general', africanFocus, caribbeanFocus, latamFocus, keywords = [] } = request.context;
 
-    return `You are an expert journalist writing for CoinDaily (covering Crypto, AI, TradFi, and Blockchain).
+    return `You are an expert journalist writing for Sygn (covering Crypto, AI, TradFi, and Blockchain).
 
 TOPIC: ${topic || 'financial news'}
 AUDIENCE: ${targetAudience}
@@ -626,7 +626,7 @@ STEP 6 - SOURCES CITED: At the end of the article, include a "Sources" section l
   - URL or document reference (if available)
 Format: numbered list. Minimum 3 sources per article. Bloomberg and Reuters cite every claim — so do we.
 
-STEP 7 - STRONG CTA: End with a call-to-action directing readers to related CoinDaily content and newsletter subscription.
+STEP 7 - STRONG CTA: End with a call-to-action directing readers to related Sygn content and newsletter subscription.
 
 STEP 8 - METADATA: Output a structured metadata block at the very end:
 \`\`\`metadata
@@ -739,7 +739,7 @@ STEP 5 - FAQ SECTION (3-5 questions): Target Google "People Also Ask" boxes. Wri
 
 STEP 6 - SOURCES CITED: Numbered list of every source referenced in the article. Each source: name, date, URL/reference. Minimum 3 sources.
 
-STEP 7 - STRONG CTA: End with call-to-action directing to related CoinDaily content, newsletter signup, or community. Format: "What to read next: [topic]" and "Stay informed: Subscribe to CoinDaily's regional briefing."
+STEP 7 - STRONG CTA: End with call-to-action directing to related Sygn content, newsletter signup, or community. Format: "What to read next: [topic]" and "Stay informed: Subscribe to Sygn's regional briefing."
 === END FRAMEWORK ===
 
 Structure:
@@ -854,7 +854,7 @@ REQUIREMENTS:
 - STEP 3: Follow the H2/H3 structure exactly with keyword variations in each heading
 - STEP 4: Insert [IMAGE: desc], [VIDEO: desc], or [CHART: desc] every ~300 words
 - STEP 5: End with FAQ section (3-5 "People Also Ask" questions with concise answers)
-- STEP 6: Close with strong CTA to related CoinDaily content and newsletter
+- STEP 6: Close with strong CTA to related Sygn content and newsletter
 
 ADDITIONAL:
 - Write for ${request.context.targetAudience || 'general'} audience

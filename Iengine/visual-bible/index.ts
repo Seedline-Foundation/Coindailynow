@@ -1,6 +1,6 @@
 /**
  * Visual Bible — Master Index
- * The highest-level design authority for the CoinDaily visual identity.
+ * The highest-level design authority for the Sygn visual identity.
  */
 
 export { cameraRules, getCameraDirective } from './camera';

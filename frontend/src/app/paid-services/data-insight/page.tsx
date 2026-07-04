@@ -80,7 +80,7 @@ const plans = [
       'Multi-currency macro analysis (NGN, KES, ZAR, GHS)',
       'Priority access to new datasets',
       'Board-ready presentation templates',
-      'Quarterly strategy sessions with CoinDaily analysts',
+      'Quarterly strategy sessions with Sygn analysts',
       'SLA-backed data availability (99.9%)',
     ],
     excluded: [],
@@ -128,7 +128,7 @@ export default function DataInsightPage() {
             📊 Premium Data Intelligence
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
-            CoinDaily Data Insight
+            Sygn Data Insight
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-3">
             In-depth analysis of African crypto and fiat markets. Trading signals, whale tracking, on-chain analytics,
@@ -254,7 +254,7 @@ export default function DataInsightPage() {
         {/* CTA */}
         <div className="text-center bg-gray-900 dark:bg-gray-800 rounded-2xl p-10 mb-8">
           <h3 className="text-2xl font-bold text-white mb-3">Stop Guessing. Start Knowing.</h3>
-          <p className="text-gray-400 mb-6 max-w-xl mx-auto">Join hundreds of traders, analysts, and institutions using CoinDaily Data Insight to make informed decisions in Africa&apos;s crypto markets.</p>
+          <p className="text-gray-400 mb-6 max-w-xl mx-auto">Join hundreds of traders, analysts, and institutions using Sygn Data Insight to make informed decisions in Africa&apos;s crypto markets.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <button className="px-8 py-3 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition-all shadow-lg">
               Start Free Trial (7 Days) →

@@ -34,7 +34,7 @@ const services = [
   {
     icon: '🛒',
     title: 'Digital Marketplace',
-    description: 'Premium reports, courses, digital tools, tax calculators, surge alerts, portfolio trackers, and CoinDaily merchandise.',
+    description: 'Premium reports, courses, digital tools, tax calculators, surge alerts, portfolio trackers, and Sygn merchandise.',
     href: '/paid-services/marketplace',
     cta: 'Browse Shop',
     priceFrom: '$4.99 – $299',
@@ -50,7 +50,7 @@ const services = [
   {
     icon: '🤝',
     title: 'Affiliate Program',
-    description: 'Earn 20–30% recurring commissions promoting CoinDaily products. Payouts via USDT, BTC, M-Pesa, or bank transfer.',
+    description: 'Earn 20–30% recurring commissions promoting Sygn products. Payouts via USDT, BTC, M-Pesa, or bank transfer.',
     href: '/paid-services/affiliate',
     cta: 'Join Program',
     priceFrom: '20–30% commission',
@@ -89,7 +89,7 @@ export default function PaidServicesPage() {
         {/* Hero */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full text-sm font-medium mb-4">
-            💼 CoinDaily Paid Services
+            💼 Sygn Paid Services
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
             Grow with Africa&apos;s #1 Crypto Platform

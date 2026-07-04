@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'User Content Policy | CoinDaily Online',
-  description: 'Guidelines for user-generated content on CoinDaily Online, including community standards, moderation policies, and content submission rules.',
+  title: 'User Content Policy | Sygn Online',
+  description: 'Guidelines for user-generated content on Sygn Online, including community standards, moderation policies, and content submission rules.',
   robots: 'index, follow',
 };
 
@@ -26,7 +26,7 @@ export default function UserContentPage() {
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Overview</h2>
                 <p className="text-gray-700 mb-4">
-                  This User Content Policy governs all content that users submit, post, or share on CoinDaily Online. By using our platform, you agree to follow these guidelines and contribute to a positive community experience.
+                  This User Content Policy governs all content that users submit, post, or share on Sygn Online. By using our platform, you agree to follow these guidelines and contribute to a positive community experience.
                 </p>
               </div>
 
@@ -226,7 +226,7 @@ export default function UserContentPage() {
                   If your content is removed or restricted, you can appeal by:
                 </p>
                 <ul className="list-disc pl-6 mb-4 text-gray-700">
-                  <li>Contacting our support team at <a href="mailto:appeals@coindaily.online" className="text-blue-600 hover:text-blue-800">appeals@coindaily.online</a></li>
+                  <li>Contacting our support team at <a href="mailto:appeals@sygn.online" className="text-blue-600 hover:text-blue-800">appeals@sygn.online</a></li>
                   <li>Providing a detailed explanation of why you believe the action was incorrect</li>
                   <li>Including any relevant evidence or context</li>
                   <li>Waiting for our review team to respond within 5-7 business days</li>
@@ -239,7 +239,7 @@ export default function UserContentPage() {
                   For questions about our User Content Policy:
                 </p>
                 <div className="bg-gray-100 p-4 rounded-lg">
-                  <p className="text-gray-700">Email: <a href="mailto:content@coindaily.online" className="text-blue-600 hover:text-blue-800">content@coindaily.online</a></p>
+                  <p className="text-gray-700">Email: <a href="mailto:content@sygn.online" className="text-blue-600 hover:text-blue-800">content@sygn.online</a></p>
                   <p className="text-gray-700">Subject: User Content Policy Inquiry</p>
                 </div>
               </div>

@@ -517,7 +517,7 @@ export class AlgorithmDefenseService {
       schema.author = { '@type': 'Person', name: 'Author Name' };
       schema.publisher = {
         '@type': 'Organization',
-        name: 'CoinDaily',
+        name: 'Sygn',
         logo: {
           '@type': 'ImageObject',
           url: 'https://sygn.live/logo.png'

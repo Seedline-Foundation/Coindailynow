@@ -12,7 +12,7 @@ CREATE TABLE "PlatformSettings" (
     "cePointsEnabled" BOOLEAN NOT NULL DEFAULT true,
     "defaultCurrency" TEXT NOT NULL DEFAULT 'JY',
     "supportedCurrencies" TEXT NOT NULL DEFAULT 'JY,USD,EUR,KES,NGN,GHS,ZAR',
-    "platformName" TEXT NOT NULL DEFAULT 'CoinDaily',
+    "platformName" TEXT NOT NULL DEFAULT 'Sygn',
     "platformUrl" TEXT,
     "maintenanceMode" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

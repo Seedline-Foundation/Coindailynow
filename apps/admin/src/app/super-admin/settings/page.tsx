@@ -244,7 +244,7 @@ function SuperAdminSettingsPage() {
   // Full defaults so the page always renders even if the API is unreachable
   const defaultConfig: SystemConfig = {
     general: {
-      siteName: 'CoinDaily',
+      siteName: 'Sygn',
       siteDescription: "Africa's Premier Cryptocurrency News Platform",
       primaryDomain: 'https://sygn.live',
       supportEmail: 'support@sygn.live',
@@ -273,7 +273,7 @@ function SuperAdminSettingsPage() {
       smtpUsername: '',
       smtpPassword: '',
       fromEmail: 'noreply@sygn.live',
-      fromName: 'CoinDaily',
+      fromName: 'Sygn',
     },
     storage: {
       provider: 'local',
@@ -399,7 +399,7 @@ function SuperAdminSettingsPage() {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `coindaily-config-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `sygn-config-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
   };
 
@@ -1029,7 +1029,7 @@ function SuperAdminSettingsPage() {
                     value={config.email.fromName}
                     onChange={(e) => updateConfig('email', 'fromName', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="CoinDaily"
+                    placeholder="Sygn"
                   />
                 </div>
               </div>
@@ -1080,7 +1080,7 @@ function SuperAdminSettingsPage() {
                         value={config.storage.s3Bucket}
                         onChange={(e) => updateConfig('storage', 's3Bucket', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                        placeholder="coindaily-media"
+                        placeholder="sygn-media"
                       />
                     </div>
                     <div>
@@ -1634,7 +1634,7 @@ function SuperAdminSettingsPage() {
                   <div>
                     <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">Social Media Engagement (Login & Contribute to Discussions)</h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                      Users earn CP by logging into and actively contributing to discussions on CoinDaily&apos;s official social channels.
+                      Users earn CP by logging into and actively contributing to discussions on Sygn&apos;s official social channels.
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                       {[

@@ -20,7 +20,7 @@ async function safeQuery<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
 const fallbackBounties = [
   {
     id: 'social-share',
-    title: 'Share CoinDaily on Social Media',
+    title: 'Share Sygn on Social Media',
     category: 'social_share',
     reward: 50,
     rewardType: 'token',
@@ -58,7 +58,7 @@ const fallbackBounties = [
   },
   {
     id: 'referral',
-    title: 'Refer a Friend to CoinDaily',
+    title: 'Refer a Friend to Sygn',
     category: 'referral',
     reward: 25,
     rewardType: 'token',

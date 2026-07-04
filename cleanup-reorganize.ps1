@@ -1,8 +1,8 @@
-# CoinDaily Platform - Directory Reorganization Script
+# Sygn Platform - Directory Reorganization Script
 $RootPath = "C:\Users\user\Desktop\news-platform"
 $DocumentationsPath = "$RootPath\documentations"
 
-Write-Host "CoinDaily Platform Reorganization" -ForegroundColor Green
+Write-Host "Sygn Platform Reorganization" -ForegroundColor Green
 Write-Host "===================================" -ForegroundColor Green
 Write-Host ""
 
@@ -27,7 +27,7 @@ $FileCategories = @{
     "ai" = @("AI_MODELS_MIGRATION_COMPLETE.md","AI_MODERATION_FIXES_PROGRESS.md","AI_SELF_HOSTING_GUIDE.md","AI_SYSTEM_INTEGRATION_COMPLETE.md","AI_SYSTEM_QUICK_REFERENCE.md","test-agents.mjs","test-agents.ps1","test-complete-workflow.ts","test-llama.ts","test-lm-studio.ps1","test-translation.ts","DEPLOY_AI_SERVER.md","deploy-ai.ps1","deploy-ai.sh")
     "deployment" = @("DEPLOYMENT_CHECKLIST.md","DEPLOYMENT_GUIDE.md","DEPLOYMENT_PACKAGE_SUMMARY.md","DEPLOYMENT_QUICKSTART.md","DEPLOYMENT_README.md","CONTABO_DEPLOYMENT_GUIDE.md","CONTABO_DB_MIGRATION_RUNBOOK.md","CONTABO_FIX_COMING_SOON.md","deploy-production.sh","deploy.ps1","deploy-all.ps1","deploy-affiliate-updates.sh","START_HERE_DEPLOYMENT.md","PRE_DEPLOYMENT_PREP.md","PRODUCTION_DEPLOYMENT_CHECKLIST.md","PRODUCTION_READY_STATUS.md","fix-server-domains.sh")
     "features" = @("WALLET_INTEGRATION_COMPLETE.md","WALLET_FRAUD_DETECTION_STATUS.md","WALLET_FRAUD_SYSTEM_COMPLETE.md","WALLET_MODALS_COMPLETE.md","WALLET_MODALS_QUICK_REFERENCE.md","WALLET_MODALS_STATUS.md","WALLET_QUICK_REFERENCE.md","WITHDRAWAL_FRONTEND_COMPLETE.md","WITHDRAWAL_SYSTEM_COMPLETE.md","HYBRID_WALLET_CONFIRMATION.md","FRAUD_ALERT_API_REFERENCE.md","FRAUD_DETECTION_DEPLOYMENT_CHECKLIST.md","WALLET_SCHEMA_ENHANCEMENTS.prisma","COMING_SOON_COMPLETE.md","START_COMING_SOON.md","FIX_COMING_SOON_NOW.md","EXPANDED_PERMISSIONS_FINANCE_FEATURES.md")
-    "architecture" = @("PLATFORM_ARCHITECTURE.md","CoinDaily_CFIS_Architecture.md","CoinDaily_Platform_Blueprint.md","BLUEPRINT_AUDIT_REPORT.md","INTEGRATION_COMPLETE.md","BACKEND_IMPLEMENTATION_COMPLETE.md","BACKEND_ENDPOINT_CONNECTIONS_COMPLETE.md","NEW_FEATURES_COMPLETE.md")
+    "architecture" = @("PLATFORM_ARCHITECTURE.md","Sygn_CFIS_Architecture.md","Sygn_Platform_Blueprint.md","BLUEPRINT_AUDIT_REPORT.md","INTEGRATION_COMPLETE.md","BACKEND_IMPLEMENTATION_COMPLETE.md","BACKEND_ENDPOINT_CONNECTIONS_COMPLETE.md","NEW_FEATURES_COMPLETE.md")
     "guides" = @("QUICK_START_GUIDE.md","QUICK_START_TESTING.md","QUICK_REFERENCE_CARD.md","LOGIN_QUICK_REFERENCE.txt","NAVIGATION_LINKS_REFERENCE.md","SUPABASE_MIGRATION_GUIDE.md","SUPABASE_QUICK_REFERENCE.md","WIREGUARD_VPN_SECURITY_GUIDE.md","NEWS_SOURCES_AND_APIS.md")
     "technical" = @("BUILD_FIX_PROGRESS.md","BUILD_FIX_TYPESCRIPT_COMPLETE.md","BUILD_STATUS_REPORT.md","ERROR_FIXES_SUMMARY.md","TYPESCRIPT_FIXES_COMPLETED.md","404_ERRORS_FIXED.md","UNIMPLEMENTED_TASKS_AND_ERRORS.md","MIGRATION_COMPLETE.md","COMPLETION_SUMMARY.md")
     "assets" = @("correction.png","correction1.png","debug-page.html")

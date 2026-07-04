@@ -1,4 +1,4 @@
-// Conversion Rate Optimization utilities for CoinDaily
+// Conversion Rate Optimization utilities for Sygn
 import React, { useState, useEffect } from 'react';
 
 // Global type declarations

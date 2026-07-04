@@ -1,7 +1,7 @@
 {
-  "name": "coindaily-coming-soon",
+  "name": "sygn-coming-soon",
   "version": "1.0.0",
-  "description": "CoinDaily Coming Soon Landing Page",
+  "description": "Sygn Coming Soon Landing Page",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3002",

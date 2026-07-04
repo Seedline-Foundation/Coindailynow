@@ -103,7 +103,7 @@ export async function HomeArticlesSection({
         </section>
       ) : (
         <section className="mb-10 rounded-2xl bg-dark-800 border border-dark-700 p-12 text-center">
-          <h2 className="text-2xl font-display font-bold text-white mb-3">Welcome to CoinDaily</h2>
+          <h2 className="text-2xl font-display font-bold text-white mb-3">Welcome to Sygn</h2>
           <p className="text-gray-400">No published articles yet for this country and language.</p>
         </section>
       )}

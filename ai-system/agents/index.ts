@@ -1,5 +1,5 @@
 /**
- * CoinDaily Agent Registry
+ * Sygn Agent Registry
  * Central registry for all AI agents - provides discovery, management, and monitoring
  */
 

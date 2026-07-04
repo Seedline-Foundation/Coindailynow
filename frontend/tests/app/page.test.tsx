@@ -13,7 +13,7 @@ describe('Home Page', () => {
   it('renders the main content', () => {
     render(<Home />);
     // Test for content that actually exists in the page
-    expect(screen.getByText('CoinDaily Africa')).toBeInTheDocument();
+    expect(screen.getByText('Sygn Africa')).toBeInTheDocument();
     expect(screen.getByText(/Africa's premier cryptocurrency news platform/)).toBeInTheDocument();
   });
 

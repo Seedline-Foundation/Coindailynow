@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
 
 export const metadata: Metadata = {
-  title: 'CoinDaily Admin',
+  title: 'Sygn Admin',
   description: 'Super Admin Portal',
   robots: 'noindex, nofollow', // Never index admin pages
 };

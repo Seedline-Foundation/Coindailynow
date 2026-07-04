@@ -3,7 +3,7 @@
  *
  * Existing researchAgent.ts covers 6 African regulator pages. This module
  * adds the US, LATAM, Caribbean, and global research-paper sources required
- * for the "info/data hub center" positioning across all CoinDaily regions.
+ * for the "info/data hub center" positioning across all Sygn regions.
  *
  * Each source is RSS or HTML; the agent fetches in parallel and dedupes
  * by URL/title before scoring. Failures are logged and skipped — one

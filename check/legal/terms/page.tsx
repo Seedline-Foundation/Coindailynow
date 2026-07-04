@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | CoinDaily',
-  description: 'Terms of Service governing your use of CoinDaily platform and services.',
+  title: 'Terms of Service | Sygn',
+  description: 'Terms of Service governing your use of Sygn platform and services.',
   robots: 'index, follow',
 };
 
@@ -14,7 +14,7 @@ export default function TermsOfServicePage() {
         <p className="text-gray-600">Effective Date: July 31, 2025</p>
 
         <p>
-          Welcome to CoinDaily (&ldquo;we&rdquo;, &ldquo;our&rdquo;, &ldquo;us&rdquo;). These Terms of Service (&ldquo;Terms&rdquo;) govern 
+          Welcome to Sygn (&ldquo;we&rdquo;, &ldquo;our&rdquo;, &ldquo;us&rdquo;). These Terms of Service (&ldquo;Terms&rdquo;) govern 
           your access to and use of our website, mobile applications, and services 
           (collectively, the &ldquo;Service&rdquo;). By accessing or using the Service, you agree to 
           be bound by these Terms.
@@ -59,7 +59,7 @@ export default function TermsOfServicePage() {
 
         <h2>6. Intellectual Property</h2>
         <p>
-          All content, logos, trademarks, and software are owned by CoinDaily or our licensors. 
+          All content, logos, trademarks, and software are owned by Sygn or our licensors. 
           Unauthorized use is prohibited. See{' '}
           <a href="/legal/intellectual-property" className="text-blue-600 hover:text-blue-800">
             Intellectual Property Notice
@@ -89,8 +89,8 @@ export default function TermsOfServicePage() {
         <h2>10. Contact</h2>
         <p>
           For questions or notices, email{' '}
-          <a href="mailto:legal@coindaily.com" className="text-blue-600 hover:text-blue-800">
-            legal@coindaily.com
+          <a href="mailto:legal@sygn.com" className="text-blue-600 hover:text-blue-800">
+            legal@sygn.com
           </a>.
         </p>
       </div>

@@ -71,7 +71,7 @@ export default function HowToBuy() {
           <p className="text-gray-400 mt-4">
             Need help? Visit{' '}
             <a href="https://sygn.live" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">
-              CoinDaily.online
+              Sygn.online
             </a>{' '}
             for guides
           </p>

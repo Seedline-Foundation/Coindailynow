@@ -288,7 +288,7 @@ export class ImoContentGenerationAgent {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert cryptocurrency journalist for CoinDaily Africa, specializing in African crypto markets.'
+            content: 'You are an expert cryptocurrency journalist for Sygn Africa, specializing in African crypto markets.'
           },
           { role: 'user', content: prompt }
         ],

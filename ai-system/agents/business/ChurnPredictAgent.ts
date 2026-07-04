@@ -14,7 +14,7 @@ export class ChurnPredictAgent extends BaseAgent {
       name: 'ChurnPredict Agent',
       type: 'churn_prediction',
       category: 'business',
-      description: 'Uses behavioral data and AI analysis to predict user churn, identify at-risk subscribers, and generate personalized retention strategies for CoinDaily platform users.',
+      description: 'Uses behavioral data and AI analysis to predict user churn, identify at-risk subscribers, and generate personalized retention strategies for Sygn platform users.',
       capabilities: [
         'churn_prediction',
         'risk_scoring',
@@ -60,7 +60,7 @@ export class ChurnPredictAgent extends BaseAgent {
   }
 
   private async predictChurn(users: any[]): Promise<Record<string, any>> {
-    const prompt = `Predict churn risk for these CoinDaily users:
+    const prompt = `Predict churn risk for these Sygn users:
 
 Users: ${JSON.stringify(users || [], null, 2)}
 
@@ -223,7 +223,7 @@ Return JSON:
   }
 
   private async createWinbackCampaign(data: any): Promise<Record<string, any>> {
-    const prompt = `Create a win-back campaign for churned CoinDaily users:
+    const prompt = `Create a win-back campaign for churned Sygn users:
 
 Churned users data: ${JSON.stringify(data || {}, null, 2)}
 

@@ -41,7 +41,7 @@ export default function TermsPage() {
             <div className="space-y-4 text-gray-200">
               <p>
                 <strong>Joy Token ($JY) is a utility token</strong> designed to provide access to features, 
-                services, and benefits within the CoinDaily ecosystem. It is <strong>NOT</strong>:
+                services, and benefits within the Sygn ecosystem. It is <strong>NOT</strong>:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li>An investment contract</li>
@@ -74,7 +74,7 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4 mb-4">
               <li>The Joy Token website at joytoken.io</li>
-              <li>The CoinDaily platform at sygn.live</li>
+              <li>The Sygn platform at sygn.live</li>
               <li>Joy Token ($JY) utility tokens</li>
               <li>All associated services, tools, and features (collectively, the "Services")</li>
             </ul>
@@ -93,7 +93,7 @@ export default function TermsPage() {
             <h3 className="text-2xl font-bold text-primary-400 mb-4">2.1 Utility Token Classification</h3>
             <p className="text-gray-300 mb-4">
               Joy Token ($JY) is a <strong>utility token</strong> that grants access to specific platform features 
-              and services within the CoinDaily ecosystem. <strong>IT IS NOT A SECURITY</strong> under the Howey Test 
+              and services within the Sygn ecosystem. <strong>IT IS NOT A SECURITY</strong> under the Howey Test 
               or similar legal frameworks because:
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4 mb-6">
@@ -248,7 +248,7 @@ export default function TermsPage() {
               <li><strong>Loss of Value:</strong> $JY price may decline to zero; no guaranteed floor price</li>
               <li><strong>No Liquidity Guarantee:</strong> We do not promise exchange listings or market liquidity</li>
               <li><strong>Volatility:</strong> Token prices can fluctuate wildly based on market sentiment</li>
-              <li><strong>Platform Failure:</strong> If CoinDaily fails, tokens may become worthless</li>
+              <li><strong>Platform Failure:</strong> If Sygn fails, tokens may become worthless</li>
               <li><strong>No Revenue Guarantee:</strong> Platform revenue may not materialize; staking rewards may be lower than projected</li>
             </ul>
 

@@ -376,7 +376,7 @@ async function sendOTPEmail(
         <div class="container">
           <div class="header">
             <h1>🔐 Verification Code</h1>
-            <p>CoinDaily Security</p>
+            <p>Sygn Security</p>
           </div>
           <div class="content">
             <h2>Hello!</h2>
@@ -394,14 +394,14 @@ async function sendOTPEmail(
               <strong>🛡️ Security Tips:</strong>
               <ul>
                 <li>Never share your verification code with anyone</li>
-                <li>CoinDaily staff will never ask for your verification code</li>
+                <li>Sygn staff will never ask for your verification code</li>
                 <li>Be cautious of phishing attempts</li>
                 <li>Verify the URL before entering any codes</li>
               </ul>
             </div>
           </div>
           <div class="footer">
-            <p>© 2025 CoinDaily. All rights reserved.</p>
+            <p>© 2025 Sygn. All rights reserved.</p>
             <p>If you have questions, contact us at support@sygn.live</p>
           </div>
         </div>

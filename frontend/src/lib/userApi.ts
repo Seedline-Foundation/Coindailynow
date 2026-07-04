@@ -10,7 +10,7 @@ function getCandidateTokens(): string[] {
 
   const authToken = localStorage.getItem('auth_token');
   const accessToken = localStorage.getItem('accessToken');
-  const storedTokensRaw = localStorage.getItem('coindaily_tokens');
+  const storedTokensRaw = localStorage.getItem('sygn_tokens');
 
   let contextToken: string | null = null;
   if (storedTokensRaw) {

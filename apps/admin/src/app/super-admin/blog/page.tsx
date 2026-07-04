@@ -123,7 +123,7 @@ export default function BlogManagementPage() {
                 title: `AI Generated: ${prompt.slice(0, 60)}`,
                 content: typeof output === 'string' ? output : JSON.stringify(output, null, 2),
                 sections: [],
-                metaTitle: `${prompt.slice(0, 55)} | CoinDaily`,
+                metaTitle: `${prompt.slice(0, 55)} | Sygn`,
                 metaDescription: `Comprehensive guide about ${prompt.slice(0, 100)}. Expert analysis for the African crypto market.`,
                 targetKeywords: prompt.split(' ').filter(w => w.length > 3),
                 estimatedWords: typeof output === 'string' ? output.split(/\s+/).length : 500,

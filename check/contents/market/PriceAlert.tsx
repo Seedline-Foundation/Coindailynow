@@ -23,7 +23,7 @@ const PriceAlert = () => {
       const timeoutId = setTimeout(() => controller.abort(), 2000); // Terminate after 2 seconds
 
       try {
-        const response = await fetch('https://api.coindaily.online/mock-price-alerts', {
+        const response = await fetch('https://api.sygn.online/mock-price-alerts', {
           signal: controller.signal,
           cache: 'no-store',
         });

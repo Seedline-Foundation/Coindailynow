@@ -51,7 +51,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           transition-colors duration-200
           ${className}
         `}
-        aria-label="Search CoinDaily content"
+        aria-label="Search Sygn content"
         aria-autocomplete="list"
         aria-expanded={false}
         autoComplete="off"

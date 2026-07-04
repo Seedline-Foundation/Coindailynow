@@ -1,7 +1,7 @@
 {
-  "name": "coindaily-frontend",
+  "name": "sygn-frontend",
   "version": "1.0.0",
-  "description": "CoinDaily Platform Frontend - Africa's Premier Cryptocurrency News Platform",
+  "description": "Sygn Platform Frontend - Africa's Premier Cryptocurrency News Platform",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",

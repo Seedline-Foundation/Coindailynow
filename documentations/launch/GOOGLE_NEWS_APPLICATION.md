@@ -20,7 +20,7 @@
 
 1. **Go to** https://publishercenter.google.com
 2. **Add publication:**
-   - Publication name: `CoinDaily Africa`
+   - Publication name: `Sygn Africa`
    - Website URL: `https://sygn.live`
    - Language: English (primary)
    - Country: Nigeria (primary market)

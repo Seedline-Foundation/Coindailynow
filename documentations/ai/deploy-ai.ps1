@@ -4,12 +4,12 @@
 param(
     [string]$ServerHost = "5.189.133.47",  # Your Contabo IP
     [string]$ServerUser = "root",
-    [string]$DeployPath = "/opt/coindaily"
+    [string]$DeployPath = "/opt/sygn"
 )
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "🚀 Deploying CoinDaily AI System to $ServerHost" -ForegroundColor Cyan
+Write-Host "🚀 Deploying Sygn AI System to $ServerHost" -ForegroundColor Cyan
 
 # Build the AI app
 Write-Host "`n📦 Building AI Dashboard..." -ForegroundColor Yellow

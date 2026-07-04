@@ -3,7 +3,7 @@
  * Universal JavaScript SDK for PR distribution
  */
 
-export { CoindailySDK as SendPress } from './core/CoindailySDK.js';
+export { SygnSDK as SendPress } from './core/SygnSDK.js';
 export { PRCard } from './components/PRCard.js';
 export { PRFull, PRContainer } from './components/PRFull.js';
 
@@ -15,7 +15,7 @@ export { PRFull, PRContainer } from './components/PRFull.js';
         document.querySelector('script[data-partner-id]');
     
     if (script && script.dataset.partnerId) {
-        const { SendPress } = require('./core/CoindailySDK.js');
+        const { SendPress } = require('./core/SygnSDK.js');
         window.sendpress = new SendPress(script.dataset.partnerId, {
             mode: script.dataset.mode || 'AUTO',
             apiUrl: script.dataset.apiUrl

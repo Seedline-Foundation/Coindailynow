@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Topic is required' }, { status: 400 });
     }
 
-    const prompt = `You are an expert cryptocurrency journalist writing for CoinDaily Africa. Write engaging, accurate news articles focused on African crypto markets.
+    const prompt = `You are an expert cryptocurrency journalist writing for Sygn Africa. Write engaging, accurate news articles focused on African crypto markets.
 
 Write a ${length || 'medium-length'} ${style || 'news'} article about:
 ${topic}

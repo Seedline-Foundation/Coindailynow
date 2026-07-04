@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { listProducts, type MarketplaceProduct } from '@/lib/marketplaceApi';
 
 export const metadata = {
-  title: 'Marketplace · CoinDaily',
+  title: 'Marketplace · Sygn',
   description: 'Buy reports, courses, datasets, and templates from African crypto creators.',
 };
 

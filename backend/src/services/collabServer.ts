@@ -58,7 +58,7 @@ function ydocToTiptapJson(ydoc: Y.Doc): any {
 
 export function createCollabServer(): ReturnType<typeof Server.configure> {
   return Server.configure({
-    name: 'coindaily-collab',
+    name: 'sygn-collab',
 
     async onAuthenticate({ token, documentName }) {
       const payload = verifyCollabToken(token);

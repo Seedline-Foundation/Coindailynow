@@ -443,7 +443,7 @@ async function executeQualityReview(inputData: any) {
   
   const content = inputData.content || inputData.text || '';
   
-  const prompt = `You are a professional editor for CoinDaily, Africa's premier crypto news platform. Review the following content for quality, accuracy, and readability.\n\nContent to review:\n${content.substring(0, 3000)}\n\nProvide your review in this JSON format:\n{"approved": true/false, "score": 0.0-1.0, "feedback": "...", "suggestions": ["..."]}\n\nReview:`;
+  const prompt = `You are a professional editor for Sygn, Africa's premier crypto news platform. Review the following content for quality, accuracy, and readability.\n\nContent to review:\n${content.substring(0, 3000)}\n\nProvide your review in this JSON format:\n{"approved": true/false, "score": 0.0-1.0, "feedback": "...", "suggestions": ["..."]}\n\nReview:`;
 
   try {
     const res = await fetch(`${OLLAMA_URL}/api/generate`, {

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================
-# CoinDaily Platform - Full Deployment Script
+# Sygn Platform - Full Deployment Script
 # ============================================
 
 set -e
@@ -9,7 +9,7 @@ set -e
 SERVER_IP="167.86.99.97"
 SERVER_USER="root"
 DEPLOY_DIR="/var/www"
-LOG_DIR="/var/log/coindaily"
+LOG_DIR="/var/log/sygn"
 LOCAL_DIR="$(dirname "$(dirname "$(readlink -f "$0")")")"
 
 # Colors for output
@@ -20,7 +20,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}============================================${NC}"
-echo -e "${BLUE}   CoinDaily Platform Deployment${NC}"
+echo -e "${BLUE}   Sygn Platform Deployment${NC}"
 echo -e "${BLUE}============================================${NC}"
 
 # Check SSH connectivity
@@ -31,15 +31,15 @@ echo -e "${GREEN}✓ SSH connection successful${NC}"
 # Create directory structure
 echo -e "${YELLOW}[2/10] Creating directory structure...${NC}"
 ssh ${SERVER_USER}@${SERVER_IP} << 'EOF'
-mkdir -p /var/www/coindaily-app
-mkdir -p /var/www/coindaily
-mkdir -p /var/www/coindaily-admin
-mkdir -p /var/www/coindaily-press
-mkdir -p /var/www/coindaily-ai
-mkdir -p /var/www/coindaily-ai-system
-mkdir -p /var/www/coindaily-token
-mkdir -p /var/log/coindaily
-chmod 755 /var/log/coindaily
+mkdir -p /var/www/sygn-app
+mkdir -p /var/www/sygn
+mkdir -p /var/www/sygn-admin
+mkdir -p /var/www/sygn-press
+mkdir -p /var/www/sygn-ai
+mkdir -p /var/www/sygn-ai-system
+mkdir -p /var/www/sygn-token
+mkdir -p /var/log/sygn
+chmod 755 /var/log/sygn
 echo "✓ Directories created"
 EOF
 
@@ -51,7 +51,7 @@ rsync -avz --delete \
     --exclude 'tests' \
     --exclude '*.log' \
     --exclude '.env.local' \
-    ${LOCAL_DIR}/backend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-app/
+    ${LOCAL_DIR}/backend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/sygn-app/
 echo -e "${GREEN}✓ Backend synced${NC}"
 
 # Sync News Frontend
@@ -61,7 +61,7 @@ rsync -avz --delete \
     --exclude '.git' \
     --exclude '.next/cache' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/frontend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily/
+    ${LOCAL_DIR}/frontend/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/sygn/
 echo -e "${GREEN}✓ News Frontend synced${NC}"
 
 # Sync Admin Portal
@@ -71,7 +71,7 @@ rsync -avz --delete \
     --exclude '.git' \
     --exclude '.next/cache' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/apps/admin/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-admin/
+    ${LOCAL_DIR}/apps/admin/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/sygn-admin/
 echo -e "${GREEN}✓ Admin Portal synced${NC}"
 
 # Sync PR System
@@ -81,7 +81,7 @@ rsync -avz --delete \
     --exclude '.git' \
     --exclude '.next/cache' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/apps/press/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-press/
+    ${LOCAL_DIR}/apps/press/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/sygn-press/
 echo -e "${GREEN}✓ PR System synced${NC}"
 
 # Sync AI Dashboard (Next.js) + AI Pipeline (orchestrator)
@@ -91,12 +91,12 @@ rsync -avz --delete \
     --exclude '.git' \
     --exclude '.next/cache' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/apps/ai/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-ai/
+    ${LOCAL_DIR}/apps/ai/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/sygn-ai/
 rsync -avz --delete \
     --exclude 'node_modules' \
     --exclude '.git' \
     --exclude '*.log' \
-    ${LOCAL_DIR}/ai-system/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/coindaily-ai-system/
+    ${LOCAL_DIR}/ai-system/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/sygn-ai-system/
 echo -e "${GREEN}✓ AI Dashboard + Pipeline synced${NC}"
 
 # Sync Infrastructure configs
@@ -128,27 +128,27 @@ cd /var/www
 
 # Backend
 echo "Installing backend dependencies..."
-cd coindaily-app && npm ci --production && cd ..
+cd sygn-app && npm ci --production && cd ..
 
 # News Frontend
 echo "Installing news frontend dependencies..."
-cd coindaily && npm ci --production && cd ..
+cd sygn && npm ci --production && cd ..
 
 # Admin Portal
 echo "Installing admin dependencies..."
-cd coindaily-admin && npm ci --production && cd ..
+cd sygn-admin && npm ci --production && cd ..
 
 # PR System
 echo "Installing PR system dependencies..."
-cd coindaily-press && npm ci --production && cd ..
+cd sygn-press && npm ci --production && cd ..
 
 # AI Dashboard
 echo "Installing AI dashboard dependencies..."
-cd coindaily-ai && npm ci --production && cd ..
+cd sygn-ai && npm ci --production && cd ..
 
 # AI Pipeline
 echo "Installing AI pipeline dependencies..."
-cd coindaily-ai-system && npm ci --production && cd ..
+cd sygn-ai-system && npm ci --production && cd ..
 
 # Start/Restart PM2
 echo "Starting PM2 services..."

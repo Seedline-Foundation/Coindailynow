@@ -104,7 +104,7 @@ const faqs = [
   },
   {
     q: 'What does the API include?',
-    a: 'The CoinDaily API provides access to market data, article search, regulatory data, and exchange rates. Free tier gets 100 requests/day, Pro gets 10,000, Enterprise gets unlimited.',
+    a: 'The Sygn API provides access to market data, article search, regulatory data, and exchange rates. Free tier gets 100 requests/day, Pro gets 10,000, Enterprise gets unlimited.',
   },
   {
     q: 'Can I switch plans or cancel anytime?',
@@ -246,7 +246,7 @@ export default function PricingPage() {
             Built for African markets
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            CoinDaily is the only financial data platform designed specifically for
+            Sygn is the only financial data platform designed specifically for
             Nigeria, Kenya, South Africa, Ghana, and the broader African diaspora.
             Local payment methods, local market data, local regulatory coverage.
           </p>

@@ -26,19 +26,27 @@ import { renderVoiceover } from '../agents/video/coquiAdapter';
 import { generateShortAvatarVideo } from '../agents/video/didAdapter';
 import { generateLongStockVideo } from '../agents/video/invideoAdapter';
 import { generateBrollClip } from '../agents/video/falAdapter';
+import { searchStockClip } from '../agents/video/stockFootageAdapter';
+import { pickMusicBed } from '../agents/video/musicBedAdapter';
+import { buildSrtFromScript } from '../agents/video/subtitleAgent';
 import { composeVideo } from '../agents/video/ffmpegComposer';
+import { decideVideoStrategy } from '../agents/video/videoStrategyAgent';
+import { cutClipsFromVideo } from '../agents/video/clipsAiAdapter';
 
 const STEP_ORDER: Record<string, number> = {
   loadArticle: 0,
-  script: 1,
-  validateScript: 2,
-  voiceover: 3,
-  shortVideo: 4,
-  longVideo: 5,
-  broll: 6,
-  compose: 7,
-  validateVideo: 8,
-  queueForReview: 9,
+  strategy: 1,        // decide short / long / both from article characteristics
+  script: 2,
+  validateScript: 3,
+  voiceover: 4,
+  shortVideo: 5,
+  longVideo: 6,
+  broll: 7,
+  music: 8,
+  compose: 9,
+  cutClips: 10,       // slice long video into social-ready clips via ClipsAI
+  validateVideo: 11,
+  queueForReview: 12,
 };
 
 export interface VideoRunResult {
@@ -77,9 +85,27 @@ export async function runVideoPipeline(
       return a;
     });
 
-    // Step 1 — script (in the article's language, via P8.1)
+    // Step 1 — decide video strategy (short / long / both / cut clips)
+    const strategy = await stepWrap(prisma, run.id, 'strategy', 1, {
+      title: article.title,
+      category: article.Category?.slug,
+    }, async () => {
+      return decideVideoStrategy(
+        {
+          articleId: article.id,
+          title: article.title,
+          excerpt: article.excerpt || undefined,
+          content: article.content,
+          category: article.Category?.slug || undefined,
+          publishedAt: undefined,
+        },
+        logger,
+      );
+    });
+
+    // Step 2 — script (in the article's language)
     const articleLang = (article.language || 'en').toLowerCase();
-    const scripts = await stepWrap(prisma, run.id, 'script', 1, { articleId, title: article.title, language: articleLang }, async () => {
+    const scripts = await stepWrap(prisma, run.id, 'script', 2, { articleId, title: article.title, language: articleLang, strategy: strategy.reason }, async () => {
       return generateVideoScripts(
         {
           articleId: article.id,
@@ -93,8 +119,8 @@ export async function runVideoPipeline(
       );
     });
 
-    // Step 2 — validate script
-    await stepWrap(prisma, run.id, 'validateScript', 2, { hasShort: !!scripts.short, hasLong: !!scripts.long }, async () => {
+    // Step 3 — validate script
+    await stepWrap(prisma, run.id, 'validateScript', 3, { hasShort: !!scripts.short, hasLong: !!scripts.long }, async () => {
       const issues: string[] = [];
       if (!scripts.short?.scenes?.length) issues.push('short script has no scenes');
       if (!scripts.long?.scenes?.length) issues.push('long script has no scenes');
@@ -104,48 +130,88 @@ export async function runVideoPipeline(
       return { passed: issues.length === 0, issues };
     });
 
-    // Step 3 — voiceover (Coqui XTTS, free, self-hosted)
-    const voiceover = await stepWrap(prisma, run.id, 'voiceover', 3, { format: 'short+long' }, async () => {
-      const [shortAudio, longAudio] = await Promise.all([
-        renderVoiceover(joinScript(scripts.short), { language: article.language || 'en' }, logger).catch(e => ({ ok: false, error: e.message })),
-        renderVoiceover(joinScript(scripts.long), { language: article.language || 'en' }, logger).catch(e => ({ ok: false, error: e.message })),
-      ]);
+    // Step 4 — voiceover (Coqui XTTS). Only render the audio for formats we'll produce.
+    const voiceover = await stepWrap(prisma, run.id, 'voiceover', 4, { produceShort: strategy.produceShort, produceLong: strategy.produceLong }, async () => {
+      const jobs: Array<Promise<any>> = [];
+      if (strategy.produceShort) jobs.push(renderVoiceover(joinScript(scripts.short), { language: article.language || 'en' }, logger).catch(e => ({ ok: false, error: e.message })));
+      else jobs.push(Promise.resolve({ ok: false, skipped: 'strategy=long-only' }));
+      if (strategy.produceLong) jobs.push(renderVoiceover(joinScript(scripts.long), { language: article.language || 'en' }, logger).catch(e => ({ ok: false, error: e.message })));
+      else jobs.push(Promise.resolve({ ok: false, skipped: 'strategy=short-only' }));
+      const [shortAudio, longAudio] = await Promise.all(jobs);
       return { shortAudio, longAudio };
     });
 
-    // Step 4 — SHORT (D-ID avatar, in the article's language)
-    const shortVideo = await stepWrap(prisma, run.id, 'shortVideo', 4, { format: 'SHORT', durationSec: scripts.short.totalDurationSec, language: articleLang }, async () => {
-      return generateShortAvatarVideo(
-        { script: scripts.short, articleId: article.id, articleTitle: article.title, language: articleLang },
-        logger,
-      );
-    });
+    // Step 5 — SHORT (D-ID avatar). Skipped if strategy says long-only.
+    const shortVideo = strategy.produceShort
+      ? await stepWrap(prisma, run.id, 'shortVideo', 5, { format: 'SHORT', durationSec: scripts.short.totalDurationSec, language: articleLang }, async () => {
+          return generateShortAvatarVideo(
+            { script: scripts.short, articleId: article.id, articleTitle: article.title, language: articleLang },
+            logger,
+          );
+        }).catch(err => {
+          logger.warn(`[video] short video step failed (non-fatal): ${err.message}`);
+          return { url: '', error: err.message } as any;
+        })
+      : (logger.info('[video] shortVideo skipped by strategy'), { url: '', skipped: true } as any);
 
-    // Step 5 — LONG (InVideo AI from article URL)
-    const longVideo = await stepWrap(prisma, run.id, 'longVideo', 5, { format: 'LONG', durationSec: scripts.long.totalDurationSec }, async () => {
-      return generateLongStockVideo(
-        { script: scripts.long, articleId: article.id, articleSlug: article.slug, articleTitle: article.title },
-        logger,
-      );
-    }).catch(err => {
-      logger.warn(`[video] long video step failed (non-fatal): ${err.message}`);
-      return { url: '', error: err.message } as any;
-    });
+    // Step 6 — LONG (InVideo AI from article URL). Skipped if strategy says short-only.
+    const longVideo = strategy.produceLong
+      ? await stepWrap(prisma, run.id, 'longVideo', 6, { format: 'LONG', durationSec: scripts.long.totalDurationSec }, async () => {
+          return generateLongStockVideo(
+            { script: scripts.long, articleId: article.id, articleSlug: article.slug, articleTitle: article.title },
+            logger,
+          );
+        }).catch(err => {
+          logger.warn(`[video] long video step failed (non-fatal): ${err.message}`);
+          return { url: '', error: err.message } as any;
+        })
+      : (logger.info('[video] longVideo skipped by strategy'), { url: '', skipped: true } as any);
 
-    // Step 6 — B-roll (fal.ai cinematic intro) — optional, doesn't block
-    const broll = await stepWrap(prisma, run.id, 'broll', 6, { hint: scripts.short.scenes[0]?.visualHint }, async () => {
-      return generateBrollClip(
-        { prompt: scripts.short.scenes[0]?.visualHint || article.title, durationSec: 5 },
+    // Step 7 — B-roll. Try fal.ai cinematic first; fall back to Pexels stock
+    // footage if fal isn't configured / errored. Either source produces a clip
+    // suitable for the compose step's intro splice.
+    const broll = await stepWrap(prisma, run.id, 'broll', 7, { hint: scripts.short.scenes[0]?.visualHint }, async () => {
+      const hint = scripts.short.scenes[0]?.visualHint || article.title;
+      const fal = await generateBrollClip({ prompt: hint, durationSec: 5 }, logger);
+      if (fal?.ok && fal.url) return { ...fal, source: 'fal' as const };
+      // Pexels fallback — free, no GPU, no per-clip cost
+      logger.info(`[video] fal broll unavailable (${fal?.error || 'no clip'}); trying Pexels stock`);
+      const stock = await searchStockClip(
+        { query: hint, orientation: 'portrait', size: 'medium', minDurationSec: 4 },
         logger,
       );
+      if (stock?.ok && stock.url) return { ...stock, source: 'pexels' as const };
+      return { ok: false, url: '', error: stock?.error || fal?.error || 'no broll source', source: 'none' as const };
     }).catch(err => {
       logger.warn(`[video] broll step failed (non-fatal): ${err.message}`);
       return { url: '', error: err.message } as any;
     });
 
-    // Step 7 — compose. ffmpeg stitching (intro + B-roll + base + outro).
-    // Returns base URL unchanged if no intro/outro/broll configured.
-    const composed = await stepWrap(prisma, run.id, 'compose', 7, { hasShort: !!shortVideo?.url, hasBroll: !!broll?.url }, async () => {
+    // Step 8 — music bed. Pick a track to sit under the voiceover. Optional;
+    // composer skips music mix entirely if no URL resolved.
+    const music = await stepWrap(prisma, run.id, 'music', 8, { category: article.Category?.slug }, async () => {
+      return pickMusicBed(
+        {
+          category: article.Category?.slug,
+          mood: article.Category?.slug || 'corporate',
+          minDurationSec: Math.max(scripts.short.totalDurationSec, scripts.long.totalDurationSec),
+        },
+        logger,
+      );
+    }).catch(err => {
+      logger.warn(`[video] music step failed (non-fatal): ${err.message}`);
+      return { ok: false, url: '', error: err.message } as any;
+    });
+
+    // Build SRT once per format (cheap; reused by short + long compose calls)
+    const shortSrt = buildSrtFromScript(scripts.short);
+    const longSrt = buildSrtFromScript(scripts.long);
+
+    // Step 9 — compose. ffmpeg stitching (intro + B-roll + base + outro) plus
+    // optional finalize pass that burns subtitles and mixes music bed.
+    const composed = await stepWrap(prisma, run.id, 'compose', 9, {
+      hasShort: !!shortVideo?.url, hasBroll: !!broll?.url, hasMusic: !!music?.url, hasSubtitles: true,
+    }, async () => {
       const out: any = { short: null, long: null };
       if (shortVideo?.url) {
         out.short = await composeVideo({
@@ -153,6 +219,8 @@ export async function runVideoPipeline(
           brollUrl: broll?.url,
           articleId: article.id,
           format: 'SHORT',
+          subtitlesSrt: shortSrt,
+          musicUrl: music?.url,
         }, logger);
       }
       if (longVideo?.url) {
@@ -160,6 +228,9 @@ export async function runVideoPipeline(
           baseVideoUrl: longVideo.url,
           articleId: article.id,
           format: 'LONG',
+          subtitlesSrt: longSrt,
+          musicUrl: music?.url,
+          musicGain: 0.12, // longer-form gets even quieter music
         }, logger);
       }
       return out;
@@ -196,24 +267,66 @@ export async function runVideoPipeline(
       assets.push({ format: 'LONG', url: longVideo.url, provider: longVideo.provider || 'invideo' });
     }
     if (broll?.url) {
+      const brollProvider = (broll as any).provider || ((broll as any).source === 'pexels' ? 'pexels' : 'fal');
       await prisma.videoAsset.create({
         data: {
           runId: run.id, format: 'BROLL', url: broll.url,
-          durationSec: 5, provider: broll.provider || 'fal',
+          durationSec: (broll as any).durationSec || 5, provider: brollProvider,
         },
       });
-      assets.push({ format: 'BROLL', url: broll.url, provider: broll.provider || 'fal' });
+      assets.push({ format: 'BROLL', url: broll.url, provider: brollProvider });
+    }
+    if (music?.url) {
+      await prisma.videoAsset.create({
+        data: {
+          runId: run.id, format: 'MUSIC', url: music.url,
+          durationSec: (music as any).durationSec || 0, provider: music.provider || 'env',
+        },
+      }).catch(err => logger.warn(`[video] persist MUSIC asset failed (non-fatal): ${err.message}`));
+      assets.push({ format: 'MUSIC', url: music.url, provider: music.provider || 'env' });
     }
 
-    // Step 8 — validate video
-    await stepWrap(prisma, run.id, 'validateVideo', 8, { assetCount: assets.length }, async () => {
+    // Step 10 — cut clips from the long video (ClipsAI). Only runs when strategy
+    // says so and a long video URL exists. Persists each clip as a CLIP asset.
+    if (strategy.cutClipsFromLong && longVideo?.url) {
+      const cut = await stepWrap(prisma, run.id, 'cutClips', 10, { source: longVideo.url }, async () => {
+        return cutClipsFromVideo(
+          { videoUrl: longVideo.url, minDurationSec: 30, maxDurationSec: 90, maxClips: 5 },
+          logger,
+        );
+      }).catch(err => {
+        logger.warn(`[video] cutClips step failed (non-fatal): ${err.message}`);
+        return { ok: false, clips: [] as any[], provider: 'clipsai' as const };
+      });
+
+      if (cut?.ok && cut.clips.length) {
+        for (const clip of cut.clips) {
+          await prisma.videoAsset.create({
+            data: {
+              runId: run.id, format: 'CLIP', url: clip.url,
+              durationSec: Math.round(clip.endSec - clip.startSec) || 0,
+              provider: 'clipsai',
+            },
+          }).catch(err => logger.warn(`[video] persist CLIP asset failed (non-fatal): ${err.message}`));
+          assets.push({ format: 'CLIP', url: clip.url, provider: 'clipsai' });
+        }
+        logger.info(`[video] persisted ${cut.clips.length} clips from long video`);
+      }
+    }
+
+    // Step 11 — validate video
+    await stepWrap(prisma, run.id, 'validateVideo', 11, { assetCount: assets.length, strategy: strategy.reason }, async () => {
       const issues: string[] = [];
-      if (!shortVideo?.url) issues.push('SHORT video missing — only blocker if no manual override available');
-      return { passed: !!shortVideo?.url, issues, assets };
+      // Blocker is now strategy-aware: if strategy asked for a short and we don't have one, that's a fail
+      if (strategy.produceShort && !shortVideo?.url) issues.push('SHORT expected but not produced');
+      if (strategy.produceLong && !longVideo?.url) issues.push('LONG expected but not produced');
+      const passed = (strategy.produceShort ? !!shortVideo?.url : true)
+                  && (strategy.produceLong ? !!longVideo?.url : true);
+      return { passed, issues, assets, strategy: { reason: strategy.reason, produceShort: strategy.produceShort, produceLong: strategy.produceLong, cutClipsFromLong: strategy.cutClipsFromLong } };
     });
 
-    // Step 9 — queue for review
-    await stepWrap(prisma, run.id, 'queueForReview', 9, { runId: run.id }, async () => ({ ok: true }));
+    // Step 12 — queue for review
+    await stepWrap(prisma, run.id, 'queueForReview', 12, { runId: run.id }, async () => ({ ok: true }));
 
     await prisma.videoRun.update({ where: { id: run.id }, data: { status: 'READY_FOR_REVIEW' } });
     logger.info(`[video] run ${run.id} READY_FOR_REVIEW; ${assets.length} assets`);

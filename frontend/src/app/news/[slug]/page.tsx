@@ -117,7 +117,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
   const articleUrl = `${siteUrl}/news/${params.slug}`;
 
   return {
-    title: `${article.title} | CoinDaily Africa`,
+    title: `${article.title} | Sygn Africa`,
     description: article.excerpt,
     alternates: {
       canonical: articleUrl,
@@ -127,7 +127,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       title: article.title,
       description: article.excerpt,
       url: articleUrl,
-      siteName: 'CoinDaily Africa',
+      siteName: 'Sygn Africa',
       images: article.featuredImageUrl ? [{ url: article.featuredImageUrl, alt: article.title }] : [],
       publishedTime: article.publishedAt || undefined,
       modifiedTime: article.updatedAt || undefined,
@@ -140,7 +140,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       title: article.title,
       description: article.excerpt,
       images: article.featuredImageUrl ? [article.featuredImageUrl] : [],
-      site: '@coindailyafrica',
+      site: '@sygnafrica',
     },
   };
 }

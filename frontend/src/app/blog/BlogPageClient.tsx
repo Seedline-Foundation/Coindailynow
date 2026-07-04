@@ -98,7 +98,7 @@ export default function BlogPageClient() {
             <span>📰</span> Africa&apos;s #1 Crypto Knowledge Hub
           </div>
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            CoinDaily <span className="text-orange-400">Blog</span>
+            Sygn <span className="text-orange-400">Blog</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
             Expert cryptocurrency insights, guides, and analysis for the African market.
@@ -203,12 +203,12 @@ export default function BlogPageClient() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'Blog',
-            name: 'CoinDaily Blog',
+            name: 'Sygn Blog',
             description: 'Expert cryptocurrency insights, guides, and analysis for Africa',
             url: 'https://sygn.live/blog',
             publisher: {
               '@type': 'Organization',
-              name: 'CoinDaily',
+              name: 'Sygn',
               url: 'https://sygn.live',
               logo: { '@type': 'ImageObject', url: 'https://sygn.live/images/logo.svg' },
             },
@@ -220,7 +220,7 @@ export default function BlogPageClient() {
               datePublished: a.publishedAt,
               dateModified: a.updatedAt,
               author: { '@type': 'Person', name: a.author },
-              publisher: { '@type': 'Organization', name: 'CoinDaily' },
+              publisher: { '@type': 'Organization', name: 'Sygn' },
               wordCount: a.wordCount,
               articleSection: a.category,
               keywords: a.targetKeywords.join(', '),

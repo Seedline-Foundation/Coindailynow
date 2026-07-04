@@ -1,8 +1,8 @@
 {
-  "name": "@coindaily/ai",
+  "name": "@sygn/ai",
   "version": "1.0.0",
   "private": true,
-  "description": "CoinDaily AI System - AI agent orchestration and content generation",
+  "description": "Sygn AI System - AI agent orchestration and content generation",
   "scripts": {
     "dev": "next dev -p 3004",
     "build": "next build",

@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation';
 
-/** S1-2: CEO login merged into /login */
-export default function AdminLoginRedirect() {
-  redirect('/login?role=super');
+/**
+ * Archived. The /admin back office was consolidated into /super-admin.
+ * This stub redirects to the equivalent super-admin destination.
+ */
+export default function ArchivedAdminPage() {
+  redirect('/auth/sadmin');
 }

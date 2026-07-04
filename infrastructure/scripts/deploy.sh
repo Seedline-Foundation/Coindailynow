@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# CoinDaily MVP Deployment Script
+# Sygn MVP Deployment Script
 # Usage: ./deploy.sh [production|staging]
 
 set -e  # Exit on error
 
 # Configuration
 ENVIRONMENT=${1:-production}
-APP_DIR="/home/coindaily/apps/Coindailynow"
-BACKUP_DIR="/home/coindaily/backups"
-LOG_FILE="/home/coindaily/deploy.log"
+APP_DIR="/home/sygn/apps/Sygn"
+BACKUP_DIR="/home/sygn/backups"
+LOG_FILE="/home/sygn/deploy.log"
 
 # Colors for output
 RED='\033[0;31m'
@@ -33,21 +33,21 @@ warning() {
 
 # Print banner
 echo "================================================"
-echo "🚀 CoinDaily MVP Deployment Script"
+echo "🚀 Sygn MVP Deployment Script"
 echo "Environment: $ENVIRONMENT"
 echo "================================================"
 echo ""
 
 # Check if running as correct user
-if [ "$USER" != "coindaily" ]; then
-    error "This script must be run as 'coindaily' user"
+if [ "$USER" != "sygn" ]; then
+    error "This script must be run as 'sygn' user"
 fi
 
 # Create backup
 log "📦 Creating backup..."
 mkdir -p "$BACKUP_DIR"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-BACKUP_PATH="$BACKUP_DIR/coindaily_$TIMESTAMP"
+BACKUP_PATH="$BACKUP_DIR/sygn_$TIMESTAMP"
 
 if [ -d "$APP_DIR" ]; then
     cp -r "$APP_DIR" "$BACKUP_PATH"

@@ -2,7 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  transpilePackages: ['@coindaily/ui', '@coindaily/utils'],
+  transpilePackages: ['@sygn/ui', '@sygn/utils'],
   experimental: {
     externalDir: true,
   },

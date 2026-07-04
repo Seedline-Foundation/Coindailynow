@@ -1,5 +1,5 @@
-// Prisma schema for CoinDaily Platform (SQLite-compatible for development)
-// Based on specs/002-coindaily-africa-s/data-model.md
+// Prisma schema for Sygn Platform (SQLite-compatible for development)
+// Based on specs/002-sygn-africa-s/data-model.md
 // Task 1: Database Schema Implementation - Complete 20+ entities with proper indexes
 
 generator client {

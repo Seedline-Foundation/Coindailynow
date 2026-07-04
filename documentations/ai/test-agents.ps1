@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # ==============================================================================
-# CoinDaily AI Agent Testing Script
+# Sygn AI Agent Testing Script
 # Tests all 26 agents via the backend API with live Ollama models
 # ==============================================================================
 
@@ -39,7 +39,7 @@ function Test-Endpoint {
 
 Write-Host "`n" 
 Write-Host "============================================================" -ForegroundColor Yellow
-Write-Host "  CoinDaily AI Agent Testing Suite" -ForegroundColor Yellow
+Write-Host "  Sygn AI Agent Testing Suite" -ForegroundColor Yellow
 Write-Host "  Tests all 26 agents with self-hosted DeepSeek R1 & Llama 3.1" -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Yellow
 
@@ -121,7 +121,7 @@ $testTasks = @(
     @{
         agent = "customer-support-agent"
         label = "Customer Support (Llama)"
-        body = '{"input":{"taskType":"respond","data":{"query":"How do I buy Bitcoin using M-Pesa on CoinDaily?","userRegion":"kenya","language":"en"}},"priority":"high"}'
+        body = '{"input":{"taskType":"respond","data":{"query":"How do I buy Bitcoin using M-Pesa on Sygn?","userRegion":"kenya","language":"en"}},"priority":"high"}'
     },
     @{
         agent = "trade-bot-agent"

@@ -48,7 +48,7 @@ export const WalletDashboard: React.FC<WalletDashboardProps> = ({ userId }) => {
   const currentUserId = userId || user?.id || (() => {
     if (typeof window === 'undefined') return undefined;
     try {
-      const stored = localStorage.getItem('user') || localStorage.getItem('coindaily_user');
+      const stored = localStorage.getItem('user') || localStorage.getItem('sygn_user');
       if (stored) {
         const parsed = JSON.parse(stored);
         return parsed.id || parsed.userId || parsed.sub;

@@ -14,7 +14,7 @@ export class DevOpsAgent extends BaseAgent {
       name: 'DevOps Agent',
       type: 'devops',
       category: 'engineering',
-      description: 'Monitors infrastructure health, automates deployments, manages Docker containers, analyzes logs, and ensures CoinDaily platform reliability on Contabo VPS with Cloudflare CDN.',
+      description: 'Monitors infrastructure health, automates deployments, manages Docker containers, analyzes logs, and ensures Sygn platform reliability on Contabo VPS with Cloudflare CDN.',
       capabilities: [
         'health_monitoring',
         'deployment_automation',
@@ -62,7 +62,7 @@ export class DevOpsAgent extends BaseAgent {
   }
 
   private async healthCheck(data: any): Promise<Record<string, any>> {
-    const prompt = `Analyze system health data for CoinDaily platform (Contabo VPS):
+    const prompt = `Analyze system health data for Sygn platform (Contabo VPS):
 
 System data: ${JSON.stringify(data || {}, null, 2)}
 
@@ -140,7 +140,7 @@ Return JSON:
   }
 
   private async createDeploymentPlan(data: any): Promise<Record<string, any>> {
-    const prompt = `Create a deployment plan for CoinDaily platform update:
+    const prompt = `Create a deployment plan for Sygn platform update:
 
 Deployment data: ${JSON.stringify(data || {}, null, 2)}
 
@@ -174,7 +174,7 @@ Return JSON:
   }
 
   private async analyzeDockerSetup(data: any): Promise<Record<string, any>> {
-    const prompt = `Analyze Docker configuration for CoinDaily platform:
+    const prompt = `Analyze Docker configuration for Sygn platform:
 
 Docker config: ${JSON.stringify(data || {}, null, 2)}
 
@@ -199,7 +199,7 @@ Return JSON:
   }
 
   private async generateNginxConfig(data: any): Promise<Record<string, any>> {
-    const prompt = `Generate optimized Nginx configuration for CoinDaily:
+    const prompt = `Generate optimized Nginx configuration for Sygn:
 
 Requirements: ${JSON.stringify(data || {}, null, 2)}
 
@@ -277,7 +277,7 @@ Return JSON:
   }
 
   private async capacityPlanning(data: any): Promise<Record<string, any>> {
-    const prompt = `Perform capacity planning analysis for CoinDaily growth:
+    const prompt = `Perform capacity planning analysis for Sygn growth:
 
 Current metrics: ${JSON.stringify(data || {}, null, 2)}
 

@@ -1,7 +1,7 @@
 /**
  * Security Monitoring Agent — powered by DeepSeek R1 (self-hosted via Ollama)
  *
- * Monitors ALL CoinDaily apps and services for security threats, anomalies,
+ * Monitors ALL Sygn apps and services for security threats, anomalies,
  * performance degradation, and suspicious activity. Sends reports and
  * real-time alerts to the super admin dashboard (jet.sygn.live).
  *
@@ -259,7 +259,7 @@ export class SecurityMonitoringAgent {
       const response = await fetch(service.url, {
         method: 'GET',
         signal: controller.signal,
-        headers: { 'User-Agent': 'CoinDaily-SecurityMonitor/1.0' },
+        headers: { 'User-Agent': 'Sygn-SecurityMonitor/1.0' },
       });
 
       clearTimeout(timeout);
@@ -409,7 +409,7 @@ export class SecurityMonitoringAgent {
 
     try {
       const prompt = `<think>
-You are CoinDaily's Security Monitoring AI. Analyze the following system state and provide a security assessment.
+You are Sygn's Security Monitoring AI. Analyze the following system state and provide a security assessment.
 
 SERVICE HEALTH:
 ${serviceHealth.map(s => `- ${s.service}: ${s.status} (${s.responseTimeMs}ms)`).join('\n')}

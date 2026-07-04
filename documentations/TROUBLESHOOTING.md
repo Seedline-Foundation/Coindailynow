@@ -1,4 +1,4 @@
-# CoinDaily Troubleshooting Guide
+# Sygn Troubleshooting Guide
 
 ## Common Issues
 

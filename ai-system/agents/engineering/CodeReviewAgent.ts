@@ -14,7 +14,7 @@ export class CodeReviewAgent extends BaseAgent {
       name: 'CodeReview Agent',
       type: 'code_review',
       category: 'engineering',
-      description: 'Automated code review agent that checks for bugs, security vulnerabilities, performance issues, coding standards, and best practices across the CoinDaily platform codebase.',
+      description: 'Automated code review agent that checks for bugs, security vulnerabilities, performance issues, coding standards, and best practices across the Sygn platform codebase.',
       capabilities: [
         'code_review',
         'security_audit',
@@ -139,7 +139,7 @@ Return JSON:
   }
 
   private async performanceReview(code: string, filePath?: string, language?: string): Promise<Record<string, any>> {
-    const prompt = `Analyze this code for performance issues. CoinDaily requires sub-500ms API responses and single I/O per request.
+    const prompt = `Analyze this code for performance issues. Sygn requires sub-500ms API responses and single I/O per request.
 
 File: ${filePath || 'unknown'}
 Code:
@@ -176,7 +176,7 @@ Return JSON:
   }
 
   private async apiReview(code: string, filePath?: string): Promise<Record<string, any>> {
-    const prompt = `Review this API endpoint code for best practices, error handling, and CoinDaily standards.
+    const prompt = `Review this API endpoint code for best practices, error handling, and Sygn standards.
 
 Code:
 \`\`\`
@@ -288,7 +288,7 @@ Return JSON:
     const prompt = `Suggest refactoring improvements for this code.
 
 File: ${filePath || 'unknown'}
-Context: ${context || 'CoinDaily platform code'}
+Context: ${context || 'Sygn platform code'}
 Code:
 \`\`\`
 ${code}

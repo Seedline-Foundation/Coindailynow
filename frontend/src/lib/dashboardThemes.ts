@@ -39,7 +39,7 @@ export interface DashboardTheme {
   };
 }
 
-export const DASHBOARD_THEME_STORAGE_KEY = 'coindaily_dashboard_theme';
+export const DASHBOARD_THEME_STORAGE_KEY = 'sygn_dashboard_theme';
 
 export const dashboardThemes: DashboardTheme[] = [
   {

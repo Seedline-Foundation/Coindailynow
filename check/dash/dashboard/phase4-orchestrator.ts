@@ -228,7 +228,7 @@ export class Phase4DashboardOrchestrator {
     const defaultUser: DashboardUser = {
       id: 'admin_default',
       name: 'System Administrator',
-      email: 'admin@coindaily.africa',
+      email: 'admin@sygn.africa',
       role: 'admin',
       permissions: {
         analytics: true,
@@ -628,7 +628,7 @@ export class Phase4DashboardOrchestrator {
     return `
     Executive Summary:
     
-    During this reporting period, the CoinDaily Africa platform processed ${articlesCount} articles 
+    During this reporting period, the Sygn Africa platform processed ${articlesCount} articles 
     with an average engagement rate of ${engagementRate.toFixed(1)}%. The system maintained 
     ${systemHealth} status with ${activeCampaigns} active campaigns delivering content to our 
     African crypto community.

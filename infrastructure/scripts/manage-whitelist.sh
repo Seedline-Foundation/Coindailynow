@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================
-# CoinDaily Admin IP Whitelist Management
+# Sygn Admin IP Whitelist Management
 # ============================================
 # Usage:
 #   ./manage-whitelist.sh add <ip> <name>
@@ -9,7 +9,7 @@
 #   ./manage-whitelist.sh test <ip>
 
 NGINX_CONF="/etc/nginx/sites-available/jet.sygn.live.conf"
-WHITELIST_LOG="/var/log/coindaily/ip-whitelist.log"
+WHITELIST_LOG="/var/log/sygn/ip-whitelist.log"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -124,7 +124,7 @@ case "$1" in
         test_ip "$2"
         ;;
     *)
-        echo "CoinDaily Admin IP Whitelist Manager"
+        echo "Sygn Admin IP Whitelist Manager"
         echo ""
         echo "Usage:"
         echo "  $0 add <ip> <name>   - Add IP to whitelist"

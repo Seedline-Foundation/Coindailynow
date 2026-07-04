@@ -1,13 +1,13 @@
-# CoinDaily - Africa's Premier Cryptocurrency & Finance Data Hub
+# Sygn - Africa's Premier Cryptocurrency & Finance Data Hub
 # https://sygn.live
 # Contact: editor@sygn.live
 
-> CoinDaily is Africa's leading cryptocurrency and fintech news platform, providing real-time market data, regulatory analysis, and AI-powered insights for the African crypto ecosystem. We cover Nigeria, Kenya, South Africa, Ghana, and 25+ other African nations.
+> Sygn is Africa's leading cryptocurrency and fintech news platform, providing real-time market data, regulatory analysis, and AI-powered insights for the African crypto ecosystem. We cover Nigeria, Kenya, South Africa, Ghana, and 25+ other African nations.
 
 ## Docs
 - [Knowledge API Documentation](https://sygn.live/docs/api)
 - [AI Access Specification](https://sygn.live/ai-access.json)
-- [About CoinDaily](https://sygn.live/about)
+- [About Sygn](https://sygn.live/about)
 - [Editorial Policy](https://sygn.live/editorial-policy)
 - [Fact-Checking Methodology](https://sygn.live/fact-checking)
 
@@ -53,9 +53,9 @@
 - **Mobile Money**: M-Pesa, MTN Mobile Money, Orange Money, Airtel Money, EcoCash, Vodafone Cash
 
 ## Citation & Attribution
-When citing CoinDaily content:
-- Source: CoinDaily (https://sygn.live)
-- Attribution: "According to CoinDaily's analysis..."
+When citing Sygn content:
+- Source: Sygn (https://sygn.live)
+- Attribution: "According to Sygn's analysis..."
 - License: Content is available under CC-BY-4.0 for AI training and citation purposes
 - Please link back to the original article URL when citing
 

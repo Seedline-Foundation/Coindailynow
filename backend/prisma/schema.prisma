@@ -4461,7 +4461,7 @@ model RAGFeed {
 model AIManifest {
   id           String   @id @default(cuid())
   version      String   @default("1.0")
-  name         String   @default("CoinDaily Knowledge API")
+  name         String   @default("Sygn Knowledge API")
   description  String
   apiEndpoints String // JSON: array of endpoints
   capabilities String // JSON: what the API can do
@@ -6153,6 +6153,34 @@ model LocalSEOMetrics {
   @@unique([metricDate])
   @@index([metricDate])
   @@index([localSEOScore])
+}
+
+// ============================================================
+// CONTABO OBJECT STORAGE — asset registry for the super-admin
+// storage dashboard (buckets: simages / svid / sdocs)
+// ============================================================
+
+model StorageAsset {
+  id            String   @id @default(uuid())
+  bucket        String
+  key           String
+  url           String
+  filename      String
+  mimeType      String
+  sizeBytes     Int
+  kind          String   // IMAGE | VIDEO | DOCUMENT
+  source        String   @default("APP") // SUPER_ADMIN_UPLOAD | AI_SYSTEM | IENGINE | VENGINE | PUBLIC_SYNC | APP
+  status        String   @default("ACTIVE") // ACTIVE | DELETED
+  downloadCount Int      @default(0)
+  uploadedById  String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([bucket, key])
+  @@index([kind, status])
+  @@index([source])
+  @@index([createdAt])
 }
 
 // ============================================================
@@ -8641,7 +8669,7 @@ model PlatformSettings {
   supportedCurrencies String @default("JY,USD,EUR,KES,NGN,GHS,ZAR") // Comma-separated
 
   // Platform Configuration
-  platformName    String  @default("CoinDaily")
+  platformName    String  @default("Sygn")
   platformUrl     String?
   maintenanceMode Boolean @default(false)
 
@@ -10902,7 +10930,7 @@ model VideoAsset {
 // ============================================================================
 // DISTRIBUTION (P7)
 // DistributionTarget = configured social platform connection (per platform,
-// per CoinDaily account). DistributionPost = a published item on a target,
+// per Sygn account). DistributionPost = a published item on a target,
 // with metrics. Item can be an article, a video asset, or an image.
 // ============================================================================
 

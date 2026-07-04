@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# CoinDaily Initial Server Setup Script
+# Sygn Initial Server Setup Script
 # Run this script as root on a fresh Ubuntu 22.04 server
 
 set -e
@@ -50,12 +50,12 @@ ufw status
 
 # Create deployment user
 echo -e "${YELLOW}👤 Creating deployment user...${NC}"
-if id "coindaily" &>/dev/null; then
-    echo "User 'coindaily' already exists"
+if id "sygn" &>/dev/null; then
+    echo "User 'sygn' already exists"
 else
-    adduser --disabled-password --gecos "" coindaily
-    usermod -aG sudo coindaily
-    echo "coindaily ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    adduser --disabled-password --gecos "" sygn
+    usermod -aG sudo sygn
+    echo "sygn ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 fi
 
 # Install Docker
@@ -64,7 +64,7 @@ if ! command -v docker &> /dev/null; then
     curl -fsSL https://get.docker.com -o get-docker.sh
     sh get-docker.sh
     rm get-docker.sh
-    usermod -aG docker coindaily
+    usermod -aG docker sygn
     systemctl enable docker
     systemctl start docker
     echo "Docker installed successfully"
@@ -119,7 +119,7 @@ apt install -y postgresql-client
 echo -e "${YELLOW}⚙️  Installing PM2...${NC}"
 if ! command -v pm2 &> /dev/null; then
     npm install -g pm2
-    pm2 startup systemd -u coindaily --hp /home/coindaily
+    pm2 startup systemd -u sygn --hp /home/sygn
     echo "PM2 installed successfully"
 else
     echo "PM2 already installed"
@@ -138,24 +138,24 @@ fi
 
 # Create application directories
 echo -e "${YELLOW}📁 Creating application directories...${NC}"
-mkdir -p /home/coindaily/apps
-mkdir -p /home/coindaily/backups
-mkdir -p /home/coindaily/logs
-chown -R coindaily:coindaily /home/coindaily
+mkdir -p /home/sygn/apps
+mkdir -p /home/sygn/backups
+mkdir -p /home/sygn/logs
+chown -R sygn:sygn /home/sygn
 
 # Setup log rotation
 echo -e "${YELLOW}📊 Setting up log rotation...${NC}"
-cat > /etc/logrotate.d/coindaily << 'EOF'
-/home/coindaily/apps/Coindailynow/logs/*.log {
+cat > /etc/logrotate.d/sygn << 'EOF'
+/home/sygn/apps/Sygn/logs/*.log {
     daily
     rotate 14
     compress
     delaycompress
     notifempty
-    create 0640 coindaily coindaily
+    create 0640 sygn sygn
     sharedscripts
     postrotate
-        su - coindaily -c "pm2 reloadLogs"
+        su - sygn -c "pm2 reloadLogs"
     endscript
 }
 EOF
@@ -219,9 +219,9 @@ echo "================================================"
 
 # Next steps
 echo -e "\n${BLUE}📝 Next Steps:${NC}"
-echo "1. Switch to coindaily user: su - coindaily"
+echo "1. Switch to sygn user: su - sygn"
 echo "2. Setup SSH key authentication (recommended)"
-echo "3. Clone your repository to /home/coindaily/apps"
+echo "3. Clone your repository to /home/sygn/apps"
 echo "4. Configure DNS A record for mvp.sygn.live"
 echo "5. Follow CONTABO_DEPLOYMENT_GUIDE.md for application setup"
 echo ""

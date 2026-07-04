@@ -24,7 +24,7 @@ export default function TermsPage() {
         <div className="prose-dark space-y-8 text-dark-300 leading-relaxed">
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">1. Acceptance of Terms</h2>
-            <p>By accessing or using the SENDPRESS platform (&ldquo;Service&rdquo;), operated by CoinDaily Technologies Ltd. (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;), you agree to be bound by these Terms &amp; Conditions (&ldquo;Terms&rdquo;). If you do not agree to all Terms, do not use the Service. These Terms apply to all users, including Publishers (media buyers) and Partners (site owners).</p>
+            <p>By accessing or using the SENDPRESS platform (&ldquo;Service&rdquo;), operated by Sygn Technologies Ltd. (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;), you agree to be bound by these Terms &amp; Conditions (&ldquo;Terms&rdquo;). If you do not agree to all Terms, do not use the Service. These Terms apply to all users, including Publishers (media buyers) and Partners (site owners).</p>
           </section>
 
           <section>
@@ -59,7 +59,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">8. Intellectual Property</h2>
-            <p>The SENDPRESS platform, including its design, features, AI models, and branding, is owned by CoinDaily Technologies Ltd. Press releases submitted by Publishers remain the property of the Publisher. Partners grant the Company a non-exclusive license to display press releases on their sites for the agreed duration. The Company does not claim ownership of user-submitted content.</p>
+            <p>The SENDPRESS platform, including its design, features, AI models, and branding, is owned by Sygn Technologies Ltd. Press releases submitted by Publishers remain the property of the Publisher. Partners grant the Company a non-exclusive license to display press releases on their sites for the agreed duration. The Company does not claim ownership of user-submitted content.</p>
           </section>
 
           <section>
@@ -84,7 +84,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">13. Contact</h2>
-            <p>For questions about these Terms, contact us at: <a href="mailto:legal@sygn.live" className="text-primary-500 hover:text-primary-400">legal@sygn.live</a> or via our <a href="https://discord.gg/coindaily" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-400">Discord Help Center</a>.</p>
+            <p>For questions about these Terms, contact us at: <a href="mailto:legal@sygn.live" className="text-primary-500 hover:text-primary-400">legal@sygn.live</a> or via our <a href="https://discord.gg/sygn" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-400">Discord Help Center</a>.</p>
           </section>
         </div>
       </main>

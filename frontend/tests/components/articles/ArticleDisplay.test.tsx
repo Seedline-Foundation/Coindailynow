@@ -1,6 +1,6 @@
 /**
  * Article Display Components Tests
- * CoinDaily Platform - Task 21 TDD Implementation
+ * Sygn Platform - Task 21 TDD Implementation
  */
 
 import React from 'react';

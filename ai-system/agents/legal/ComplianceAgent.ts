@@ -14,7 +14,7 @@ export class ComplianceAgent extends BaseAgent {
       name: 'Compliance Agent',
       type: 'compliance',
       category: 'legal',
-      description: 'Monitors regulatory compliance for crypto content, enforces content policies, tracks African regulatory changes, ensures GDPR/data protection compliance, and supports audit processes for CoinDaily platform.',
+      description: 'Monitors regulatory compliance for crypto content, enforces content policies, tracks African regulatory changes, ensures GDPR/data protection compliance, and supports audit processes for Sygn platform.',
       capabilities: [
         'regulatory_monitoring',
         'content_compliance',

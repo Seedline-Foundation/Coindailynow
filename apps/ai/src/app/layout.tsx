@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
 
 export const metadata: Metadata = {
-  title: 'CoinDaily AI System',
+  title: 'Sygn AI System',
   description: 'AI Agent Orchestration and Content Generation Platform',
   robots: 'noindex, nofollow',
 };

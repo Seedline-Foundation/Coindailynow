@@ -429,7 +429,7 @@ export default function KnowledgeAPIDashboard() {
                         size="small"
                         onClick={() =>
                           copyToClipboard(
-                            `https://coindaily.ai/api/knowledge-api/feeds/${feed.feedType}/${feed.id}`
+                            `https://sygn.ai/api/knowledge-api/feeds/${feed.feedType}/${feed.id}`
                           )
                         }
                       >

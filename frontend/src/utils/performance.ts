@@ -1,4 +1,4 @@
-// Performance monitoring utilities for CoinDaily platform
+// Performance monitoring utilities for Sygn platform
 import { NextWebVitalsMetric } from 'next/app';
 
 export interface PerformanceMetrics {

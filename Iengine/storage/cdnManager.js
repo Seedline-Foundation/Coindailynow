@@ -13,7 +13,7 @@ class CDNManager {
     constructor(config) {
         this.config = {
             provider: process.env.CDN_PROVIDER || 'backblaze-b2',
-            bucket: process.env.CDN_BUCKET || 'coindaily-media',
+            bucket: process.env.CDN_BUCKET || 'sygn-media',
             region: process.env.CDN_REGION || 'us-west-001',
             endpoint: process.env.CDN_ENDPOINT,
             publicUrl: process.env.CDN_URL || process.env.CFIS_PUBLIC_MEDIA_BASE || 'https://cdn.sygn.live',

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Risk Disclosure | CoinDaily',
+  title: 'Risk Disclosure | Sygn',
   description: 'Understanding the risks associated with cryptocurrency investments.',
   robots: 'index, follow',
 };
@@ -14,7 +14,7 @@ export default function RiskDisclosurePage() {
         <p className="text-gray-600">Effective Date: July 31, 2025</p>
 
         <p>
-          Investing in cryptocurrencies and memecoins involves substantial risk. CoinDaily 
+          Investing in cryptocurrencies and memecoins involves substantial risk. Sygn 
           (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) provides educational content but does not guarantee investment outcomes.
         </p>
 

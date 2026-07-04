@@ -1,4 +1,4 @@
-# CoinDaily - Africa's Premier Crypto News
+# Sygn - Africa's Premier Crypto News
 # https://sygn.live
 
 User-agent: *

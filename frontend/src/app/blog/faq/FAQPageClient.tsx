@@ -190,7 +190,7 @@ export default function FAQPageClient() {
         <section className="mt-16 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-8 text-white text-center">
           <h2 className="text-2xl font-bold mb-3">Still Have Questions?</h2>
           <p className="text-orange-100 max-w-xl mx-auto mb-6">
-            Our team is here to help. Browse our in-depth guides or join the CoinDaily community
+            Our team is here to help. Browse our in-depth guides or join the Sygn community
             to get answers from fellow African crypto enthusiasts.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

@@ -312,23 +312,23 @@ export class KnowledgeAPIService {
           '@_version': '2.0',
           '@_xmlns:atom': 'http://www.w3.org/2005/Atom',
           '@_xmlns:content': 'http://purl.org/rss/1.0/modules/content/',
-          '@_xmlns:ai': 'https://coindaily.ai/ai-namespace',
+          '@_xmlns:ai': 'https://sygn.ai/ai-namespace',
           channel: {
             title: feed.name,
             description: feed.description,
-            link: `https://coindaily.ai/api/feeds/${feed.endpoint}`,
+            link: `https://sygn.ai/api/feeds/${feed.endpoint}`,
             language: feed.language,
             lastBuildDate: new Date().toUTCString(),
             item: articles.map((article: any) => ({
               title: article.title,
-              link: `https://coindaily.ai/articles/${article.slug}`,
+              link: `https://sygn.ai/articles/${article.slug}`,
               description: article.excerpt,
               pubDate: article.publishedAt?.toUTCString(),
               author: article.User.username,
               category: article.Category.name,
               guid: {
                 '@_isPermaLink': 'true',
-                '#text': `https://coindaily.ai/articles/${article.slug}`,
+                '#text': `https://sygn.ai/articles/${article.slug}`,
               },
               'content:encoded': article.content,
               'ai:summary': article.KnowledgeBase?.summary || '',
@@ -411,12 +411,12 @@ export class KnowledgeAPIService {
         version: 'https://jsonfeed.org/version/1.1',
         title: feed.name,
         description: feed.description,
-        home_page_url: 'https://coindaily.ai',
-        feed_url: `https://coindaily.ai/api/feeds/${feed.endpoint}`,
+        home_page_url: 'https://sygn.ai',
+        feed_url: `https://sygn.ai/api/feeds/${feed.endpoint}`,
         language: feed.language,
         items: articles.map((article: any) => ({
           id: article.id,
-          url: `https://coindaily.ai/articles/${article.slug}`,
+          url: `https://sygn.ai/articles/${article.slug}`,
           title: article.title,
           summary: article.excerpt,
           content_html: article.content,
@@ -458,7 +458,7 @@ export class KnowledgeAPIService {
         manifest = await prisma.aIManifest.create({
           data: {
             version: '1.0',
-            name: 'CoinDaily Knowledge API',
+            name: 'Sygn Knowledge API',
             description:
               'AI-optimized API for cryptocurrency and blockchain news, analysis, and data',
             apiEndpoints: JSON.stringify([

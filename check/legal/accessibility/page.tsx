@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Accessibility Statement | CoinDaily',
+  title: 'Accessibility Statement | Sygn',
   description: 'Our commitment to digital accessibility for all users.',
   robots: 'index, follow',
 };
@@ -14,7 +14,7 @@ export default function AccessibilityPage() {
         <p className="text-gray-600">Effective Date: July 31, 2025</p>
 
         <p>
-          CoinDaily (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is committed to ensuring digital accessibility 
+          Sygn (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is committed to ensuring digital accessibility 
           for all users, including those with disabilities. We aim to provide a user-friendly 
           experience across our website and services.
         </p>
@@ -38,7 +38,7 @@ export default function AccessibilityPage() {
         <h2>Feedback & Contact</h2>
         <p>If you encounter any accessibility barriers, please contact us:</p>
         <ul>
-          <li>Email: <a href="mailto:accessibility@coindaily.com" className="text-blue-600 hover:text-blue-800">accessibility@coindaily.com</a></li>
+          <li>Email: <a href="mailto:accessibility@sygn.com" className="text-blue-600 hover:text-blue-800">accessibility@sygn.com</a></li>
           <li>Phone: +1 (302) 555-0199 (US) / +234 (1) 1234-568 (Nigeria)</li>
         </ul>
 

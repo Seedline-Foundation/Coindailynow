@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${entity.name} (${entity.ticker || typeLabel}) — Factsheet`,
     description: `${entity.tagline}. ${entity.africanRelevance.slice(0, 120)}...`,
     openGraph: {
-      title: `${entity.name} Factsheet — CoinDaily Africa`,
+      title: `${entity.name} Factsheet — Sygn Africa`,
       description: entity.tagline,
       type: 'article',
     },

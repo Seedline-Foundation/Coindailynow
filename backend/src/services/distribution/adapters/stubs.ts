@@ -8,7 +8,7 @@
  *
  * NOTE: each requires offline setup (see /admin/settings/setup-checklist):
  *   - app/business registration with the platform
- *   - OAuth flow against your CoinDaily account
+ *   - OAuth flow against your Sygn account
  *   - business verification (Meta family, TikTok for Business, X paid tier)
  */
 
@@ -200,7 +200,7 @@ export class TikTokAdapter extends BaseAdapter {
     // Metrics polling later reconciles to the final TikTok video id.
     return {
       externalId: publishId,
-      externalUrl: `https://www.tiktok.com/@${payload.targetMetadata?.username || 'coindaily'}`,
+      externalUrl: `https://www.tiktok.com/@${payload.targetMetadata?.username || 'sygn'}`,
       metadata: { publishId, asyncPublish: true },
     };
   }

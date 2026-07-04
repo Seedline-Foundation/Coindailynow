@@ -1,12 +1,12 @@
 version: '3.8'
 
-# CoinDaily Monitoring Stack — Prometheus + Grafana
+# Sygn Monitoring Stack — Prometheus + Grafana
 # Usage: docker compose -f infrastructure/docker/docker-compose.monitoring.yml up -d
 
 services:
   prometheus:
     image: prom/prometheus:v2.51.0
-    container_name: coindaily-prometheus
+    container_name: sygn-prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./alert-rules.yml:/etc/prometheus/alert-rules.yml:ro
@@ -20,7 +20,7 @@ services:
       - '--web.enable-lifecycle'
       - '--web.external-url=http://localhost:9090'
     networks:
-      - coindaily-network
+      - sygn-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
@@ -30,7 +30,7 @@ services:
 
   alertmanager:
     image: prom/alertmanager:v0.27.0
-    container_name: coindaily-alertmanager
+    container_name: sygn-alertmanager
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     ports:
@@ -39,15 +39,15 @@ services:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
       - '--storage.path=/alertmanager'
     networks:
-      - coindaily-network
+      - sygn-network
     restart: unless-stopped
 
   grafana:
     image: grafana/grafana:10.4.0
-    container_name: coindaily-grafana
+    container_name: sygn-grafana
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-coindaily2026}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-sygn2026}
       GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3100}
       GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-piechart-panel
     volumes:
@@ -61,12 +61,12 @@ services:
       prometheus:
         condition: service_healthy
     networks:
-      - coindaily-network
+      - sygn-network
     restart: unless-stopped
 
   node-exporter:
     image: prom/node-exporter:v1.7.0
-    container_name: coindaily-node-exporter
+    container_name: sygn-node-exporter
     ports:
       - "127.0.0.1:9100:9100"
     volumes:
@@ -78,24 +78,24 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     networks:
-      - coindaily-network
+      - sygn-network
     restart: unless-stopped
 
   loki:
     image: grafana/loki:2.9.4
-    container_name: coindaily-loki
+    container_name: sygn-loki
     ports:
       - "127.0.0.1:3200:3100"
     volumes:
       - loki_data:/loki
     command: -config.file=/etc/loki/local-config.yaml
     networks:
-      - coindaily-network
+      - sygn-network
     restart: unless-stopped
 
   promtail:
     image: grafana/promtail:2.9.4
-    container_name: coindaily-promtail
+    container_name: sygn-promtail
     volumes:
       - /var/log:/var/log:ro
       - ./promtail.yml:/etc/promtail/config.yml:ro
@@ -103,7 +103,7 @@ services:
     depends_on:
       - loki
     networks:
-      - coindaily-network
+      - sygn-network
     restart: unless-stopped
 
 volumes:
@@ -112,6 +112,6 @@ volumes:
   loki_data:
 
 networks:
-  coindaily-network:
+  sygn-network:
     external: true
-    name: docker_coindaily-network
+    name: docker_sygn-network

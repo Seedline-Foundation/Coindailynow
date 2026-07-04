@@ -259,19 +259,19 @@ export class StructuredDataService {
       console.error('Error generating Person schema:', error);
       return {
         '@type': 'Person',
-        name: 'CoinDaily Team',
+        name: 'Sygn Team',
       };
     }
   }
 
   /**
-   * Generate Organization schema for CoinDaily
+   * Generate Organization schema for Sygn
    */
   generateOrganizationSchema(): OrganizationSchema {
     return {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'CoinDaily',
+      name: 'Sygn',
       url: process.env.FRONTEND_URL || 'https://sygn.live',
       logo: {
         '@type': 'ImageObject',
@@ -280,10 +280,10 @@ export class StructuredDataService {
         height: 60,
       },
       sameAs: [
-        'https://twitter.com/coindaily',
-        'https://t.me/coindaily',
-        'https://linkedin.com/company/coindaily',
-        'https://youtube.com/@coindaily',
+        'https://twitter.com/sygn',
+        'https://t.me/sygn',
+        'https://linkedin.com/company/sygn',
+        'https://youtube.com/@sygn',
       ],
       contactPoint: {
         '@type': 'ContactPoint',
@@ -630,7 +630,7 @@ export class StructuredDataService {
       },
       author: {
         '@type': 'Organization',
-        name: params.reviewerName || 'CoinDaily Fact Check',
+        name: params.reviewerName || 'Sygn Fact Check',
         url: process.env.FRONTEND_URL || 'https://sygn.live',
       },
       reviewRating: {

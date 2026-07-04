@@ -7,8 +7,8 @@
 set -e
 
 ENVIRONMENT=${1:-production}
-APP_NAME="coindaily-admin"
-APP_DIR="/var/www/coindaily-admin"
+APP_NAME="sygn-admin"
+APP_DIR="/var/www/sygn-admin"
 SOURCE_DIR="apps/admin"
 
 echo "[ADMIN] Starting secure deployment..."

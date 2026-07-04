@@ -27,7 +27,7 @@ export {
   EventsNewsSection,       // FR-060
   PartnersSection,         // FR-061
   MemefiAwardSection,      // FR-064
-  CoinDailyCastSection,    // FR-067
+  SygnCastSection,    // FR-067
   ScamAlertsSection        // FR-072
 } from './MoreSections';
 
@@ -115,7 +115,7 @@ export const getSectionComponent = (sectionId: string) => {
     'memefi-award': 'MemefiAwardSection',
     'featured-news': 'FeaturedNewsSection',
     'general-crypto': 'GeneralCryptoSection',
-    'coindaily-cast': 'CoinDailyCastSection',
+    'sygn-cast': 'SygnCastSection',
     'opinion': 'OpinionSection',
     'token-reviews': 'TokenReviewsSection',
     'policy-updates': 'PolicyUpdatesSection',
@@ -143,7 +143,7 @@ export const validateSectionConfig = (config: any) => {
     'memefi-award',       // FR-064
     'featured-news',      // FR-065
     'general-crypto',     // FR-066
-    'coindaily-cast',     // FR-067
+    'sygn-cast',     // FR-067
     'opinion',            // FR-068
     'token-reviews',      // FR-069
     'policy-updates',     // FR-070

@@ -226,7 +226,7 @@ export default function DashboardPage() {
           <h1 className="text-5xl md:text-7xl font-bold mb-4">
             <span className="gradient-text">Project Dashboard</span>
           </h1>
-          <p className="text-xl text-gray-300">Real-time updates on CoinDaily and JY Token development</p>
+          <p className="text-xl text-gray-300">Real-time updates on Sygn and JY Token development</p>
           <p className="text-sm text-gray-500 mt-2">Last updated: November 14, 2025 • Weekly admin updates</p>
         </motion.div>
 

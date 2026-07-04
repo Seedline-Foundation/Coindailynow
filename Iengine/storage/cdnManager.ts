@@ -1,7 +1,8 @@
 /**
  * CDN / Object Storage Manager
  * Handles image upload, optimization, and CDN distribution.
- * Integrates with existing Backblaze B2 / Cloudflare R2 infrastructure.
+ * Uploads route through the backend media API into Contabo Object Storage
+ * (simages bucket), fronted by Cloudflare CDN.
  */
 
 import { ImageVariant } from '../types';
@@ -16,7 +17,7 @@ export interface CDNUploadResult {
 }
 
 export interface CDNConfig {
-  provider: 'backblaze-b2' | 'cloudflare-r2' | 's3' | 'local';
+  provider: 'contabo' | 's3' | 'local';
   bucket: string;
   region?: string;
   endpoint?: string;
@@ -32,9 +33,9 @@ export class CDNManager {
 
   constructor(config?: Partial<CDNConfig>) {
     this.config = {
-      provider: (process.env.CDN_PROVIDER as any) || 'backblaze-b2',
-      bucket: process.env.CDN_BUCKET || 'coindaily-media',
-      region: process.env.CDN_REGION || 'us-west-001',
+      provider: (process.env.CDN_PROVIDER as any) || 'contabo',
+      bucket: process.env.CDN_BUCKET || 'simages',
+      region: process.env.CDN_REGION || 'eu2',
       endpoint: process.env.CDN_ENDPOINT,
       publicUrl: process.env.CDN_URL || process.env.CFIS_PUBLIC_MEDIA_BASE || 'https://cdn.sygn.live',
       ...config,

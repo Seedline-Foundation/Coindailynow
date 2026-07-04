@@ -211,7 +211,7 @@ export default function SuperAdminFinancePage() {
         <div>
           <h1 className="text-2xl font-bold text-white">CFIS — Financial Intelligence</h1>
           <p className="text-dark-400 text-sm mt-1">
-            CoinDaily Financial Intelligence System overview. Real-time metrics from CFIS.
+            Sygn Financial Intelligence System overview. Real-time metrics from CFIS.
           </p>
         </div>
         <div className="flex items-center gap-3">

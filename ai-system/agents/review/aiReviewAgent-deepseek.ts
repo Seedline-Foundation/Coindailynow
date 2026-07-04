@@ -266,7 +266,7 @@ export class AIReviewAgent {
   ): Promise<ValidationResult> {
     try {
       const prompt = `<think>
-You are performing a FINAL quality gate on a complete article package for CoinDaily Africa.
+You are performing a FINAL quality gate on a complete article package for Sygn Africa.
 
 ARTICLE: "${article.title}" (${article.word_count} words, SEO: ${article.seo_score}, Readability: ${article.readability_score})
 IMAGE: quality_score=${image.quality_score}, theme_match=${image.theme_match_score}

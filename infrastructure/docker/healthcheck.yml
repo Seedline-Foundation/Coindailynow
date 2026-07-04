@@ -8,11 +8,11 @@ version: '3.8'
 services:
   blackbox-exporter:
     image: prom/blackbox-exporter:v0.25.0
-    container_name: coindaily-blackbox
+    container_name: sygn-blackbox
     ports:
       - "127.0.0.1:9115:9115"
     volumes:
       - ./blackbox.yml:/etc/blackbox_exporter/config.yml:ro
     networks:
-      - coindaily-network
+      - sygn-network
     restart: unless-stopped

@@ -7,8 +7,8 @@ import Link from 'next/link';
 // import Footer from '@/components/footer/Footer';
 
 const channels = [
-  { id: 'telegram', name: 'Telegram Bot', icon: '✈️', command: '@CoinDailySummaryBot', users: '3,200+', features: ['Article summaries', 'Topic queries', 'Daily digest', 'Multi-language'] },
-  { id: 'whatsapp', name: 'WhatsApp Bot', icon: '📱', command: '+1 (800) COINDAILY', users: '1,800+', features: ['Summary templates', 'Daily/weekly digest', 'Location-based news'] },
+  { id: 'telegram', name: 'Telegram Bot', icon: '✈️', command: '@SygnSummaryBot', users: '3,200+', features: ['Article summaries', 'Topic queries', 'Daily digest', 'Multi-language'] },
+  { id: 'whatsapp', name: 'WhatsApp Bot', icon: '📱', command: '+1 (800) SYGN', users: '1,800+', features: ['Summary templates', 'Daily/weekly digest', 'Location-based news'] },
   { id: 'web', name: 'Web Widget', icon: '🌐', command: 'Embedded on site', users: '5,000+', features: ['Real-time chat', 'Article search', 'Explainer mode', 'Interactive Q&A'] },
 ];
 
@@ -116,7 +116,7 @@ export default function AISummarizerPage() {
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6">
             <h3 className="font-bold text-blue-800 dark:text-blue-200 mb-3">📲 Telegram — Get Started</h3>
             <ol className="space-y-2 text-sm text-blue-700 dark:text-blue-300 list-decimal list-inside">
-              <li>Open Telegram and search for <strong>@CoinDailySummaryBot</strong></li>
+              <li>Open Telegram and search for <strong>@SygnSummaryBot</strong></li>
               <li>Send <code>/start</code> to begin</li>
               <li>Set your language with <code>/language sw</code> (for Swahili)</li>
               <li>Subscribe to topics: <code>/subscribe bitcoin nigeria</code></li>
@@ -126,7 +126,7 @@ export default function AISummarizerPage() {
           <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-6">
             <h3 className="font-bold text-green-800 dark:text-green-200 mb-3">📱 WhatsApp — Get Started</h3>
             <ol className="space-y-2 text-sm text-green-700 dark:text-green-300 list-decimal list-inside">
-              <li>Save our WhatsApp number: <strong>+1 (800) COINDAILY</strong></li>
+              <li>Save our WhatsApp number: <strong>+1 (800) SYGN</strong></li>
               <li>Send "Hi" to start the conversation</li>
               <li>Choose your preferred language</li>
               <li>Select topics of interest</li>

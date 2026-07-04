@@ -34,7 +34,7 @@ describe('MainNavigation', () => {
     render(<MainNavigation />);
     
     expect(screen.getByRole('navigation')).toBeInTheDocument();
-    expect(screen.getByText('CoinDaily')).toBeInTheDocument();
+    expect(screen.getByText('Sygn')).toBeInTheDocument();
     expect(screen.getByText('Services')).toBeInTheDocument();
     expect(screen.getByText('Products')).toBeInTheDocument();
     expect(screen.getByText('Market Insights')).toBeInTheDocument();

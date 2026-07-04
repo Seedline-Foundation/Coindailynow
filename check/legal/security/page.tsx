@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Security Policy | CoinDaily Online',
-  description: 'Learn about CoinDaily Online\'s security measures, data protection practices, and how we keep your information safe.',
+  title: 'Security Policy | Sygn Online',
+  description: 'Learn about Sygn Online\'s security measures, data protection practices, and how we keep your information safe.',
   robots: 'index, follow',
 };
 
@@ -26,7 +26,7 @@ export default function SecurityPage() {
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Commitment to Security</h2>
                 <p className="text-gray-700 mb-4">
-                  At CoinDaily Online, we take the security of your data and our platform seriously. This Security Policy outlines our comprehensive approach to protecting your information and maintaining a secure environment for all users.
+                  At Sygn Online, we take the security of your data and our platform seriously. This Security Policy outlines our comprehensive approach to protecting your information and maintaining a secure environment for all users.
                 </p>
               </div>
 
@@ -236,7 +236,7 @@ export default function SecurityPage() {
                 
                 <div className="bg-gray-100 p-6 rounded-lg mb-4">
                   <p className="font-medium text-gray-800">Security Team</p>
-                  <p className="text-gray-700">Email: <a href="mailto:security@coindaily.online" className="text-blue-600 hover:text-blue-800">security@coindaily.online</a></p>
+                  <p className="text-gray-700">Email: <a href="mailto:security@sygn.online" className="text-blue-600 hover:text-blue-800">security@sygn.online</a></p>
                   <p className="text-gray-700">Subject Line: Security Vulnerability Report</p>
                   <p className="text-gray-700">GPG Key: Available upon request</p>
                 </div>
@@ -272,8 +272,8 @@ export default function SecurityPage() {
                   For security-related questions or concerns:
                 </p>
                 <div className="bg-gray-100 p-4 rounded-lg">
-                  <p className="text-gray-700">Security Team: <a href="mailto:security@coindaily.online" className="text-blue-600 hover:text-blue-800">security@coindaily.online</a></p>
-                  <p className="text-gray-700">General Inquiries: <a href="mailto:legal@coindaily.online" className="text-blue-600 hover:text-blue-800">legal@coindaily.online</a></p>
+                  <p className="text-gray-700">Security Team: <a href="mailto:security@sygn.online" className="text-blue-600 hover:text-blue-800">security@sygn.online</a></p>
+                  <p className="text-gray-700">General Inquiries: <a href="mailto:legal@sygn.online" className="text-blue-600 hover:text-blue-800">legal@sygn.online</a></p>
                   <p className="text-gray-700">Emergency: Available 24/7 through security email</p>
                 </div>
               </div>

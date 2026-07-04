@@ -13,14 +13,14 @@ NC='\033[0m'
 PATTERNS='CHANGE_ME|changeme|your[-_].*[-_]here|YOUR_[A-Z_]+|example\.com|localhost:5432.*password|sk-test-|sk-placeholder'
 
 if [ "$#" -eq 0 ]; then
-  echo -e "${YELLOW}Usage: $0 /var/www/coindaily-app/.env [more .env files]${NC}"
+  echo -e "${YELLOW}Usage: $0 /var/www/sygn-app/.env [more .env files]${NC}"
   echo "Typical production paths:"
-  echo "  /var/www/coindaily-app/.env"
-  echo "  /var/www/coindaily/.env"
-  echo "  /var/www/coindaily-admin/.env"
-  echo "  /var/www/coindaily-press/.env"
-  echo "  /var/www/coindaily-ai/.env"
-  echo "  /var/www/coindaily-ai-system/.env"
+  echo "  /var/www/sygn-app/.env"
+  echo "  /var/www/sygn/.env"
+  echo "  /var/www/sygn-admin/.env"
+  echo "  /var/www/sygn-press/.env"
+  echo "  /var/www/sygn-ai/.env"
+  echo "  /var/www/sygn-ai-system/.env"
   exit 2
 fi
 

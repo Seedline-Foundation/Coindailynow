@@ -60,7 +60,7 @@ jobs:
         working-directory: ./backend
         env:
           REDIS_URL: redis://localhost:6379
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/coindaily_test' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/sygn_test' }}
           JWT_SECRET: ci-test-secret
           NODE_ENV: test
         run: |
@@ -189,7 +189,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            cd /opt/coindaily
+            cd /opt/sygn
             git pull origin main
             docker compose -f infrastructure/docker/docker-compose.yml pull
             docker compose -f infrastructure/docker/docker-compose.yml up -d

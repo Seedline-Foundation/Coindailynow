@@ -35,7 +35,7 @@ export function GeoProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem('coindaily_lang');
+    const stored = localStorage.getItem('sygn_lang');
     if (stored) {
       setActiveLanguage(stored);
     }
@@ -59,7 +59,7 @@ export function GeoProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (langCode: string) => {
     setActiveLanguage(langCode);
-    localStorage.setItem('coindaily_lang', langCode);
+    localStorage.setItem('sygn_lang', langCode);
     document.cookie = `lang=${langCode};path=/;max-age=${60 * 60 * 24 * 365}`;
   };
 

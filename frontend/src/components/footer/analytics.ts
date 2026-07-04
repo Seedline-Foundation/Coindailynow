@@ -1,5 +1,5 @@
 /**
- * CoinDaily Platform - Footer Analytics Service
+ * Sygn Platform - Footer Analytics Service
  * Task 55: FR-112 Analytics tracking for footer interactions
  * 
  * Features:
@@ -51,7 +51,7 @@ class FooterAnalyticsService {
     
     // Try to get user ID from localStorage or cookies
     try {
-      return localStorage.getItem('coindaily_user_id') || undefined;
+      return localStorage.getItem('sygn_user_id') || undefined;
     } catch {
       return undefined;
     }
@@ -91,11 +91,11 @@ class FooterAnalyticsService {
   }
 
   private getSessionStartTime(): number {
-    const stored = sessionStorage.getItem('coindaily_session_start');
+    const stored = sessionStorage.getItem('sygn_session_start');
     if (stored) return parseInt(stored, 10);
     
     const startTime = Date.now();
-    sessionStorage.setItem('coindaily_session_start', startTime.toString());
+    sessionStorage.setItem('sygn_session_start', startTime.toString());
     return startTime;
   }
 
@@ -360,7 +360,7 @@ class FooterAnalyticsService {
   public setUserId(userId: string): void {
     this.userId = userId;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('coindaily_user_id', userId);
+      localStorage.setItem('sygn_user_id', userId);
     }
   }
 
@@ -370,8 +370,8 @@ class FooterAnalyticsService {
   public clearUserData(): void {
     this.userId = undefined;
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('coindaily_user_id');
-      sessionStorage.removeItem('coindaily_session_start');
+      localStorage.removeItem('sygn_user_id');
+      sessionStorage.removeItem('sygn_session_start');
     }
     this.eventQueue = [];
   }

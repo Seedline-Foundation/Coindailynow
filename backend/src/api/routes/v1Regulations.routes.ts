@@ -235,7 +235,7 @@ router.get('/export.csv', async (req: Request, res: Response) => {
   );
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="coindaily-regulations.csv"');
+  res.setHeader('Content-Disposition', 'attachment; filename="sygn-regulations.csv"');
   return res.send(lines.join('\n'));
 });
 

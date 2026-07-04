@@ -25,7 +25,7 @@ import {
   EventsNewsSection as EventsNewsSectionType,
   PartnersSection as PartnersSectionType,
   MemefiAwardSection as MemefiAwardSectionType,
-  CoinDailyCastSection as CoinDailyCastSectionType,
+  SygnCastSection as SygnCastSectionType,
   ScamAlertsSection as ScamAlertsSectionType
 } from '../../types/content-sections';
 import { 
@@ -514,14 +514,14 @@ export const MemefiAwardSection: React.FC<MemefiAwardSectionProps> = ({
   );
 };
 
-// ========== FR-067: CoinDaily Cast Interviews (6 cards) ==========
+// ========== FR-067: Sygn Cast Interviews (6 cards) ==========
 
-interface CoinDailyCastSectionProps {
-  data?: CoinDailyCastSectionType;
+interface SygnCastSectionProps {
+  data?: SygnCastSectionType;
   isLoading?: boolean;
 }
 
-export const CoinDailyCastSection: React.FC<CoinDailyCastSectionProps> = ({ 
+export const SygnCastSection: React.FC<SygnCastSectionProps> = ({ 
   data, 
   isLoading = false 
 }) => {
@@ -542,9 +542,9 @@ export const CoinDailyCastSection: React.FC<CoinDailyCastSectionProps> = ({
         },
         duration: 45,
         publishedAt: new Date('2024-10-03T15:00:00Z'),
-        videoUrl: '/videos/coindaily-cast-ep-101',
-        audioUrl: '/audio/coindaily-cast-ep-101',
-        transcriptUrl: '/transcripts/coindaily-cast-ep-101',
+        videoUrl: '/videos/sygn-cast-ep-101',
+        audioUrl: '/audio/sygn-cast-ep-101',
+        transcriptUrl: '/transcripts/sygn-cast-ep-101',
         imageUrl: '/api/placeholder/400/250',
         topics: ['DeFi', 'Africa', 'Innovation'],
         viewCount: 8934,
@@ -565,8 +565,8 @@ export const CoinDailyCastSection: React.FC<CoinDailyCastSectionProps> = ({
         },
         duration: 38,
         publishedAt: new Date('2024-10-02T14:00:00Z'),
-        videoUrl: '/videos/coindaily-cast-ep-100',
-        audioUrl: '/audio/coindaily-cast-ep-100',
+        videoUrl: '/videos/sygn-cast-ep-100',
+        audioUrl: '/audio/sygn-cast-ep-100',
         imageUrl: '/api/placeholder/400/250',
         topics: ['Regulation', 'Nigeria', 'Banking'],
         viewCount: 12450,
@@ -582,7 +582,7 @@ export const CoinDailyCastSection: React.FC<CoinDailyCastSectionProps> = ({
     return (
       <section className="space-y-6">
         <SectionHeader 
-          title="CoinDaily Cast"
+          title="Sygn Cast"
           icon={<Mic className="w-5 h-5 text-red-500" />}
         />
         <ContentCardGrid columns={3}>
@@ -597,7 +597,7 @@ export const CoinDailyCastSection: React.FC<CoinDailyCastSectionProps> = ({
   return (
     <section className="space-y-6">
       <SectionHeader 
-        title="CoinDaily Cast"
+        title="Sygn Cast"
         description="In-depth interviews with African crypto leaders"
         icon={<Mic className="w-5 h-5 text-red-500" />}
         action={{

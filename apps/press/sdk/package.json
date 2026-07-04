@@ -1,7 +1,7 @@
 {
   "name": "@sendpress/sdk",
   "version": "1.0.0",
-  "description": "SENDPRESS SDK for PR distribution by Coindaily",
+  "description": "SENDPRESS SDK for PR distribution by Sygn",
   "main": "dist/sendpress.umd.js",
   "module": "dist/sendpress.esm.js",
   "types": "dist/types/index.d.ts",
@@ -19,18 +19,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Seedline-Foundation/Coindailynow.git",
+    "url": "https://github.com/Seedline-Foundation/Sygn.git",
     "directory": "apps/press/sdk"
   },
   "keywords": [
     "sendpress",
-    "coindaily",
+    "sygn",
     "pr-distribution",
     "blockchain",
     "polygon",
     "web-components"
   ],
-  "author": "Coindaily",
+  "author": "Sygn",
   "license": "MIT",
   "peerDependencies": {},
   "devDependencies": {

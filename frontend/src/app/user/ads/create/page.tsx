@@ -126,7 +126,7 @@ export default function CreateAdvertiserCampaignPage() {
       const rawUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
       const parsedUser = rawUser ? JSON.parse(rawUser) : null;
       const advertiserId = parsedUser?.id || parsedUser?.userId || parsedUser?.email || 'demo-advertiser';
-      const advertiserName = parsedUser?.name || parsedUser?.fullName || 'CoinDaily Advertiser';
+      const advertiserName = parsedUser?.name || parsedUser?.fullName || 'Sygn Advertiser';
 
       const campaignPayload = {
         advertiserId,

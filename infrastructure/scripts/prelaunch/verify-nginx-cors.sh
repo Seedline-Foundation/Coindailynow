@@ -25,7 +25,7 @@ for CONF in "$NGINX_DIR"/*.conf; do
     FAILED=1
   fi
 
-  if [[ "$BASENAME" == *app.coindaily* ]] || [[ "$BASENAME" == *backend* ]]; then
+  if [[ "$BASENAME" == *app.sygn* ]] || [[ "$BASENAME" == *backend* ]]; then
     if ! grep -q 'NO CORS' "$CONF" && ! grep -q 'Express handles CORS' "$CONF"; then
       echo -e "${YELLOW}⚠ $BASENAME — add comment that CORS is Express-only${NC}"
     else

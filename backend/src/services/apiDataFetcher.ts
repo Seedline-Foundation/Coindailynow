@@ -141,7 +141,7 @@ async function fetchWithRetry(
       ...options,
       signal: controller.signal,
       headers: {
-        'User-Agent': 'CoinDaily/1.0 (Financial News Aggregator)',
+        'User-Agent': 'Sygn/1.0 (Financial News Aggregator)',
         'Accept': 'application/json, application/xml, text/xml',
         ...options.headers,
       },

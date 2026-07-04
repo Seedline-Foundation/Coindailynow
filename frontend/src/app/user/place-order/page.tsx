@@ -59,7 +59,7 @@ const SERVICES: Service[] = [
   {
     id: 'sponsored-article',
     name: 'Sponsored Article',
-    description: 'Publish a branded article on CoinDaily reaching our 500k+ monthly African crypto audience.',
+    description: 'Publish a branded article on Sygn reaching our 500k+ monthly African crypto audience.',
     icon: <Megaphone className="w-6 h-6" />,
     category: 'advertising',
     prices: [
@@ -71,7 +71,7 @@ const SERVICES: Service[] = [
   {
     id: 'banner-ad',
     name: 'Banner Advertising',
-    description: 'Display your ads across CoinDaily pages with geo-targeting for African markets.',
+    description: 'Display your ads across Sygn pages with geo-targeting for African markets.',
     icon: <Zap className="w-6 h-6" />,
     category: 'advertising',
     prices: [
@@ -108,7 +108,7 @@ const SERVICES: Service[] = [
   {
     id: 'verification-badge',
     name: 'Verified Creator Badge',
-    description: 'Get a verified badge on your CoinDaily profile. Builds trust with the community.',
+    description: 'Get a verified badge on your Sygn profile. Builds trust with the community.',
     icon: <Shield className="w-6 h-6" />,
     category: 'other',
     prices: [{ label: 'One-time', amount: 4.99 }],
@@ -163,7 +163,7 @@ export default function PlaceOrderPage() {
           <CreditCard className="w-6 h-6 text-primary-500" />
           Place Order
         </h1>
-        <p className="text-dark-400 mt-1">Browse and purchase CoinDaily paid services directly from your dashboard.</p>
+        <p className="text-dark-400 mt-1">Browse and purchase Sygn paid services directly from your dashboard.</p>
       </div>
 
       {/* Category filter */}

@@ -1,5 +1,5 @@
 
-> coindaily-backend@1.0.0 dev
+> sygn-backend@1.0.0 dev
 > ts-node-dev --respawn --transpile-only src/index.ts
 
 [INFO] 23:03:53 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.2)

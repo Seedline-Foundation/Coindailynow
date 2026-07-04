@@ -85,7 +85,7 @@ const plans = [
 ];
 
 const testimonials = [
-  { name: 'Adebayo O.', role: 'Compliance Officer, Quidax', text: 'CoinDaily Pro saved our compliance team 20+ hours per month tracking regulatory changes across Africa.', avatar: '🧑🏾‍💼' },
+  { name: 'Adebayo O.', role: 'Compliance Officer, Quidax', text: 'Sygn Pro saved our compliance team 20+ hours per month tracking regulatory changes across Africa.', avatar: '🧑🏾‍💼' },
   { name: 'Fatima K.', role: 'Fund Manager, Cape Town', text: 'The expert analysis and risk scores are invaluable for our African crypto fund. Worth every cent.', avatar: '👩🏽‍💼' },
   { name: 'Samuel M.', role: 'Fintech Founder, Nairobi', text: 'The API access lets us embed regulation data directly into our app. Our users love it.', avatar: '👨🏿‍💻' },
 ];
@@ -151,7 +151,7 @@ export default function MembershipPage() {
         {/* Hero */}
         <div className="text-center mb-12">
           <span className="inline-block px-4 py-1 bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 rounded-full text-sm font-medium mb-4">
-            👑 CoinDaily Premium Membership
+            👑 Sygn Premium Membership
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             Africa's #1 Crypto Regulatory Intelligence
@@ -294,7 +294,7 @@ export default function MembershipPage() {
         <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-8 text-center text-white mb-8">
           <h2 className="text-3xl font-bold mb-3">Ready to Stay Ahead of Africa's Crypto Regulations?</h2>
           <p className="text-white/90 text-lg mb-6 max-w-2xl mx-auto">
-            Join 2,500+ compliance professionals, fund managers, and fintech founders using CoinDaily Pro.
+            Join 2,500+ compliance professionals, fund managers, and fintech founders using Sygn Pro.
           </p>
           <button
             onClick={() => handleSubscribe('pro')}

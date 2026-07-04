@@ -1,6 +1,6 @@
 /**
  * ReadingProgress - Reading Progress Indicator Component
- * CoinDaily Platform - Task 21 Implementation
+ * Sygn Platform - Task 21 Implementation
  */
 
 import React from 'react';

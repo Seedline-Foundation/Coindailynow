@@ -2,7 +2,7 @@
 
 import AirdropABI from './Airdrop.json';
 import CDPPointsABI from './CDPPoints.json';
-import CoinDailyTimelockABI from './CoinDailyTimelock.json';
+import SygnTimelockABI from './SygnTimelock.json';
 import JoyTokenABI from './JoyToken.json';
 import PressDistributionABI from './PressDistribution.json';
 import ReputationSBTABI from './ReputationSBT.json';
@@ -13,4 +13,4 @@ import TimelockGovernanceABI from './TimelockGovernance.json';
 import TokenVestingABI from './TokenVesting.json';
 import VestingWalletABI from './VestingWallet.json';
 
-export { AirdropABI, CDPPointsABI, CoinDailyTimelockABI, JoyTokenABI, PressDistributionABI, ReputationSBTABI, SimpleWalletABI, StakingVaultABI, SubscriptionABI, TimelockGovernanceABI, TokenVestingABI, VestingWalletABI };
+export { AirdropABI, CDPPointsABI, SygnTimelockABI, JoyTokenABI, PressDistributionABI, ReputationSBTABI, SimpleWalletABI, StakingVaultABI, SubscriptionABI, TimelockGovernanceABI, TokenVestingABI, VestingWalletABI };

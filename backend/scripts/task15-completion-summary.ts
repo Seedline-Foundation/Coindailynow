@@ -175,5 +175,5 @@ console.log('    QUALITY: PRODUCTION-READY 🚀');
 console.log('    COVERAGE: COMPREHENSIVE 💯');
 console.log();
 console.log('='.repeat(60));
-console.log('   Ready for CoinDaily Africa mobile money payments! 🌍📱💰');
+console.log('   Ready for Sygn Africa mobile money payments! 🌍📱💰');
 console.log('='.repeat(60));

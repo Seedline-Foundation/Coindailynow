@@ -123,12 +123,12 @@ export class ElasticsearchService {
    */
   private async createArticlesIndex(): Promise<void> {
     const indexExists = await this.client.indices.exists({
-      index: 'coindaily_articles'
+      index: 'sygn_articles'
     });
 
     if (!indexExists) {
       await this.client.indices.create({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         body: {
           settings: {
             number_of_shards: 2,
@@ -243,12 +243,12 @@ export class ElasticsearchService {
    */
   private async createMarketDataIndex(): Promise<void> {
     const indexExists = await this.client.indices.exists({
-      index: 'coindaily_market_data'
+      index: 'sygn_market_data'
     });
 
     if (!indexExists) {
       await this.client.indices.create({
-        index: 'coindaily_market_data',
+        index: 'sygn_market_data',
         body: {
           settings: {
             number_of_shards: 1,
@@ -278,12 +278,12 @@ export class ElasticsearchService {
    */
   private async createSearchAnalyticsIndex(): Promise<void> {
     const indexExists = await this.client.indices.exists({
-      index: 'coindaily_search_analytics'
+      index: 'sygn_search_analytics'
     });
 
     if (!indexExists) {
       await this.client.indices.create({
-        index: 'coindaily_search_analytics',
+        index: 'sygn_search_analytics',
         body: {
           settings: {
             number_of_shards: 1,
@@ -385,7 +385,7 @@ export class ElasticsearchService {
       }
 
       const response = await this.client.search({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         body: searchBody
       });
 
@@ -440,7 +440,7 @@ export class ElasticsearchService {
   async getSuggestions(text: string, options: { field?: string; size?: number } = {}): Promise<Array<{ text: string; score: number }>> {
     try {
       const response = await this.client.search({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         body: {
           suggest: {
             article_suggest: {
@@ -481,7 +481,7 @@ export class ElasticsearchService {
   async indexArticle(article: any): Promise<IndexResult> {
     try {
       const response = await this.client.index({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         id: article.id,
         body: {
           title: article.title,
@@ -521,7 +521,7 @@ export class ElasticsearchService {
   async bulkIndexArticles(articles: any[]): Promise<BulkIndexResult> {
     try {
       const body = articles.flatMap(article => [
-        { index: { _index: 'coindaily_articles', _id: article.id } },
+        { index: { _index: 'sygn_articles', _id: article.id } },
         {
           title: article.title,
           content: article.content,
@@ -569,7 +569,7 @@ export class ElasticsearchService {
   async updateArticle(id: string, updates: any): Promise<IndexResult> {
     try {
       const response = await this.client.update({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         id,
         body: {
           doc: {
@@ -598,7 +598,7 @@ export class ElasticsearchService {
   async deleteArticle(id: string): Promise<IndexResult> {
     try {
       await this.client.delete({
-        index: 'coindaily_articles',
+        index: 'sygn_articles',
         id
       });
 
@@ -618,7 +618,7 @@ export class ElasticsearchService {
   async indexMarketData(data: any): Promise<IndexResult> {
     try {
       const response = await this.client.index({
-        index: 'coindaily_market_data',
+        index: 'sygn_market_data',
         id: data.id,
         body: {
           symbol: data.symbol,
@@ -684,7 +684,7 @@ export class ElasticsearchService {
       }
 
       const response = await this.client.search({
-        index: 'coindaily_market_data',
+        index: 'sygn_market_data',
         body: {
           query: {
             bool: {
@@ -733,7 +733,7 @@ export class ElasticsearchService {
   ): Promise<void> {
     try {
       await this.client.index({
-        index: 'coindaily_search_analytics',
+        index: 'sygn_search_analytics',
         body: {
           query,
           language: options.language || 'unknown',
@@ -768,7 +768,7 @@ export class ElasticsearchService {
       }
 
       const response = await this.client.search({
-        index: 'coindaily_search_analytics',
+        index: 'sygn_search_analytics',
         body: {
           query: Object.keys(query).length > 0 ? query : { match_all: {} },
           aggs: {
@@ -831,7 +831,7 @@ export class ElasticsearchService {
   }> {
     try {
       const response = await this.client.search({
-        index: 'coindaily_search_analytics',
+        index: 'sygn_search_analytics',
         body: {
           aggs: {
             languages: {

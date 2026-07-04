@@ -184,7 +184,7 @@ export class GoogleReviewAgent {
   }
 
   private buildReviewPrompt(request: ReviewRequest): string {
-    const basePrompt = `You are an expert content reviewer for CoinDaily Africa, the continent's largest AI-driven crypto news platform. Your role is to provide thorough, objective content review.
+    const basePrompt = `You are an expert content reviewer for Sygn Africa, the continent's largest AI-driven crypto news platform. Your role is to provide thorough, objective content review.
 
 Review Guidelines:
 - Maintain high editorial standards while being fair and constructive

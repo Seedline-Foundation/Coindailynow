@@ -3,7 +3,7 @@
 ## Cursor Cloud specific instructions
 
 ### Architecture Overview
-CoinDaily is a Turborepo monorepo with npm workspaces. The two core services are the **backend** (Express + GraphQL on port 4000) and the **frontend** (Next.js on port 3001). See `README.md` for the full project structure.
+Sygn is a Turborepo monorepo with npm workspaces. The two core services are the **backend** (Express + GraphQL on port 4000) and the **frontend** (Next.js on port 3001). See `README.md` for the full project structure.
 
 ### Infrastructure Services
 - **PostgreSQL 16** is required (installed via `apt`; Docker cgroup issues prevent using `docker-compose` in Cloud Agent VMs).
@@ -39,7 +39,7 @@ The backend `.env` file must contain `DATABASE_URL` pointing to the local Postgr
 - The backend `dotenv/config` import loads `.env` from the working directory (i.e., `backend/.env`).
 - Docker containers do not start in Cloud Agent VMs due to cgroup v2 limitations — install PostgreSQL and Redis directly via `apt` instead.
 ### Architecture
-CoinDaily is a monorepo (npm workspaces + Turborepo) with two core services:
+Sygn is a monorepo (npm workspaces + Turborepo) with two core services:
 - **Backend** (`backend/`) — Express.js + Apollo GraphQL on port **4000**
 - **Frontend** (`frontend/`) — Next.js 14 on port **3001**
 
@@ -79,7 +79,7 @@ Solidity smart contracts compiled with Hardhat. Config is `hardhat.config.cjs`, 
 - **Test**: `cd contracts && npx hardhat test` (120 tests across 8 test files)
 - **Deploy (local)**: `cd contracts && npx hardhat run scripts/deploy-all.js`
 - The Hardhat config uses `require()` (CommonJS `.cjs`), Solidity 0.8.20 with Paris EVM target.
-- `TimelockGovernance.sol` and `CoinDailyTimelock` (in `TimelockController.sol`) both wrap OZ `TimelockController`; the former is the N16 governance timelock.
+- `TimelockGovernance.sol` and `SygnTimelock` (in `TimelockController.sol`) both wrap OZ `TimelockController`; the former is the N16 governance timelock.
 
 ### Useful commands
 See `package.json` scripts at root, `backend/package.json`, and `frontend/package.json` for the full list. Key commands:

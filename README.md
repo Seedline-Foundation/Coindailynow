@@ -1,12 +1,12 @@
-# CoinDaily Platform
+# Sygn Platform
 
 **Africa's Premier Cryptocurrency News & Community Platform**
 
-CoinDaily is a comprehensive web application delivering real-time cryptocurrency news, market data, and AI-driven content specifically tailored for African markets.
+Sygn is a comprehensive web application delivering real-time cryptocurrency news, market data, and AI-driven content specifically tailored for African markets.
 
 ## 🌍 Overview
 
-CoinDaily serves the growing African cryptocurrency community with:
+Sygn serves the growing African cryptocurrency community with:
 - **AI-Powered Content Generation** - Multilingual news in 15+ African languages
 - **Real-Time Market Data** - Live tracking of African exchanges (Binance Africa, Luno, Quidax, etc.)
 - **Community Features** - Bounty system, staking, and rewards
@@ -48,7 +48,7 @@ CoinDaily serves the growing African cryptocurrency community with:
 
 ```bash
 # Clone repository
-git clone https://github.com/Seedline-Foundation/Coindailynow.git
+git clone https://github.com/Seedline-Foundation/Sygn.git
 cd news-platform
 
 # Install backend dependencies
@@ -172,8 +172,8 @@ Proprietary - All rights reserved by Seedline Foundation
 ## 🔗 Links
 
 - **Website**: Coming soon
-- **Twitter**: [@Coindaily001](https://twitter.com/Coindaily001)
-- **Telegram**: [CoinDaily](https://t.me/coindaily)
+- **Twitter**: [@Sygn001](https://twitter.com/Sygn001)
+- **Telegram**: [Sygn](https://t.me/sygn)
 
 ## 📞 Contact
 

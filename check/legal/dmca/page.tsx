@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'DMCA Policy | CoinDaily Online',
-  description: 'CoinDaily Online\'s Digital Millennium Copyright Act (DMCA) policy and procedures for reporting copyright infringement.',
+  title: 'DMCA Policy | Sygn Online',
+  description: 'Sygn Online\'s Digital Millennium Copyright Act (DMCA) policy and procedures for reporting copyright infringement.',
   robots: 'index, follow',
 };
 
@@ -26,7 +26,7 @@ export default function DMCAPage() {
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Overview</h2>
                 <p className="text-gray-700 mb-4">
-                  CoinDaily Online respects the intellectual property rights of others and complies with the Digital Millennium Copyright Act (DMCA). This policy outlines our procedures for reporting and responding to copyright infringement claims.
+                  Sygn Online respects the intellectual property rights of others and complies with the Digital Millennium Copyright Act (DMCA). This policy outlines our procedures for reporting and responding to copyright infringement claims.
                 </p>
               </div>
 
@@ -77,14 +77,14 @@ export default function DMCAPage() {
                 </p>
                 <div className="bg-gray-100 p-6 rounded-lg mb-4">
                   <p className="font-medium text-gray-800">DMCA Agent</p>
-                  <p className="text-gray-700">CoinDaily Online</p>
-                  <p className="text-gray-700">Email: <a href="mailto:dmca@coindaily.online" className="text-blue-600 hover:text-blue-800">dmca@coindaily.online</a></p>
+                  <p className="text-gray-700">Sygn Online</p>
+                  <p className="text-gray-700">Email: <a href="mailto:dmca@sygn.online" className="text-blue-600 hover:text-blue-800">dmca@sygn.online</a></p>
                   <p className="text-gray-700">Subject Line: DMCA Copyright Infringement Notice</p>
                   <p className="text-gray-700">Phone: +234 (0) 123-456-7890</p>
                   <p className="text-gray-700 mt-2">
                     <strong>Mailing Address:</strong><br />
                     DMCA Agent<br />
-                    CoinDaily Online<br />
+                    Sygn Online<br />
                     [Address Line 1]<br />
                     Lagos, Nigeria
                   </p>
@@ -173,7 +173,7 @@ export default function DMCAPage() {
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Safe Harbor Provisions</h2>
                 <p className="text-gray-700 mb-4">
-                  CoinDaily Online qualifies for safe harbor protection under the DMCA as an online service provider. We:
+                  Sygn Online qualifies for safe harbor protection under the DMCA as an online service provider. We:
                 </p>
                 <ul className="list-disc pl-6 mb-4 text-gray-700">
                   <li>Have designated an agent to receive infringement notices</li>
@@ -206,7 +206,7 @@ export default function DMCAPage() {
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">International Considerations</h2>
                 <p className="text-gray-700 mb-4">
-                  While CoinDaily Online is based in Nigeria, we comply with international copyright laws and respect intellectual property rights globally. We will process DMCA notices from copyright holders worldwide.
+                  While Sygn Online is based in Nigeria, we comply with international copyright laws and respect intellectual property rights globally. We will process DMCA notices from copyright holders worldwide.
                 </p>
               </div>
 
@@ -216,8 +216,8 @@ export default function DMCAPage() {
                   For questions about our DMCA policy or the process:
                 </p>
                 <div className="bg-gray-100 p-4 rounded-lg">
-                  <p className="text-gray-700">Email: <a href="mailto:dmca@coindaily.online" className="text-blue-600 hover:text-blue-800">dmca@coindaily.online</a></p>
-                  <p className="text-gray-700">Legal Team: <a href="mailto:legal@coindaily.online" className="text-blue-600 hover:text-blue-800">legal@coindaily.online</a></p>
+                  <p className="text-gray-700">Email: <a href="mailto:dmca@sygn.online" className="text-blue-600 hover:text-blue-800">dmca@sygn.online</a></p>
+                  <p className="text-gray-700">Legal Team: <a href="mailto:legal@sygn.online" className="text-blue-600 hover:text-blue-800">legal@sygn.online</a></p>
                 </div>
               </div>
 

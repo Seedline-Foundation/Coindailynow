@@ -1,6 +1,6 @@
 /**
  * Formatters Utility - Common formatting functions
- * CoinDaily Platform - Task 21 Implementation
+ * Sygn Platform - Task 21 Implementation
  */
 
 /**

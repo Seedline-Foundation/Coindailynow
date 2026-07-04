@@ -91,7 +91,7 @@ export default function AffiliatePage() {
             Earn Up to 30% Recurring Commission
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-6">
-            Join CoinDaily&apos;s affiliate program and earn recurring commissions by referring crypto enthusiasts,
+            Join Sygn&apos;s affiliate program and earn recurring commissions by referring crypto enthusiasts,
             traders, and businesses to Africa&apos;s leading crypto intelligence platform.
           </p>
           <div className="flex flex-wrap justify-center gap-3">

@@ -157,7 +157,7 @@ const FALLBACK: Record<string, Record<string, { metrics: { label: string; value:
   settings: {
     general: {
       metrics: [
-        { label: 'Platform', value: 'CoinDaily' },
+        { label: 'Platform', value: 'Sygn' },
         { label: 'Environment', value: 'Production' },
         { label: 'Version', value: '2.4.1' },
         { label: 'Node.js', value: '18.19.0' },

@@ -80,7 +80,7 @@ CREATE TABLE "RAGFeed" (
 CREATE TABLE "AIManifest" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "version" TEXT NOT NULL DEFAULT '1.0',
-    "name" TEXT NOT NULL DEFAULT 'CoinDaily Knowledge API',
+    "name" TEXT NOT NULL DEFAULT 'Sygn Knowledge API',
     "description" TEXT NOT NULL,
     "apiEndpoints" TEXT NOT NULL,
     "capabilities" TEXT NOT NULL,

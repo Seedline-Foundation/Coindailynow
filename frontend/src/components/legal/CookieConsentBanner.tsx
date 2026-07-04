@@ -71,13 +71,13 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
       cookies: [
         {
           name: 'session_id',
-          provider: 'CoinDaily',
+          provider: 'Sygn',
           purpose: 'Session management',
           duration: 'Session'
         },
         {
           name: 'csrf_token',
-          provider: 'CoinDaily',
+          provider: 'Sygn',
           purpose: 'Security protection',
           duration: '1 hour'
         }
@@ -93,7 +93,7 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
       cookies: [
         {
           name: 'user_preferences',
-          provider: 'CoinDaily',
+          provider: 'Sygn',
           purpose: 'Store user preferences',
           duration: '1 year'
         }
@@ -125,7 +125,7 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
       cookies: [
         {
           name: 'marketing_consent',
-          provider: 'CoinDaily',
+          provider: 'Sygn',
           purpose: 'Track marketing consent preferences',
           duration: '1 year'
         }
@@ -151,7 +151,7 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
 
   useEffect(() => {
     if (autoShow) {
-      const hasConsent = localStorage.getItem('coindaily_cookie_consent');
+      const hasConsent = localStorage.getItem('sygn_cookie_consent');
       if (!hasConsent) {
         setShowBanner(true);
       }
@@ -199,7 +199,7 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
       version: '1.0'
     };
     
-    localStorage.setItem('coindaily_cookie_consent', JSON.stringify(consentData));
+    localStorage.setItem('sygn_cookie_consent', JSON.stringify(consentData));
     
     if (onConsentChange) {
       onConsentChange(prefs);

@@ -35,12 +35,12 @@ interface Release {
 }
 
 const MOCK_RELEASES: Release[] = [
-  { id: 'pr-001', title: 'Bitcoin Hits New ATH in African Markets', publisher: 'CoinDaily', positionSlug: '/sponsored', status: 'verified', earned: 75, distributedAt: '2026-02-12T10:30:00Z', verifiedAt: '2026-02-12T10:31:00Z' },
+  { id: 'pr-001', title: 'Bitcoin Hits New ATH in African Markets', publisher: 'Sygn', positionSlug: '/sponsored', status: 'verified', earned: 75, distributedAt: '2026-02-12T10:30:00Z', verifiedAt: '2026-02-12T10:31:00Z' },
   { id: 'pr-002', title: 'M-Pesa Crypto Integration Launch', publisher: 'FinTechAfrica', positionSlug: '#sidebar-widget', status: 'verified', earned: 25, distributedAt: '2026-02-11T14:00:00Z', verifiedAt: '2026-02-11T14:02:00Z' },
-  { id: 'pr-003', title: 'JOY Token Staking Goes Live', publisher: 'CoinDaily', positionSlug: '/sponsored', status: 'pending', earned: 0, distributedAt: '2026-02-10T09:00:00Z' },
+  { id: 'pr-003', title: 'JOY Token Staking Goes Live', publisher: 'Sygn', positionSlug: '/sponsored', status: 'pending', earned: 0, distributedAt: '2026-02-10T09:00:00Z' },
   { id: 'pr-004', title: 'DeFi Yield Farming Guide for Beginners', publisher: 'Web3Weekly', positionSlug: '#sidebar-widget', status: 'verified', earned: 25, distributedAt: '2026-02-09T16:45:00Z', verifiedAt: '2026-02-09T16:47:00Z' },
   { id: 'pr-005', title: 'Luno Partners with Orange Money', publisher: 'AfricaTech', positionSlug: '/press/feed', status: 'failed', earned: 0, distributedAt: '2026-02-08T11:20:00Z' },
-  { id: 'pr-006', title: 'Nigeria SEC Approves Token Framework', publisher: 'CoinDaily', positionSlug: '/sponsored', status: 'verified', earned: 75, distributedAt: '2026-02-07T08:00:00Z', verifiedAt: '2026-02-07T08:01:30Z' },
+  { id: 'pr-006', title: 'Nigeria SEC Approves Token Framework', publisher: 'Sygn', positionSlug: '/sponsored', status: 'verified', earned: 75, distributedAt: '2026-02-07T08:00:00Z', verifiedAt: '2026-02-07T08:01:30Z' },
 ];
 
 const statusConfig: Record<ReleaseStatus, { icon: any; label: string; className: string }> = {

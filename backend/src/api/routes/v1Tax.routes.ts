@@ -174,7 +174,7 @@ router.post('/report.csv', async (req: Request, res: Response) => {
   lines.push(`taxDueUsd,${result.totals.taxDueUsd}`);
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="coindaily-tax-report-${countryCode}-${taxYear}.csv"`);
+  res.setHeader('Content-Disposition', `attachment; filename="sygn-tax-report-${countryCode}-${taxYear}.csv"`);
   return res.send(lines.join('\n'));
 });
 
@@ -202,7 +202,7 @@ router.post('/report.pdf', async (req: Request, res: Response) => {
     page.drawText(text, { x: 50, y, size, font, color: rgb(0.1, 0.1, 0.1) });
   };
 
-  drawLine('CoinDaily — Crypto Tax Report', 790, 16);
+  drawLine('Sygn — Crypto Tax Report', 790, 16);
   drawLine(`Country: ${countryCode}   Tax Year: ${taxYear}   Cost Basis: ${result.costBasis}`, 770);
   drawLine(`Capital Gains: $${result.totals.capitalGainsUsd}   Capital Losses: $${result.totals.capitalLossesUsd}`, 745);
   drawLine(`Income: $${result.totals.incomeUsd}   Net Capital: $${result.totals.netCapitalUsd}`, 725);
@@ -220,7 +220,7 @@ router.post('/report.pdf', async (req: Request, res: Response) => {
 
   const bytes = await pdfDoc.save();
   res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename="coindaily-tax-report-${countryCode}-${taxYear}.pdf"`);
+  res.setHeader('Content-Disposition', `attachment; filename="sygn-tax-report-${countryCode}-${taxYear}.pdf"`);
   return res.send(Buffer.from(bytes));
 });
 

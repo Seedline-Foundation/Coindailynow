@@ -78,20 +78,20 @@ const ComingSoonPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>CoinDaily - Coming Soon | Africa's Premier Crypto News Platform</title>
+        <title>Sygn - Coming Soon | Africa's Premier Crypto News Platform</title>
         <meta name="description" content="Africa's first AI-powered cryptocurrency and memecoin news platform. Join the waitlist for exclusive early access!" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="CoinDaily - Coming Soon" />
+        <meta property="og:title" content="Sygn - Coming Soon" />
         <meta property="og:description" content="Africa's first AI-powered cryptocurrency and memecoin news platform. Join the waitlist!" />
         <meta property="og:image" content="/og-image.png" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="CoinDaily - Coming Soon" />
+        <meta name="twitter:title" content="Sygn - Coming Soon" />
         <meta name="twitter:description" content="Africa's first AI-powered cryptocurrency and memecoin news platform. Join the waitlist!" />
         <meta name="twitter:image" content="/og-image.png" />
       </Head>
@@ -120,7 +120,7 @@ const ComingSoonPage: React.FC = () => {
               className="mb-8"
             >
               <h1 className="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-purple-400 to-blue-400 mb-4">
-                CoinDaily
+                Sygn
               </h1>
               <p className="text-xl md:text-2xl text-gray-300 font-light">
                 Africa's Premier Cryptocurrency News Platform
@@ -275,12 +275,12 @@ const ComingSoonPage: React.FC = () => {
             >
               <p className="text-gray-400 mb-4">Follow us for updates</p>
               <div className="flex justify-center gap-6">
-                <a href="https://x.com/coindaily001" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Follow us on X (Twitter)">
+                <a href="https://x.com/sygn001" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Follow us on X (Twitter)">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                   </svg>
                 </a>
-                <a href="https://t.me/coindailynewz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Join us on Telegram">
+                <a href="https://t.me/sygnnewz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Join us on Telegram">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
                   </svg>
@@ -293,7 +293,7 @@ const ComingSoonPage: React.FC = () => {
         {/* Footer */}
         <div className="absolute bottom-0 left-0 right-0 text-center pb-6">
           <p className="text-gray-500 text-sm">
-            © 2025 CoinDaily. All rights reserved.
+            © 2025 Sygn. All rights reserved.
           </p>
         </div>
       </div>

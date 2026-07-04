@@ -14,7 +14,7 @@ export class TestAgent extends BaseAgent {
       name: 'Test Agent',
       type: 'testing',
       category: 'engineering',
-      description: 'Generates unit tests, integration tests, E2E tests, and test plans. Identifies untested code paths, suggests test strategies, and helps maintain high test coverage for CoinDaily platform.',
+      description: 'Generates unit tests, integration tests, E2E tests, and test plans. Identifies untested code paths, suggests test strategies, and helps maintain high test coverage for Sygn platform.',
       capabilities: [
         'unit_test_generation',
         'integration_test_generation',
@@ -68,7 +68,7 @@ Code:
 ${code}
 \`\`\`
 
-Follow CoinDaily TDD approach. Return JSON:
+Follow Sygn TDD approach. Return JSON:
 {
   "tests": {
     "file": "${filePath?.replace('.ts', '.test.ts') || 'test.test.ts'}",
@@ -177,7 +177,7 @@ Return JSON:
 Endpoint: ${JSON.stringify(endpoint, null, 2)}
 Schema: ${JSON.stringify(schema || {}, null, 2)}
 
-Test against CoinDaily <500ms requirement. Return JSON:
+Test against Sygn <500ms requirement. Return JSON:
 {
   "apiTests": {
     "endpoint": string,
@@ -205,7 +205,7 @@ Test against CoinDaily <500ms requirement. Return JSON:
   }
 
   private async generatePerformanceTests(target: any, requirements: any): Promise<Record<string, any>> {
-    const prompt = `Generate performance tests for CoinDaily:
+    const prompt = `Generate performance tests for Sygn:
 
 Target: ${JSON.stringify(target || {}, null, 2)}
 Requirements: ${JSON.stringify(requirements || { maxResponseTime: 500 }, null, 2)}
@@ -279,7 +279,7 @@ Return JSON:
   }
 
   private async generateTestData(schema: any, count?: number): Promise<Record<string, any>> {
-    const prompt = `Generate realistic test data for CoinDaily:
+    const prompt = `Generate realistic test data for Sygn:
 
 Schema: ${JSON.stringify(schema || {}, null, 2)}
 Count: ${count || 10}

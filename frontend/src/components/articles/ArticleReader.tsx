@@ -1,6 +1,6 @@
 /**
  * ArticleReader - Main Article Display Component
- * CoinDaily Platform - Task 21 Implementation
+ * Sygn Platform - Task 21 Implementation
  * 
  * Features:
  * - Multi-language content switching
@@ -259,7 +259,7 @@ export const ArticleReader: React.FC<ArticleReaderProps> = ({
             },
             publisher: {
               '@type': 'Organization',
-              name: 'CoinDaily Africa',
+              name: 'Sygn Africa',
               logo: 'https://sygn.live/logo.png'
             },
             datePublished: article.publishedAt,

@@ -5,7 +5,7 @@
 #   1. pg_dump the Supabase DB from its DIRECT (non-pooler) endpoint,
 #      excluding Supabase-internal schemas.
 #   2. psql restore into the local Contabo Postgres container.
-#   3. Leaves the dump file in ~/coindaily/backups/ for audit/rollback.
+#   3. Leaves the dump file in ~/sygn/backups/ for audit/rollback.
 #
 # Prerequisites:
 #   - provision.sh already ran successfully.
@@ -35,7 +35,7 @@ fi
 # shellcheck disable=SC1091
 set -a; source .env; set +a
 
-BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/coindaily/backups}"
+BACKUPS_DIR="${HOST_BACKUPS_DIR:-$HOME/sygn/backups}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 DUMP_FILE="$BACKUPS_DIR/supabase-${STAMP}.sql"
 
@@ -83,7 +83,7 @@ DUMP_SIZE="$(du -h "$DUMP_FILE" | cut -f1)"
 echo "[migrate] dump complete, size: $DUMP_SIZE"
 
 echo "[migrate] sanity-checking Contabo DB is empty (public schema)..."
-TABLE_COUNT="$(docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
+TABLE_COUNT="$(docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" sygn-postgres \
   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -At \
   -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public';")"
 
@@ -94,16 +94,16 @@ if [[ "$TABLE_COUNT" -gt 0 ]]; then
 fi
 
 echo "[migrate] copying dump into container..."
-docker cp "$DUMP_FILE" coindaily-postgres:/backups/restore.sql
+docker cp "$DUMP_FILE" sygn-postgres:/backups/restore.sql
 
 echo "[migrate] restoring into $POSTGRES_DB ..."
-docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
+docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" sygn-postgres \
   psql \
     -U "$POSTGRES_USER" \
     -d "$POSTGRES_DB" \
     -f /backups/restore.sql
 
 echo "[migrate] restore complete."
-docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" coindaily-postgres \
+docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" sygn-postgres \
   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -At \
   -c "SELECT 'tables_restored=' || COUNT(*) FROM information_schema.tables WHERE table_schema='public';"

@@ -19,7 +19,7 @@ export default function ContactPage() {
             <span className="gradient-text">Get In Touch</span>
           </h1>
           <p className="text-xl text-gray-300">
-            Connect with the CoinDaily team and join our community
+            Connect with the Sygn team and join our community
           </p>
         </motion.div>
 
@@ -54,7 +54,7 @@ export default function ContactPage() {
 
           {/* Telegram */}
           <motion.a
-            href="https://t.me/CoindailyNewz"
+            href="https://t.me/SygnNewz"
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, y: 20 }}
@@ -75,13 +75,13 @@ export default function ContactPage() {
               Get instant support, discuss crypto news, and connect with 50K+ members in our Telegram group.
             </p>
             <div className="text-blue-400 font-mono font-bold text-lg group-hover:text-blue-300 transition-colors">
-              @CoindailyNewz
+              @SygnNewz
             </div>
           </motion.a>
 
           {/* Twitter/X */}
           <motion.a
-            href="https://twitter.com/Coindaily001"
+            href="https://twitter.com/Sygn001"
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, x: 20 }}
@@ -102,7 +102,7 @@ export default function ContactPage() {
               Stay updated with breaking crypto news, market analysis, and exclusive insights on X.
             </p>
             <div className="text-gray-300 font-mono font-bold text-lg group-hover:text-white transition-colors">
-              @Coindaily001
+              @Sygn001
             </div>
           </motion.a>
         </div>

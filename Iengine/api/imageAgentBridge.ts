@@ -101,7 +101,7 @@ export class ImageAgentBridge {
 
   private generateAltText(article: ArticleContext): string {
     const keywords = article.tags?.slice(0, 3).join(', ') || 'cryptocurrency';
-    return `Featured image for: ${article.title}. Visual elements: ${keywords} — CoinDaily Africa`;
+    return `Featured image for: ${article.title}. Visual elements: ${keywords} — Sygn Africa`;
   }
 }
 

@@ -829,7 +829,7 @@ function generateMicrodata(content: string, metadata: any): any {
     properties: {
       headline: extractHeadline(content),
       datePublished: new Date().toISOString(),
-      author: metadata?.author || 'CoinDaily'
+      author: metadata?.author || 'Sygn'
     }
   };
 }

@@ -37,9 +37,9 @@ async function createSuperAdminDemo() {
             location: 'Lagos, Nigeria',
             website: 'https://sygn.live',
             socialMedia: JSON.stringify({
-              twitter: '@coindaily_africa',
-              linkedin: 'coindaily-africa',
-              telegram: '@coindaily_admin'
+              twitter: '@sygn_africa',
+              linkedin: 'sygn-africa',
+              telegram: '@sygn_admin'
             }),
             tradingExperience: 'EXPERT',
             investmentPortfolioSize: 'LARGE',

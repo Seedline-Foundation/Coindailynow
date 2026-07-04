@@ -98,8 +98,8 @@ export default function AboutPage() {
             <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl p-8 md:p-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-6 gradient-text">Our Mission</h2>
               <p className="text-gray-300 text-lg leading-relaxed mb-6">
-                Joy Token is more than just a cryptocurrency - it's the utility backbone of the CoinDaily ecosystem, 
-                CoinDaily is Africa's leading crypto, blockchain, and AI news Hub platform. It is not just your normal news platform, 
+                Joy Token is more than just a cryptocurrency - it's the utility backbone of the Sygn ecosystem, 
+                Sygn is Africa's leading crypto, blockchain, and AI news Hub platform. It is not just your normal news platform, 
                 but the next generation African widest read innovative news platform. We're building a comprehensive Web3 news infrastructure ecosystem 
                 that combines real-world utility with sustainable tokenomics.
               </p>

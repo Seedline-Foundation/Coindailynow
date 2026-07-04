@@ -1,4 +1,4 @@
-# ── CoinDaily Frontend (Next.js 14) ─────────────────────
+# ── Sygn Frontend (Next.js 14) ─────────────────────
 FROM node:18-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache libc6-compat

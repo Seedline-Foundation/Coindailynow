@@ -20,7 +20,7 @@ const SUMMARY_TIMEOUT_MS = 30_000;
 const OLLAMA_URL = process.env.OLLAMA_API_URL || 'http://localhost:11434';
 const LLAMA_MODEL = process.env.LLAMA_MODEL || 'llama3.1:8b';
 
-const UA = 'CoinDailyResearchBot/1.0 (+https://sygn.live)';
+const UA = 'SygnResearchBot/1.0 (+https://sygn.live)';
 
 // ─── webSearch ──────────────────────────────────────────────────────────────
 

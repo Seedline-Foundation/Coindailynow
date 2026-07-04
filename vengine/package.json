@@ -1,7 +1,7 @@
 {
   "name": "vengine",
   "version": "1.0.0",
-  "description": "Video Generation Engine - AI-powered video pipeline for CoinDaily",
+  "description": "Video Generation Engine - AI-powered video pipeline for Sygn",
   "main": "pipeline/index.ts",
   "scripts": {
     "dev": "tsx watch pipeline/index.ts",

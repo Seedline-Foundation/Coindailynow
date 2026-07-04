@@ -177,7 +177,7 @@ const mockApplications: AffiliateApplication[] = [
   },
   {
     id: 'APP-002', name: 'Samuel Mwangi', email: 'sam@kenycoin.co.ke', country: 'Kenya', audienceSize: '1000-10000', promotionMethod: 'youtube',
-    reason: 'I make YouTube tutorials on crypto for East African audiences. I explain exchange comparisons and want to promote CoinDaily tools.',
+    reason: 'I make YouTube tutorials on crypto for East African audiences. I explain exchange comparisons and want to promote Sygn tools.',
     sites: [
       { url: 'https://youtube.com/@samcryptoKE', type: 'youtube' },
       { url: 'https://tiktok.com/@samcryptoke', type: 'tiktok' },
@@ -205,7 +205,7 @@ const mockApplications: AffiliateApplication[] = [
   },
   {
     id: 'APP-005', name: 'Linda Osei', email: 'linda@finpodcast.com', country: 'Ghana', audienceSize: '10000-50000', promotionMethod: 'podcast',
-    reason: 'I host "Crypto Africa Podcast" with 15K listeners per episode. I interview founders and review platforms—would love to do a CoinDaily feature.',
+    reason: 'I host "Crypto Africa Podcast" with 15K listeners per episode. I interview founders and review platforms—would love to do a Sygn feature.',
     sites: [
       { url: 'https://finpodcast.com', type: 'website' },
       { url: 'https://open.spotify.com/show/cryptoafrica', type: 'podcast' },

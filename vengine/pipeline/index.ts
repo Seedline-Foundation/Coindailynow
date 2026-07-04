@@ -41,7 +41,7 @@ export class VenginePipeline {
 
     const distributions = await this.distributionAgent.distribute(shortOutput, {
       title: article.title,
-      description: `${article.title} - CoinDaily`,
+      description: `${article.title} - Sygn`,
       tags: article.tags,
       category: article.category,
     });

@@ -1,6 +1,6 @@
 /**
  * Narrative Angle Agent — generates a positive and a negative editorial
- * angle for a research topic, framed to position CoinDaily as the
+ * angle for a research topic, framed to position Sygn as the
  * info/data hub center across US / Africa / LATAM / Caribbean.
  *
  * Calls Ollama (llama3.1:8b by default) with a structured-output prompt.
@@ -82,7 +82,7 @@ function buildPrompt(input: NarrativeInput): string {
     .map((s, i) => `[${i + 1}] ${s.title} — ${s.domain}${s.region ? ` (${s.region})` : ''}`)
     .join('\n');
 
-  return `You are an editorial strategist for CoinDaily, an AI/blockchain/TradFi/crypto news platform positioning itself as the data and info hub for Africa, the United States, Latin America, and the Caribbean. Your job is to extract the two strongest editorial angles from a research topic so the platform controls the narrative — not by being biased, but by being the most clearly framed and regionally relevant source.
+  return `You are an editorial strategist for Sygn, an AI/blockchain/TradFi/crypto news platform positioning itself as the data and info hub for Africa, the United States, Latin America, and the Caribbean. Your job is to extract the two strongest editorial angles from a research topic so the platform controls the narrative — not by being biased, but by being the most clearly framed and regionally relevant source.
 
 TOPIC:
 ${input.topic}

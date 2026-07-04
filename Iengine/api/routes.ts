@@ -1,6 +1,6 @@
 /**
  * Iengine REST API Routes
- * Mounts into the CoinDaily backend Express app.
+ * Mounts into the Sygn backend Express app.
  */
 
 import { Router, Request, Response } from 'express';

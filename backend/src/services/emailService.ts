@@ -98,7 +98,7 @@ class EmailService {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Password Reset - CoinDaily</title>
+        <title>Password Reset - Sygn</title>
         <style>
           body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -166,7 +166,7 @@ class EmailService {
         <div class="content">
           <p>Hello <strong>${data.username}</strong>,</p>
           
-          <p>We received a request to reset your password for your CoinDaily account.</p>
+          <p>We received a request to reset your password for your Sygn account.</p>
           
           <p>Click the button below to reset your password:</p>
           
@@ -186,24 +186,24 @@ class EmailService {
           <p>For security reasons, never share your password reset link with anyone.</p>
           
           <p>Best regards,<br>
-          The CoinDaily Team</p>
+          The Sygn Team</p>
         </div>
         
         <div class="footer">
-          <p>This is an automated message from CoinDaily.</p>
+          <p>This is an automated message from Sygn.</p>
           <p>If you have any questions, please contact support@sygn.live</p>
-          <p>&copy; ${new Date().getFullYear()} CoinDaily. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} Sygn. All rights reserved.</p>
         </div>
       </body>
       </html>
     `;
 
     const text = `
-Password Reset Request - CoinDaily
+Password Reset Request - Sygn
 
 Hello ${data.username},
 
-We received a request to reset your password for your CoinDaily account.
+We received a request to reset your password for your Sygn account.
 
 Click or paste this link into your browser to reset your password:
 ${data.resetUrl}
@@ -215,17 +215,17 @@ If you didn't request a password reset, please ignore this email and your passwo
 For security reasons, never share your password reset link with anyone.
 
 Best regards,
-The CoinDaily Team
+The Sygn Team
 
 ---
-This is an automated message from CoinDaily.
+This is an automated message from Sygn.
 If you have any questions, please contact support@sygn.live
-© ${new Date().getFullYear()} CoinDaily. All rights reserved.
+© ${new Date().getFullYear()} Sygn. All rights reserved.
     `;
 
     return this.sendEmail({
       to: email,
-      subject: 'Reset Your CoinDaily Password',
+      subject: 'Reset Your Sygn Password',
       html,
       text,
     });
@@ -240,7 +240,7 @@ If you have any questions, please contact support@sygn.live
       <html>
       <head>
         <meta charset="utf-8">
-        <title>Verify Your Email - CoinDaily</title>
+        <title>Verify Your Email - Sygn</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
           .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center; }
@@ -251,11 +251,11 @@ If you have any questions, please contact support@sygn.live
       <body>
         <div class="header"><h1>✅ Verify Your Email</h1></div>
         <div class="content">
-          <p>Welcome to CoinDaily!</p>
+          <p>Welcome to Sygn!</p>
           <p>Please verify your email address by clicking the button below:</p>
           <center><a href="${verificationUrl}" class="button">Verify Email</a></center>
           <p>Or copy this link: ${verificationUrl}</p>
-          <p>If you didn't create a CoinDaily account, please ignore this email.</p>
+          <p>If you didn't create a Sygn account, please ignore this email.</p>
         </div>
       </body>
       </html>
@@ -263,7 +263,7 @@ If you have any questions, please contact support@sygn.live
 
     return this.sendEmail({
       to: email,
-      subject: 'Verify Your CoinDaily Email',
+      subject: 'Verify Your Sygn Email',
       html,
     });
   }

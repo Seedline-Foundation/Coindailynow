@@ -633,7 +633,7 @@ export function useProfile(): UseProfileReturn {
         const url = window.URL.createObjectURL(response.data);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `coindaily-data-export-${new Date().toISOString().split('T')[0]}.json`;
+        link.download = `sygn-data-export-${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

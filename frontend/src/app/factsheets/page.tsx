@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description:
     'Bloomberg-style factsheets for the cryptocurrencies, exchanges, companies, and countries shaping Africa\'s digital finance landscape.',
   openGraph: {
-    title: 'CoinDaily Factsheets',
+    title: 'Sygn Factsheets',
     description: 'In-depth profiles of the entities shaping African crypto and finance.',
   },
 };

@@ -111,7 +111,7 @@ export default function WireAlertModal({ open, onClose, sources }: Props) {
                 type="text"
                 value={telegramChatId}
                 onChange={(e) => setTelegramChatId(e.target.value)}
-                placeholder="123456789 (DM @CoinDailyAlertBot then /start)"
+                placeholder="123456789 (DM @SygnAlertBot then /start)"
                 className="w-full bg-dark-950 border border-dark-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-dark-500 focus:border-primary-500 focus:outline-none"
               />
             </div>

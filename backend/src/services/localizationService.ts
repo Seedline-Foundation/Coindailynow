@@ -933,6 +933,6 @@ export class LocalizationService {
   }
 
   private generateApiKey(): string {
-    return `coindaily_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+    return `sygn_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
   }
 }

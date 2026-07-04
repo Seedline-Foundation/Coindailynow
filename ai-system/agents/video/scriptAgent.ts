@@ -115,7 +115,7 @@ function normalizeScript(raw: any, format: 'SHORT' | 'LONG', defaultTitle: strin
     title: String(raw.title || defaultTitle).slice(0, 140),
     hook: String(raw.hook || '').slice(0, 300),
     scenes,
-    cta: String(raw.cta || 'Read the full article on CoinDaily.').slice(0, 200),
+    cta: String(raw.cta || 'Read the full article on Sygn.').slice(0, 200),
     totalDurationSec: total,
   };
 }
@@ -127,7 +127,7 @@ function buildPrompt(input: ScriptInput): string {
   const langLine = lang === 'en'
     ? ''
     : `\nIMPORTANT: Write BOTH scripts entirely in ${langName} (${lang}). Use ${langName} idioms; do not mix English unless quoting a proper noun.\n`;
-  return `You are CoinDaily's video scriptwriter. Produce TWO scripts from the article below — a SHORT (60-second vertical for TikTok/Reels) and a LONG (3-minute landscape for YouTube). Both must be defensible from the article's actual content; no invented facts.${langLine}
+  return `You are Sygn's video scriptwriter. Produce TWO scripts from the article below — a SHORT (60-second vertical for TikTok/Reels) and a LONG (3-minute landscape for YouTube). Both must be defensible from the article's actual content; no invented facts.${langLine}
 
 ARTICLE TITLE: ${input.title}
 EXCERPT: ${input.excerpt}
@@ -179,7 +179,7 @@ function deterministicScripts(input: ScriptInput): { short: VideoScript; long: V
       title: input.title.slice(0, 80),
       hook: input.excerpt.slice(0, 200),
       scenes,
-      cta: 'Read the full article on CoinDaily.',
+      cta: 'Read the full article on Sygn.',
       totalDurationSec: total,
     };
   };

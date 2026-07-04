@@ -72,7 +72,7 @@ export class MpesaProvider implements IMobileMoneyProvider {
         PhoneNumber: this.formatPhoneNumber(request.phoneNumber),
         CallBackURL: request.callbackUrl || process.env.MPESA_CALLBACK_URL,
         AccountReference: request.id,
-        TransactionDesc: request.description || 'CoinDaily Payment'
+        TransactionDesc: request.description || 'Sygn Payment'
       };
 
       // Mock M-Pesa API response for development

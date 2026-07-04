@@ -244,7 +244,7 @@ export default function OnboardingPage() {
             {/* STEP 3: GOALS */}
             {step === 3 && (
               <div className="animate-fadeIn">
-                <h1 className="text-2xl md:text-3xl font-extrabold mb-3">What is your goal on CoinDaily?</h1>
+                <h1 className="text-2xl md:text-3xl font-extrabold mb-3">What is your goal on Sygn?</h1>
                 <p className="text-gray-400 text-sm md:text-base mb-8">Choose what you want to extract from the platform to customize your dashboard layout.</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

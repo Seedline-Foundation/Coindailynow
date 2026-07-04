@@ -19,7 +19,7 @@ const LiveBlogging = () => {
       const timeoutId = setTimeout(() => controller.abort(), 2000); // Terminate after 2 seconds
 
       try {
-        const response = await fetch('https://api.coindaily.online/mock-live-updates', {
+        const response = await fetch('https://api.sygn.online/mock-live-updates', {
           signal: controller.signal,
           cache: 'no-store',
         });

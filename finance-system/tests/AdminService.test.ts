@@ -7,7 +7,7 @@ jest.mock('bcryptjs', () => ({
 }));
 
 const mockTOTPValidate = jest.fn();
-const mockTOTPToString = jest.fn().mockReturnValue('otpauth://totp/CoinDaily%20CFIS:admin@test.com?secret=BASE32&issuer=CoinDaily%20CFIS');
+const mockTOTPToString = jest.fn().mockReturnValue('otpauth://totp/Sygn%20CFIS:admin@test.com?secret=BASE32&issuer=Sygn%20CFIS');
 
 jest.mock('otpauth', () => {
   const SecretCtor: any = jest.fn().mockImplementation(() => ({

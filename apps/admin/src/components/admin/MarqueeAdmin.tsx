@@ -770,7 +770,7 @@ const MarqueeAdmin: React.FC = () => {
                     {tempStyles.showIcons && (
                       <span style={{ color: tempStyles.iconColor || '#f59e0b', fontSize: tempStyles.iconSize || '20px' }}>⚡</span>
                     )}
-                    <span>Breaking News: CoinDaily AI Launch!</span>
+                    <span>Breaking News: Sygn AI Launch!</span>
                   </div>
                 </div>
 

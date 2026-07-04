@@ -132,7 +132,7 @@ const WHY_CHOOSE = [
   { icon: Globe, title: 'Africa-First, Globally Connected', desc: 'Built for African markets with support for 15+ African languages, local exchanges (Luno, Quidax, Valr), and mobile money correlation.' },
   { icon: ShieldCheck, title: '24/7 Anti-Malware Protection', desc: 'Continuous virus scanning, phishing detection, and bad-content filtering protect all partner sites around the clock.' },
   { icon: Users, title: 'Transparent Partner Network', desc: 'Every partner site is scored with a Domain Health (DH) metric. Buyers see real stats — no fake traffic, no inflated numbers.' },
-  { icon: Award, title: 'Built by CoinDaily', desc: 'Backed by Africa\'s premier crypto media platform with 2M+ monthly readers, established in 2023. Trusted by top-tier publishers worldwide.' },
+  { icon: Award, title: 'Built by Sygn', desc: 'Backed by Africa\'s premier crypto media platform with 2M+ monthly readers, established in 2023. Trusted by top-tier publishers worldwide.' },
 ];
 
 const PRICING_TIERS = [
@@ -357,7 +357,7 @@ export default function PressLandingPage() {
               Why Choose SENDPRESS?
             </h2>
             <p className="text-dark-400 text-lg max-w-2xl mx-auto">
-              Built by CoinDaily — Africa&apos;s largest crypto media platform. Trusted by 5,000+ publishers and 3,500+ media buyers worldwide.
+              Built by Sygn — Africa&apos;s largest crypto media platform. Trusted by 5,000+ publishers and 3,500+ media buyers worldwide.
             </p>
           </div>
 
@@ -607,11 +607,11 @@ export default function PressLandingPage() {
                 <span className="font-display font-bold text-lg text-white">SENDPRESS</span>
               </div>
               <p className="text-dark-400 text-sm leading-relaxed mb-4">
-                Africa&apos;s largest AI-powered PR distribution network. Built by CoinDaily.
+                Africa&apos;s largest AI-powered PR distribution network. Built by Sygn.
               </p>
               <div className="flex items-center gap-3">
                 <a
-                  href="https://discord.gg/coindaily"
+                  href="https://discord.gg/sygn"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 bg-dark-800 hover:bg-dark-700 rounded-lg flex items-center justify-center transition-colors"
@@ -620,7 +620,7 @@ export default function PressLandingPage() {
                   <LifeBuoy className="w-4 h-4 text-dark-400" />
                 </a>
                 <a
-                  href="https://x.com/coindaily"
+                  href="https://x.com/sygn"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 bg-dark-800 hover:bg-dark-700 rounded-lg flex items-center justify-center transition-colors"
@@ -659,7 +659,7 @@ export default function PressLandingPage() {
               <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Support</h4>
               <ul className="space-y-2.5 text-sm">
                 <li>
-                  <a href="https://discord.gg/coindaily" target="_blank" rel="noopener noreferrer" className="text-dark-400 hover:text-white transition-colors flex items-center gap-1.5">
+                  <a href="https://discord.gg/sygn" target="_blank" rel="noopener noreferrer" className="text-dark-400 hover:text-white transition-colors flex items-center gap-1.5">
                     Help Center (Discord) <ExternalLink className="w-3 h-3" />
                   </a>
                 </li>
@@ -676,12 +676,12 @@ export default function PressLandingPage() {
           {/* Bottom bar */}
           <div className="border-t border-dark-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-dark-500 text-sm">
-              &copy; {new Date().getFullYear()} CoinDaily Technologies Ltd. All rights reserved.
+              &copy; {new Date().getFullYear()} Sygn Technologies Ltd. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-sm">
               <Link href="/terms" className="text-dark-500 hover:text-dark-300 transition-colors">Terms</Link>
               <Link href="/privacy" className="text-dark-500 hover:text-dark-300 transition-colors">Privacy</Link>
-              <a href="https://discord.gg/coindaily" target="_blank" rel="noopener noreferrer" className="text-dark-500 hover:text-dark-300 transition-colors">Discord</a>
+              <a href="https://discord.gg/sygn" target="_blank" rel="noopener noreferrer" className="text-dark-500 hover:text-dark-300 transition-colors">Discord</a>
             </div>
           </div>
         </div>

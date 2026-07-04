@@ -5,9 +5,9 @@ import Footer from '@/components/footer/Footer';
 import SearchClient from './SearchClient';
 
 export const metadata: Metadata = {
-  title: 'Search | CoinDaily Africa',
+  title: 'Search | Sygn Africa',
   description:
-    'Search across articles, factsheets, regulations, and market data on CoinDaily Africa.',
+    'Search across articles, factsheets, regulations, and market data on Sygn Africa.',
   robots: { index: false }, // search results pages shouldn't be indexed
 };
 

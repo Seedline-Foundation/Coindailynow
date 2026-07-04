@@ -45,9 +45,9 @@ const FALLBACK_EARNINGS = {
 };
 
 const FALLBACK_RELEASES = [
-  { id: 'pr-001', title: 'Bitcoin Hits New ATH in African Markets', publisher: 'CoinDaily', status: 'verified', earned: 75, date: '2026-02-12' },
+  { id: 'pr-001', title: 'Bitcoin Hits New ATH in African Markets', publisher: 'Sygn', status: 'verified', earned: 75, date: '2026-02-12' },
   { id: 'pr-002', title: 'M-Pesa Crypto Integration Launch', publisher: 'FinTechAfrica', status: 'verified', earned: 50, date: '2026-02-11' },
-  { id: 'pr-003', title: 'JOY Token Staking Goes Live', publisher: 'CoinDaily', status: 'pending', earned: 0, date: '2026-02-10' },
+  { id: 'pr-003', title: 'JOY Token Staking Goes Live', publisher: 'Sygn', status: 'pending', earned: 0, date: '2026-02-10' },
   { id: 'pr-004', title: 'DeFi Yield Farming Guide for Beginners', publisher: 'Web3Weekly', status: 'verified', earned: 25, date: '2026-02-09' },
 ];
 

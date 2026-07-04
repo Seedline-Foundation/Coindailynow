@@ -35,7 +35,7 @@ export default function AuthorGraphPage() {
             👥 Author Profiles & Editorial Standards
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Meet our verified expert authors. Every article on CoinDaily goes through a rigorous editorial workflow to ensure accuracy, trustworthiness, and expertise — aligned with E-E-A-T standards.
+            Meet our verified expert authors. Every article on Sygn goes through a rigorous editorial workflow to ensure accuracy, trustworthiness, and expertise — aligned with E-E-A-T standards.
           </p>
         </div>
 
@@ -133,7 +133,7 @@ export default function AuthorGraphPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🔧 Schema CI Pipeline</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            Every article published on CoinDaily passes through our automated Schema CI pipeline to ensure:
+            Every article published on Sygn passes through our automated Schema CI pipeline to ensure:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[
@@ -156,7 +156,7 @@ export default function AuthorGraphPage() {
         {/* JSON-LD */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           '@context': 'https://schema.org', '@type': 'ItemList',
-          name: 'CoinDaily Expert Authors',
+          name: 'Sygn Expert Authors',
           itemListElement: experts.map((e, i) => ({
             '@type': 'ListItem', position: i + 1,
             item: { '@type': 'Person', name: e.name, jobTitle: e.role, sameAs: e.sameAs }

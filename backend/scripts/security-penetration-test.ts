@@ -1,6 +1,6 @@
 /**
  * Security Penetration Testing Script
- * Automated security testing for the CoinDaily platform
+ * Automated security testing for the Sygn platform
  * 
  * Tests:
  * - Authentication vulnerabilities

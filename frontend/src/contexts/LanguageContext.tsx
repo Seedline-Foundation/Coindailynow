@@ -2,10 +2,10 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
-const LANG_DEFAULT_KEY = 'coindaily-lang-default';
-const LANG_SESSION_KEY = 'coindaily-lang-session';
-const LANG_COUNTS_KEY = 'coindaily-lang-counts';
-const LEGACY_LANG_KEY = 'coindaily-lang';
+const LANG_DEFAULT_KEY = 'sygn-lang-default';
+const LANG_SESSION_KEY = 'sygn-lang-session';
+const LANG_COUNTS_KEY = 'sygn-lang-counts';
+const LEGACY_LANG_KEY = 'sygn-lang';
 
 function isSupportedLanguage(code: string): boolean {
   return SUPPORTED_LANGUAGES.some(l => l.code === code);
@@ -40,7 +40,7 @@ function setLangCookie(languageCode: string) {
   // Cookie is best-effort (helps server-side rendering/localization later).
   try {
     const oneYearSeconds = 60 * 60 * 24 * 365;
-    document.cookie = `coindaily-lang=${encodeURIComponent(languageCode)}; path=/; max-age=${oneYearSeconds}; samesite=lax`;
+    document.cookie = `sygn-lang=${encodeURIComponent(languageCode)}; path=/; max-age=${oneYearSeconds}; samesite=lax`;
   } catch {
     // ignore
   }

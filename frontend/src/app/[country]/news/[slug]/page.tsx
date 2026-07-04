@@ -93,7 +93,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `${article.title} | CoinDaily`,
+    title: `${article.title} | Sygn`,
     description: article.excerpt,
     alternates: { canonical: articleUrl, languages },
     openGraph: {
@@ -101,7 +101,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: article.title,
       description: article.excerpt,
       url: articleUrl,
-      siteName: 'CoinDaily',
+      siteName: 'Sygn',
       locale: code,
       images: article.featuredImageUrl ? [{ url: article.featuredImageUrl, alt: article.title }] : [],
       publishedTime: article.publishedAt || undefined,
@@ -111,7 +111,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: article.title,
       description: article.excerpt,
       images: article.featuredImageUrl ? [article.featuredImageUrl] : [],
-      site: '@coindailyafrica',
+      site: '@sygnafrica',
     },
   };
 }

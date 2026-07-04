@@ -346,7 +346,7 @@ export class TaxReportService {
         !isBuy ? tx.asset : '',
         String(tx.fee),
         tx.asset,
-        'CoinDaily CFIS',
+        'Sygn CFIS',
         tx.category,
         tx.source,
         tx.date,

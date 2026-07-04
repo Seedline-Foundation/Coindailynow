@@ -28,7 +28,7 @@ const AMPLayout: React.FC<AMPLayoutProps> = ({
   description,
   config = { enabled: false },
   keywords = [],
-  author = 'CoinDaily',
+  author = 'Sygn',
   publishedAt,
   modifiedAt,
   image,
@@ -36,7 +36,7 @@ const AMPLayout: React.FC<AMPLayoutProps> = ({
 }) => {
   const router = useRouter();
   const isAMP = config.enabled || router.query.amp === '1';
-  const canonicalUrl = config.canonical || `https://coindaily.co${router.asPath.split('?')[0]}`;
+  const canonicalUrl = config.canonical || `https://sygn.co${router.asPath.split('?')[0]}`;
   const ampUrl = `${canonicalUrl}?amp=1`;
 
   // Generate structured data
@@ -48,14 +48,14 @@ const AMPLayout: React.FC<AMPLayoutProps> = ({
     author: {
       '@type': 'Organization',
       name: author,
-      url: 'https://coindaily.co'
+      url: 'https://sygn.co'
     },
     publisher: {
       '@type': 'Organization',
-      name: 'CoinDaily',
+      name: 'Sygn',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://coindaily.co/icons/icon-512x512.png',
+        url: 'https://sygn.co/icons/icon-512x512.png',
         width: 512,
         height: 512
       }
@@ -234,7 +234,7 @@ const AMPDocument: React.FC<AMPDocumentProps> = ({
       
       <div className="amp-container">
         <header className="amp-header">
-          <a href="/" className="amp-logo">CoinDaily</a>
+          <a href="/" className="amp-logo">Sygn</a>
           <nav className="amp-nav">
             <a href="/news">News</a>
             <a href="/market">Market</a>
@@ -247,7 +247,7 @@ const AMPDocument: React.FC<AMPDocumentProps> = ({
         </main>
         
         <footer className="amp-footer">
-          <p>&copy; 2024 CoinDaily. Africa's Premier Cryptocurrency News Platform.</p>
+          <p>&copy; 2024 Sygn. Africa's Premier Cryptocurrency News Platform.</p>
         </footer>
       </div>
       
@@ -277,7 +277,7 @@ const AMPDocument: React.FC<AMPDocumentProps> = ({
 // Generate AMP styles
 function getAMPStyles(customCSS: string): string {
   const baseStyles = `
-    /* AMP Custom CSS for CoinDaily */
+    /* AMP Custom CSS for Sygn */
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.6;
@@ -557,7 +557,7 @@ export const AMPMarketData: React.FC<AMPMarketDataProps> = ({
 export const AMPNewsletterSignup: React.FC = () => {
   return (
     <div className="amp-newsletter-signup">
-      <h3>Stay Updated with CoinDaily</h3>
+      <h3>Stay Updated with Sygn</h3>
       <p>Get the latest crypto news from Africa delivered to your inbox.</p>
       <form
         method="post"

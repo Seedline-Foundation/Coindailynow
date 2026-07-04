@@ -362,7 +362,7 @@ function DashboardContent() {
         </div>
       </div>
 
-      {/* ── CoinDaily Top 10 KPI Tracker ── */}
+      {/* ── Sygn Top 10 KPI Tracker ── */}
       <KpiTracker kpis={platformStats.kpis} />
 
       {/* System Metrics Dashboard - Embedded directly, no Grafana login needed! */}
@@ -375,7 +375,7 @@ function DashboardContent() {
 import SystemMetricsDashboard from '@/components/super-admin/SystemMetricsDashboard';
 
 /* ────────────────────────────────────────────────────────────────────────── *
- *  KPI Tracker Component — CoinDaily Top-10 North Star Metrics              *
+ *  KPI Tracker Component — Sygn Top-10 North Star Metrics              *
  * ────────────────────────────────────────────────────────────────────────── */
 
 interface KpiDef {

@@ -1,5 +1,5 @@
 /**
- * CoinDaily Platform - Footer Components Export
+ * Sygn Platform - Footer Components Export
  * Task 55: Comprehensive Footer Implementation
  */
 

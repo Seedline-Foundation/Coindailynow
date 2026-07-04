@@ -57,7 +57,7 @@ const mockProducts = [
     category: 'Reports',
     seller: {
       id: 'seller-1',
-      name: 'CoinDaily Team',
+      name: 'Sygn Team',
       rating: 4.8
     },
     features: ['Market insights', 'Price predictions', 'Risk analysis']

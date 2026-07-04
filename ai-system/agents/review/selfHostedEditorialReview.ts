@@ -1,6 +1,6 @@
 /**
  * Mandatory editorial quality pass via self-hosted Ollama (DeepSeek R1 / Llama).
- * Default for CoinDaily — no cloud Gemini required.
+ * Default for Sygn — no cloud Gemini required.
  */
 
 import { editorialPolicy } from '../../config/editorialPolicy';

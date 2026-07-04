@@ -1,7 +1,7 @@
-# CoinDaily Disaster Recovery Plan
+# Sygn Disaster Recovery Plan
 
 ## Overview
-This document outlines recovery procedures for the CoinDaily platform.
+This document outlines recovery procedures for the Sygn platform.
 
 ## Backup Strategy
 
@@ -28,14 +28,14 @@ This document outlines recovery procedures for the CoinDaily platform.
 
 ### Scenario 2: Database Corruption
 1. Stop backend: `pm2 stop all`
-2. Restore from backup: `pg_restore -U postgres -d coindaily_dev latest_backup.dump`
+2. Restore from backup: `pg_restore -U postgres -d sygn_dev latest_backup.dump`
 3. Run migrations: `cd backend && npx prisma db push`
 4. Restart: `pm2 reload ecosystem.config.js --env production`
 
 ### Scenario 3: Full Server Loss
 1. Provision new VPS (Contabo)
 2. Install dependencies: Docker, Node.js 18+, PostgreSQL, Redis
-3. Clone repository: `git clone https://github.com/Seedline-Foundation/Coindailynow.git`
+3. Clone repository: `git clone https://github.com/Seedline-Foundation/Sygn.git`
 4. Restore database from offsite backup
 5. Configure DNS to point to new server IP
 6. Deploy: `bash infrastructure/scripts/deploy-all.sh`

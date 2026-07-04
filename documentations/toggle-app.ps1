@@ -1,6 +1,6 @@
 # Toggle Script - Switch Between Coming Soon and Main App
 
-Write-Host "🔄 CoinDaily - App Switcher" -ForegroundColor Cyan
+Write-Host "🔄 Sygn - App Switcher" -ForegroundColor Cyan
 Write-Host "===========================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -14,8 +14,8 @@ Write-Host ""
 try {
     $pm2List = pm2 jlist | ConvertFrom-Json
     
-    $comingSoon = $pm2List | Where-Object { $_.name -eq "coindaily-coming-soon" }
-    $mainApp = $pm2List | Where-Object { $_.name -eq "coindaily-main" }
+    $comingSoon = $pm2List | Where-Object { $_.name -eq "sygn-coming-soon" }
+    $mainApp = $pm2List | Where-Object { $_.name -eq "sygn-main" }
     
     if ($comingSoon) {
         Write-Host "Coming Soon Page: " -NoNewline
@@ -62,13 +62,13 @@ switch ($choice) {
         Write-Host "🔄 Switching to Coming Soon Page..." -ForegroundColor Yellow
         
         # Stop main app if running
-        pm2 stop coindaily-main 2>$null
+        pm2 stop sygn-main 2>$null
         
         # Start/restart coming soon
         Set-Location "$projectRoot\coming"
-        pm2 restart coindaily-coming-soon 2>$null
+        pm2 restart sygn-coming-soon 2>$null
         if ($LASTEXITCODE -ne 0) {
-            pm2 start npm --name "coindaily-coming-soon" -- start
+            pm2 start npm --name "sygn-coming-soon" -- start
         }
         
         pm2 save
@@ -82,13 +82,13 @@ switch ($choice) {
         Write-Host "🚀 Switching to Main App..." -ForegroundColor Yellow
         
         # Stop coming soon if running
-        pm2 stop coindaily-coming-soon 2>$null
+        pm2 stop sygn-coming-soon 2>$null
         
         # Start/restart main app
         Set-Location "$projectRoot\frontend"
-        pm2 restart coindaily-main 2>$null
+        pm2 restart sygn-main 2>$null
         if ($LASTEXITCODE -ne 0) {
-            pm2 start npm --name "coindaily-main" -- start
+            pm2 start npm --name "sygn-main" -- start
         }
         
         pm2 save
@@ -103,16 +103,16 @@ switch ($choice) {
         
         # Start coming soon on port 3001
         Set-Location "$projectRoot\coming"
-        pm2 restart coindaily-coming-soon 2>$null
+        pm2 restart sygn-coming-soon 2>$null
         if ($LASTEXITCODE -ne 0) {
-            pm2 start npm --name "coindaily-coming-soon" -- start
+            pm2 start npm --name "sygn-coming-soon" -- start
         }
         
         # Start main app on port 3000
         Set-Location "$projectRoot\frontend"
-        pm2 restart coindaily-main 2>$null
+        pm2 restart sygn-main 2>$null
         if ($LASTEXITCODE -ne 0) {
-            pm2 start npm --name "coindaily-main" -- start
+            pm2 start npm --name "sygn-main" -- start
         }
         
         pm2 save
@@ -126,8 +126,8 @@ switch ($choice) {
         Write-Host ""
         Write-Host "🛑 Stopping all applications..." -ForegroundColor Yellow
         
-        pm2 stop coindaily-coming-soon 2>$null
-        pm2 stop coindaily-main 2>$null
+        pm2 stop sygn-coming-soon 2>$null
+        pm2 stop sygn-main 2>$null
         pm2 save
         
         Write-Host "✅ All applications stopped" -ForegroundColor Green

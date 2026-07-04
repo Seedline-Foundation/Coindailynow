@@ -116,7 +116,7 @@ describeIfDatabase('Structured Data Service - Task 57', () => {
     it('should handle missing user gracefully', async () => {
       const schema = await structuredDataService.generatePersonSchema('non-existent-id');
       expect(schema['@type']).toBe('Person');
-      expect(schema.name).toBe('CoinDaily Team');
+      expect(schema.name).toBe('Sygn Team');
     });
   });
 
@@ -126,7 +126,7 @@ describeIfDatabase('Structured Data Service - Task 57', () => {
 
       expect(schema['@context']).toBe('https://schema.org');
       expect(schema['@type']).toBe('Organization');
-      expect(schema.name).toBe('CoinDaily');
+      expect(schema.name).toBe('Sygn');
       expect(schema.logo).toBeDefined();
       expect(schema.logo['@type']).toBe('ImageObject');
       expect(schema.sameAs).toBeInstanceOf(Array);

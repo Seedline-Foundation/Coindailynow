@@ -15,7 +15,7 @@ import { MarketAnalysisAgent } from '../src/agents/marketAnalysisAgent';
 import { HybridSearchService } from '../src/services/hybridSearchService';
 
 async function demonstrateTask17() {
-  console.log('\n🚀 CoinDaily - Content Recommendation Engine Demonstration');
+  console.log('\n🚀 Sygn - Content Recommendation Engine Demonstration');
   console.log('📋 Task 17: AI-Powered Content Recommendations with African Market Focus');
   console.log('================================================================================\n');
 
