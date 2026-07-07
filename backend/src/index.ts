@@ -69,6 +69,7 @@ import indexNowRouter from './routes/indexnow.routes';
 import legalRouter from './api/legal-routes';
 import structuredContentRouter from './routes/structured-content.routes';
 import knowledgeApiRouter from './api/routes/knowledgeApi.routes';
+import contentStrategyRouter from './api/routes/contentStrategy.routes';
 import authRouter from './routes/auth.routes';
 import walletCallbackRouter from './routes/walletCallbackRoutes';
 import subscriptionRouter from './routes/subscription.routes';
@@ -507,6 +508,9 @@ export async function setupApp() {
 
   // Knowledge API endpoints (manifest/search/feeds for RAG clients)
   app.use('/api/knowledge-api', knowledgeApiRouter);
+
+  // Content Strategy API
+  app.use('/api/content-strategy', contentStrategyRouter);
 
   // Frontend compatibility REST endpoints: /api/market-data, /api/african-exchanges, ...
   app.use('/api', marketCompatRouter);
