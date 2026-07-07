@@ -81,6 +81,10 @@ export const CAPABILITIES = {
   USER_MANAGE: ['ADMIN', 'SUPER_ADMIN', 'CEO'] as Role[],
   IP_WHITELIST_MANAGE: ['SUPER_ADMIN', 'TECH_ADMIN'] as Role[],
   AI_TASK_CONTROL: ['EDITOR', 'CEO', 'ADMIN', 'SUPER_ADMIN', 'CONTENT_ADMIN', 'TECH_ADMIN'] as Role[],
+
+  // Content Strategy
+  CONTENT_STRATEGY_READ: ['EDITOR', 'CEO', 'ADMIN', 'SUPER_ADMIN', 'CONTENT_ADMIN'] as Role[],
+  CONTENT_STRATEGY_WRITE: ['EDITOR', 'CEO', 'ADMIN', 'SUPER_ADMIN', 'CONTENT_ADMIN'] as Role[],
 } as const;
 
 export type Capability = keyof typeof CAPABILITIES;
