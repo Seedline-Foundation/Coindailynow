@@ -132,6 +132,14 @@ interface SummaryReportData {
   }>;
 }
 
+interface WalletLockedEmailData {
+  username: string;
+  reason: string;
+  lockType: string;
+  unlockAt: Date | null;
+  timestamp: Date;
+}
+
 export class FinanceEmailService {
   /**
    * Send deposit confirmation email
@@ -719,6 +727,84 @@ export class FinanceEmailService {
     return emailService.sendEmail({
       to: email,
       subject: `🔐 Your OTP Code: ${data.otpCode} (Expires in ${data.expiresInMinutes} minutes)`,
+      html,
+    });
+  }
+
+  /**
+   * Send wallet locked notification email
+   */
+  async sendWalletLockedEmail(email: string, data: WalletLockedEmailData): Promise<boolean> {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+          .alert-box { background: #fee2e2; border: 2px solid #ef4444; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb; }
+          .detail-label { font-weight: bold; color: #6b7280; }
+          .detail-value { color: #111827; }
+          .footer { text-align: center; color: #6b7280; margin-top: 30px; font-size: 12px; }
+          .button { background: #ef4444; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔐 Wallet Locked</h1>
+            <p>Administrative Security Action</p>
+          </div>
+          <div class="content">
+            <p>Hi ${data.username},</p>
+            <p>Your wallet has been locked by an administrator for security or administrative reasons.</p>
+
+            <div class="alert-box">
+              <strong>Action Details:</strong>
+              <div class="detail-row">
+                <span class="detail-label">Lock Type</span>
+                <span class="detail-value">${data.lockType}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Reason</span>
+                <span class="detail-value">${data.reason || 'No specific reason provided'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Locked At</span>
+                <span class="detail-value">${data.timestamp.toLocaleString()}</span>
+              </div>
+              ${data.unlockAt ? `
+                <div class="detail-row">
+                  <span class="detail-label">Scheduled Unlock</span>
+                  <span class="detail-value">${data.unlockAt.toLocaleString()}</span>
+                </div>
+              ` : ''}
+            </div>
+
+            <p>During this period, all transactions, including deposits, withdrawals, and transfers, are suspended for this wallet.</p>
+
+            <div style="text-align: center;">
+              <a href="${process.env.FRONTEND_URL}/support" class="button">Contact Support</a>
+            </div>
+
+            <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
+              If you have any questions regarding this action, please reach out to our support team with your wallet ID.
+            </p>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} Sygn. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return emailService.sendEmail({
+      to: email,
+      subject: `🔐 Security Alert: Your Wallet has been Locked`,
       html,
     });
   }
