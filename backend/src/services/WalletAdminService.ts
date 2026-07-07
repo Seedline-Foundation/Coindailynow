@@ -12,6 +12,7 @@
 import { Wallet, WalletType, WalletStatus, UserRole } from '@prisma/client';
 import prisma from '../lib/prisma';
 import { generateOTP, OTPPurpose } from './OTPService';
+import { financeEmailService } from './FinanceEmailService';
 
 // ============================================================================
 // TYPES
@@ -398,6 +399,7 @@ export async function lockWallet(input: LockWalletInput): Promise<Wallet> {
 
   const wallet = await prisma.wallet.findUnique({
     where: { id: walletId },
+    include: { user: true },
   });
 
   if (!wallet) {
@@ -436,8 +438,18 @@ export async function lockWallet(input: LockWalletInput): Promise<Wallet> {
   });
 
   // Send notification to user
-  if (wallet.userId) {
-    // TODO: Send email notification
+  if (wallet.userId && wallet.user) {
+    try {
+      await financeEmailService.sendWalletLockedEmail(wallet.user.email, {
+        username: wallet.user.username,
+        reason: reason,
+        lockType,
+        unlockAt,
+        timestamp: new Date(),
+      });
+    } catch (error) {
+      console.error(`Failed to send wallet lock notification to user ${wallet.userId}:`, error);
+    }
   }
 
   return updatedWallet;
