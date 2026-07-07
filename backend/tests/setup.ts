@@ -1,4 +1,23 @@
 import 'jest';
+import { Blob as NodeBlob } from 'buffer';
+
+// Polyfill for File and Blob in Node 18 environments
+// This fixes ReferenceError: File is not defined in tests using cheerio/undici
+if (typeof Blob === 'undefined') {
+  (global as any).Blob = NodeBlob;
+}
+
+if (typeof File === 'undefined') {
+  (global as any).File = class File extends NodeBlob {
+    name: string;
+    lastModified: number;
+    constructor(parts: any[], filename: string, options?: any) {
+      super(parts, options);
+      this.name = filename;
+      this.lastModified = options?.lastModified || Date.now();
+    }
+  };
+}
 
 jest.setTimeout(30000);
 
