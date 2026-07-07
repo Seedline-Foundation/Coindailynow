@@ -1,30 +1,38 @@
 /**
- * API Route Proxy
- * Proxies requests to backend API
+ * API Route: Super Admin Login
+ * Proxies login requests to backend API, enforcing SUPER_ADMIN role
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
 
-// Hardcoded super admin credentials (match backend seed)
-const SUPER_ADMIN = {
-  email: 'admin@sygn.live',
-  // Hash for "Admin@2024!" and "Admin@2024"
-  passwordHashes: [
-    '$2a$10$6PqDxQNVLpUYPSGSLVQ8uOJGJx8qVYxvXKxQN8jQxOxQx8qVYxvXK', // Admin@2024!
-    '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // Admin@2024
-  ],
-  id: 'super_admin_001',
-  role: 'SUPER_ADMIN',
-  username: 'superadmin'
-};
+const LOGIN_MUTATION = `mutation Login($input: LoginInput!) {
+  login(input: $input) {
+    success
+    message
+    user {
+      id
+      email
+      username
+      firstName
+      lastName
+      role
+    }
+    tokens {
+      accessToken
+      refreshToken
+    }
+    error {
+      code
+      message
+    }
+  }
+}`;
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const { email, password } = body;
 
     // Validate input
@@ -35,40 +43,62 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if credentials match
-    const emailMatch = email.toLowerCase() === SUPER_ADMIN.email.toLowerCase();
-    
-    // Check password against both hashes OR plain text comparison for simple auth
-    const passwordMatch = password === 'Admin@2024' || password === 'Admin@2024!';
+    // Proxy to backend GraphQL
+    const response = await fetch(`${BACKEND_URL}/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: LOGIN_MUTATION,
+        variables: {
+          input: { email, password }
+        }
+      }),
+    });
 
-    if (emailMatch && passwordMatch) {
-      // Generate JWT token
-      const token = jwt.sign(
-        {
-          sub: SUPER_ADMIN.id,
-          email: SUPER_ADMIN.email,
-          role: SUPER_ADMIN.role,
-          username: SUPER_ADMIN.username,
-        },
-        JWT_SECRET,
-        { expiresIn: '7d' }
+    const gqlData = await response.json();
+    const loginResult = gqlData?.data?.login;
+
+    if (gqlData?.errors?.length) {
+      return NextResponse.json(
+        { success: false, error: gqlData.errors[0]?.message || 'Login failed' },
+        { status: 401 }
       );
+    }
+
+    if (loginResult?.success && loginResult?.tokens?.accessToken) {
+      const { user, tokens } = loginResult;
+
+      // Enforce SUPER_ADMIN role for this specific endpoint
+      if (user.role !== 'SUPER_ADMIN') {
+        return NextResponse.json(
+          { success: false, error: 'Access denied. Super Admin privileges required.' },
+          { status: 403 }
+        );
+      }
 
       return NextResponse.json({
         success: true,
-        token,
+        token: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
         user: {
-          id: SUPER_ADMIN.id,
-          email: SUPER_ADMIN.email,
-          role: SUPER_ADMIN.role,
-          username: SUPER_ADMIN.username,
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
         },
       });
     }
 
-    // Invalid credentials
+    // Invalid credentials or other error from backend
     return NextResponse.json(
-      { success: false, error: 'Invalid email or password' },
+      {
+        success: false,
+        error: loginResult?.error?.message || loginResult?.message || 'Invalid email or password'
+      },
       { status: 401 }
     );
   } catch (error) {
