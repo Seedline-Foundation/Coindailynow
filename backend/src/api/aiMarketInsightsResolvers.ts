@@ -191,6 +191,19 @@ const queryResolvers = {
    */
   marketCacheStats: async (_: any, __: any, context: any) => {
     try {
+      // Check for admin role
+      const isAdmin = context.user && ['ADMIN', 'SUPER_ADMIN'].includes(context.user.role);
+      if (!isAdmin) {
+        return {
+          data: null,
+          timestamp: new Date(),
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Admin authentication required',
+          },
+        };
+      }
+
       const service = getAIMarketInsightsService();
       const data = await service.getCacheStats();
 
@@ -224,7 +237,20 @@ const mutationResolvers = {
    */
   invalidateMarketCache: async (_: any, { input }: any, context: any) => {
     try {
-      // TODO: Add authentication check for admin
+      // Check for admin role
+      const isAdmin = context.user && ['ADMIN', 'SUPER_ADMIN'].includes(context.user.role);
+      if (!isAdmin) {
+        return {
+          success: false,
+          message: 'Admin authentication required',
+          timestamp: new Date(),
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Admin authentication required',
+          },
+        };
+      }
+
       const service = getAIMarketInsightsService();
       await service.invalidateCache(input?.symbol);
 
