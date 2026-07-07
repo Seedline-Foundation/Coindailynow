@@ -360,12 +360,35 @@ router.post('/queue/:id/request-edit', async (req: Request, res: Response) => {
     console.log(`[Admin Queue API] ✅ Edit request routed to ${routing.agent}`);
     console.log(`[Admin Queue API] Instructions: ${routing.instructions}`);
 
-    // TODO: Actually call the appropriate agent with edit instructions
-    // For now, we just return the routing information
+    // Notify UI that edit is requested/in-progress
+    emitAdminQueueUpdate({
+      action: 'edit_requested',
+      itemId: id,
+      status: 'edit_requested',
+      by: admin_id || (req as any).user?.id,
+      at: new Date().toISOString(),
+    });
+
+    // Execute the actual AI edit in the background
+    reviewAgent.executeEditRequest(id, editRequest)
+      .then((updatedItem) => {
+        logger.info(`[Admin Queue API] ✅ Edit completed for ${id}`);
+        // Notify UI that the item is updated and back in pending
+        emitAdminQueueUpdate({
+          action: 'updated',
+          itemId: id,
+          status: updatedItem.status,
+          by: 'AIReviewAgent',
+          at: new Date().toISOString(),
+        });
+      })
+      .catch((err) => {
+        logger.error(`[Admin Queue API] ❌ Edit execution failed for ${id}:`, err);
+      });
 
     res.json({
       success: true,
-      message: `Edit request sent to ${routing.agent}`,
+      message: `Edit request sent to ${routing.agent} for processing`,
       routing: {
         agent: routing.agent,
         instructions: routing.instructions,
