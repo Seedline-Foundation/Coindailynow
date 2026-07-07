@@ -1,3 +1,7 @@
+import { File } from "node:buffer";
+if (typeof global.File === "undefined") {
+  (global as any).File = File;
+}
 import 'jest';
 
 jest.setTimeout(30000);

@@ -21,6 +21,8 @@ import {
   isHighRisk,
 } from '../../../constants/financeOperations';
 import { generateTransactionHash, logFinanceOperation } from '../financeHelpers';
+import * as FinPriv from '../financePrivateCompliance';
+import OTPService, { OTPPurpose } from '../../OTPService';
 import type {
   TransactionResult,
   DepositInput,
@@ -416,12 +418,44 @@ export class FinanceWalletManagement {
         return { success: false, error: 'Unauthorized wallet recovery attempt' };
       }
 
-      // TODO: Implement actual recovery code verification
-      // This would integrate with email/SMS/authenticator verification
-      const isRecoveryValid = recoveryCode && recoveryCode.length >= 6;
+      // Get user for security settings
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (!user) {
+        return { success: false, error: 'User not found' };
+      }
+
+      // Verify recovery code based on method
+      let isRecoveryValid = false;
+      let errorMessage = 'Invalid recovery code';
+
+      switch (recoveryMethod) {
+        case 'EMAIL':
+        case 'SMS':
+          const verifyResult = await OTPService.verifyOTP({
+            userId,
+            code: recoveryCode,
+            purpose: OTPPurpose.WALLET_RECOVERY,
+          });
+          isRecoveryValid = verifyResult.success;
+          if (!isRecoveryValid && verifyResult.error) {
+            errorMessage = verifyResult.error;
+          }
+          break;
+        case 'AUTHENTICATOR':
+          if (!user.twoFactorEnabled || !user.twoFactorSecret) {
+            return { success: false, error: '2FA is not enabled for this user' };
+          }
+          isRecoveryValid = FinPriv.validate2FAToken(user.twoFactorSecret, recoveryCode);
+          break;
+        case 'BACKUP_CODES':
+          // Schema doesn't currently support backup codes storage
+          return { success: false, error: 'Backup codes recovery is not yet supported' };
+        default:
+          return { success: false, error: `Unsupported recovery method: ${recoveryMethod}` };
+      }
 
       if (!isRecoveryValid) {
-        return { success: false, error: 'Invalid recovery code' };
+        return { success: false, error: errorMessage };
       }
 
       // Unlock wallet if it was frozen
