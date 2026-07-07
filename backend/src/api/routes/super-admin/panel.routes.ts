@@ -143,7 +143,7 @@ router.get('/panel-data/:section/:page', authMiddleware, async (req: Request, re
           prisma.article.count(),
           prisma.aITask.count(),
           prisma.wallet.count(),
-          prisma.$queryRawUnsafe('SELECT 1 as ok').catch(() => []),
+          prisma.$queryRaw`SELECT 1 as ok`.catch(() => []),
         ]);
 
         const dbOnline = Array.isArray(pingResult) && pingResult.length > 0;
@@ -190,9 +190,8 @@ router.get('/panel-data/:section/:page', authMiddleware, async (req: Request, re
       }
 
       case 'data/migrations': {
-        const migrations = await prisma.$queryRawUnsafe<any[]>(
-          'SELECT migration_name, finished_at FROM _prisma_migrations ORDER BY finished_at DESC NULLS LAST LIMIT 5'
-        ).catch(() => []);
+        const migrations = await prisma.$queryRaw<any[]>`SELECT migration_name, finished_at FROM _prisma_migrations ORDER BY finished_at DESC NULLS LAST LIMIT 5`
+          .catch(() => []);
 
         payload = {
           title: 'Migrations',
@@ -236,7 +235,7 @@ router.get('/panel-data/:section/:page', authMiddleware, async (req: Request, re
         const [pendingAlerts, activeUsers, dbPing] = await Promise.all([
           prisma.moderationAlert.count({ where: { status: 'PENDING' } }).catch(() => 0),
           prisma.user.count({ where: { status: 'ACTIVE' } }).catch(() => 0),
-          prisma.$queryRawUnsafe('SELECT 1 as ok').catch(() => []),
+          prisma.$queryRaw`SELECT 1 as ok`.catch(() => []),
         ]);
 
         payload = {
