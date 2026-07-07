@@ -14,6 +14,8 @@ import {
 import prisma from '../../../lib/prisma';
 import { WalletService } from '../../WalletService';
 import { PermissionService } from '../../PermissionService';
+import { financeEmailService } from '../../FinanceEmailService';
+import engagementService from '../../engagementService';
 import checkoutNodeJssdk from '@paypal/checkout-server-sdk';
 import {
   ALL_FINANCE_OPERATIONS,
@@ -247,7 +249,26 @@ export class FinanceSecurity {
         },
       });
 
-      // TODO: Send notification to wallet owner
+      // Send notification to wallet owner
+      if (wallet.user && wallet.user.email) {
+        // Send email notification
+        await financeEmailService.sendSecurityAlert(wallet.user.email, {
+          username: wallet.user.username || 'User',
+          alertType: 'wallet_locked',
+          message: `Your wallet (Address: ${wallet.walletAddress}) has been frozen due to security concerns. Reason: ${reason}.`,
+          timestamp: new Date(),
+          actionRequired: 'Please contact support if you believe this is an error or to begin the verification process.',
+        }).catch(err => console.error('Failed to send wallet freeze email:', err));
+
+        // Send push notification
+        await engagementService.sendPushNotification({
+          userId: wallet.userId,
+          title: 'Wallet Frozen',
+          body: 'Your wallet has been frozen due to security concerns. Check your email for details.',
+          actionUrl: '/wallet/security',
+        }).catch(err => console.error('Failed to send wallet freeze push notification:', err));
+      }
+
       // TODO: Set up automatic unfreeze if duration is specified
 
       return { 
