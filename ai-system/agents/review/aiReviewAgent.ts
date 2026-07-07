@@ -521,7 +521,8 @@ export class AIReviewAgent {
    */
   async requestTranslationPrompts(
     article: ArticleOutcome,
-    research: ResearchOutcome
+    research: ResearchOutcome,
+    instructions?: string
   ): Promise<Map<string, string>> {
     console.log(`[Review Agent] Requesting translation prompts from Imo (15 languages)`);
 
@@ -543,7 +544,8 @@ export class AIReviewAgent {
           preserve_terminology: true, // Crypto terms
           preserve_tone: true,
           preserve_facts: research.facts,
-          domain: 'cryptocurrency_finance'
+          domain: 'cryptocurrency_finance',
+          instructions
         });
 
         // Extract prompt string from result
@@ -723,6 +725,71 @@ export class AIReviewAgent {
     );
 
     return route;
+  }
+
+  /**
+   * Actually performs the edit by calling the appropriate sub-agent.
+   */
+  async executeEditRequest(
+    queueItemId: string,
+    editRequest: EditRequest
+  ): Promise<AdminQueueItem> {
+    this.logger.info(`[Review Agent] Executing edit request: ${editRequest.type} for item ${queueItemId}`);
+
+    const queueItem = await this.getQueueItem(queueItemId);
+    const bundle = queueItem.articles;
+
+    try {
+      switch (editRequest.type) {
+        case 'research':
+          if (!bundle.research) {
+            throw new Error(`Cannot re-research: original research data missing for ${queueItemId}`);
+          }
+          bundle.research = await this.researchAgent.reResearch(bundle.research, editRequest.instructions);
+          break;
+
+        case 'content':
+          bundle.english = await this.writerAgent.reviseArticle(bundle.english, editRequest.instructions, bundle.research);
+          break;
+
+        case 'image':
+          bundle.image = await this.imageAgent.regenerateImage(bundle.image, editRequest.instructions, bundle.english);
+          break;
+
+        case 'translation':
+          if (editRequest.target_language) {
+            const updatedTranslation = await this.translationAgent.retranslateLanguage(
+              editRequest.target_language,
+              bundle.english,
+              editRequest.instructions
+            );
+
+            const index = bundle.translations.findIndex(t => t.language === editRequest.target_language);
+            if (index !== -1) {
+              bundle.translations[index] = updatedTranslation;
+            } else {
+              bundle.translations.push(updatedTranslation);
+            }
+          } else {
+            // Re-translate all if no specific language target
+            const prompts = await this.requestTranslationPrompts(bundle.english, bundle.research, editRequest.instructions);
+            bundle.translations = await this.translationAgent.translateWithPrompts(prompts, bundle.english);
+          }
+          break;
+
+        default:
+          throw new Error(`Unsupported edit type: ${editRequest.type}`);
+      }
+
+      // Update the bundle in the queue item
+      queueItem.articles = bundle;
+
+      // Re-queue for approval after successful edit
+      return await this.reQueueAfterEdit(queueItemId, bundle);
+    } catch (error) {
+      this.logger.error(`[Review Agent] Edit execution failed for ${queueItemId}:`, error);
+      throw error;
+    }
   }
 
   // ==========================================================================

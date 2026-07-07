@@ -290,6 +290,7 @@ export class ImoService {
     preserve_tone?: boolean;
     preserve_facts?: string[];
     domain?: string;
+    instructions?: string;
   }): Promise<ImoPromptResult & { sourceText: string }> {
     const sourceText = params.sourceText || params.source_text || '';
     const sourceLanguage = params.sourceLanguage || params.source_language || 'English';
@@ -308,6 +309,9 @@ export class ImoService {
     }
     if (params.domain) {
       customParts.push(`Domain: ${params.domain.replace(/_/g, ' ')}`);
+    }
+    if (params.instructions) {
+      customParts.push(`Additional instructions: ${params.instructions}`);
     }
 
     const result = await this.agent.generatePrompt({
