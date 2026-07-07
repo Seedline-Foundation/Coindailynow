@@ -35,6 +35,7 @@ export enum OTPPurpose {
   WHITELIST_ADDRESS = 'WHITELIST_ADDRESS',
   BALANCE_ADJUSTMENT = 'BALANCE_ADJUSTMENT',
   WALLET_LOCK = 'WALLET_LOCK',
+  WALLET_RECOVERY = 'WALLET_RECOVERY',
 }
 
 interface GenerateOTPInput {
@@ -429,6 +430,7 @@ function getPurposeText(purpose: OTPPurpose): string {
     WHITELIST_ADDRESS: 'Whitelist Address Verification',
     BALANCE_ADJUSTMENT: 'Balance Adjustment',
     WALLET_LOCK: 'Wallet Lock Action',
+    WALLET_RECOVERY: 'Wallet Recovery',
   };
 
   return purposeMap[purpose] || purpose;

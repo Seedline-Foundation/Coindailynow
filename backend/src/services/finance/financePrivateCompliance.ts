@@ -1,4 +1,5 @@
 import prisma from '../../lib/prisma';
+import { authenticator } from 'otplib';
 
   export function generateOTP(userId: string, operationType: string): string {
     // In real implementation, use proper OTP generation and storage
@@ -6,8 +7,13 @@ import prisma from '../../lib/prisma';
   }
 
   export function validate2FAToken(secret: string, token: string): boolean {
-    // In real implementation, use TOTP library (e.g., speakeasy)
-    return token === '123456';
+    if (!secret) return false;
+    try {
+      return authenticator.check(token, secret);
+    } catch (error) {
+      console.error('2FA validation error:', error);
+      return false;
+    }
   }
 
   export async function incrementFailedOTPAttempts(userId: string): Promise<void> {
