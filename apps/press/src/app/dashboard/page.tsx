@@ -27,12 +27,17 @@ import {
   Globe,
   Layers,
   Send,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import {
   fetchPublisherProfile,
   fetchPublisherDistributions,
   fetchAvailablePartnerSites,
+  createPressRelease,
+  createDistribution,
+  createPublisherProfile,
 } from '@/lib/api';
 
 /**
@@ -399,6 +404,7 @@ export default function PublisherDashboard() {
 /* ---------- Distribution Wizard (Step 1-4) ---------- */
 
 function DistributionWizard({ onClose, walletInfo }: { onClose: () => void; walletInfo: { address: string; joyBalance: number; lockedInEscrow: number; available: number } }) {
+  const { user } = useAuth();
   const WALLET_INFO = walletInfo;
   const [step, setStep] = useState(1);
   const [wizardPartners, setWizardPartners] = useState<{ id: string; domain: string; dh: number; tier: string; type: string }[]>([]);
@@ -409,6 +415,8 @@ function DistributionWizard({ onClose, walletInfo }: { onClose: () => void; wall
     budget: 0,
     prUrl: '',
   });
+  const [launching, setLaunching] = useState(false);
+  const [launchError, setLaunchError] = useState('');
 
   // Load real partners from Supabase
   useEffect(() => {
@@ -458,7 +466,7 @@ function DistributionWizard({ onClose, walletInfo }: { onClose: () => void; wall
             <h2 className="text-xl font-bold text-white">Distribution Wizard</h2>
             <p className="text-dark-400 text-sm">Step {step} of 4</p>
           </div>
-          <button onClick={onClose} className="p-2 text-dark-400 hover:text-white">
+          <button onClick={onClose} disabled={launching} className="p-2 text-dark-400 hover:text-white disabled:opacity-50">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -609,6 +617,12 @@ function DistributionWizard({ onClose, walletInfo }: { onClose: () => void; wall
                   JOY tokens will be locked in the CreditsEscrow contract until AI verification confirms placement on each site. Pre-existing partners receive no charge.
                 </p>
               </div>
+              {launchError && (
+                <div className="mt-4 flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span>{launchError}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -617,22 +631,78 @@ function DistributionWizard({ onClose, walletInfo }: { onClose: () => void; wall
         <div className="flex items-center justify-between p-6 border-t border-dark-700">
           <button
             onClick={() => (step > 1 ? setStep(step - 1) : onClose())}
-            className="px-4 py-2 text-dark-300 hover:text-white transition-colors"
+            disabled={launching}
+            className="px-4 py-2 text-dark-300 hover:text-white transition-colors disabled:opacity-50"
           >
             {step > 1 ? 'Back' : 'Cancel'}
           </button>
           <button
-            onClick={() => {
-              if (step < 4) setStep(step + 1);
-              else {
-                // TODO: Call DistributionService.process() to lock escrow & begin distribution
-                onClose();
+            disabled={launching || (step === 4 && !strategy.prUrl)}
+            onClick={async () => {
+              if (step < 4) {
+                setStep(step + 1);
+              } else {
+                setLaunching(true);
+                setLaunchError('');
+                try {
+                  // 1. Ensure publisher profile exists
+                  let publisherId = '';
+                  if (user?.id) {
+                    const profile = await fetchPublisherProfile(user.id);
+                    if (profile) {
+                      publisherId = profile.id;
+                    } else {
+                      const newProfile = await createPublisherProfile({
+                        user_id: user.id,
+                        wallet_address: user.wallet_address || '',
+                        company_name: user.company_name || undefined,
+                        contact_email: user.email || undefined,
+                      });
+                      publisherId = newProfile.id;
+                    }
+                  }
+
+                  if (!publisherId) {
+                    throw new Error('Publisher profile could not be found or created. Please ensure you are logged in.');
+                  }
+
+                  // 2. Create press release
+                  const urlDomain = strategy.prUrl ? new URL(strategy.prUrl).hostname : 'Distributed PR';
+                  const release = await createPressRelease({
+                    publisher_id: publisherId,
+                    title: `PR Distribution: ${urlDomain}`,
+                    content: `PR distributed via URL: ${strategy.prUrl || 'Not specified'}`,
+                    word_count: 0,
+                    status: 'pending',
+                    url: strategy.prUrl || null,
+                  });
+
+                  // 3. Create distribution
+                  await createDistribution({
+                    pr_id: release.id,
+                    publisher_id: publisherId,
+                    target_sites: strategy.preExistingPartners,
+                    target_tiers: strategy.extendToTiers,
+                    credits_locked: strategy.budget,
+                    status: 'pending',
+                  });
+
+                  onClose();
+                  window.location.reload();
+                } catch (err: any) {
+                  console.error('Launch failed:', err);
+                  setLaunchError(err.message || 'Failed to launch campaign. Please try again.');
+                } finally {
+                  setLaunching(false);
+                }
               }
             }}
-            className="flex items-center gap-2 px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-dark-950 font-semibold rounded-lg transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-dark-950 font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {step < 4 ? (
               <>Next <ArrowRight className="w-4 h-4" /></>
+            ) : launching ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Distributing...</>
             ) : (
               <>Lock Escrow & Distribute <Send className="w-4 h-4" /></>
             )}
