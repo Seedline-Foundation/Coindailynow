@@ -27,6 +27,16 @@ export interface QueueStats {
   newestMessage?: Date | undefined;
 }
 
+const REMOVE_EXPIRED_MESSAGE_SCRIPT = `
+  local messages = redis.call('lrange', KEYS[1], 0, -1)
+  redis.call('del', KEYS[1])
+  for i, message in ipairs(messages) do
+    if i ~= tonumber(ARGV[1]) + 1 then
+      redis.call('rpush', KEYS[1], message)
+    end
+  end
+`;
+
 export class MessageQueue {
   private redis: any; // Can be Redis or MockIORedis
   private readonly QUEUE_PREFIX = 'ws:queue:';
@@ -330,16 +340,20 @@ export class MessageQueue {
     const sortedIndices = expiredIndices.sort((a, b) => b - a);
     
     for (const index of sortedIndices) {
-      // Use Lua script to remove by index atomically
-      await this.redis.eval(`
-        local messages = redis.call('lrange', KEYS[1], 0, -1)
-        redis.call('del', KEYS[1])
-        for i, message in ipairs(messages) do
-          if i ~= tonumber(ARGV[1]) + 1 then
-            redis.call('rpush', KEYS[1], message)
-          end
-        end
-      `, 1, queueKey, index);
+      // Use static Lua script to remove by index atomically
+      if (typeof this.redis.eval === 'function') {
+        await this.redis.eval(REMOVE_EXPIRED_MESSAGE_SCRIPT, 1, queueKey, index);
+      } else {
+        // Fallback for mock/in-memory environments if eval is not available
+        const rawMessages = await this.redis.lrange(queueKey, 0, -1);
+        if (rawMessages && rawMessages.length > 0) {
+          const updatedMessages = rawMessages.filter((_: any, i: number) => i !== index);
+          await this.redis.del(queueKey);
+          if (updatedMessages.length > 0) {
+            await this.redis.rpush(queueKey, ...updatedMessages);
+          }
+        }
+      }
     }
   }
 
