@@ -11,6 +11,7 @@ import {
   UserRole,
 } from '@prisma/client';
 import prisma from '../../../lib/prisma';
+import { v4 as uuidv4 } from 'uuid';
 import { WalletService } from '../../WalletService';
 import { PermissionService } from '../../PermissionService';
 import checkoutNodeJssdk from '@paypal/checkout-server-sdk';
@@ -344,32 +345,53 @@ export class FinanceTransfers {
         return { success: false, error: 'Insufficient balance' };
       }
 
-      const transactionIds: string[] = [];
+      // 1. Prepare transactions data with pre-generated UUIDs
+      const transactionData = transfers.map(transfer => {
+        const id = uuidv4();
+        return {
+          id,
+          fromWalletId,
+          toWalletId: transfer.toWalletId,
+          transactionType: TransactionType.TRANSFER,
+          transactionHash: generateTransactionHash(),
+          operationType: ALL_FINANCE_OPERATIONS.BULK_TRANSFER,
+          netAmount: transfer.amount,
+          purpose: 'Bulk Transfer',
+          amount: transfer.amount,
+          currency,
+          status: TransactionStatus.COMPLETED,
+          description: transfer.description ?? null,
+          metadata: JSON.stringify(metadata || {}),
+        };
+      });
 
+      const transactionIds = transactionData.map(t => t.id);
+
+      // 2. Insert all transactions in a single batch insert query
+      await prisma.walletTransaction.createMany({
+        data: transactionData,
+      });
+
+      // 3. Update the source wallet balance ONCE with the total amount
+      await WalletService.updateWalletBalance(fromWalletId, { availableBalance: -totalAmount });
+
+      // 4. Group transfers by destination wallet to sum up the amounts and minimize database calls
+      const destinationBalanceChanges = new Map<string, number>();
       for (const transfer of transfers) {
-        const transaction = await prisma.walletTransaction.create({
-          data: {
-            fromWalletId,
-            toWalletId: transfer.toWalletId,
-            transactionType: TransactionType.TRANSFER,
-            transactionHash: generateTransactionHash(),
-            operationType: ALL_FINANCE_OPERATIONS.BULK_TRANSFER,
-            netAmount: transfer.amount,
-            purpose: 'Bulk Transfer',
-            amount: transfer.amount,
-            currency,
-            status: TransactionStatus.COMPLETED,
-            description: transfer.description ?? null,
-            metadata: JSON.stringify(metadata || {}),
-          },
-        });
-
-        await WalletService.updateWalletBalance(fromWalletId, { availableBalance: -transfer.amount });
-        await WalletService.updateWalletBalance(transfer.toWalletId, { availableBalance: transfer.amount });
-
-        transactionIds.push(transaction.id);
+        const currentAmount = destinationBalanceChanges.get(transfer.toWalletId) || 0;
+        destinationBalanceChanges.set(transfer.toWalletId, currentAmount + transfer.amount);
       }
 
+      // 5. Perform all destination balance updates concurrently
+      const balanceUpdatePromises: Promise<any>[] = [];
+      for (const [toWalletId, amount] of destinationBalanceChanges.entries()) {
+        balanceUpdatePromises.push(
+          WalletService.updateWalletBalance(toWalletId, { availableBalance: amount })
+        );
+      }
+      await Promise.all(balanceUpdatePromises);
+
+      // 6. Log the bulk operation
       await logFinanceOperation({
         operationKey: ALL_FINANCE_OPERATIONS.BULK_TRANSFER,
         userId: fromUserId,
