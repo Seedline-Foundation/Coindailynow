@@ -260,7 +260,7 @@ router.post('/:runId/approve', async (req: Request, res: Response) => {
     const editedDocs = await prisma.pipelineTranslationDoc.findMany({ where: { runId } });
     const editedByLang = new Map(editedDocs.map(d => [d.langCode, d]));
 
-    let persistedTranslations = 0;
+    const translationsToCreate: any[] = [];
     for (const tr of aiTranslations) {
       const langCode = tr.language_code || tr.language;
       if (!langCode) continue;
@@ -269,22 +269,26 @@ router.post('/:runId/approve', async (req: Request, res: Response) => {
       const content = fromEditor || tr.content || '';
       if (!content) continue;
 
-      await prisma.articleTranslation.create({
-        data: {
-          id: uuidv4(),
-          articleId: article.id,
-          languageCode: langCode,
-          title: tr.title || article.title,
-          excerpt: content.slice(0, 280),
-          content,
-          translationStatus: edited ? 'HUMAN_REVIEWED' : 'AI_GENERATED',
-          aiGenerated: true,
-          humanReviewed: Boolean(edited),
-          updatedAt: new Date(),
-        },
+      translationsToCreate.push({
+        id: uuidv4(),
+        articleId: article.id,
+        languageCode: langCode,
+        title: tr.title || article.title,
+        excerpt: content.slice(0, 280),
+        content,
+        translationStatus: edited ? 'HUMAN_REVIEWED' : 'AI_GENERATED',
+        aiGenerated: true,
+        humanReviewed: Boolean(edited),
+        updatedAt: new Date(),
       });
-      persistedTranslations++;
     }
+
+    if (translationsToCreate.length > 0) {
+      await prisma.articleTranslation.createMany({
+        data: translationsToCreate,
+      });
+    }
+    const persistedTranslations = translationsToCreate.length;
 
     await prisma.pipelineRun.update({
       where: { id: runId },
