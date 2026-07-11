@@ -137,27 +137,45 @@ async function loop(redis: Redis): Promise<void> {
   }
 }
 
-async function drainPromoted(redis: Redis): Promise<void> {
+export async function drainPromoted(redis: Redis): Promise<void> {
+  // Fetch recent alerts once before the loop to avoid redundant Redis network calls.
+  let recentList: string[] = [];
+  try {
+    recentList = await redis.lrange('gov_alerts:recent', 0, -1);
+  } catch (err: any) {
+    logger.warn('[govAlertConsumer] failed to fetch recent alerts', { err: err.message });
+    return;
+  }
+
+  // Pre-parse the recent alerts into a Map for O(1) lookups.
+  // Each alert in 'gov_alerts:recent' has a 'url' property.
+  const recentMap = new Map<string, GovAlert>();
+  for (const rawAlert of recentList) {
+    try {
+      const alert = JSON.parse(rawAlert) as GovAlert;
+      if (alert && alert.url) {
+        // To preserve original .find() behavior, we only keep the first occurrence of each URL.
+        if (!recentMap.has(alert.url)) {
+          recentMap.set(alert.url, alert);
+        }
+      }
+    } catch {
+      // Ignore parsing errors for individual corrupt elements
+    }
+  }
+
   // Pull up to 20 promotions per cycle so the worker stays responsive.
   for (let i = 0; i < 20; i++) {
     const raw = await redis.rpop(PROMOTED_LIST);
     if (!raw) return;
     try {
       const { url, at } = JSON.parse(raw) as { url: string; at: string };
-      // Promoted entries don't carry the full alert; we look it up from recent.
-      const recent = await redis.lrange('gov_alerts:recent', 0, -1);
-      const alertRaw = recent.find(r => {
-        try {
-          return JSON.parse(r).url === url;
-        } catch {
-          return false;
-        }
-      });
-      if (!alertRaw) {
+      // O(1) lookup in our pre-parsed map
+      const alert = recentMap.get(url);
+      if (!alert) {
         logger.warn(`[govAlertConsumer] promoted url ${url} not in recent list, skipping`);
         continue;
       }
-      const alert = JSON.parse(alertRaw) as GovAlert;
       await enqueueSeed(redis, { ...toSeed(alert, 'gov_alert_promote'), detected_at: at });
     } catch (err: any) {
       logger.warn('[govAlertConsumer] promote parse failed', { err: err.message });
