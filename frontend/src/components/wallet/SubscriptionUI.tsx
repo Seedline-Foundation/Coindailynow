@@ -106,7 +106,7 @@ export const SubscriptionUI: React.FC<SubscriptionUIProps> = ({
 
       try {
         setLoading(true);
-        // TODO: Replace with actual API call
+        // Load user's active subscription from finance API
         const subscription = await financeApi.getUserSubscription(user.id);
         setCurrentSubscription(subscription);
       } catch (err: any) {
