@@ -132,12 +132,14 @@ describe('WalletConnectionModal - Real Web3 Integration', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('should focus management correctly', () => {
+  it('should focus management correctly', async () => {
     render(<WalletConnectionModal {...defaultProps} />);
     
-    // Check that focus is managed properly (first focusable element should be focused)
-    const firstButton = screen.getByText('MetaMask').closest('button');
-    expect(document.activeElement).toBe(firstButton);
+    // Check that focus is managed properly (first focusable element should be focused, which is the Close modal button)
+    const closeButton = screen.getByRole('button', { name: 'Close modal' });
+    await waitFor(() => {
+      expect(document.activeElement).toBe(closeButton);
+    });
   });
 
   it('should call onWalletConnected when wallet connects successfully', async () => {
