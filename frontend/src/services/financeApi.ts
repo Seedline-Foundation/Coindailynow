@@ -29,7 +29,10 @@ import {
   AdminWalletOverview,
   CEPointsOperation,
   AirdropInput,
-  Airdrop
+  Airdrop,
+  SubscriptionTier,
+  SubscriptionStatus,
+  PaymentType
 } from '../types/finance';
 
 // ============================================================================
@@ -430,15 +433,74 @@ export const financeApi = {
     return data.convertCEToTokens;
   },
 
-  async getUserSubscriptions(userId: string, filters?: { status?: string }): Promise<any[]> {
-    // Mock implementation - replace with actual GraphQL query when available
-    return [];
+  async getUserSubscription(userId: string): Promise<any | null> {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+      const response = await fetch(`${API_BASE_URL}/api/subscriptions/me`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user subscription');
+      }
+
+      const result = await response.json();
+      if (!result.success || !result.data) {
+        return null;
+      }
+
+      const sub = result.data;
+      const planName = sub.SubscriptionPlan?.name || '';
+      let tier = SubscriptionTier.FREE;
+      if (planName.toUpperCase().includes('ENTERPRISE')) {
+        tier = SubscriptionTier.ENTERPRISE;
+      } else if (planName.toUpperCase().includes('PRO') || planName.toUpperCase().includes('PREMIUM')) {
+        tier = SubscriptionTier.PREMIUM;
+      }
+
+      let status = SubscriptionStatus.PENDING;
+      if (sub.status === 'ACTIVE' || sub.status === 'TRIAL') {
+        status = SubscriptionStatus.ACTIVE;
+      } else if (sub.status === 'CANCELLED') {
+        status = SubscriptionStatus.CANCELLED;
+      } else if (sub.status === 'EXPIRED') {
+        status = SubscriptionStatus.EXPIRED;
+      }
+
+      const expiresAt = new Date(sub.currentPeriodEnd);
+      const amount = sub.SubscriptionPlan?.priceCents ? sub.SubscriptionPlan.priceCents / 100 : 0;
+      const currency = sub.SubscriptionPlan?.currency || 'USD';
+
+      return {
+        id: sub.id,
+        userId: sub.userId,
+        tier,
+        status,
+        expiresAt,
+        endDate: expiresAt,
+        startDate: new Date(sub.currentPeriodStart),
+        amount,
+        currency,
+        autoRenew: !sub.cancelAtPeriodEnd,
+        features: []
+      };
+    } catch (error) {
+      console.error('getUserSubscription error:', error);
+      return null;
+    }
   },
 
-  async getUserSubscription(userId: string): Promise<any | null> {
-    // Mock implementation - replace with actual GraphQL query when available
-    const subscriptions = await this.getUserSubscriptions(userId, { status: 'ACTIVE' });
-    return subscriptions.length > 0 ? subscriptions[0] : null;
+  async getUserSubscriptions(userId: string, filters?: { status?: string }): Promise<any[]> {
+    const sub = await this.getUserSubscription(userId);
+    if (!sub) return [];
+    if (filters?.status && sub.status !== filters.status) {
+      return [];
+    }
+    return [sub];
   },
 
   async purchaseSubscription(input: {
@@ -448,12 +510,20 @@ export const financeApi = {
     paymentMethod: string;
     otpCode?: string;
   }): Promise<any> {
-    // Mock implementation - replace with actual GraphQL mutation when available
-    return {
-      success: true,
-      subscriptionId: `sub_${Date.now()}`,
-      message: 'Subscription purchased successfully'
+    const price = input.tier === 'ENTERPRISE' ? 49.99 : 24.99;
+    const paymentInput: PaymentInput = {
+      userId: input.userId,
+      walletId: input.walletId,
+      amount: price,
+      currency: 'JY',
+      paymentType: PaymentType.SUBSCRIPTION,
+      referenceId: input.tier.toLowerCase(),
+      metadata: {
+        tierName: input.tier,
+        otpCode: input.otpCode
+      }
     };
+    return this.makePayment(paymentInput);
   },
 
   async sendGift(input: GiftInput): Promise<TransactionResult> {
