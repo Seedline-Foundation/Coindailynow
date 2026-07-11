@@ -189,6 +189,79 @@ describe('MessageQueue', () => {
       expect(messages).toHaveLength(1);
       expect(messages[0]!.type).toBe('valid_message');
     });
+
+    test('should use static Lua script to remove expired messages', async () => {
+      const now = new Date();
+      const pastDate = new Date(now.getTime() - 3600000); // 1 hour ago
+
+      const mockMessages = [
+        JSON.stringify({
+          id: 'msg1',
+          type: 'expired_message',
+          data: {},
+          priority: 'normal',
+          timestamp: pastDate,
+          expiresAt: pastDate, // Expired
+          retryCount: 0,
+          maxRetries: 3
+        })
+      ];
+
+      mockRedis.lrange.mockResolvedValue(mockMessages);
+
+      await messageQueue.getQueuedMessages(testUserId);
+
+      expect(mockRedis.eval).toHaveBeenCalledWith(
+        expect.any(String),
+        1,
+        `ws:queue:${testUserId}`,
+        0
+      );
+    });
+
+    test('should fallback to JS array operations if redis.eval is not available', async () => {
+      const now = new Date();
+      const pastDate = new Date(now.getTime() - 3600000); // 1 hour ago
+
+      const mockMessages = [
+        JSON.stringify({
+          id: 'msg1',
+          type: 'expired_message',
+          data: {},
+          priority: 'normal',
+          timestamp: pastDate,
+          expiresAt: pastDate, // Expired
+          retryCount: 0,
+          maxRetries: 3
+        }),
+        JSON.stringify({
+          id: 'msg2',
+          type: 'valid_message',
+          data: {},
+          priority: 'normal',
+          timestamp: now,
+          expiresAt: new Date(now.getTime() + 3600000), // Valid
+          retryCount: 0,
+          maxRetries: 3
+        })
+      ];
+
+      mockRedis.lrange.mockResolvedValue(mockMessages);
+      mockRedis.rpush = jest.fn();
+
+      // Temporarily remove eval from mockRedis to trigger fallback
+      const originalEval = mockRedis.eval;
+      delete (mockRedis as any).eval;
+
+      try {
+        await messageQueue.getQueuedMessages(testUserId);
+
+        expect(mockRedis.del).toHaveBeenCalledWith(`ws:queue:${testUserId}`);
+        expect(mockRedis.rpush).toHaveBeenCalledWith(`ws:queue:${testUserId}`, mockMessages[1]);
+      } finally {
+        mockRedis.eval = originalEval;
+      }
+    });
   });
 
   describe('clearMessages', () => {
