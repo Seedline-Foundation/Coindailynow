@@ -458,9 +458,11 @@ export class FinanceSecurityMiddleware {
    */
   private async getWhitelistFromDB(): Promise<string[]> {
     try {
-      // This would query a WhitelistedIP table
-      // For now, return empty array
-      return [];
+      const whitelist = await prisma.whitelistedIP.findMany({
+        where: { isActive: true },
+        select: { ipAddress: true },
+      });
+      return whitelist.map(item => item.ipAddress);
     } catch (error) {
       logger.error('Failed to fetch IP whitelist from database:', error);
       return [];
@@ -500,7 +502,24 @@ export class FinanceSecurityMiddleware {
     reason: string,
     req: Request
   ): Promise<void> {
-    // TODO: Save to database WhitelistedIP table
+    try {
+      await prisma.whitelistedIP.upsert({
+        where: { ipAddress },
+        create: {
+          ipAddress,
+          reason,
+          addedBy: adminId,
+          isActive: true,
+        },
+        update: {
+          reason,
+          addedBy: adminId,
+          isActive: true,
+        },
+      });
+    } catch (error) {
+      logger.error(`Failed to save IP ${ipAddress} to whitelist:`, error);
+    }
     
     await financeAuditService.logAdminOperation(
       adminId,
@@ -526,7 +545,13 @@ export class FinanceSecurityMiddleware {
     reason: string,
     req: Request
   ): Promise<void> {
-    // TODO: Remove from database WhitelistedIP table
+    try {
+      await prisma.whitelistedIP.deleteMany({
+        where: { ipAddress },
+      });
+    } catch (error) {
+      logger.error(`Failed to remove IP ${ipAddress} from whitelist:`, error);
+    }
 
     await financeAuditService.logAdminOperation(
       adminId,
