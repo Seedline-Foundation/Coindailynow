@@ -654,30 +654,37 @@ router.post('/queue/bulk-action', requireRole(['SUPER_ADMIN']), validateRequest(
       details: [] as any[]
     };
 
-    for (const queueId of queueIds) {
+    if (action === 'DELETE') {
       try {
-        switch (action) {
-          case 'CONFIRM':
-            await moderationService.confirmViolation(queueId, adminId);
-            break;
-            
-          case 'FALSE_POSITIVE':
-            await moderationService.markFalsePositive(queueId, adminId, notes);
-            break;
-            
-          case 'DELETE':
-            await prisma.moderationQueue.delete({
-              where: { id: queueId }
-            });
-            break;
-        }
-
-        results.processed++;
-        results.details.push({ queueId, status: 'success' });
-
+        await prisma.moderationQueue.deleteMany({
+          where: { id: { in: queueIds } }
+        });
+        results.processed = queueIds.length;
+        results.details = queueIds.map((queueId: string) => ({ queueId, status: 'success' }));
       } catch (error: any) {
-        results.errors++;
-        results.details.push({ queueId, status: 'error', error: error.message });
+        results.errors = queueIds.length;
+        results.details = queueIds.map((queueId: string) => ({ queueId, status: 'error', error: error.message }));
+      }
+    } else {
+      for (const queueId of queueIds) {
+        try {
+          switch (action) {
+            case 'CONFIRM':
+              await moderationService.confirmViolation(queueId, adminId);
+              break;
+
+            case 'FALSE_POSITIVE':
+              await moderationService.markFalsePositive(queueId, adminId, notes);
+              break;
+          }
+
+          results.processed++;
+          results.details.push({ queueId, status: 'success' });
+
+        } catch (error: any) {
+          results.errors++;
+          results.details.push({ queueId, status: 'error', error: error.message });
+        }
       }
     }
 
