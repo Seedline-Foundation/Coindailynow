@@ -8,9 +8,14 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function GET(request: NextRequest) {
+  if (!JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET environment variable is not configured.');
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+
   const authHeader = request.headers.get('authorization');
   const token = authHeader?.replace('Bearer ', '');
 
