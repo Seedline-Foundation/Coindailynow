@@ -5,10 +5,9 @@ import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Verify JWT token from request
-function verifyToken(request: NextRequest): { affiliateId: string; email: string; affiliateCode: string } | null {
+function verifyToken(request: NextRequest, secret: string): { affiliateId: string; email: string; affiliateCode: string } | null {
   const authHeader = request.headers.get('authorization');
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,7 +17,7 @@ function verifyToken(request: NextRequest): { affiliateId: string; email: string
   const token = authHeader.substring(7);
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, secret) as any;
     return {
       affiliateId: decoded.affiliateId,
       email: decoded.email,
@@ -31,7 +30,16 @@ function verifyToken(request: NextRequest): { affiliateId: string; email: string
 
 export async function GET(request: NextRequest) {
   try {
-    const tokenData = verifyToken(request);
+    const JWT_SECRET = process.env.JWT_SECRET;
+    if (!JWT_SECRET) {
+      console.error('JWT_SECRET is not configured in the environment');
+      return NextResponse.json(
+        { error: 'Internal Server Error' },
+        { status: 500 }
+      );
+    }
+
+    const tokenData = verifyToken(request, JWT_SECRET);
 
     if (!tokenData) {
       return NextResponse.json(
