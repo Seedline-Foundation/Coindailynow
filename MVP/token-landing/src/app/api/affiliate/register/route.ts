@@ -9,11 +9,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Generate unique affiliate code
 function generateAffiliateCode(): string {
-  // Generate a random 8-character code
+  // Generate a random 8-character code securely using crypto.randomInt
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = '';
   for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+    code += chars.charAt(crypto.randomInt(0, chars.length));
   }
   return code;
 }
