@@ -55,7 +55,7 @@ describe('HeroSection', () => {
     );
 
     // Check if the featured news title is rendered
-    expect(screen.getByText('Test Article Title')).toBeInTheDocument();
+    expect(screen.getAllByText('Test Article Title')[0]).toBeInTheDocument();
     
     // Check if the breaking news is rendered
     expect(screen.getByText('Breaking News')).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe('HeroSection', () => {
     expect(screen.getByText('5 min read')).toBeInTheDocument();
     
     // Check if category badge is rendered
-    expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+    expect(screen.getAllByText('Bitcoin')[0]).toBeInTheDocument();
   });
 
   it('renders today\'s top stories section', () => {

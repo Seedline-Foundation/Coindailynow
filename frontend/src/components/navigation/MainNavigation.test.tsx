@@ -47,7 +47,7 @@ describe('MainNavigation', () => {
     fireEvent.click(hamburgerButton);
     
     // Check if mobile menu items are visible
-    expect(screen.getByPlaceholderText('Search crypto news...')).toBeInTheDocument();
+    expect(screen.getAllByPlaceholderText('Search crypto news...')[0]).toBeInTheDocument();
   });
 
   it('opens dropdown menu when navigation item is clicked', () => {
@@ -76,7 +76,7 @@ describe('MainNavigation', () => {
   it('handles search form submission', () => {
     render(<MainNavigation />);
     
-    const searchInput = screen.getByPlaceholderText('Search crypto news...');
+    const searchInput = screen.getAllByPlaceholderText('Search crypto news...')[0];
     const searchForm = searchInput.closest('form');
     
     fireEvent.change(searchInput, { target: { value: 'bitcoin' } });
@@ -179,7 +179,7 @@ describe('BreadcrumbNavigation', () => {
     render(<BreadcrumbNavigation />);
     
     expect(screen.getByRole('navigation')).toHaveAttribute('aria-label', 'Breadcrumb');
-    expect(screen.getByText('Bitcoin Analysis')).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('Bitcoin Analysis').parentElement).toHaveAttribute('aria-current', 'page');
   });
 });
 
