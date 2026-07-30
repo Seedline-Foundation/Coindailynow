@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET;
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:4000';
 
 interface ReportData {
@@ -15,6 +15,12 @@ interface ReportData {
 
 export async function GET(request: NextRequest) {
   try {
+    // Fail securely if JWT_SECRET is not configured
+    if (!JWT_SECRET) {
+      console.error('JWT_SECRET environment variable is not defined');
+      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+
     // Verify authentication
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
