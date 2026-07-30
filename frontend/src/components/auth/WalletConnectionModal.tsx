@@ -26,7 +26,7 @@ export function WalletConnectionModal({
       
       // Focus first button when modal opens
       setTimeout(() => {
-        const firstButton = modalRef.current?.querySelector('button');
+        const firstButton = modalRef.current?.querySelector('button:not([aria-label="Close modal"])') || modalRef.current?.querySelector('button');
         if (firstButton) {
           firstButton.focus();
         }

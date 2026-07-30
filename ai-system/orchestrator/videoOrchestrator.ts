@@ -300,17 +300,23 @@ export async function runVideoPipeline(
       });
 
       if (cut?.ok && cut.clips.length) {
+        const clipAssetsData = cut.clips.map((clip: any) => ({
+          runId: run.id,
+          format: 'CLIP',
+          url: clip.url,
+          durationSec: Math.round(clip.endSec - clip.startSec) || 0,
+          provider: 'clipsai',
+        }));
+
+        await prisma.videoAsset.createMany({
+          data: clipAssetsData,
+          skipDuplicates: true,
+        }).catch(err => logger.warn(`[video] persist CLIP assets via createMany failed (non-fatal): ${err.message}`));
+
         for (const clip of cut.clips) {
-          await prisma.videoAsset.create({
-            data: {
-              runId: run.id, format: 'CLIP', url: clip.url,
-              durationSec: Math.round(clip.endSec - clip.startSec) || 0,
-              provider: 'clipsai',
-            },
-          }).catch(err => logger.warn(`[video] persist CLIP asset failed (non-fatal): ${err.message}`));
           assets.push({ format: 'CLIP', url: clip.url, provider: 'clipsai' });
         }
-        logger.info(`[video] persisted ${cut.clips.length} clips from long video`);
+        logger.info(`[video] persisted ${cut.clips.length} clips from long video via bulk insertion`);
       }
     }
 
