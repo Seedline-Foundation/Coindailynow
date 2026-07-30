@@ -327,17 +327,17 @@ export async function verifyAndPersist(
   // Delete old verification entries for this profile
   await prisma.influencerVerification.deleteMany({ where: { profileId } });
 
-  // Store each verification category
-  for (const r of report.results) {
-    await prisma.influencerVerification.create({
-      data: {
+  // Store each verification category in a single bulk insert to prevent N+1 query overhead
+  if (report.results.length > 0) {
+    await prisma.influencerVerification.createMany({
+      data: report.results.map(r => ({
         profileId,
         category: r.category,
         score: r.score,
         weight: r.weight,
         details: JSON.stringify(r.details),
         passed: r.passed,
-      },
+      })),
     });
   }
 
