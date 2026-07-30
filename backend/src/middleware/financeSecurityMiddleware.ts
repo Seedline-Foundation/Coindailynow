@@ -14,6 +14,7 @@ import { UserRole, WalletType } from '@prisma/client';
 import prisma from '../lib/prisma';
 import { logger } from '../utils/logger';
 import { financeAuditService, AuditAction } from '../services/FinanceAuditService';
+import { financeEmailService } from '../services/FinanceEmailService';
 
 // ============================================================================
 // CONFIGURATION
@@ -429,7 +430,16 @@ export class FinanceSecurityMiddleware {
       });
 
       if (user) {
-        // TODO: Send email notification
+        financeEmailService.sendSecurityAlert(user.email, {
+          username: user.username,
+          alertType: 'wallet_locked',
+          message: `Your wallet has been automatically locked due to: ${reason}`,
+          timestamp: new Date(),
+          ipAddress: this.getClientIP(req),
+          actionRequired: 'Please contact support for assistance with unlocking your wallet.',
+        }).catch(err => {
+          logger.error(`Failed to send security alert email on wallet lock for user ${user.username}:`, err);
+        });
         logger.info(`Wallet locked for user ${user.username}: ${reason}`);
       }
     } catch (error) {
