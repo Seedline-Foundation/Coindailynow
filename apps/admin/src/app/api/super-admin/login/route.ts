@@ -5,9 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Hardcoded super admin credentials (match backend seed)
 const SUPER_ADMIN = {
@@ -23,6 +22,11 @@ const SUPER_ADMIN = {
 };
 
 export async function POST(request: NextRequest) {
+  if (!JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET environment variable is not configured.');
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+
   try {
     const body = await request.json();
     const { email, password } = body;

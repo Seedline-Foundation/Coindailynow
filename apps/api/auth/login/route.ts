@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
 
 const LOGIN_MUTATION = `mutation Login($input: LoginInput!) {
@@ -44,6 +44,11 @@ const DEMO_USERS: Record<string, { id: string; name: string; role: string; passw
 };
 
 export async function POST(request: NextRequest) {
+  if (!JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET environment variable is not configured.');
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+
   const body = await request.json().catch(() => ({}));
   const { email = '', password = '' } = body as { email: string; password: string };
 
