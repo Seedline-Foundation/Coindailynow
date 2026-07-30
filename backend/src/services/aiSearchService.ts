@@ -630,9 +630,9 @@ Return ONLY a JSON array of 3 suggested queries, nothing else. Example: ["query 
       const uniqueTags = Array.from(new Set(allTags));
 
       // Filter out the original query words and return top 3
-      const queryWords = query.toLowerCase().split(' ');
+      const queryWords = new Set(query.toLowerCase().split(' '));
       const relatedTags = uniqueTags
-        .filter((tag): tag is string => tag !== null && !queryWords.includes(tag.toLowerCase()))
+        .filter((tag): tag is string => tag !== null && !queryWords.has(tag.toLowerCase()))
         .slice(0, 3);
 
       return relatedTags;
