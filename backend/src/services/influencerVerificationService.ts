@@ -291,67 +291,102 @@ export async function verifyAndPersist(
 ): Promise<VerificationReport> {
   const report = verifyInfluencer(handles);
 
-  // Upsert social handles
+  // Fetch existing social handles to determine create vs update
+  const existingHandles = await prisma.influencerSocialHandle.findMany({
+    where: { profileId },
+  });
+
+  const existingMap = new Map<string, any>(
+    existingHandles.map((eh: any) => [eh.platform, eh])
+  );
+
+  const isOrganic = report.results.find(r => r.category === 'organic')?.passed ?? true;
+  const now = new Date();
+
+  const handleCreates: any[] = [];
+  const handleUpdates: any[] = [];
+
   for (const h of handles) {
-    await prisma.influencerSocialHandle.upsert({
-      where: {
-        profileId_platform: { profileId, platform: h.platform },
-      },
-      create: {
+    const existing = existingMap.get(h.platform);
+
+    const data = {
+      handle: h.handle,
+      profileUrl: h.profileUrl,
+      followers: h.followers,
+      avgViews: h.avgViews,
+      watchHours: h.watchHours,
+      engagementRate: h.engagementRate,
+      isOrganic,
+      verified: true,
+      lastChecked: now,
+    };
+
+    if (existing) {
+      handleUpdates.push(
+        prisma.influencerSocialHandle.update({
+          where: { id: existing.id },
+          data,
+        })
+      );
+    } else {
+      handleCreates.push({
         profileId,
         platform: h.platform,
-        handle: h.handle,
-        profileUrl: h.profileUrl,
-        followers: h.followers,
-        avgViews: h.avgViews,
-        watchHours: h.watchHours,
-        engagementRate: h.engagementRate,
-        isOrganic: report.results.find(r => r.category === 'organic')?.passed ?? true,
-        verified: true,
-        lastChecked: new Date(),
-      },
-      update: {
-        handle: h.handle,
-        profileUrl: h.profileUrl,
-        followers: h.followers,
-        avgViews: h.avgViews,
-        watchHours: h.watchHours,
-        engagementRate: h.engagementRate,
-        isOrganic: report.results.find(r => r.category === 'organic')?.passed ?? true,
-        verified: true,
-        lastChecked: new Date(),
-      },
-    });
+        ...data,
+      });
+    }
+  }
+
+  const transactionOperations: any[] = [];
+
+  if (handleCreates.length > 0) {
+    transactionOperations.push(
+      prisma.influencerSocialHandle.createMany({
+        data: handleCreates,
+      })
+    );
+  }
+
+  if (handleUpdates.length > 0) {
+    transactionOperations.push(...handleUpdates);
   }
 
   // Delete old verification entries for this profile
-  await prisma.influencerVerification.deleteMany({ where: { profileId } });
+  transactionOperations.push(
+    prisma.influencerVerification.deleteMany({ where: { profileId } })
+  );
 
-  // Store each verification category
-  for (const r of report.results) {
-    await prisma.influencerVerification.create({
-      data: {
-        profileId,
-        category: r.category,
-        score: r.score,
-        weight: r.weight,
-        details: JSON.stringify(r.details),
-        passed: r.passed,
-      },
-    });
+  // Store each verification category using createMany
+  if (report.results.length > 0) {
+    transactionOperations.push(
+      prisma.influencerVerification.createMany({
+        data: report.results.map(r => ({
+          profileId,
+          category: r.category,
+          score: r.score,
+          weight: r.weight,
+          details: JSON.stringify(r.details),
+          passed: r.passed,
+        })),
+      })
+    );
   }
 
   // Update the profile's overall score and status
-  await prisma.influencerPartnerProfile.update({
-    where: { id: profileId },
-    data: {
-      overallScore: report.overallScore,
-      status: report.qualified ? 'approved' : 'rejected',
-      qualifiedAt: report.qualified ? new Date() : null,
-      rejectedAt: report.qualified ? null : new Date(),
-      rejectionReason: report.qualified ? null : report.summary,
-    },
-  });
+  transactionOperations.push(
+    prisma.influencerPartnerProfile.update({
+      where: { id: profileId },
+      data: {
+        overallScore: report.overallScore,
+        status: report.qualified ? 'approved' : 'rejected',
+        qualifiedAt: report.qualified ? new Date() : null,
+        rejectedAt: report.qualified ? null : new Date(),
+        rejectionReason: report.qualified ? null : report.summary,
+      },
+    })
+  );
+
+  await prisma.$transaction(transactionOperations);
 
   return report;
 }
