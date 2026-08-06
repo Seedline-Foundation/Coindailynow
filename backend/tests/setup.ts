@@ -2,6 +2,15 @@ import 'jest';
 
 jest.setTimeout(30000);
 
+// Polyfill Blob and File for environments (like Jest VM) where they are not globally exposed.
+// This prevents undici/cheerio from throwing ReferenceError: File is not defined.
+if (typeof global.Blob === 'undefined') {
+  global.Blob = require('buffer').Blob;
+}
+if (typeof global.File === 'undefined') {
+  global.File = require('buffer').File;
+}
+
 // Configure environment variables for testing
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-only';
