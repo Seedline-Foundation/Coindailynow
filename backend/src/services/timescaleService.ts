@@ -103,27 +103,27 @@ export class TimescaleService {
     to: Date,
     limit: number
   ): Promise<OHLCCandle[]> {
-    // Safe: view name is hardcoded from the calling method, not user input
-    const rows = await this.prisma.$queryRawUnsafe<OHLCCandle[]>(
-      `SELECT bucket, symbol, exchange,
-              open::float8  AS open,
-              high::float8  AS high,
-              low::float8   AS low,
-              close::float8 AS close,
-              volume::float8 AS volume
-       FROM ${view}
-       WHERE symbol   = $1
-         AND exchange  = $2
-         AND bucket   >= $3
-         AND bucket   <= $4
-       ORDER BY bucket DESC
-       LIMIT $5`,
-      symbol,
-      exchange,
-      from,
-      to,
-      limit
-    );
+    // Defense-in-depth: strict validation of the continuous aggregate view name
+    if (view !== 'price_ticks_1h' && view !== 'price_ticks_1d') {
+      throw new Error('Invalid continuous aggregate view name');
+    }
+
+    // Safe and standard parameterized query via $queryRaw and Prisma.raw for dynamic view identifier
+    const rows = await this.prisma.$queryRaw<OHLCCandle[]>`
+      SELECT bucket, symbol, exchange,
+             open::float8  AS open,
+             high::float8  AS high,
+             low::float8   AS low,
+             close::float8 AS close,
+             volume::float8 AS volume
+      FROM ${Prisma.raw(view)}
+      WHERE symbol   = ${symbol}
+        AND exchange  = ${exchange}
+        AND bucket   >= ${from}
+        AND bucket   <= ${to}
+      ORDER BY bucket DESC
+      LIMIT ${limit}
+    `;
     return rows;
   }
 
