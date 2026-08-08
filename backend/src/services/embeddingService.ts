@@ -11,6 +11,7 @@
 import prisma from '../lib/prisma';
 import { getRedis } from '../lib/redis';
 import { generateEmbeddings, complete, AI_MODELS, AI_ENDPOINTS } from './aiClient';
+import { v4 as uuidv4 } from 'uuid';
 const redis = getRedis();
 const CACHE_TTL = 600; // 10 minutes
 const EMBEDDING_MODEL = 'BAAI/bge-small-en-v1.5'; // Local BGE model
@@ -230,7 +231,7 @@ Return a JSON object with an "entities" array containing objects with: type, nam
 };
 
 /**
- * Store recognized entities and their mentions
+ * Store recognized entities and their mentions (Optimized to prevent N+1 queries)
  */
 export const storeRecognizedEntities = async (
   contentId: string,
@@ -238,44 +239,116 @@ export const storeRecognizedEntities = async (
   entities: RecognizedEntityData[]
 ): Promise<void> => {
   try {
-    for (const entityData of entities) {
-      // Upsert entity
-      const entity = await prisma.recognizedEntity.upsert({
-        where: {
-          normalizedName_entityType: {
-            normalizedName: entityData.normalizedName,
-            entityType: entityData.type,
-          },
-        },
-        create: {
+    if (!entities || entities.length === 0) {
+      return;
+    }
+
+    // 1. Group/aggregate duplicate entity mentions in the current batch
+    interface GroupedEntity {
+      entityData: RecognizedEntityData;
+      occurrences: number;
+    }
+    const groupedMap = new Map<string, GroupedEntity>();
+    for (const entity of entities) {
+      const key = `${entity.normalizedName}:${entity.type}`;
+      const existing = groupedMap.get(key);
+      if (existing) {
+        existing.occurrences += 1;
+        // Keep the one with higher confidence
+        if (entity.confidence > existing.entityData.confidence) {
+          existing.entityData = entity;
+        }
+      } else {
+        groupedMap.set(key, { entityData: entity, occurrences: 1 });
+      }
+    }
+    const groupedEntities = Array.from(groupedMap.values());
+
+    // 2. Fetch all existing recognized entities matching normalizedName and entityType in one batch select
+    const existingEntities = await prisma.recognizedEntity.findMany({
+      where: {
+        OR: groupedEntities.map(g => ({
+          normalizedName: g.entityData.normalizedName,
+          entityType: g.entityData.type,
+        })),
+      },
+    });
+
+    // 3. Map existing entities by unique key for O(1) lookup
+    const existingMap = new Map<string, typeof existingEntities[number]>();
+    for (const entity of existingEntities) {
+      const key = `${entity.normalizedName}:${entity.entityType}`;
+      existingMap.set(key, entity);
+    }
+
+    // 4. Prepare data for create/update operations
+    const updates = [];
+    const newEntitiesToCreate = [];
+    const mentionsToCreate = [];
+    const now = new Date();
+
+    for (const grouped of groupedEntities) {
+      const { entityData, occurrences } = grouped;
+      const key = `${entityData.normalizedName}:${entityData.type}`;
+      const existing = existingMap.get(key);
+
+      let entityId: string;
+
+      if (existing) {
+        entityId = existing.id;
+        updates.push(
+          prisma.recognizedEntity.update({
+            where: { id: entityId },
+            data: {
+              mentionCount: { increment: occurrences },
+              lastMentionedAt: now,
+              confidence: entityData.confidence,
+            },
+          })
+        );
+      } else {
+        entityId = uuidv4();
+        newEntitiesToCreate.push({
+          id: entityId,
           entityType: entityData.type,
           name: entityData.name,
           normalizedName: entityData.normalizedName,
           category: entityData.category || null,
           metadata: entityData.metadata ? JSON.stringify(entityData.metadata) : null,
           confidence: entityData.confidence,
-          mentionCount: 1,
-          lastMentionedAt: new Date(),
+          mentionCount: occurrences,
+          lastMentionedAt: now,
           isActive: true,
-        },
-        update: {
-          mentionCount: { increment: 1 },
-          lastMentionedAt: new Date(),
-          confidence: entityData.confidence, // Update with latest confidence
-        },
-      });
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
 
-      // Create mention record
-      await prisma.entityMention.create({
-        data: {
-          entityId: entity.id,
+      // Prepare mention records
+      for (let i = 0; i < occurrences; i++) {
+        mentionsToCreate.push({
+          id: uuidv4(),
+          entityId,
           contentId,
           contentType,
-          position: 0, // Could be enhanced with actual position
+          position: 0,
           relevanceScore: entityData.confidence,
-        },
-      });
+          createdAt: now,
+        });
+      }
     }
+
+    // 5. Execute everything in a single database transaction
+    await prisma.$transaction([
+      ...(newEntitiesToCreate.length > 0
+        ? [prisma.recognizedEntity.createMany({ data: newEntitiesToCreate })]
+        : []),
+      ...updates,
+      ...(mentionsToCreate.length > 0
+        ? [prisma.entityMention.createMany({ data: mentionsToCreate })]
+        : []),
+    ]);
+
   } catch (error: any) {
     console.error('Error storing entities:', error);
     throw error;
