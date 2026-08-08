@@ -1,5 +1,10 @@
 import 'jest';
 
+if (typeof global.File === 'undefined') {
+  const { File } = require('buffer');
+  global.File = File;
+}
+
 jest.setTimeout(30000);
 
 // Configure environment variables for testing
