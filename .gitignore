@@ -170,3 +170,9 @@ tmp-query.json
 task-test.json
 ollama-test.json
 
+# Python virtual environment and cache
+venv/
+.venv/
+__pycache__/
+*.pyc
+translation-service/venv/
