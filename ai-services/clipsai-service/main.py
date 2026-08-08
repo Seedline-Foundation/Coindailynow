@@ -24,6 +24,7 @@ import uuid
 import shutil
 import subprocess
 import tempfile
+import asyncio
 from typing import List, Optional
 from pathlib import Path
 
@@ -121,7 +122,7 @@ class CutResponse(BaseModel):
 
 
 @app.post("/cut", response_model=CutResponse)
-def cut(req: CutRequest):
+async def cut(req: CutRequest):
     _ensure_loaded()
     if _load_error:
         raise HTTPException(503, f"service not ready: {_load_error}")
@@ -134,13 +135,14 @@ def cut(req: CutRequest):
     try:
         # 1. Download source video
         src_path = job_dir / "source.mp4"
-        _download(req.video_url, src_path)
+        await asyncio.to_thread(_download, req.video_url, src_path)
 
         # 2. Transcribe
-        transcription = _transcriber.transcribe(str(src_path))
+        transcription = await asyncio.to_thread(_transcriber.transcribe, str(src_path))
 
         # 3. Find natural clip boundaries
-        raw_clips = _clipfinder.find_clips(
+        raw_clips = await asyncio.to_thread(
+            _clipfinder.find_clips,
             transcription=transcription,
             min_clip_duration=req.min_duration_sec,
             max_clip_duration=req.max_duration_sec,
@@ -156,8 +158,8 @@ def cut(req: CutRequest):
             if end - start < 5:
                 continue
             clip_path = job_dir / f"clip-{i+1:02d}.mp4"
-            _ffmpeg_cut(src_path, clip_path, start, end)
-            url = _publish(clip_path, f"clips/{job_id}/{clip_path.name}")
+            await _ffmpeg_cut_async(src_path, clip_path, start, end)
+            url = await asyncio.to_thread(_publish, clip_path, f"clips/{job_id}/{clip_path.name}")
             out.append(Clip(
                 url=url,
                 start_sec=start,
@@ -167,7 +169,7 @@ def cut(req: CutRequest):
             ))
 
         # 5. Best-effort source-duration probe
-        total = _probe_duration(src_path)
+        total = await _probe_duration_async(src_path)
 
         return CutResponse(
             clips=out,
@@ -177,7 +179,7 @@ def cut(req: CutRequest):
     finally:
         # Keep workdir if no CDN (need to serve files); otherwise clean up
         if CDN_BASE_URL or S3_BUCKET:
-            shutil.rmtree(job_dir, ignore_errors=True)
+            await asyncio.to_thread(shutil.rmtree, job_dir, ignore_errors=True)
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────
@@ -238,6 +240,62 @@ def _probe_duration(path: Path) -> Optional[float]:
                "-of", "default=noprint_wrappers=1:nokey=1", str(path)]
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         return float(r.stdout.strip()) if r.returncode == 0 else None
+    except Exception:
+        return None
+
+
+async def _ffmpeg_cut_async(src: Path, dest: Path, start: float, end: float) -> None:
+    duration = max(1, end - start)
+    cmd = [
+        "ffmpeg", "-y",
+        "-ss", f"{start:.2f}",
+        "-i", str(src),
+        "-t", f"{duration:.2f}",
+        "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+        "-c:a", "aac", "-b:a", "128k",
+        "-movflags", "+faststart",
+        str(dest),
+    ]
+    proc = await asyncio.create_subprocess_exec(
+        *cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    try:
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=600)
+    except asyncio.TimeoutError:
+        try:
+            proc.kill()
+        except OSError:
+            pass
+        await proc.communicate()
+        raise RuntimeError("ffmpeg timed out after 600 seconds")
+
+    if proc.returncode != 0:
+        err = stderr.decode("utf-8", errors="replace")[-500:]
+        raise RuntimeError(f"ffmpeg failed: {err}")
+
+
+async def _probe_duration_async(path: Path) -> Optional[float]:
+    try:
+        cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+               "-of", "default=noprint_wrappers=1:nokey=1", str(path)]
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        try:
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30)
+            if proc.returncode == 0:
+                return float(stdout.decode("utf-8", errors="replace").strip())
+        except asyncio.TimeoutError:
+            try:
+                proc.kill()
+            except OSError:
+                pass
+            await proc.communicate()
+        return None
     except Exception:
         return None
 
