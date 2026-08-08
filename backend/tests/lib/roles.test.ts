@@ -12,10 +12,33 @@ describe('roles hierarchy', () => {
     expect(ROLE_RANK.SUPER_ADMIN).toBeGreaterThan(ROLE_RANK.ADMIN);
   });
 
-  test('hasMinimumRole respects ordering', () => {
-    expect(hasMinimumRole('JOURNALIST', 'CONTRIBUTOR')).toBe(true);
-    expect(hasMinimumRole('CONTRIBUTOR', 'JOURNALIST')).toBe(false);
-    expect(hasMinimumRole('SUPER_ADMIN', 'EDITOR')).toBe(true);
+  describe('hasMinimumRole', () => {
+    test('returns true when role ranks above the minimum', () => {
+      expect(hasMinimumRole('JOURNALIST', 'CONTRIBUTOR')).toBe(true);
+      expect(hasMinimumRole('SUPER_ADMIN', 'EDITOR')).toBe(true);
+      expect(hasMinimumRole('CEO', 'JOURNALIST')).toBe(true);
+    });
+
+    test('returns true when role matches the minimum exactly', () => {
+      expect(hasMinimumRole('USER', 'USER')).toBe(true);
+      expect(hasMinimumRole('EDITOR', 'EDITOR')).toBe(true);
+      expect(hasMinimumRole('SUPER_ADMIN', 'SUPER_ADMIN')).toBe(true);
+    });
+
+    test('returns false when role ranks below the minimum', () => {
+      expect(hasMinimumRole('CONTRIBUTOR', 'JOURNALIST')).toBe(false);
+      expect(hasMinimumRole('USER', 'SUPER_ADMIN')).toBe(false);
+      expect(hasMinimumRole('EDITOR', 'CEO')).toBe(false);
+    });
+
+    test('returns false when role is an invalid string', () => {
+      expect(hasMinimumRole('NOT_A_ROLE', 'USER')).toBe(false);
+    });
+
+    test('returns false when role is null or undefined', () => {
+      expect(hasMinimumRole(null, 'USER')).toBe(false);
+      expect(hasMinimumRole(undefined, 'USER')).toBe(false);
+    });
   });
 
   test('hasAnyRole short-circuits on null/undefined', () => {
