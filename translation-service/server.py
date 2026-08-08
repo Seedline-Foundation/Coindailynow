@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware  # type: ignore
 from pydantic import BaseModel  # type: ignore
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM  # type: ignore
 import torch  # type: ignore
-from typing import List, Optional
+from typing import List, Optional, Union
 import logging
 
 # Configure logging
@@ -125,12 +125,12 @@ async def load_model():
         raise
 
 
-def translate_text(text: str, src_lang: str, tgt_lang: str) -> str:
-    """Translate text using NLLB model with proper tokenizer configuration"""
+def translate_text(text: Union[str, List[str]], src_lang: str, tgt_lang: str) -> Union[str, List[str]]:
+    """Translate text(s) using NLLB model with proper tokenizer configuration"""
     # Set source language on tokenizer
     tokenizer.src_lang = src_lang
     
-    # Encode the input text
+    # Encode the input text(s)
     inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
     
     # Move to same device as model
@@ -151,9 +151,11 @@ def translate_text(text: str, src_lang: str, tgt_lang: str) -> str:
         )
     
     # Decode the generated tokens
-    translated_text = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
+    translated_texts = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
     
-    return translated_text
+    if isinstance(text, str):
+        return translated_texts[0]
+    return translated_texts
 
 def protect_crypto_terms(text: str) -> tuple[str, dict]:
     """Replace crypto terms with placeholders"""
@@ -278,23 +280,38 @@ async def translate_batch(request: BatchTranslationRequest):
                 logger.warning(f"Skipping unsupported language: {target_lang}")
                 continue
             
-            lang_translations = []
+            if not request.texts:
+                translations[target_lang] = []
+                continue
+
+            # Prepare all texts and replacements
+            texts_to_translate = []
+            replacements_list = []
             
             for text in request.texts:
-                # Protect crypto terms
-                text_to_translate = text
-                replacements = {}
-                
                 if request.preserve_crypto_terms:
                     text_to_translate, replacements = protect_crypto_terms(text)
-                
-                # Translate
-                translated = translate_text(text_to_translate, src_code, tgt_code)
-                
-                # Restore crypto terms
+                    texts_to_translate.append(text_to_translate)
+                    replacements_list.append(replacements)
+                else:
+                    texts_to_translate.append(text)
+                    replacements_list.append({})
+
+            # Translate in chunks to prevent OOM
+            translated_batch = []
+            chunk_size = 16
+            for i in range(0, len(texts_to_translate), chunk_size):
+                chunk = texts_to_translate[i : i + chunk_size]
+                translated_chunk = translate_text(chunk, src_code, tgt_code)
+                if isinstance(translated_chunk, str):
+                    translated_chunk = [translated_chunk]
+                translated_batch.extend(translated_chunk)
+
+            # Restore crypto terms
+            lang_translations = []
+            for translated, replacements in zip(translated_batch, replacements_list):
                 if request.preserve_crypto_terms:
                     translated = restore_crypto_terms(translated, replacements)
-                
                 lang_translations.append(translated)
             
             translations[target_lang] = lang_translations
