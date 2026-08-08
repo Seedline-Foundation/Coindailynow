@@ -36,6 +36,16 @@ describe('Market Data Aggregator', () => {
   let mockRedis: jest.Mocked<Redis>;
   let mockPrisma: jest.Mocked<PrismaClient>;
   let testConfig: MarketDataAggregatorConfig;
+  let originalNodeEnv: string | undefined;
+
+  beforeAll(() => {
+    originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+  });
+
+  afterAll(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+  });
 
   beforeEach(() => {
     // Setup mocks

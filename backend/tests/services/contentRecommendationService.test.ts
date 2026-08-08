@@ -65,7 +65,9 @@ describe('ContentRecommendationService', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     status: 'ACTIVE',
-    isShadowBanned: false
+    isShadowBanned: false,
+    country: 'NG',
+    onboardingCompleted: true
   };
 
   const mockArticles = [

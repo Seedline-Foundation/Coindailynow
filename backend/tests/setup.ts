@@ -1,5 +1,14 @@
 import 'jest';
 
+// Polyfill global File and Blob for environments where they are not globally exposed by default
+const { File: NodeFile, Blob: NodeBlob } = require('node:buffer');
+if (typeof global.File === 'undefined') {
+  global.File = NodeFile;
+}
+if (typeof global.Blob === 'undefined') {
+  global.Blob = NodeBlob;
+}
+
 jest.setTimeout(30000);
 
 // Configure environment variables for testing
