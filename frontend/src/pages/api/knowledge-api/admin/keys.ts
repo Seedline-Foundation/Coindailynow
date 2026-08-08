@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // TODO: Add authentication headers
+        'Authorization': req.headers.authorization || '',
       },
       body: JSON.stringify(req.body),
     });
