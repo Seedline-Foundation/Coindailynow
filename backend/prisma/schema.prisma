@@ -10973,3 +10973,18 @@ model DistributionPost {
   @@index([postedAt])
   @@map("distribution_posts")
 }
+
+// ============================================================================
+// BLOCKCHAIN SYNC PERSISTENCE
+// ============================================================================
+
+model BlockchainSync {
+  id              String   @id @default(cuid())
+  workerId        String   @unique @default("main")
+  lastSyncedBlock Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([workerId])
+  @@map("blockchain_sync")
+}
