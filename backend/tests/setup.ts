@@ -1,4 +1,12 @@
 import 'jest';
+import { File, Blob } from 'node:buffer';
+
+if (typeof global.File === 'undefined') {
+  (global as any).File = File;
+}
+if (typeof global.Blob === 'undefined') {
+  (global as any).Blob = Blob;
+}
 
 jest.setTimeout(30000);
 
