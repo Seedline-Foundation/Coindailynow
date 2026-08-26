@@ -14,6 +14,7 @@ import { UserRole, WalletType } from '@prisma/client';
 import prisma from '../lib/prisma';
 import { logger } from '../utils/logger';
 import { financeAuditService, AuditAction } from '../services/FinanceAuditService';
+import { verifyOTP, OTPPurpose } from '../services/OTPService';
 
 // ============================================================================
 // CONFIGURATION
@@ -472,19 +473,29 @@ export class FinanceSecurityMiddleware {
    */
   private async verifyWeWalletToken(token: string, email: string): Promise<boolean> {
     try {
-      // TODO: Implement actual token verification
-      // This should verify JWT or OTP sent to the email
-      
-      // For now, basic check
-      if (!token || token.length < 6) {
+      if (!token || token.length < 6 || !email) {
         return false;
       }
 
-      // In production, verify against OTPService
-      // const verified = await otpService.verify(email, token);
-      // return verified;
+      // Find user associated with authorized email
+      const user = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true },
+      });
 
-      return true; // Placeholder
+      if (!user) {
+        logger.warn(`User not found for We Wallet authentication email: ${email}`);
+        return false;
+      }
+
+      // Verify OTP against OTPService
+      const result = await verifyOTP({
+        userId: user.id,
+        code: token,
+        purpose: OTPPurpose.WE_WALLET_ACCESS,
+      });
+
+      return result.success;
     } catch (error) {
       logger.error(`Failed to verify We Wallet token for ${email}:`, error);
       return false;
