@@ -238,10 +238,11 @@ const mutationResolvers = {
    */
   cleanupOldAnalytics: async (_parent: any, _args: any, context: any) => {
     try {
-      // TODO: Add authentication check for admin role
-      // if (!context.user || !context.user.isAdmin) {
-      //   throw new Error('Unauthorized: Admin access required');
-      // }
+      const user = context?.user;
+      const isAdminUser = user && (user.isAdmin || ['ADMIN', 'SUPER_ADMIN'].includes(user.role));
+      if (!isAdminUser) {
+        throw new Error('Unauthorized: Admin access required');
+      }
 
       logger.debug('GraphQL: Starting analytics cleanup');
       const result = await cleanupOldAnalytics();
