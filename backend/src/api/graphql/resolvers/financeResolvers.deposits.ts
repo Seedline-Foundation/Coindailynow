@@ -1,12 +1,14 @@
 /**
- * Finance GraphQL Resolvers - Deposit Operations Only
+ * Finance GraphQL Resolvers - Deposit & Withdrawal Operations
  * Wallet and Transaction Management System
  * 
- * This file contains ONLY the implemented deposit operations:
+ * This file contains the implemented deposit and withdrawal operations:
  * - Deposits (4 operations) ✅
  * - Withdrawals (3 operations) ✅
  * 
- * Other operations are in FinanceService but not exposed here yet.
+ * Other finance operations (transfers, payments, refunds, staking, conversions,
+ * airdrops, escrow, gifts) are implemented in their respective modular resolver files
+ * and merged in financeResolvers.ts.
  */
 
 import { PrismaClient, PaymentMethod } from '@prisma/client';
@@ -410,8 +412,6 @@ export const financeResolvers: any = {
         });
       }
     }
-
-    // TODO: Add remaining operations (transfers, payments, etc.) when needed
   }
 };
 
