@@ -443,11 +443,157 @@ export class BlockchainSyncWorker {
       const events = await this.airdropContract.queryFilter(filter, fromBlock, toBlock);
 
       for (const event of events) {
-        // TODO: Process airdrop event
-        logger.debug('Airdrop event detected');
+        await this.processAirdropEvent(event);
+      }
+
+      if (events.length > 0) {
+        logger.info(`Processed ${events.length} airdrop events`);
       }
     } catch (error) {
       logger.error('Error syncing airdrops:', error);
+    }
+  }
+
+  /**
+   * Process individual airdrop event
+   */
+  private async processAirdropEvent(event: ethers.Event): Promise<void> {
+    try {
+      const [recipient, value, campaignId] = event.args || [];
+      const txHash = event.transactionHash;
+
+      if (!recipient || !value) {
+        logger.warn(`Invalid airdrop event args for tx ${txHash}`);
+        return;
+      }
+
+      // Check if already processed
+      const existing = await prisma.walletTransaction.findFirst({
+        where: { externalReference: txHash },
+      });
+
+      if (existing) {
+        logger.debug(`Airdrop ${txHash} already processed`);
+        return;
+      }
+
+      // Find user by recipient wallet address
+      const wallet = await prisma.wallet.findFirst({
+        where: { walletAddress: recipient.toLowerCase() },
+        include: { user: true },
+      });
+
+      if (!wallet) {
+        logger.warn(`Airdrop to unknown wallet ${recipient}: ${txHash}`);
+        return;
+      }
+
+      // Get decimals from token contract if possible, default to 18
+      let decimals = 18;
+      if (this.mainTokenContract && typeof this.mainTokenContract.decimals === 'function') {
+        try {
+          decimals = await this.mainTokenContract.decimals();
+        } catch (e) {
+          logger.warn(`Failed to fetch token contract decimals, using default 18: ${e}`);
+        }
+      }
+      const amount = parseFloat(ethers.utils.formatUnits(value, decimals));
+
+      // Create airdrop transaction
+      const transaction = await prisma.walletTransaction.create({
+        data: {
+          transactionHash: txHash,
+          externalReference: txHash,
+          transactionType: TransactionType.AIRDROP,
+          operationType: 'AIRDROP_DISTRIBUTION',
+          toWalletId: wallet.id,
+          amount,
+          currency: wallet.currency || 'JY',
+          fee: 0,
+          netAmount: amount,
+          purpose: 'AIRDROP',
+          description: `Blockchain airdrop distribution to ${recipient}`,
+          status: TransactionStatus.COMPLETED,
+          referenceId: campaignId ? String(campaignId) : txHash,
+          metadata: JSON.stringify({
+            blockNumber: event.blockNumber,
+            recipient,
+            valueRaw: value.toString(),
+            campaignId: campaignId ? String(campaignId) : null,
+          }),
+        },
+      });
+
+      // Update wallet balance
+      await prisma.wallet.update({
+        where: { id: wallet.id },
+        data: {
+          availableBalance: {
+            increment: amount,
+          },
+          totalBalance: {
+            increment: amount,
+          },
+        },
+      });
+
+      // Update AirdropCampaign and AirdropClaim if applicable
+      if (campaignId) {
+        const campaignStr = String(campaignId);
+        const campaign = await prisma.airdropCampaign.findFirst({
+          where: {
+            OR: [
+              { id: campaignStr },
+              { campaignName: campaignStr },
+              { name: campaignStr },
+            ],
+          },
+        });
+
+        if (campaign) {
+          await prisma.airdropCampaign.update({
+            where: { id: campaign.id },
+            data: {
+              distributedAmount: { increment: amount },
+              remainingAmount: Math.max(0, campaign.remainingAmount - amount),
+            },
+          });
+
+          if (wallet.userId) {
+            const existingClaim = await prisma.airdropClaim.findFirst({
+              where: { campaignId: campaign.id, userId: wallet.userId },
+            });
+
+            if (!existingClaim) {
+              await prisma.airdropClaim.create({
+                data: {
+                  campaignId: campaign.id,
+                  userId: wallet.userId,
+                  walletId: wallet.id,
+                  amount,
+                  claimAmount: amount,
+                  status: 'CLAIMED',
+                  claimedAt: new Date(),
+                  transactionId: transaction.id,
+                },
+              });
+            } else if (existingClaim.status !== 'CLAIMED') {
+              await prisma.airdropClaim.update({
+                where: { id: existingClaim.id },
+                data: {
+                  status: 'CLAIMED',
+                  claimedAt: new Date(),
+                  transactionId: transaction.id,
+                },
+              });
+            }
+          }
+        }
+      }
+
+      logger.info(`Processed airdrop: ${amount} tokens to ${recipient} (${txHash})`);
+    } catch (error) {
+      logger.error('Error processing airdrop event:', error);
     }
   }
 
