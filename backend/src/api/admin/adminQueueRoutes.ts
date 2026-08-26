@@ -354,23 +354,21 @@ router.post('/queue/:id/request-edit', async (req: Request, res: Response) => {
       requested_at: new Date()
     };
 
-    // Route edit request to appropriate agent
-    const routing = await reviewAgent.routeEditRequest(id, editRequest);
+    // Execute edit request via AI review agent
+    const result = await reviewAgent.executeEditRequest(id, editRequest);
 
-    console.log(`[Admin Queue API] ✅ Edit request routed to ${routing.agent}`);
-    console.log(`[Admin Queue API] Instructions: ${routing.instructions}`);
-
-    // TODO: Actually call the appropriate agent with edit instructions
-    // For now, we just return the routing information
+    console.log(`[Admin Queue API] ✅ Edit request executed by ${result.routing.agent}`);
+    console.log(`[Admin Queue API] Instructions: ${result.routing.instructions}`);
 
     res.json({
       success: true,
-      message: `Edit request sent to ${routing.agent}`,
+      message: `Edit request executed by ${result.routing.agent}`,
       routing: {
-        agent: routing.agent,
-        instructions: routing.instructions,
+        agent: result.routing.agent,
+        instructions: result.routing.instructions,
         edit_request: editRequest
-      }
+      },
+      updated_item: result.updatedItem
     });
 
   } catch (error) {
