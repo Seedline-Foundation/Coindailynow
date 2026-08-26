@@ -725,6 +725,102 @@ export class AIReviewAgent {
     return route;
   }
 
+  /**
+   * Executes edit request by routing to appropriate agent and re-queueing updated bundle
+   */
+  async executeEditRequest(
+    queueItemId: string,
+    editRequest: EditRequest
+  ): Promise<{ routing: { agent: string; instructions: string }; updatedItem: AdminQueueItem }> {
+    const routing = await this.routeEditRequest(queueItemId, editRequest);
+    const queueItem = await this.getQueueItem(queueItemId);
+
+    console.log(`[Review Agent] Executing edit request via ${routing.agent}`);
+
+    const updatedBundle = { ...queueItem.articles };
+
+    switch (editRequest.type) {
+      case 'research': {
+        const freshResearch = await this.researchAgent.reResearch(
+          updatedBundle.research,
+          editRequest.instructions
+        );
+        updatedBundle.research = freshResearch;
+        break;
+      }
+      case 'content': {
+        const revisedArticle = await this.writerAgent.reviseArticle(
+          updatedBundle.english,
+          editRequest.instructions,
+          updatedBundle.research
+        );
+        const validation = await this.validateArticle(revisedArticle, updatedBundle.research);
+        if (!validation.passed) {
+          console.warn(`[Review Agent] Revised article warning: ${validation.issues.join(', ')}`);
+        }
+        updatedBundle.english = revisedArticle;
+        break;
+      }
+      case 'image': {
+        const newImage = await this.imageAgent.regenerateImage(
+          updatedBundle.image,
+          editRequest.instructions,
+          updatedBundle.english
+        );
+        const validation = await this.validateImage(newImage, updatedBundle.english);
+        if (!validation.passed) {
+          console.warn(`[Review Agent] Regenerated image warning: ${validation.issues.join(', ')}`);
+        }
+        updatedBundle.image = newImage;
+        // Re-embed image into article if url changed or present
+        updatedBundle.english = await this.embedImageInArticle(updatedBundle.english, newImage);
+        break;
+      }
+      case 'translation': {
+        if (editRequest.target_language) {
+          const updatedTranslation = await this.translationAgent.retranslateLanguage(
+            editRequest.target_language,
+            updatedBundle.english,
+            editRequest.instructions
+          );
+          const index = updatedBundle.translations.findIndex(
+            t => t.language.toLowerCase() === editRequest.target_language?.toLowerCase() ||
+                 t.language_code.toLowerCase() === editRequest.target_language?.toLowerCase()
+          );
+          if (index >= 0) {
+            updatedBundle.translations[index] = updatedTranslation;
+          } else {
+            updatedBundle.translations.push(updatedTranslation);
+          }
+        } else {
+          const translationPrompts = await this.requestTranslationPrompts(
+            updatedBundle.english,
+            updatedBundle.research
+          );
+          updatedBundle.translations = await this.callTranslationAgent(
+            translationPrompts,
+            updatedBundle.english
+          );
+        }
+        const validation = await this.validateTranslations(
+          updatedBundle.translations,
+          updatedBundle.english
+        );
+        if (!validation.passed) {
+          console.warn(`[Review Agent] Updated translations warning: ${validation.issues.join(', ')}`);
+        }
+        break;
+      }
+    }
+
+    const updatedItem = await this.reQueueAfterEdit(queueItemId, updatedBundle);
+
+    return {
+      routing,
+      updatedItem
+    };
+  }
+
   // ==========================================================================
   // STEP 10: RE-QUEUE AFTER EDIT
   // ==========================================================================

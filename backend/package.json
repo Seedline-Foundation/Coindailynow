@@ -71,7 +71,6 @@
     "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
     "bullmq": "^5.79.1",
-    "coindaily-ai-system": "*",
     "bullmq": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
