@@ -452,14 +452,21 @@ export class BlockchainSyncWorker {
   }
 
   /**
-   * Load last synced block from database (using in-memory for now)
+   * Load last synced block from database
    */
   private async loadLastSyncedBlock(): Promise<void> {
     try {
-      // For now, use environment variable or start block
-      // TODO: Implement persistent storage in a dedicated BlockchainSync table
-      this.lastSyncedBlock = CONFIG.startBlock;
-      logger.info(`Starting blockchain sync from block ${this.lastSyncedBlock}`);
+      const record = await prisma.blockchainSync.findUnique({
+        where: { workerId: 'main' },
+      });
+
+      if (record) {
+        this.lastSyncedBlock = record.lastSyncedBlock;
+        logger.info(`Loaded last synced block from database: ${this.lastSyncedBlock}`);
+      } else {
+        this.lastSyncedBlock = CONFIG.startBlock;
+        logger.info(`Starting blockchain sync from block ${this.lastSyncedBlock}`);
+      }
     } catch (error) {
       logger.error('Error loading last synced block:', error);
       this.lastSyncedBlock = CONFIG.startBlock;
@@ -467,12 +474,18 @@ export class BlockchainSyncWorker {
   }
 
   /**
-   * Save last synced block (in-memory for now)
+   * Save last synced block
    */
   private async saveLastSyncedBlock(): Promise<void> {
     try {
-      // For now, just log it
-      // TODO: Implement persistent storage in a dedicated BlockchainSync table
+      await prisma.blockchainSync.upsert({
+        where: { workerId: 'main' },
+        update: { lastSyncedBlock: this.lastSyncedBlock },
+        create: {
+          workerId: 'main',
+          lastSyncedBlock: this.lastSyncedBlock,
+        },
+      });
       logger.debug(`Last synced block: ${this.lastSyncedBlock}`);
     } catch (error) {
       logger.error('Error saving last synced block:', error);
