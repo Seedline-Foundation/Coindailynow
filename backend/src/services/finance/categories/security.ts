@@ -13,6 +13,7 @@ import {
 } from '@prisma/client';
 import prisma from '../../../lib/prisma';
 import { WalletService } from '../../WalletService';
+import { financeEmailService } from '../../FinanceEmailService';
 import { PermissionService } from '../../PermissionService';
 import checkoutNodeJssdk from '@paypal/checkout-server-sdk';
 import {
@@ -247,7 +248,42 @@ export class FinanceSecurity {
         },
       });
 
-      // TODO: Send notification to wallet owner
+      // Send notification to wallet owner (in-app notification)
+      if (wallet.userId) {
+        try {
+          await prisma.userNotification.create({
+            data: {
+              userId: wallet.userId,
+              type: 'SECURITY_ALERT',
+              title: 'Wallet Frozen',
+              message: `Your wallet (${wallet.walletAddress}) has been frozen. Reason: ${reason}${
+                duration ? `. Freeze duration: ${duration} hours.` : ''
+              }`,
+              link: '/wallet/security',
+            },
+          });
+        } catch (notificationError) {
+          console.error('Failed to create in-app notification for wallet freeze:', notificationError);
+        }
+      }
+
+      // Send email alert to wallet owner
+      if (wallet.user?.email) {
+        try {
+          await financeEmailService.sendSecurityAlert(wallet.user.email, {
+            username: wallet.user.username || wallet.user.email,
+            alertType: 'wallet_locked',
+            message: `Your wallet (${wallet.walletAddress}) has been frozen. Reason: ${reason}`,
+            timestamp: new Date(),
+            actionRequired: duration
+              ? `Your wallet is frozen for ${duration} hours. Please contact support if you have questions.`
+              : 'Please contact support to unlock your wallet.',
+          });
+        } catch (emailError) {
+          console.error('Failed to send wallet freeze email notification:', emailError);
+        }
+      }
+
       // TODO: Set up automatic unfreeze if duration is specified
 
       return { 
