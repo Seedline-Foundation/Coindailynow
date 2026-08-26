@@ -55,6 +55,8 @@ describe('ContentRecommendationService', () => {
     avatarUrl: null,
     bio: null,
     location: null,
+    country: 'Nigeria',
+    onboardingCompleted: true,
     emailVerified: false,
     lastLoginAt: null,
     preferredLanguage: 'en',
