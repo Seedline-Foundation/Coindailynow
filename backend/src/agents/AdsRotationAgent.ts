@@ -1323,20 +1323,34 @@ export async function registerInventorySlot(slot: InventorySlot): Promise<void> 
   }
 }
 
-async function getAllInventorySlots(): Promise<InventorySlot[]> {
+export async function getAllInventorySlots(): Promise<InventorySlot[]> {
   const indexKey = `${REDIS_PREFIX.INVENTORY}index`;
   const raw = await redisClient.get(indexKey);
   if (!raw) return getDefaultInventorySlots();
 
   const ids: string[] = JSON.parse(raw);
-  const slots: InventorySlot[] = [];
+  if (!Array.isArray(ids) || ids.length === 0) return getDefaultInventorySlots();
 
-  for (const id of ids) {
-    const slotRaw = await redisClient.get(`${REDIS_PREFIX.INVENTORY}${id}`);
+  const keys = ids.map((id) => `${REDIS_PREFIX.INVENTORY}${id}`);
+  const mGetFn = redisClient.mGet ? redisClient.mGet.bind(redisClient) : redisClient.mget ? redisClient.mget.bind(redisClient) : null;
+
+  let slotsRaw: (string | null)[] = [];
+  if (mGetFn) {
+    slotsRaw = await mGetFn(keys);
+  } else {
+    slotsRaw = await Promise.all(keys.map((key) => redisClient.get(key)));
+  }
+
+  const slots: InventorySlot[] = [];
+  for (const slotRaw of slotsRaw) {
     if (slotRaw) {
-      const slot = JSON.parse(slotRaw);
-      slot.lastUpdated = new Date(slot.lastUpdated);
-      slots.push(slot);
+      try {
+        const slot = JSON.parse(slotRaw);
+        slot.lastUpdated = new Date(slot.lastUpdated);
+        slots.push(slot);
+      } catch (err) {
+        logger.warn('[AdsAgent] Failed to parse slot raw JSON:', err);
+      }
     }
   }
 

@@ -33,6 +33,30 @@ const createMockRedisClient = () => ({
     memoryCache.delete(key);
     return 1;
   },
+  mGet: async (keys: string[] | string, ...moreKeys: string[]) => {
+    const keyList = Array.isArray(keys) ? keys : [keys, ...moreKeys];
+    return keyList.map((key) => {
+      const item = memoryCache.get(key);
+      if (!item) return null;
+      if (item.expiry && Date.now() > item.expiry) {
+        memoryCache.delete(key);
+        return null;
+      }
+      return item.value;
+    });
+  },
+  mget: async (keys: string[] | string, ...moreKeys: string[]) => {
+    const keyList = Array.isArray(keys) ? keys : [keys, ...moreKeys];
+    return keyList.map((key) => {
+      const item = memoryCache.get(key);
+      if (!item) return null;
+      if (item.expiry && Date.now() > item.expiry) {
+        memoryCache.delete(key);
+        return null;
+      }
+      return item.value;
+    });
+  },
   on: () => {},
   publish: async () => 0,
   subscribe: async () => {},
