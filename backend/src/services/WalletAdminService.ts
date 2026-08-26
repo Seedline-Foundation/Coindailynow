@@ -12,6 +12,8 @@
 import { Wallet, WalletType, WalletStatus, UserRole } from '@prisma/client';
 import prisma from '../lib/prisma';
 import { generateOTP, OTPPurpose } from './OTPService';
+import { financeEmailService } from './FinanceEmailService';
+import { logger } from '../utils/logger';
 
 // ============================================================================
 // TYPES
@@ -398,6 +400,7 @@ export async function lockWallet(input: LockWalletInput): Promise<Wallet> {
 
   const wallet = await prisma.wallet.findUnique({
     where: { id: walletId },
+    include: { user: true },
   });
 
   if (!wallet) {
@@ -436,8 +439,18 @@ export async function lockWallet(input: LockWalletInput): Promise<Wallet> {
   });
 
   // Send notification to user
-  if (wallet.userId) {
-    // TODO: Send email notification
+  if (wallet.user?.email) {
+    try {
+      await financeEmailService.sendSecurityAlert(wallet.user.email, {
+        username: wallet.user.username,
+        alertType: 'wallet_locked',
+        message: `Your wallet has been locked [Type: ${lockType}]. Reason: ${reason}`,
+        timestamp: new Date(),
+        actionRequired: 'Please contact support if you need assistance regarding your wallet lock status.',
+      });
+    } catch (emailError) {
+      logger.error(`Failed to send wallet lock email notification to ${wallet.user.email}:`, emailError);
+    }
   }
 
   return updatedWallet;
