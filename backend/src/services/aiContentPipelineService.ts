@@ -21,6 +21,7 @@
 import prisma from '../lib/prisma';
 import { getRedis } from '../lib/redis';
 import { fetchAllFeeds, markArticleAsPublished, isAlreadyPublished, FeedItem } from './rssFeedAggregator';
+import { UnifiedNewsItem } from './unifiedNewsAggregator';
 const redis = getRedis();
 
 // ============================================================================
@@ -901,6 +902,40 @@ export class AIContentPipelineService {
   // --------------------------------------------------------------------------
   // AUTOMATED ARTICLE CREATION
   // --------------------------------------------------------------------------
+
+  /**
+   * Process news items from news scheduler or aggregators
+   */
+  async processNewsItems(items: UnifiedNewsItem[]): Promise<PipelineStatus[]> {
+    console.log(`[AIContentPipeline] Processing ${items.length} news items`);
+    const results: PipelineStatus[] = [];
+
+    for (const item of items) {
+      try {
+        const priority = item.priority ?? 50;
+        let urgency: 'breaking' | 'high' | 'medium' | 'low' = 'low';
+        if (priority >= 80) {
+          urgency = 'breaking';
+        } else if (priority >= 65) {
+          urgency = 'high';
+        } else if (priority >= 45) {
+          urgency = 'medium';
+        }
+
+        const status = await this.initiateArticlePipeline({
+          topic: item.title,
+          urgency,
+          autoPublish: true,
+        });
+
+        results.push(status);
+      } catch (error) {
+        console.error(`[AIContentPipeline] Failed to process news item "${item.title}":`, error);
+      }
+    }
+
+    return results;
+  }
 
   /**
    * Initiate automated article generation pipeline
