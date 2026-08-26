@@ -108,6 +108,7 @@ import { startPipelineSeedConsumer } from './services/pipelineSeedConsumer';
 import { startScheduledPublisher } from './services/scheduledPublisher';
 import { getRedis } from './lib/redis';
 import { startScheduler as startNewsScheduler, registerNewsHandler } from './services/newsScheduler';
+import { aiContentPipelineService } from './services/aiContentPipelineService';
 import { startPipelineScheduler as startAnalysisScheduler } from './services/dataAnalysisPipeline';
 import { MarketDataAggregator } from './services/marketDataAggregator';
 import { ReputationService } from './services/reputation/ReputationService';
@@ -878,8 +879,7 @@ async function startServer() {
       // Register a handler to process news items (connect to AI pipeline here)
       registerNewsHandler(async (items) => {
         logger.info(`[News] Processing ${items.length} news items`);
-        // TODO: Connect to AI content pipeline service
-        // await aiContentPipeline.processNewsItems(items);
+        await aiContentPipelineService.processNewsItems(items);
       });
       
       startNewsScheduler();
