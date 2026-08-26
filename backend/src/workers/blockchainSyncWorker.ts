@@ -15,6 +15,7 @@ import { ethers } from 'ethers';
 import { logger } from '../utils/logger';
 import { financeAuditService, AuditAction } from '../services/FinanceAuditService';
 import { financeEmailService } from '../services/FinanceEmailService';
+import { ALL_FINANCE_OPERATIONS } from '../constants/financeOperations';
 import prisma from '../lib/prisma';
 
 // ============================================================================
@@ -55,8 +56,8 @@ const ERC20_ABI = [
 ];
 
 const STAKING_ABI = [
-  'event Staked(address indexed user, uint256 amount, uint256 lockPeriod)',
-  'event Unstaked(address indexed user, uint256 amount, uint256 reward)',
+  'event Staked(address indexed user, uint256 amount, uint256 tierId, uint256 lockupEnd)',
+  'event Unstaked(address indexed user, uint256 amount, uint256 rewards)',
   'event RewardClaimed(address indexed user, uint256 amount)',
 ];
 
@@ -393,18 +394,218 @@ export class BlockchainSyncWorker {
    * Process stake event
    */
   private async processStakeEvent(event: ethers.Event): Promise<void> {
-    // Similar to processDepositEvent but for staking
-    // TODO: Implement based on your staking contract
-    logger.debug('Stake event processed');
+    try {
+      const [user, amount, tierId, lockupEnd] = event.args || [];
+      const txHash = event.transactionHash;
+
+      if (!user || !amount) {
+        logger.warn(`Invalid Stake event args for tx ${txHash}`);
+        return;
+      }
+
+      // Check if already processed
+      const existing = await prisma.walletTransaction.findFirst({
+        where: { externalReference: txHash },
+      });
+
+      if (existing) {
+        logger.debug(`Stake event ${txHash} already processed`);
+        return;
+      }
+
+      // Find user by wallet address
+      const wallet = await prisma.wallet.findFirst({
+        where: { walletAddress: user.toLowerCase() },
+        include: { user: true },
+      });
+
+      if (!wallet) {
+        logger.warn(`Stake event from unknown wallet ${user}: ${txHash}`);
+        return;
+      }
+
+      // Get token decimals (default to 18 if not available)
+      let decimals = 18;
+      if (this.mainTokenContract) {
+        try {
+          decimals = await this.mainTokenContract.decimals();
+        } catch (e) {
+          logger.warn('Failed to fetch decimals for mainTokenContract, defaulting to 18');
+        }
+      }
+      const amountFormatted = parseFloat(ethers.utils.formatUnits(amount, decimals));
+
+      // Calculate lockPeriodDays and unlockAt timestamp
+      const lockupEndSec = lockupEnd ? (typeof lockupEnd.toNumber === 'function' ? lockupEnd.toNumber() : Number(lockupEnd)) : Math.floor(Date.now() / 1000);
+      const unlockAt = new Date(lockupEndSec * 1000);
+      const nowMs = Date.now();
+      const diffDays = Math.round((unlockAt.getTime() - nowMs) / (1000 * 60 * 60 * 24));
+      const lockPeriodDays = diffDays > 0 ? diffDays : 0;
+
+      // Create StakingRecord
+      const stakingRecord = await prisma.stakingRecord.create({
+        data: {
+          userId: wallet.userId,
+          walletId: wallet.id,
+          stakedAmount: amountFormatted,
+          lockPeriodDays,
+          rewardRate: 0,
+          status: 'ACTIVE',
+          stakedAt: new Date(),
+          unlockAt,
+        },
+      });
+
+      // Create wallet transaction
+      const transaction = await prisma.walletTransaction.create({
+        data: {
+          transactionHash: txHash,
+          transactionType: TransactionType.STAKE,
+          operationType: ALL_FINANCE_OPERATIONS.STAKE_LOCK,
+          fromWalletId: wallet.id,
+          amount: amountFormatted,
+          currency: wallet.currency || 'JY',
+          fee: 0,
+          netAmount: amountFormatted,
+          purpose: 'STAKE',
+          description: `Blockchain stake (Tier ${tierId ? tierId.toString() : '0'})`,
+          status: TransactionStatus.COMPLETED,
+          referenceId: stakingRecord.id,
+          externalReference: txHash,
+          metadata: JSON.stringify({
+            blockNumber: event.blockNumber,
+            user,
+            tierId: tierId ? tierId.toString() : null,
+            lockupEnd: lockupEndSec,
+            valueRaw: amount.toString(),
+            stakingRecordId: stakingRecord.id,
+          }),
+        },
+      });
+
+      // Update wallet balances (move available to staked)
+      await prisma.wallet.update({
+        where: { id: wallet.id },
+        data: {
+          availableBalance: { decrement: amountFormatted },
+          stakedBalance: { increment: amountFormatted },
+        },
+      });
+
+      logger.info(`Processed stake event: ${amountFormatted} JY for ${user} (${txHash})`);
+    } catch (error) {
+      logger.error('Error processing stake event:', error);
+    }
   }
 
   /**
    * Process unstake event
    */
   private async processUnstakeEvent(event: ethers.Event): Promise<void> {
-    // Similar to processDepositEvent but for unstaking
-    // TODO: Implement based on your staking contract
-    logger.debug('Unstake event processed');
+    try {
+      const [user, amount, rewards] = event.args || [];
+      const txHash = event.transactionHash;
+
+      if (!user || !amount) {
+        logger.warn(`Invalid Unstake event args for tx ${txHash}`);
+        return;
+      }
+
+      // Check if already processed
+      const existing = await prisma.walletTransaction.findFirst({
+        where: { externalReference: txHash },
+      });
+
+      if (existing) {
+        logger.debug(`Unstake event ${txHash} already processed`);
+        return;
+      }
+
+      // Find user by wallet address
+      const wallet = await prisma.wallet.findFirst({
+        where: { walletAddress: user.toLowerCase() },
+        include: { user: true },
+      });
+
+      if (!wallet) {
+        logger.warn(`Unstake event for unknown wallet ${user}: ${txHash}`);
+        return;
+      }
+
+      // Get token decimals (default to 18 if not available)
+      let decimals = 18;
+      if (this.mainTokenContract) {
+        try {
+          decimals = await this.mainTokenContract.decimals();
+        } catch (e) {
+          logger.warn('Failed to fetch decimals for mainTokenContract, defaulting to 18');
+        }
+      }
+
+      const amountFormatted = parseFloat(ethers.utils.formatUnits(amount, decimals));
+      const rewardsFormatted = rewards ? parseFloat(ethers.utils.formatUnits(rewards, decimals)) : 0;
+
+      // Find matching active StakingRecord
+      const stakingRecord = await prisma.stakingRecord.findFirst({
+        where: {
+          walletId: wallet.id,
+          status: 'ACTIVE',
+        },
+        orderBy: { stakedAt: 'asc' },
+      });
+
+      if (stakingRecord) {
+        await prisma.stakingRecord.update({
+          where: { id: stakingRecord.id },
+          data: {
+            status: 'COMPLETED',
+            unlockedAt: new Date(),
+            totalRewardsClaimed: { increment: rewardsFormatted },
+          },
+        });
+      }
+
+      // Create wallet transaction
+      const transaction = await prisma.walletTransaction.create({
+        data: {
+          transactionHash: txHash,
+          transactionType: TransactionType.UNSTAKE,
+          operationType: ALL_FINANCE_OPERATIONS.STAKE_UNLOCK,
+          toWalletId: wallet.id,
+          amount: amountFormatted,
+          currency: wallet.currency || 'JY',
+          fee: 0,
+          netAmount: amountFormatted + rewardsFormatted,
+          purpose: 'UNSTAKE',
+          description: `Blockchain unstake (Rewards: ${rewardsFormatted})`,
+          status: TransactionStatus.COMPLETED,
+          referenceId: stakingRecord ? stakingRecord.id : null,
+          externalReference: txHash,
+          metadata: JSON.stringify({
+            blockNumber: event.blockNumber,
+            user,
+            amountRaw: amount.toString(),
+            rewardsRaw: rewards ? rewards.toString() : '0',
+            rewardsFormatted,
+            stakingRecordId: stakingRecord ? stakingRecord.id : null,
+          }),
+        },
+      });
+
+      // Update wallet balances (move staked back to available and add reward)
+      await prisma.wallet.update({
+        where: { id: wallet.id },
+        data: {
+          stakedBalance: { decrement: amountFormatted },
+          availableBalance: { increment: amountFormatted + rewardsFormatted },
+          totalBalance: { increment: rewardsFormatted },
+        },
+      });
+
+      logger.info(`Processed unstake event: ${amountFormatted} JY + ${rewardsFormatted} rewards for ${user} (${txHash})`);
+    } catch (error) {
+      logger.error('Error processing unstake event:', error);
+    }
   }
 
   /**
