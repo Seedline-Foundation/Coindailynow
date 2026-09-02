@@ -6,17 +6,10 @@ import { WalletType } from '../../src/types/auth';
 // Mock the useWallet hook
 const mockConnectWallet = jest.fn();
 const mockDisconnectWallet = jest.fn();
+const mockUseWallet = jest.fn();
 
 jest.mock('../../src/hooks/useWallet', () => ({
-  useWallet: () => ({
-    wallet: null,
-    isConnecting: false,
-    error: null,
-    connectWallet: mockConnectWallet,
-    disconnectWallet: mockDisconnectWallet,
-    supportedWallets: [WalletType.METAMASK, WalletType.WALLET_CONNECT],
-    isMetaMaskInstalled: jest.fn().mockReturnValue(true)
-  })
+  useWallet: () => mockUseWallet()
 }));
 
 describe('WalletConnectionModal - Real Web3 Integration', () => {
@@ -28,6 +21,15 @@ describe('WalletConnectionModal - Real Web3 Integration', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseWallet.mockReturnValue({
+      wallet: null,
+      isConnecting: false,
+      error: null,
+      connectWallet: mockConnectWallet,
+      disconnectWallet: mockDisconnectWallet,
+      supportedWallets: [WalletType.METAMASK, WalletType.WALLET_CONNECT],
+      isMetaMaskInstalled: jest.fn().mockReturnValue(true)
+    });
   });
 
   it('should render modal when open', () => {
@@ -100,18 +102,15 @@ describe('WalletConnectionModal - Real Web3 Integration', () => {
   });
 
   it('should display loading state when connecting', () => {
-    // Mock connecting state
-    jest.doMock('../../src/hooks/useWallet', () => ({
-      useWallet: () => ({
-        wallet: null,
-        isConnecting: true,
-        error: null,
-        connectWallet: mockConnectWallet,
-        disconnectWallet: mockDisconnectWallet,
-        supportedWallets: [WalletType.METAMASK, WalletType.WALLET_CONNECT],
-        isMetaMaskInstalled: jest.fn().mockReturnValue(true)
-      })
-    }));
+    mockUseWallet.mockReturnValue({
+      wallet: null,
+      isConnecting: true,
+      error: null,
+      connectWallet: mockConnectWallet,
+      disconnectWallet: mockDisconnectWallet,
+      supportedWallets: [WalletType.METAMASK, WalletType.WALLET_CONNECT],
+      isMetaMaskInstalled: jest.fn().mockReturnValue(true)
+    });
 
     render(<WalletConnectionModal {...defaultProps} />);
     
@@ -119,18 +118,15 @@ describe('WalletConnectionModal - Real Web3 Integration', () => {
   });
 
   it('should display error message when connection fails', () => {
-    // Mock error state
-    jest.doMock('../../src/hooks/useWallet', () => ({
-      useWallet: () => ({
-        wallet: null,
-        isConnecting: false,
-        error: 'User rejected request',
-        connectWallet: mockConnectWallet,
-        disconnectWallet: mockDisconnectWallet,
-        supportedWallets: [WalletType.METAMASK, WalletType.WALLET_CONNECT],
-        isMetaMaskInstalled: jest.fn().mockReturnValue(true)
-      })
-    }));
+    mockUseWallet.mockReturnValue({
+      wallet: null,
+      isConnecting: false,
+      error: 'User rejected request',
+      connectWallet: mockConnectWallet,
+      disconnectWallet: mockDisconnectWallet,
+      supportedWallets: [WalletType.METAMASK, WalletType.WALLET_CONNECT],
+      isMetaMaskInstalled: jest.fn().mockReturnValue(true)
+    });
 
     render(<WalletConnectionModal {...defaultProps} />);
     
@@ -147,17 +143,19 @@ describe('WalletConnectionModal - Real Web3 Integration', () => {
   });
 
   it('should focus management correctly', () => {
+    jest.useFakeTimers();
     render(<WalletConnectionModal {...defaultProps} />);
     
-    // Check that focus is managed properly (first focusable element should be focused)
-    const firstButton = screen.getByText('MetaMask').closest('button');
+    jest.advanceTimersByTime(100);
+
+    const firstButton = screen.getByLabelText('Close modal');
     expect(document.activeElement).toBe(firstButton);
+    jest.useRealTimers();
   });
 
   it('should call onWalletConnected when wallet connects successfully', async () => {
     const onWalletConnected = jest.fn();
     
-    // Mock successful connection
     const mockWallet = {
       type: WalletType.METAMASK,
       address: '0x1234567890abcdef1234567890abcdef12345678',
@@ -169,17 +167,15 @@ describe('WalletConnectionModal - Real Web3 Integration', () => {
       formattedAddress: '0x1234...5678'
     };
 
-    jest.doMock('../../src/hooks/useWallet', () => ({
-      useWallet: () => ({
-        wallet: mockWallet,
-        isConnecting: false,
-        error: null,
-        connectWallet: mockConnectWallet,
-        disconnectWallet: mockDisconnectWallet,
-        supportedWallets: [WalletType.METAMASK, WalletType.WALLET_CONNECT],
-        isMetaMaskInstalled: jest.fn().mockReturnValue(true)
-      })
-    }));
+    mockUseWallet.mockReturnValue({
+      wallet: mockWallet,
+      isConnecting: false,
+      error: null,
+      connectWallet: mockConnectWallet,
+      disconnectWallet: mockDisconnectWallet,
+      supportedWallets: [WalletType.METAMASK, WalletType.WALLET_CONNECT],
+      isMetaMaskInstalled: jest.fn().mockReturnValue(true)
+    });
 
     render(<WalletConnectionModal {...defaultProps} onWalletConnected={onWalletConnected} />);
     

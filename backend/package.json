@@ -8,7 +8,7 @@
     "build:force": "tsc --skipLibCheck",
     "start": "node dist/backend/src/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "test": "jest",
+    "test": "NODE_OPTIONS=\"--max-old-space-size=6144\" jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:api": "jest --testPathPattern=tests/api",

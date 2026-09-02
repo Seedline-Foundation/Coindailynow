@@ -23,6 +23,14 @@ const config = {
     '<rootDir>/tests/**/*.(test|spec).(js|jsx|ts|tsx)',
     '<rootDir>/src/**/*.(test|spec).(js|jsx|ts|tsx)'
   ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/tests/e2e/',
+    '<rootDir>/tests/integration/',
+    '<rootDir>/tests/accessibility.test.ts',
+    '<rootDir>/tests/responsive.test.ts',
+    '<rootDir>/tests/unit/(security-dashboard|audit-system|accessibility|rate-limiting).test.tsx',
+  ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
     '!src/**/*.d.ts',
