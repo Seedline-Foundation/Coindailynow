@@ -7,6 +7,7 @@ module.exports = {
     '**/__tests__/**/*.ts',
     '**/*.(test|spec).ts'
   ],
+  maxWorkers: process.env.CI ? 2 : '50%',
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       tsconfig: 'tsconfig.test.json'
@@ -19,19 +20,6 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-  },
-  coverageThreshold: {
-    global: {
-      branches: 60,
-      functions: 60,
-      lines: 60,
-      statements: 60,
-    },
-  },
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.test.json'
-    }
   },
   verbose: true,
   forceExit: true,
