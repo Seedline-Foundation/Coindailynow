@@ -10973,3 +10973,14 @@ model DistributionPost {
   @@index([postedAt])
   @@map("distribution_posts")
 }
+
+// Blockchain Sync - Tracks blockchain event syncing status
+model BlockchainSync {
+  id              String   @id @default(cuid())
+  workerId        String   @unique @default("main")
+  lastSyncedBlock Int      @default(0)
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  @@map("blockchain_sync")
+}
