@@ -452,14 +452,21 @@ export class BlockchainSyncWorker {
   }
 
   /**
-   * Load last synced block from database (using in-memory for now)
+   * Load last synced block from database
    */
   private async loadLastSyncedBlock(): Promise<void> {
     try {
-      // For now, use environment variable or start block
-      // TODO: Implement persistent storage in a dedicated BlockchainSync table
-      this.lastSyncedBlock = CONFIG.startBlock;
-      logger.info(`Starting blockchain sync from block ${this.lastSyncedBlock}`);
+      const syncRecord = await prisma.blockchainSync.findUnique({
+        where: { workerId: 'main' },
+      });
+
+      if (syncRecord && syncRecord.lastSyncedBlock !== undefined && syncRecord.lastSyncedBlock !== null) {
+        this.lastSyncedBlock = syncRecord.lastSyncedBlock;
+        logger.info(`Starting blockchain sync from block ${this.lastSyncedBlock} (loaded from database)`);
+      } else {
+        this.lastSyncedBlock = CONFIG.startBlock;
+        logger.info(`No previous sync record found in database, starting from block ${this.lastSyncedBlock}`);
+      }
     } catch (error) {
       logger.error('Error loading last synced block:', error);
       this.lastSyncedBlock = CONFIG.startBlock;
@@ -467,13 +474,21 @@ export class BlockchainSyncWorker {
   }
 
   /**
-   * Save last synced block (in-memory for now)
+   * Save last synced block to database
    */
   private async saveLastSyncedBlock(): Promise<void> {
     try {
-      // For now, just log it
-      // TODO: Implement persistent storage in a dedicated BlockchainSync table
-      logger.debug(`Last synced block: ${this.lastSyncedBlock}`);
+      await prisma.blockchainSync.upsert({
+        where: { workerId: 'main' },
+        update: {
+          lastSyncedBlock: this.lastSyncedBlock,
+        },
+        create: {
+          workerId: 'main',
+          lastSyncedBlock: this.lastSyncedBlock,
+        },
+      });
+      logger.debug(`Saved last synced block to database: ${this.lastSyncedBlock}`);
     } catch (error) {
       logger.error('Error saving last synced block:', error);
     }
