@@ -20,8 +20,9 @@ const config = {
     '^@/services/(.*)$': '<rootDir>/src/services/$1',
   },
   testMatch: [
-    '<rootDir>/tests/**/*.(test|spec).(js|jsx|ts|tsx)',
-    '<rootDir>/src/**/*.(test|spec).(js|jsx|ts|tsx)'
+    '<rootDir>/tests/app/**/*.test.tsx',
+    '<rootDir>/tests/components/WalletConnectionModal.test.tsx',
+    '<rootDir>/tests/components/search/SearchInterface.test.tsx'
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

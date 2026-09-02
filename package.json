@@ -46,6 +46,7 @@
     "contracts:artifacts": "npm --prefix contracts run artifacts"
   },
   "devDependencies": {
+    "@testing-library/dom": "^9.3.4",
     "husky": "^8.0.0",
     "rimraf": "^5.0.5",
     "turbo": "^1.11.0"

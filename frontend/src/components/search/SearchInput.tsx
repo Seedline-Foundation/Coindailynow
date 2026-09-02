@@ -15,6 +15,7 @@ interface SearchInputProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  'aria-describedby'?: string;
 }
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
@@ -26,7 +27,8 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     onKeyDown,
     placeholder = "Search...",
     disabled = false,
-    className = ""
+    className = "",
+    'aria-describedby': ariaDescribedBy
   }, ref) {
     const { state } = useSearch();
 
@@ -42,6 +44,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         disabled={disabled}
+        aria-describedby={ariaDescribedBy}
         className={`
           search-input
           w-full px-4 py-3 pr-24 text-gray-900 placeholder-gray-500

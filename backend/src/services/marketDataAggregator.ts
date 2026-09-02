@@ -69,7 +69,7 @@ export class MarketDataAggregator extends EventEmitter implements IMarketDataAgg
       cacheMisses: 0
     };
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.USE_MOCK_MARKET_DATA === 'true') {
       const mockData = symbols.map(symbol => ({
         id: `mock_${symbol.toLowerCase()}_${Date.now()}`,
         tokenId: `token_${symbol.toLowerCase()}`,

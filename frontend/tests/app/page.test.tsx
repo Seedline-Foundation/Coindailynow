@@ -9,31 +9,31 @@ jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),
 }));
 
+jest.mock('next/headers', () => ({
+  cookies: jest.fn().mockImplementation(() => Promise.resolve({
+    get: jest.fn().mockReturnValue({ value: 'ng' }),
+    getAll: jest.fn().mockReturnValue([]),
+    has: jest.fn().mockReturnValue(false),
+  })),
+  headers: jest.fn().mockReturnValue(new Map()),
+}));
+
 describe('Home Page', () => {
-  it('renders the main content', () => {
-    render(<Home />);
-    // Test for content that actually exists in the page
-    expect(screen.getByText('Sygn Africa')).toBeInTheDocument();
-    expect(screen.getByText(/Africa's premier cryptocurrency news platform/)).toBeInTheDocument();
+  it('renders the main content', async () => {
+    const jsx = await Home({});
+    render(jsx);
+    expect(screen.getByText('Narrative Spotlight')).toBeInTheDocument();
   });
 
-  it('renders call-to-action buttons', () => {
-    render(<Home />);
-    expect(screen.getByText('Get Started')).toBeInTheDocument();
-    expect(screen.getByText('Learn More')).toBeInTheDocument();
+  it('renders intelligence streams section', async () => {
+    const jsx = await Home({});
+    render(jsx);
+    expect(screen.getByText('Intelligence Streams')).toBeInTheDocument();
   });
 
-  it('renders feature sections', () => {
-    render(<Home />);
-    expect(screen.getByText('Built for African Crypto Enthusiasts')).toBeInTheDocument();
-    expect(screen.getByText('African Exchange Data')).toBeInTheDocument();
-    expect(screen.getByText('AI-Powered Content')).toBeInTheDocument();
-    expect(screen.getByText('Multi-Language Support')).toBeInTheDocument();
-  });
-
-  it('renders community section', () => {
-    render(<Home />);
-    expect(screen.getByText(/Ready to Join Africa's Crypto Community/)).toBeInTheDocument();
-    expect(screen.getByText('Create Free Account')).toBeInTheDocument();
+  it('renders narrative clusters', async () => {
+    const jsx = await Home({});
+    render(jsx);
+    expect(screen.getByText(/Stablecoin Hedging Surges/)).toBeInTheDocument();
   });
 });

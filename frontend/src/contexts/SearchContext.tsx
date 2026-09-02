@@ -290,8 +290,8 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
       logger.info('Search completed', {
         query: searchQuery,
-        results: results.total,
-        searchTime: results.searchTime
+        results: results?.total,
+        searchTime: results?.searchTime
       });
     } catch (error) {
       logger.error('Search error:', error);
