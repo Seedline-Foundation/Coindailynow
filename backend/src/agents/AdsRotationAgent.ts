@@ -1329,16 +1329,27 @@ async function getAllInventorySlots(): Promise<InventorySlot[]> {
   if (!raw) return getDefaultInventorySlots();
 
   const ids: string[] = JSON.parse(raw);
+  if (ids.length === 0) return getDefaultInventorySlots();
+
+  const keys = ids.map(id => `${REDIS_PREFIX.INVENTORY}${id}`);
+  const mgetFn = typeof redisClient.mGet === 'function'
+    ? redisClient.mGet.bind(redisClient)
+    : redisClient.mget.bind(redisClient);
+
+  const rawResults: (string | null)[] = await mgetFn(keys);
   const slots: InventorySlot[] = [];
 
-  for (const id of ids) {
-    const slotRaw = await redisClient.get(`${REDIS_PREFIX.INVENTORY}${id}`);
+  rawResults.forEach((slotRaw) => {
     if (slotRaw) {
-      const slot = JSON.parse(slotRaw);
-      slot.lastUpdated = new Date(slot.lastUpdated);
-      slots.push(slot);
+      try {
+        const slot = JSON.parse(slotRaw);
+        slot.lastUpdated = new Date(slot.lastUpdated);
+        slots.push(slot);
+      } catch (err) {
+        logger.warn('[AdsAgent] Failed to parse inventory slot:', err);
+      }
     }
-  }
+  });
 
   return slots.length > 0 ? slots : getDefaultInventorySlots();
 }
@@ -1460,14 +1471,22 @@ function getDaypartingActiveHours(config?: DaypartingConfig): number {
 /**
  * Real-time pacing adjustment — called every PACING_INTERVAL_MS
  */
-export async function adjustPacing(campaignId: string): Promise<{
+export async function adjustPacing(campaignOrId: string | AdCampaign): Promise<{
   newDailyCap: number;
   newTier: BudgetTier;
   action: string;
+  campaign: AdCampaign;
 }> {
-  const campaign = await getCampaign(campaignId);
-  if (!campaign) throw new Error(`Campaign ${campaignId} not found`);
+  const campaign = typeof campaignOrId === 'string'
+    ? await getCampaign(campaignOrId)
+    : campaignOrId;
 
+  if (!campaign) {
+    const idStr = typeof campaignOrId === 'string' ? campaignOrId : 'unknown';
+    throw new Error(`Campaign ${idStr} not found`);
+  }
+
+  const campaignId = campaign.id;
   const oldTier = campaign.currentTier;
   const newTier = calculateBudgetTier(campaign);
   const pacing = calculatePacing(campaign);
@@ -1534,6 +1553,7 @@ export async function adjustPacing(campaignId: string): Promise<{
     newDailyCap: campaign.dailyCap,
     newTier: campaign.currentTier,
     action,
+    campaign,
   };
 }
 
@@ -1662,10 +1682,13 @@ export async function selectAd(request: AdRequest): Promise<AdResponse | null> {
 
 async function getEligibleCampaigns(request: AdRequest): Promise<AdCampaign[]> {
   const activeCampaignIds = await getActiveCampaignIds();
+  if (activeCampaignIds.length === 0) return [];
+
+  const campaignMap = await getCampaigns(activeCampaignIds);
   const campaigns: AdCampaign[] = [];
 
   for (const id of activeCampaignIds) {
-    const campaign = await getCampaign(id);
+    const campaign = campaignMap.get(id);
     if (!campaign || campaign.status !== 'active') continue;
 
     // Check budget
@@ -2165,19 +2188,19 @@ export async function processBatchPlacements(campaignIds?: string[]): Promise<{
   const BATCH_SIZE = 50;
   for (let i = 0; i < ids.length; i += BATCH_SIZE) {
     const batch = ids.slice(i, i + BATCH_SIZE);
+    const campaignMap = await getCampaigns(batch);
 
     const batchResults = await Promise.allSettled(
       batch.map(async (campaignId) => {
-        const campaign = await getCampaign(campaignId);
+        const campaign = campaignMap.get(campaignId);
         if (!campaign || campaign.status !== 'active') {
           return { campaignId, placements: 0 };
         }
 
-        // Recalculate pacing
-        await adjustPacing(campaignId);
+        // Recalculate pacing using pre-fetched campaign object
+        const pacingResult = await adjustPacing(campaign);
+        const updated = pacingResult.campaign;
 
-        // Get fresh campaign data
-        const updated = await getCampaign(campaignId);
         if (!updated || updated.remainingBudget <= 0) {
           return { campaignId, placements: 0 };
         }
@@ -2212,9 +2235,12 @@ export async function processBatchPlacements(campaignIds?: string[]): Promise<{
 export async function dailyReset(): Promise<void> {
   logger.info('[AdsAgent] Running daily reset...');
   const campaignIds = await getActiveCampaignIds();
+  if (campaignIds.length === 0) return;
+
+  const campaignMap = await getCampaigns(campaignIds);
 
   for (const id of campaignIds) {
-    const campaign = await getCampaign(id);
+    const campaign = campaignMap.get(id);
     if (!campaign) continue;
 
     campaign.dailySpent = 0;
@@ -2303,9 +2329,12 @@ export async function getSystemHealthReport(): Promise<SystemHealthReport> {
   const campaignIds = await getActiveCampaignIds();
   const campaigns: AdCampaign[] = [];
 
-  for (const id of campaignIds) {
-    const c = await getCampaign(id);
-    if (c && c.status === 'active') campaigns.push(c);
+  if (campaignIds.length > 0) {
+    const campaignMap = await getCampaigns(campaignIds);
+    for (const id of campaignIds) {
+      const c = campaignMap.get(id);
+      if (c && c.status === 'active') campaigns.push(c);
+    }
   }
 
   const totalBudget = campaigns.reduce((sum, c) => sum + c.remainingBudget, 0);
@@ -2384,6 +2413,35 @@ async function getCampaign(campaignId: string): Promise<AdCampaign | null> {
   if (campaign.approvedAt) campaign.approvedAt = new Date(campaign.approvedAt);
 
   return campaign;
+}
+
+async function getCampaigns(campaignIds: string[]): Promise<Map<string, AdCampaign>> {
+  const campaignMap = new Map<string, AdCampaign>();
+  if (campaignIds.length === 0) return campaignMap;
+
+  const keys = campaignIds.map(id => `${REDIS_PREFIX.CAMPAIGN}${id}`);
+  const mgetFn = typeof redisClient.mGet === 'function'
+    ? redisClient.mGet.bind(redisClient)
+    : redisClient.mget.bind(redisClient);
+
+  const rawResults: (string | null)[] = await mgetFn(keys);
+
+  rawResults.forEach((raw, idx) => {
+    if (!raw) return;
+    try {
+      const campaign = JSON.parse(raw);
+      campaign.createdAt = new Date(campaign.createdAt);
+      campaign.startDate = new Date(campaign.startDate);
+      campaign.endDate = new Date(campaign.endDate);
+      if (campaign.approvedAt) campaign.approvedAt = new Date(campaign.approvedAt);
+
+      campaignMap.set(campaignIds[idx], campaign);
+    } catch (err) {
+      logger.warn(`[AdsAgent] Failed to parse campaign ${campaignIds[idx]}:`, err);
+    }
+  });
+
+  return campaignMap;
 }
 
 async function saveCampaign(campaign: AdCampaign): Promise<void> {
@@ -2591,10 +2649,13 @@ export async function cancelCampaign(campaignId: string): Promise<{ refundAmount
  */
 export async function getAdvertiserCampaigns(advertiserId: string): Promise<AdCampaign[]> {
   const allIds = await getAllCampaignIds();
+  if (allIds.length === 0) return [];
+
+  const campaignMap = await getCampaigns(allIds);
   const campaigns: AdCampaign[] = [];
 
   for (const id of allIds) {
-    const campaign = await getCampaign(id);
+    const campaign = campaignMap.get(id);
     if (campaign && campaign.advertiserId === advertiserId) {
       campaigns.push(campaign);
     }
@@ -2608,14 +2669,10 @@ export async function getAdvertiserCampaigns(advertiserId: string): Promise<AdCa
  */
 export async function getAllCampaigns(): Promise<AdCampaign[]> {
   const allIds = await getAllCampaignIds();
-  const campaigns: AdCampaign[] = [];
+  if (allIds.length === 0) return [];
 
-  for (const id of allIds) {
-    const campaign = await getCampaign(id);
-    if (campaign) campaigns.push(campaign);
-  }
-
-  return campaigns;
+  const campaignMap = await getCampaigns(allIds);
+  return Array.from(campaignMap.values());
 }
 
 // ============================================================================
@@ -2693,13 +2750,21 @@ export async function syncCampaignConnectors(campaignId: string): Promise<{
 
 let retrainingTimer: NodeJS.Timeout | null = null;
 
-export async function retrainCampaignModel(campaignId: string): Promise<{
+export async function retrainCampaignModel(campaignOrId: string | AdCampaign): Promise<{
   campaignId: string;
   updated: boolean;
   creativesUpdated: number;
 }> {
-  const campaign = await getCampaign(campaignId);
-  if (!campaign) throw new Error(`Campaign ${campaignId} not found`);
+  const campaign = typeof campaignOrId === 'string'
+    ? await getCampaign(campaignOrId)
+    : campaignOrId;
+
+  if (!campaign) {
+    const idStr = typeof campaignOrId === 'string' ? campaignOrId : 'unknown';
+    throw new Error(`Campaign ${idStr} not found`);
+  }
+
+  const campaignId = campaign.id;
 
   const creativePerf = campaign.performance.creativePerformance || [];
   if (creativePerf.length === 0) {
@@ -2729,11 +2794,16 @@ export async function retrainAllActiveCampaignModels(): Promise<{
   updated: number;
 }> {
   const ids = await getActiveCampaignIds();
+  if (ids.length === 0) return { total: 0, updated: 0 };
+
+  const campaignMap = await getCampaigns(ids);
   let updated = 0;
 
   for (const id of ids) {
     try {
-      const result = await retrainCampaignModel(id);
+      const campaign = campaignMap.get(id);
+      if (!campaign) continue;
+      const result = await retrainCampaignModel(campaign);
       if (result.updated) updated += 1;
     } catch (error) {
       logger.warn(`[AdsAgent] Retrain failed for ${id}:`, error);
