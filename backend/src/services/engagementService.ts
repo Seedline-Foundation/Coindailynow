@@ -880,20 +880,25 @@ export class EngagementService {
       take: 10,
     });
 
-    const topUsers = await Promise.all(
-      topUserBehaviors.map(async (behavior) => {
-        const user = await prisma.user.findUnique({
-          where: { id: behavior.userId },
+    const topUserIds = Array.from(new Set(topUserBehaviors.map((b) => b.userId)));
+    const topUserRecords = topUserIds.length > 0
+      ? await prisma.user.findMany({
+          where: { id: { in: topUserIds } },
           select: {
             id: true,
             username: true,
             email: true,
             avatarUrl: true,
           },
-        });
-        return { ...behavior, User: user };
-      })
-    );
+        })
+      : [];
+
+    const topUserMap = new Map(topUserRecords.map((u) => [u.id, u]));
+
+    const topUsers = topUserBehaviors.map((behavior) => ({
+      ...behavior,
+      User: topUserMap.get(behavior.userId) || null,
+    }));
 
     // Recent milestones
     const recentMilestoneData = await prisma.engagementMilestone.findMany({
@@ -902,18 +907,24 @@ export class EngagementService {
       take: 20,
     });
 
-    const recentMilestones = await Promise.all(
-      recentMilestoneData.map(async (milestone) => {
-        const user = await prisma.user.findUnique({
-          where: { id: milestone.userId },
+    const milestoneUserIds = Array.from(new Set(recentMilestoneData.map((m) => m.userId)));
+    const milestoneUserRecords = milestoneUserIds.length > 0
+      ? await prisma.user.findMany({
+          where: { id: { in: milestoneUserIds } },
           select: {
+            id: true,
             username: true,
             avatarUrl: true,
           },
-        });
-        return { ...milestone, User: user };
-      })
-    );
+        })
+      : [];
+
+    const milestoneUserMap = new Map(milestoneUserRecords.map((u) => [u.id, u]));
+
+    const recentMilestones = recentMilestoneData.map((milestone) => ({
+      ...milestone,
+      User: milestoneUserMap.get(milestone.userId) || null,
+    }));
 
     return {
       overview: {
