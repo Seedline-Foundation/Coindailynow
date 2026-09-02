@@ -36,6 +36,7 @@ describe('MessageQueue', () => {
       del: jest.fn(),
       keys: jest.fn(),
       eval: jest.fn(),
+      evalsha: jest.fn(),
     } as any;
 
     messageQueue = new MessageQueue(mockRedis);
@@ -131,7 +132,7 @@ describe('MessageQueue', () => {
       expect(messages[1]!.priority).toBe('normal');
     });
 
-    test('should filter out expired messages', async () => {
+    test('should filter out expired messages and invoke script via evalsha', async () => {
       const now = new Date();
       const pastDate = new Date(now.getTime() - 3600000); // 1 hour ago
       const futureDate = new Date(now.getTime() + 3600000); // 1 hour from now
@@ -160,11 +161,83 @@ describe('MessageQueue', () => {
       ];
 
       mockRedis.lrange.mockResolvedValue(mockMessages);
+      mockRedis.evalsha.mockResolvedValue('OK');
 
       const messages = await messageQueue.getQueuedMessages(testUserId);
 
       expect(messages).toHaveLength(1);
       expect(messages[0]!.type).toBe('valid_message');
+      expect(mockRedis.evalsha).toHaveBeenCalledWith(
+        expect.any(String),
+        1,
+        `ws:queue:${testUserId}`,
+        0
+      );
+    });
+
+    test('should fallback to eval on NOSCRIPT error from evalsha', async () => {
+      const now = new Date();
+      const pastDate = new Date(now.getTime() - 3600000);
+
+      const mockMessages = [
+        JSON.stringify({
+          id: 'msg1',
+          type: 'expired_message',
+          data: {},
+          priority: 'normal',
+          timestamp: pastDate,
+          expiresAt: pastDate,
+          retryCount: 0,
+          maxRetries: 3
+        })
+      ];
+
+      mockRedis.lrange.mockResolvedValue(mockMessages);
+      mockRedis.evalsha.mockRejectedValue(new Error('NOSCRIPT No matching script. Please use EVAL.'));
+      mockRedis.eval.mockResolvedValue('OK');
+
+      const messages = await messageQueue.getQueuedMessages(testUserId);
+
+      expect(messages).toHaveLength(0);
+      expect(mockRedis.evalsha).toHaveBeenCalled();
+      expect(mockRedis.eval).toHaveBeenCalledWith(
+        expect.any(String),
+        1,
+        `ws:queue:${testUserId}`,
+        0
+      );
+    });
+
+    test('should use eval directly if evalsha is not available on client', async () => {
+      const now = new Date();
+      const pastDate = new Date(now.getTime() - 3600000);
+
+      const mockMessages = [
+        JSON.stringify({
+          id: 'msg1',
+          type: 'expired_message',
+          data: {},
+          priority: 'normal',
+          timestamp: pastDate,
+          expiresAt: pastDate,
+          retryCount: 0,
+          maxRetries: 3
+        })
+      ];
+
+      delete (mockRedis as any).evalsha;
+      mockRedis.lrange.mockResolvedValue(mockMessages);
+      mockRedis.eval.mockResolvedValue('OK');
+
+      const messages = await messageQueue.getQueuedMessages(testUserId);
+
+      expect(messages).toHaveLength(0);
+      expect(mockRedis.eval).toHaveBeenCalledWith(
+        expect.any(String),
+        1,
+        `ws:queue:${testUserId}`,
+        0
+      );
     });
 
     test('should handle parsing errors gracefully', async () => {

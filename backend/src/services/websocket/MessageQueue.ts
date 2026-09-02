@@ -5,6 +5,7 @@
  * Queues messages for offline users with Redis persistence and TTL management
  */
 
+import crypto from 'crypto';
 // Use type 'any' to support both real Redis and mock
 import { logger } from '../../utils/logger';
 
@@ -321,26 +322,55 @@ export class MessageQueue {
     }
   }
 
+  private static readonly REMOVE_EXPIRED_MESSAGES_SCRIPT = `
+    local messages = redis.call('lrange', KEYS[1], 0, -1)
+    redis.call('del', KEYS[1])
+    local removeMap = {}
+    for _, idx in ipairs(ARGV) do
+      removeMap[tonumber(idx) + 1] = true
+    end
+    for i, message in ipairs(messages) do
+      if not removeMap[i] then
+        redis.call('rpush', KEYS[1], message)
+      end
+    end
+  `.trim();
+
+  private scriptSha: string | null = null;
+
+  private getScriptSha(): string {
+    if (!this.scriptSha) {
+      this.scriptSha = crypto
+        .createHash('sha1')
+        .update(MessageQueue.REMOVE_EXPIRED_MESSAGES_SCRIPT)
+        .digest('hex');
+    }
+    return this.scriptSha;
+  }
+
+  private async executeLuaScript(keys: string[], args: (string | number)[]): Promise<any> {
+    const sha = this.getScriptSha();
+    if (typeof this.redis.evalsha === 'function') {
+      try {
+        return await this.redis.evalsha(sha, keys.length, ...keys, ...args);
+      } catch (error: any) {
+        if (error?.message?.includes('NOSCRIPT') && typeof this.redis.eval === 'function') {
+          return await this.redis.eval(MessageQueue.REMOVE_EXPIRED_MESSAGES_SCRIPT, keys.length, ...keys, ...args);
+        }
+        throw error;
+      }
+    } else if (typeof this.redis.eval === 'function') {
+      return await this.redis.eval(MessageQueue.REMOVE_EXPIRED_MESSAGES_SCRIPT, keys.length, ...keys, ...args);
+    }
+  }
+
   private generateMessageId(): string {
     return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   private async removeExpiredMessages(queueKey: string, expiredIndices: number[]): Promise<void> {
-    // Remove expired messages in reverse order to maintain indices
-    const sortedIndices = expiredIndices.sort((a, b) => b - a);
-    
-    for (const index of sortedIndices) {
-      // Use Lua script to remove by index atomically
-      await this.redis.eval(`
-        local messages = redis.call('lrange', KEYS[1], 0, -1)
-        redis.call('del', KEYS[1])
-        for i, message in ipairs(messages) do
-          if i ~= tonumber(ARGV[1]) + 1 then
-            redis.call('rpush', KEYS[1], message)
-          end
-        end
-      `, 1, queueKey, index);
-    }
+    if (expiredIndices.length === 0) return;
+    await this.executeLuaScript([queueKey], expiredIndices);
   }
 
   private async updateQueueMetrics(messageType: string, priority: string): Promise<void> {
