@@ -1316,6 +1316,22 @@ model BlacklistedIP {
   @@index([expiresAt])
 }
 
+model WhitelistedIP {
+  id        String    @id @default(cuid())
+  ipAddress String    @unique
+  addedBy   String?
+  reason    String
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([ipAddress])
+  @@index([addedBy])
+  @@index([isActive])
+  @@index([expiresAt])
+}
+
 // SEO Metadata Model for comprehensive SEO management
 model SEOMetadata {
   id             String   @id @default(cuid())
