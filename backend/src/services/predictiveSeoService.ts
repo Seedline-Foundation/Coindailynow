@@ -1136,12 +1136,18 @@ export async function getIntelligenceDashboard(): Promise<IntelligenceDashboardD
 // ============= BATCH OPERATIONS =============
 
 export async function batchAnalyzeEEAT(contentIds: string[]): Promise<void> {
-  for (const contentId of contentIds) {
-    try {
-      await analyzeContentEEAT(contentId);
-    } catch (error) {
-      console.error(`Error analyzing E-E-A-T for ${contentId}:`, error);
-    }
+  const batchSize = 10;
+  for (let i = 0; i < contentIds.length; i += batchSize) {
+    const batch = contentIds.slice(i, i + batchSize);
+    await Promise.all(
+      batch.map(async (contentId) => {
+        try {
+          await analyzeContentEEAT(contentId);
+        } catch (error) {
+          console.error(`Error analyzing E-E-A-T for ${contentId}:`, error);
+        }
+      })
+    );
   }
 }
 
@@ -1151,12 +1157,18 @@ export async function generateAllForecasts(): Promise<void> {
     take: 100,
   });
 
-  for (const keyword of keywords) {
-    try {
-      await generateSearchForecast(keyword.id, keyword.keyword);
-    } catch (error) {
-      console.error(`Error generating forecast for ${keyword.keyword}:`, error);
-    }
+  const batchSize = 10;
+  for (let i = 0; i < keywords.length; i += batchSize) {
+    const batch = keywords.slice(i, i + batchSize);
+    await Promise.all(
+      batch.map(async (keyword) => {
+        try {
+          await generateSearchForecast(keyword.id, keyword.keyword);
+        } catch (error) {
+          console.error(`Error generating forecast for ${keyword.keyword}:`, error);
+        }
+      })
+    );
   }
 }
 
