@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import prisma from '../../lib/prisma';
 import { ALL_FINANCE_OPERATIONS } from '../../constants/financeOperations';
 
@@ -8,6 +9,19 @@ import { ALL_FINANCE_OPERATIONS } from '../../constants/financeOperations';
   }
 
   /**
+   * Extract client IP address from request
+   */
+  export function getClientIP(req?: Request): string {
+    if (!req) return '0.0.0.0';
+    const forwarded = req.headers['x-forwarded-for'];
+    if (typeof forwarded === 'string') {
+      const ip = forwarded.split(',')[0]?.trim();
+      if (ip) return ip;
+    }
+    return req.ip || req.socket?.remoteAddress || '0.0.0.0';
+  }
+
+  /**
    * Log finance operation for audit trail
    */
   export async function logFinanceOperation(data: {
@@ -15,8 +29,14 @@ import { ALL_FINANCE_OPERATIONS } from '../../constants/financeOperations';
     userId: string;
     transactionId: string;
     metadata?: Record<string, any>;
+    req?: Request;
   }): Promise<void> {
     try {
+      const ipAddress = getClientIP(data.req);
+      const userAgent = data.req?.get
+        ? (data.req.get('user-agent') || 'FinanceService')
+        : (data.req?.headers?.['user-agent'] as string || 'FinanceService');
+
       await prisma.financeOperationLog.create({
         data: {
           operationType: data.operationKey,
@@ -26,8 +46,8 @@ import { ALL_FINANCE_OPERATIONS } from '../../constants/financeOperations';
           transactionId: data.transactionId,
           inputData: JSON.stringify(data.metadata || {}),
           status: 'SUCCESS',
-          ipAddress: '0.0.0.0', // TODO: Get from request
-          userAgent: 'FinanceService',
+          ipAddress,
+          userAgent,
         },
       });
     } catch (error) {

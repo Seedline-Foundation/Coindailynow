@@ -752,8 +752,27 @@ export class FinanceService {
     userId: string;
     transactionId: string;
     metadata?: Record<string, any>;
+    req?: any;
   }): Promise<void> {
     try {
+      let ipAddress = '0.0.0.0';
+      let userAgent = 'FinanceService';
+
+      if (data.req) {
+        const forwarded = data.req.headers?.['x-forwarded-for'];
+        if (typeof forwarded === 'string') {
+          ipAddress = forwarded.split(',')[0]?.trim() || data.req.ip || data.req.socket?.remoteAddress || '0.0.0.0';
+        } else {
+          ipAddress = data.req.ip || data.req.socket?.remoteAddress || '0.0.0.0';
+        }
+
+        if (typeof data.req.get === 'function') {
+          userAgent = data.req.get('user-agent') || 'FinanceService';
+        } else if (data.req.headers?.['user-agent']) {
+          userAgent = data.req.headers['user-agent'];
+        }
+      }
+
       await prisma.financeOperationLog.create({
         data: {
           operationType: data.operationKey,
@@ -763,8 +782,8 @@ export class FinanceService {
           transactionId: data.transactionId,
           inputData: JSON.stringify(data.metadata || {}),
           status: 'SUCCESS',
-          ipAddress: '0.0.0.0', // TODO: Get from request
-          userAgent: 'FinanceService',
+          ipAddress,
+          userAgent,
         },
       });
     } catch (error) {
