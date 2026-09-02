@@ -224,7 +224,22 @@ const mutationResolvers = {
    */
   invalidateMarketCache: async (_: any, { input }: any, context: any) => {
     try {
-      // TODO: Add authentication check for admin
+      const user = context?.user;
+      const isAdmin = user && (user.isAdmin === true || ['ADMIN', 'SUPER_ADMIN'].includes(user.role?.toUpperCase()));
+
+      if (!user || !isAdmin) {
+        return {
+          success: false,
+          message: 'Unauthorized: Admin access required',
+          timestamp: new Date(),
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Admin authentication required',
+            details: null,
+          },
+        };
+      }
+
       const service = getAIMarketInsightsService();
       await service.invalidateCache(input?.symbol);
 
